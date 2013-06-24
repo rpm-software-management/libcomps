@@ -1,0 +1,171 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE comps PUBLIC "-//Red Hat, Inc.//DTD Comps info//EN" "comps.dtd">
+<comps>
+  <group>
+    <id>additional-devel</id>
+    <name xml:lang="ca">Eines d'administració</name>
+    <name xml:lang="cs">Administrace systému</name>
+    <name xml:lang="cy">Arfau Gweinyddol</name>
+    <description>Additional development headers and libraries for developing applications</description>
+    <default>false</default>
+    <uservisible>false</uservisible>
+    <packagelist>
+      <packagereq type="default">alsa-lib-devel</packagereq>
+      <packagereq type="default">audit-libs-devel</packagereq>
+      <packagereq type="default">binutils-devel</packagereq>
+      <packagereq type="default">boost-devel</packagereq>
+      <packagereq type="default">bzip2-devel</packagereq>
+      <packagereq type="default">cyrus-sasl-devel</packagereq>
+      <packagereq type="default">dbus-glib-devel</packagereq>
+      <packagereq type="default">elfutils-devel</packagereq>
+      <packagereq type="default">elfutils-libelf-devel</packagereq>
+      <packagereq type="default">evolution-data-server-devel</packagereq>
+      <packagereq type="default">GConf2-devel</packagereq>
+      <packagereq type="default">gnome-desktop-devel</packagereq>
+      <packagereq type="default">gstreamer-devel</packagereq>
+      <packagereq type="default">gvfs-devel</packagereq>
+      <packagereq type="default">hmaccalc</packagereq>
+      <packagereq type="default">java-1.7.0-openjdk-devel</packagereq>
+      <packagereq type="default">libacl-devel</packagereq>
+      <packagereq type="default">libattr-devel</packagereq>
+      <packagereq type="default">libcanberra-devel</packagereq>
+      <packagereq type="default">libcap-ng-devel</packagereq>
+      <packagereq type="default">libcgroup-devel</packagereq>
+      <packagereq type="default">libcurl-devel</packagereq>
+      <packagereq type="default">libgnome-keyring-devel</packagereq>
+      <packagereq type="default">libnotify-devel</packagereq>
+      <packagereq type="default">librsvg2-devel</packagereq>
+      <packagereq type="default">libselinux-devel</packagereq>
+      <packagereq type="default">libsoup-devel</packagereq>
+      <packagereq type="default">mysql-devel</packagereq>
+      <packagereq type="default">perl-App-cpanminus</packagereq>
+      <packagereq type="default">perl-devel</packagereq>
+      <packagereq type="default">perl-ExtUtils-MakeMaker</packagereq>
+      <packagereq type="default">perl-homedir</packagereq>
+      <packagereq type="default">polkit-devel</packagereq>
+      <packagereq type="default">postgresql-devel</packagereq>
+      <packagereq type="default">pulseaudio-libs-devel</packagereq>
+      <packagereq type="default">pygobject3-devel</packagereq>
+      <packagereq type="default">python-devel</packagereq>
+      <packagereq type="default">readline-devel</packagereq>
+      <packagereq type="default">sqlite-devel</packagereq>
+      <packagereq type="default">tbb-devel</packagereq>
+      <packagereq type="optional">cups-devel</packagereq>
+      <packagereq type="optional">e2fsprogs-devel</packagereq>
+      <packagereq type="optional">expat-devel</packagereq>
+      <packagereq type="optional">freeglut-devel</packagereq>
+      <packagereq type="optional">fuse-devel</packagereq>
+      <packagereq type="optional">gmp-devel</packagereq>
+      <packagereq type="optional">gnutls-devel</packagereq>
+      <packagereq type="optional">gstreamer-plugins-base-devel</packagereq>
+      <packagereq type="optional">httpd-devel</packagereq>
+      <packagereq type="optional">hunspell-devel</packagereq>
+      <packagereq type="optional">iptables-devel</packagereq>
+      <packagereq type="optional">java-1.5.0-gcj-devel</packagereq>
+      <packagereq type="optional">junit</packagereq>
+      <packagereq type="optional">kde-workspace-devel</packagereq>
+      <packagereq type="optional">kdegraphics-devel</packagereq>
+      <packagereq type="optional">kdelibs-apidocs</packagereq>
+      <packagereq type="optional">kdelibs-devel</packagereq>
+      <packagereq type="optional">kdenetwork-devel</packagereq>
+      <packagereq type="optional">kdepim-devel</packagereq>
+      <packagereq type="optional">kdepimlibs-devel</packagereq>
+      <packagereq type="optional">kdesdk-devel</packagereq>
+      <packagereq type="optional">libaio-devel</packagereq>
+      <packagereq type="optional">libblkid-devel</packagereq>
+      <packagereq type="optional">libcap-devel</packagereq>
+      <packagereq type="optional">libdrm-devel</packagereq>
+      <packagereq type="optional">libgcrypt-devel</packagereq>
+      <packagereq type="optional">libgudev1-devel</packagereq>
+      <packagereq type="optional">libhugetlbfs-devel</packagereq>
+      <packagereq type="optional">libibverbs-devel</packagereq>
+      <packagereq type="optional">libnl-devel</packagereq>
+      <packagereq type="optional">libtiff-devel</packagereq>
+      <packagereq type="optional">libtopology-devel</packagereq>
+      <packagereq type="optional">libusbx-devel</packagereq>
+      <packagereq type="optional">libuuid-devel</packagereq>
+      <packagereq type="optional">libXau-devel</packagereq>
+      <packagereq type="optional">libXaw-devel</packagereq>
+      <packagereq type="optional">libXinerama-devel</packagereq>
+      <packagereq type="optional">libXmu-devel</packagereq>
+      <packagereq type="optional">libXpm-devel</packagereq>
+      <packagereq type="optional">libXrandr-devel</packagereq>
+      <packagereq type="optional">libxslt-devel</packagereq>
+      <packagereq type="optional">net-snmp-devel</packagereq>
+      <packagereq type="optional">numactl-devel</packagereq>
+      <packagereq type="optional">openmotif-devel</packagereq>
+      <packagereq type="optional">papi-devel</packagereq>
+      <packagereq type="optional">pcre-devel</packagereq>
+      <packagereq type="optional">perl-Test-Pod</packagereq>
+      <packagereq type="optional">perl-Test-Pod-Coverage</packagereq>
+      <packagereq type="optional">popt-devel</packagereq>
+      <packagereq type="optional">PyQt4-devel</packagereq>
+      <packagereq type="optional">python-setuptools</packagereq>
+      <packagereq type="optional">sane-backends-devel</packagereq>
+      <packagereq type="optional">SDL-devel</packagereq>
+      <packagereq type="optional">startup-notification-devel</packagereq>
+      <packagereq type="optional">systemd-devel</packagereq>
+      <packagereq type="optional">tcl-devel</packagereq>
+      <packagereq type="optional">tcp_wrappers-devel</packagereq>
+      <packagereq type="optional">tk-devel</packagereq>
+      <packagereq type="optional">unique3-devel</packagereq>
+      <packagereq type="optional">unixODBC-devel</packagereq>
+      <packagereq type="optional">xorg-x11-proto-devel</packagereq>
+      <packagereq type="optional">xz-devel</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>backup-client</id>
+    <name>Backup Client</name>
+    <description>Client tools for connecting to a backup server and doing backups.</description>
+    <default>true</default>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq type="mandatory">amanda-client</packagereq>
+      <packagereq type="optional">bacula-client</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>backup-server</id>
+    <name>Backup Server</name>
+    <description>Software to centralize your infrastructure's backups.</description>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq type="mandatory">amanda-server</packagereq>
+      <packagereq type="optional">mt-st</packagereq>
+      <packagereq type="optional">mtx</packagereq>
+    </packagelist>
+  </group>
+  <category>
+    <id>cat 1</id>
+    <name>category 1</name>
+    <description>cat 1 description</description>
+    <grouplist>
+        <groupid>a</groupid>
+    </grouplist>
+  </category>
+  <category>
+    <id>cat 2</id>
+    <name>category 2</name>
+    <description>cat 2 description</description>
+    <grouplist>
+        <groupid>a</groupid>
+        <groupid>b</groupid>
+    </grouplist>
+  </category>
+  <environment>
+    <id>env 1</id>
+    <name>environment 1</name>
+    <description>description of environment 1</description>
+    <grouplist>
+        <groupid>a</groupid>
+        <groupid>b</groupid>
+        <groupid>c</groupid>
+    </grouplist>
+    <optionlist>
+        <optionid> option1 </optionid>
+        <optionid> option2 </optionid>
+    </optionlist>
+  </environment>
+</comps>

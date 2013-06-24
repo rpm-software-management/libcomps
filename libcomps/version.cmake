@@ -1,0 +1,3 @@
+set (LIBCOMPS_MAJOR "0")
+set (LIBCOMPS_MINOR "0")
+set (LIBCOMPS_PATCH "0")
