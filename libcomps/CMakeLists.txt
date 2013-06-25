@@ -8,7 +8,7 @@ include (${CMAKE_SOURCE_DIR}/version.cmake)
 set (CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} --pedantic -std=c99 -Wall -Wextra -g -Wno-missing-field-initializers")
 set (CMAKE_C_FLAGS_DEBUG    "${CMAKE_C_FLAGS} -ggdb -O0 -Wall -Wextra")
 
-set (VERSION "${LIBCOMPS_MAJOR}.${LIBCOMPS_MINOR}.${LIBCOMPS_PATCH}")
+set (VERSION "${libcomps_VERSION_MAJOR}.${libcomps_VERSION_MINOR}.${libcomps_VERSION_PATCH}")
 #set (libcomps_SOURCE comps_list.c)
 #set (libcomps_HEADERS comps_list.h)
 

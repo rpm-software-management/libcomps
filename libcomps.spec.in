@@ -2,14 +2,14 @@
 %global with_python3 1
 
 Name:           libcomps
-Version:        1.0
+Version:        @VERSION@
 Release:        1%{?dist}
 Summary:        Alternative for yum.comps writen in C
 
 Group:          Development/Libraries
 License:	    GPLv2+
-URL:            http://git.engineering.redhat.com/?p=users/jluza/libcomps.git
-Source0:        libcomps-$GITREV.tar.xz
+URL:            https://github.com/midnightercz/libcomps/
+Source0:        libcomps-@GITREV@.tar.xz
 
 BuildRequires:  libxml2-devel
 BuildRequires:	check-devel

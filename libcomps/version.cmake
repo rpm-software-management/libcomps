@@ -1,3 +1,3 @@
-set (LIBCOMPS_MAJOR "0")
-set (LIBCOMPS_MINOR "0")
-set (LIBCOMPS_PATCH "0")
+set (libcomps_VERSION_MAJOR "0")
+set (libcomps_VERSION_MINOR "1")
+set (libcomps_VERSION_PATCH "0")

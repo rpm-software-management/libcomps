@@ -21,7 +21,7 @@ add_library(libcomps SHARED ${libcomps_SOURCES})
 target_link_libraries(libcomps ${EXPAT_LIBRARY})
 target_link_libraries(libcomps ${LIBXML2_LIBRARIES})
 set_target_properties(libcomps PROPERTIES OUTPUT_NAME "comps")
-
+set_target_properties(libcomps PROPERTIES SOVERSION ${VERSION})
 
 IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
     SET (LIB_SUFFIX "64")
