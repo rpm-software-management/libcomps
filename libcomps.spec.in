@@ -19,12 +19,19 @@ Source0:        https://github.com/midnightercz/libcomps/archive/%{commit}/libco
 BuildRequires:  libxml2-devel
 BuildRequires:  check-devel
 BuildRequires:  expat-devel
-BuildRequires:  doxygen
 BuildRequires:  cmake
-
 
 %description -n libcomps
 Alternative for yum.comps written in C
+
+%package -n libcomps-doc
+Summary:        libcomps bindings for python2
+Group:          Development/Libraries
+BuildRequires:  doxygen
+
+%description -n libcomps-doc
+libcomps documentation package
+
 
 %if %{with_python}
 %package -n python-libcomps
@@ -58,7 +65,6 @@ libcomps bindings for python3
     mv ../py3 ./
 %endif
 
-
 %build -n libcomps
 # order matters - py3 needs to be build first; why?
 %if %{with_python}
@@ -88,21 +94,26 @@ popd
 
 
 %files
-%doc docs/html
+%doc README.md COPYING
 %{_libdir}/*
 %exclude %{_libdir}/python*
 %{_includedir}/*
 
+%files -n libcomps-doc
+%doc docs/libcomps-doc/html
+
 %if %{with_python}
 %files -n python-libcomps
-%doc docs/*
+#%doc docs/libcomps-py-doc/*
 %{_libdir}/python2*
+%exclude %{_libdir}/python2/libcomps/__pycache__
 %endif
 
 %if %{with_python3}
 %files -n python3-libcomps
-%doc docs/*
+#%doc docs/libcomps-py-doc/*
 %{_libdir}/python3*
+%exclude %{_libdir}/python3/libcomps/__pycache__
 %endif
 
 

@@ -23,10 +23,9 @@ target_link_libraries(pycomps ${PYTHON_LIBRARIES})
 
 INSTALL(FILES ${pycomps_SRCDIR}/__init__.py DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
 INSTALL(FILES ${pycomps_SRCDIR}/tests/__test.py DESTINATION
-              ${PYTHON_INSTALL_DIR}/libcomps)
+              ${PYTHON_INSTALL_DIR}/libcomps/)
 INSTALL(FILES ${pycomps_SRCDIR}/tests/fedora_comps.xml DESTINATION
-              ${PYTHON_INSTALL_DIR}/libcomps/fedora_comps.xml)
+              ${PYTHON_INSTALL_DIR}/libcomps/)
 INSTALL(FILES ${pycomps_SRCDIR}/tests/sample_comps.xml DESTINATION
-              ${PYTHON_INSTALL_DIR}/libcomps/sample_comps.xml)
+              ${PYTHON_INSTALL_DIR}/libcomps/)
 INSTALL (TARGETS pycomps LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
-

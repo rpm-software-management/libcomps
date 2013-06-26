@@ -541,6 +541,7 @@ PyNumberMethods PyCOMPS_Nums = {
     .nb_add = PyCOMPS_union
 };
 
+
 PyTypeObject PyCOMPS_Type = {
     PY_OBJ_HEAD_INIT
     "_libpycomps.Comps",             /*tp_name*/
@@ -562,7 +563,7 @@ PyTypeObject PyCOMPS_Type = {
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "Comps Class",             /* tp_doc */
+    PYCOMPS_DOCU,             /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */
     PyCOMPS_cmp,               /* tp_richcompare */

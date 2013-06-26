@@ -44,4 +44,6 @@ static void pycomps_doc_destroy(void *doc);
 
 extern PyTypeObject PyCOMPS_Type;
 
+const char PYCOMPS_DOCU[] = "Comps class is representating comps.xml file"
+" represented in structure form.";
 #endif

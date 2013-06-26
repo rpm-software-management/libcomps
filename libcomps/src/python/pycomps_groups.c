@@ -785,7 +785,7 @@ PyMethodDef PyCOMPSPacks_methods[] = {
 
 PyTypeObject PyCOMPS_PacksType = {
     PY_OBJ_HEAD_INIT
-    "libcomps.Category.PackageList",   /*tp_name*/
+    "libcomps.PackageList",   /*tp_name*/
     sizeof(PyCOMPS_CtoPySeq), /*tp_basicsize*/
     0,                        /*tp_itemsize*/
     (destructor)PyCOMPSCtoPySeq_dealloc, /*tp_dealloc*/
@@ -1030,7 +1030,7 @@ PyCOMPS_CtoPySeqItemMan PyCOMPSPack_ItemMan = {
 
 PyTypeObject PyCOMPS_PackType = {
     PY_OBJ_HEAD_INIT
-    "libcomps.Group.Package",   /*tp_name*/
+    "libcomps.Package",   /*tp_name*/
     sizeof(PyCOMPS_Package), /*tp_basicsize*/
     0,                        /*tp_itemsize*/
     (destructor)PyCOMPSPack_dealloc, /*tp_dealloc*/

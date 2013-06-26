@@ -148,7 +148,7 @@ PyObject* __pycomps_lang_decode(char * lang) {
 
 long PyCOMPS_hash(PyObject *self) {
     PyObject * str;
-    char *cstr;
+    char *cstr = NULL;
 
     str = Py_TYPE(self)->tp_str(self);
     __pycomps_PyUnicode_AsString(str, &cstr);
