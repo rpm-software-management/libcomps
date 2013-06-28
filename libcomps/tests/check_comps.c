@@ -40,12 +40,29 @@ void print_gids(COMPS_ListItem* item, unsigned int num, void * data) {
 void print_group(COMPS_ListItem* item, unsigned int num, void * data) {
     (void)num;
     (void)data;
+    char *id, *name, *desc;
+    int disp_ord, def, uservis;
+    COMPS_Prop *tmp_prop;
+
+    tmp_prop = comps_dict_get(((COMPS_DocGroup*)item->data)->properties, "id");
+    id = (tmp_prop)?tmp_prop->prop.str:"NULL";
+    tmp_prop = comps_dict_get(((COMPS_DocGroup*)item->data)->properties, "name");
+    name = (tmp_prop)?tmp_prop->prop.str:"NULL";
+    tmp_prop = comps_dict_get(((COMPS_DocGroup*)item->data)->properties, "desc");
+    desc = (tmp_prop)?tmp_prop->prop.str:"NULL";
+    tmp_prop = comps_dict_get(((COMPS_DocGroup*)item->data)->properties, "display_order");
+    disp_ord = (tmp_prop)?tmp_prop->prop.num:0;
+    tmp_prop = comps_dict_get(((COMPS_DocGroup*)item->data)->properties, "uservis");
+    uservis = (tmp_prop)?tmp_prop->prop.num:0;
+    tmp_prop = comps_dict_get(((COMPS_DocGroup*)item->data)->properties, "def");
+    def = (tmp_prop)?tmp_prop->prop.num:0;
     
-    printf("id: %s\n", ((COMPS_DocGroup*)item->data)->id);
-    printf("name: %s\n", ((COMPS_DocGroup*)item->data)->name);
-    printf("desc: %s\n", ((COMPS_DocGroup*)item->data)->desc);
-    printf("default: %d\n", ((COMPS_DocGroup*)item->data)->def);
-    printf("uservisible: %d\n", ((COMPS_DocGroup*)item->data)->uservisible);
+    printf("id: %s\n", id);
+    printf("name: %s\n", name);
+    printf("desc: %s\n", desc);
+    printf("default: %d\n", def);
+    printf("uservisible: %d\n", uservis);
+    printf("display_order: %d\n", disp_ord);
     comps_list_walk(((COMPS_DocGroup*)item->data)->packages, &print_package, NULL);
     printf("-------------------------------------\n");
 }
@@ -53,10 +70,23 @@ void print_group(COMPS_ListItem* item, unsigned int num, void * data) {
 void print_category(COMPS_ListItem* item, unsigned int num, void * data) {
     (void)data;
     (void)num;
+    char *id, *name, *desc;
+    int disp_ord;
+    COMPS_Prop *tmp_prop;
 
-    printf("id: %s\n", ((COMPS_DocCategory*)item->data)->id);
-    printf("name: %s\n", ((COMPS_DocCategory*)item->data)->name);
-    printf("desc: %s\n", ((COMPS_DocCategory*)item->data)->desc);
+    tmp_prop = comps_dict_get(((COMPS_DocGroup*)item->data)->properties, "id");
+    id = (tmp_prop)?tmp_prop->prop.str:"NULL";
+    tmp_prop = comps_dict_get(((COMPS_DocGroup*)item->data)->properties, "name");
+    name = (tmp_prop)?tmp_prop->prop.str:"NULL";
+    tmp_prop = comps_dict_get(((COMPS_DocGroup*)item->data)->properties, "desc");
+    desc = (tmp_prop)?tmp_prop->prop.str:"NULL";
+    tmp_prop = comps_dict_get(((COMPS_DocGroup*)item->data)->properties, "display_order");
+    disp_ord = (tmp_prop)?tmp_prop->prop.num:0;
+    
+    printf("id: %s\n", id);
+    printf("name: %s\n", name);
+    printf("desc: %s\n", desc);
+    printf("display_order: %d\n", disp_ord);
     comps_list_walk(((COMPS_DocCategory*)item->data)->group_ids, &print_gids, NULL);
 }
 

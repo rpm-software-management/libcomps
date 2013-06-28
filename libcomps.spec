@@ -1,13 +1,13 @@
 %global with_python 1
 %global with_python3 1
 
-%global commit 4e72c17d608f1beef4c58a8c00f80ba20fc6e3a7
-%global shortcommit 4e72c17
+%global commit e401de99222bac95e61b10836b230367a92f5e4f
+%global shortcommit e401de9
 %global name libcomps
 
 
 Name:           libcomps
-Version:        0.1.1
+Version:        0.1.0
 Release:        1%{?dist}
 Summary:        Alternative for yum.comps writen in C
 
@@ -100,25 +100,22 @@ popd
 %{_includedir}/*
 
 %files -n libcomps-doc
-%doc docs/html
+%doc docs/libcomps-doc/html
 
 %if %{with_python}
 %files -n python-libcomps
-%doc docs/libcomps-py-doc/*
+#%doc docs/libcomps-py-doc/*
 %{_libdir}/python2*
 %exclude %{_libdir}/python2/libcomps/__pycache__
 %endif
 
 %if %{with_python3}
 %files -n python3-libcomps
-%doc docs/libcomps-py-doc/*
+#%doc docs/libcomps-py-doc/*
 %{_libdir}/python3*
 %exclude %{_libdir}/python3/libcomps/__pycache__
 %endif
 
 
 %changelog
-* Wed Jun 26 2013 Jindrich Luza <jluza@redhat.com>
-- separated doc package. Some fixes in CMake files
-
 

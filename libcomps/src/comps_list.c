@@ -324,7 +324,6 @@ void comps_list_remove_item(COMPS_List * dl, COMPS_ListItem *it) {
     for (tmpit = dl->first; tmpit != it && tmpit != NULL; tmpit = tmpit->next) pos++;
     if (!tmpit) return;
 
-    //printf("removing item: %d\n", *(int*)tmpit->data);
     if (tmpit->prev != NULL) {
         if (tmpit->next != NULL) {
             tmpit->prev->next = tmpit->next;
@@ -336,10 +335,6 @@ void comps_list_remove_item(COMPS_List * dl, COMPS_ListItem *it) {
     if (tmpit->next) {
         tmpit->next->prev = tmpit->prev;
     } else dl->last = tmpit->prev;
-    //if (tmpit->prev)
-    //    printf("removing item->prev: %d\n", *(int*)tmpit->prev->data);
-    //if (tmpit->prev->next)
-    //    printf("removing item->next: %d\n", *(int*)tmpit->prev->next->data);
     dl->len--;
 }
 
@@ -415,7 +410,5 @@ COMPS_ListItem * comps_list_at(COMPS_List* dl, unsigned int pos) {
     for (it = dl->first;
          it != NULL && index<pos;
          it = it->next, index++);
-    //printf("%d\n", index);
-    //printf("%d\n", *((int*)it->data));
     return it;
 }

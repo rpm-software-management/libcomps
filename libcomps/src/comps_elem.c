@@ -80,9 +80,6 @@ char * comps_elem_get_name(const COMPS_ElemType type) {
         case COMPS_ELEM_OPTLIST:
             return "optionlist";
         break;
-        //case COMPS_ELEM_OPTID:
-        //    return "optionid";
-        //break;
         case COMPS_ELEM_IGNOREDEP:
             return "ignoredep";
         break;
@@ -124,7 +121,6 @@ COMPS_ElemType comps_elem_get_type(char * name) {
     else if (strcmp(name, "langonly") == 0) type = COMPS_ELEM_LANGONLY;
     else if (strcmp(name, "environment") == 0) type = COMPS_ELEM_ENV;
     else if (strcmp(name, "optionlist") == 0) type = COMPS_ELEM_OPTLIST;
-    //else if (strcmp(name, "optionid") == 0) type = COMPS_ELEM_OPTID;
     else if (strcmp(name, "langpacks") == 0) type = COMPS_ELEM_LANGPACKS;
     else if (strcmp(name, "match") == 0) type = COMPS_ELEM_MATCH;
     else if (strcmp(name, "blacklist") == 0) type = COMPS_ELEM_BLACKLIST;

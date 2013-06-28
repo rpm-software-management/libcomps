@@ -8,8 +8,9 @@ inline COMPS_DocEnvExtra * comps_docenv_extra_create() {
 }
 
 char __compsenv_id_cmp(void *e1, void *e2) {
-    return (strcmp(((COMPS_DocEnv*)e1)->id,
-                  ((COMPS_DocEnv*)e2)->id) == 0);
+    return (strcmp((char*)comps_dict_get(((COMPS_DocEnv*)e1)->properties, "id"),
+                   (char*)comps_dict_get(((COMPS_DocEnv*)e2)->properties, "id"))
+            == 0);
 }
 
 inline COMPS_DocEnv* pycomps_env_get(PyObject *pyenv) {
@@ -49,9 +50,10 @@ inline void pycomps_env_decref(void * env) {
 }
 
 void pycomps_env_destroy(void * env) {
-    free(((COMPS_DocEnv*)env)->id);
-    free(((COMPS_DocEnv*)env)->name);
-    free(((COMPS_DocEnv*)env)->desc);
+    //free(((COMPS_DocEnv*)env)->id);
+    //free(((COMPS_DocEnv*)env)->name);
+    //free(((COMPS_DocEnv*)env)->desc);
+    comps_dict_destroy(((COMPS_DocEnv*)env)->properties);
     free(((COMPS_DocEnv*)env)->reserved);
     free(env);
 }
@@ -214,12 +216,21 @@ void pycomps_env_print(FILE *f, void *e) {
     COMPS_ListItem *it;
     COMPS_HSList *pairlist;
     COMPS_HSListItem *hsit;
+    char *id, *name, *desc;
+    int display_order;
+    COMPS_Prop* tmp_prop;
+    tmp_prop = comps_dict_get(((COMPS_DocEnv*)e)->properties, "id");
+    id = (tmp_prop)?tmp_prop->prop.str: NULL;
+    tmp_prop = comps_dict_get(((COMPS_DocEnv*)e)->properties, "name");
+    name = (tmp_prop)?tmp_prop->prop.str: NULL;
+    tmp_prop = comps_dict_get(((COMPS_DocEnv*)e)->properties, "desc");
+    desc = (tmp_prop)?tmp_prop->prop.str: NULL;
+    tmp_prop = comps_dict_get(((COMPS_DocEnv*)e)->properties, "display_order");
+    display_order = (tmp_prop)?tmp_prop->prop.num: 0;
 
     fprintf(f, "<COMPS_Environment: id='%s'"
-               "name='%s' description=%s ",
-                ((COMPS_DocEnv*)e)->id,
-                ((COMPS_DocEnv*)e)->name,
-                ((COMPS_DocEnv*)e)->desc);
+               "name='%s' description='%s' display_order=%d", id, name, desc,
+                display_order);
 
     fprintf(f, ", name_by_lang={");
     pairlist = comps_rtree_pairs(((COMPS_DocEnv*)e)->name_by_lang);
@@ -275,6 +286,7 @@ PyObject* comps_env_str(void * env) {
     const char *id, *name, *desc;
     char *empty;
     COMPS_ListItem *it;
+    COMPS_Prop *tmp_prop;
 
     emptytmp = Py_TYPE(Py_None)->tp_str(Py_None);
     if (PyUnicode_Check(emptytmp)) {
@@ -283,9 +295,12 @@ PyObject* comps_env_str(void * env) {
         empty = PyBytes_AsString(emptytmp);
     }
 
-    id = (((COMPS_DocEnv*)env)->id)?((COMPS_DocEnv*)env)->id:empty;
-    name = (((COMPS_DocEnv*)env)->name)?((COMPS_DocEnv*)env)->name:empty;
-    desc = (((COMPS_DocEnv*)env)->desc)?((COMPS_DocEnv*)env)->desc:empty;
+    tmp_prop = comps_dict_get(((COMPS_DocEnv*)env)->properties, "id");
+    id = (tmp_prop)?tmp_prop->prop.str:empty;
+    tmp_prop = comps_dict_get(((COMPS_DocEnv*)env)->properties, "name");
+    name = (tmp_prop)?tmp_prop->prop.str:empty;
+    tmp_prop = comps_dict_get(((COMPS_DocEnv*)env)->properties, "desc");
+    desc = (tmp_prop)?tmp_prop->prop.str:empty;
 
     ret = PyUnicode_FromFormat("<COMPS_Env: id='%s', name='%s', description='%s',"
                               "name_by_lang=",
@@ -387,7 +402,7 @@ PyObject* PyCOMPSEnv_cmp(PyObject *self, PyObject *other, int op) {
     }
     CMP_NONE_CHECK(op, self, other)
 
-    ret = comps_env_cmp((void*)pycomps_env_get(self),
+    ret = comps_docenv_cmp((void*)pycomps_env_get(self),
                           (void*)pycomps_env_get(other));
     if (op == Py_EQ) {
         if (!ret) Py_RETURN_FALSE;
@@ -395,58 +410,6 @@ PyObject* PyCOMPSEnv_cmp(PyObject *self, PyObject *other, int op) {
         if (ret) Py_RETURN_FALSE;
     }
     Py_RETURN_TRUE;
-}
-
-char comps_env_cmp(void *e1, void *e2) {
-    COMPS_ListItem *it;
-    COMPS_Set *set;
-
-    if (__pycomps_strcmp(((COMPS_DocEnv*)e1)->id,
-                         ((COMPS_DocEnv*)e2)->id) != 0) {
-        return 0;
-    }
-    if (__pycomps_strcmp(((COMPS_DocEnv*)e1)->name,
-                         ((COMPS_DocEnv*)e2)->name) != 0) {
-        return 0;
-    }
-    if (__pycomps_strcmp(((COMPS_DocEnv*)e1)->desc,
-                         ((COMPS_DocEnv*)e2)->desc) != 0) {
-        return 0;
-    }
-    set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__pycomps_strcmp_v);
-
-    it = (((COMPS_DocEnv*)e1)->group_list)
-         ?((COMPS_DocEnv*)e1)->group_list->first: NULL;
-    for (; it!= NULL; it = it->next) {
-        comps_set_add(set, it->data);
-    }
-    it = (((COMPS_DocEnv*)e2)->group_list)
-          ?((COMPS_DocEnv*)e2)->group_list->first: NULL;
-    for (; it!= NULL; it = it->next) {
-        if (!comps_set_in(set, it->data)) {
-                comps_set_destroy(&set);
-                return 0;
-        }
-    }
-    comps_set_clear(set);
-
-    it = (((COMPS_DocEnv*)e1)->option_list)
-         ?((COMPS_DocEnv*)e1)->option_list->first: NULL;
-    for (; it!= NULL; it = it->next) {
-        comps_set_add(set, it->data);
-    }
-    it = (((COMPS_DocEnv*)e2)->option_list)
-          ?((COMPS_DocEnv*)e2)->option_list->first: NULL;
-    for (; it!= NULL; it = it->next) {
-        if (!comps_set_in(set, it->data)) {
-            comps_set_destroy(&set);
-            return 0;
-        }
-    }
-    comps_set_destroy(&set);
-
-    return 1;
 }
 
 PyObject* PyCOMPSEnv_get_groupids(PyCOMPS_Env *self, void *closure) {
@@ -573,20 +536,25 @@ inline int PyCOMPSEnv_set_desc_by_lang(PyObject *self, PyObject *value,
 
 int pycomps_env_strattr_setter(PyObject *self, PyObject *val, void *closure) {
     char *tmp;
+    COMPS_Prop *tmp_prop;
     if (__pycomps_stringable_to_char(val, &tmp) < 0) {
         return -1;
     }
-    __comps_doc_char_setter((void**)&GET_FROM(pycomps_env_get(self), (size_t)closure),
-                                      tmp, 0);
+    tmp_prop = comps_dict_get(pycomps_env_get(self)->properties, (char*)closure);
+    if (!tmp_prop) {
+        tmp_prop = comps_doc_prop_str_create(tmp, 0);
+        comps_dict_set(pycomps_env_get(self)->properties, (char*)closure, tmp_prop);
+    } else {
+        __comps_doc_char_setter((void**)&tmp_prop->prop.str, tmp, 0);
+    }
     return 0;
 }
 
 PyObject* pycomps_env_strattr_getter(PyObject *self, void *closure) {
-
-    char *tmp;
-    tmp = GET_FROM(pycomps_env_get(self), (size_t)closure);
-    if (tmp)
-        return PyUnicode_FromString(tmp);
+    COMPS_Prop *tmp_prop;
+    tmp_prop = comps_dict_get(pycomps_env_get(self)->properties, (char*)closure);
+    if (tmp_prop)
+        return PyUnicode_FromString(tmp_prop->prop.str);
     else
         Py_RETURN_NONE;
 }
@@ -601,16 +569,13 @@ PyMethodDef PyCOMPSEnv_methods[] = {
 PyGetSetDef PyCOMPSEnv_getset[] = {
     {"id",
      (getter)pycomps_env_strattr_getter, (setter)pycomps_env_strattr_setter,
-     "Env id",
-     (void*)offsetof(COMPS_DocEnv, id)},
+     "Env id", "id"},
     {"name",
      (getter)pycomps_env_strattr_getter, (setter)pycomps_env_strattr_setter,
-     "Env name",
-     (void*)offsetof(COMPS_DocEnv, name)},
+     "Env name", "name"},
     {"desc",
      (getter)pycomps_env_strattr_getter, (setter)pycomps_env_strattr_setter,
-     "Env description",
-     (void*)offsetof(COMPS_DocEnv, desc)},
+     "Env description", "desc"},
     {"group_ids",
      (getter)PyCOMPSEnv_get_groupids, (setter)PyCOMPSEnv_set_groupids,
      "Env group ids",
@@ -637,7 +602,7 @@ PyCOMPS_CtoPySeqItemMan PyCOMPSEnv_ItemMan = {
     .ctopy_convert = &PyCOMPSEnv_convert,
     .data_decref = &pycomps_env_decref,
     .data_incref = &comps_env_incref,
-    .data_cmp = &comps_env_cmp,
+    .data_cmp = &comps_docenv_cmp_v,
     .fprint_f = &pycomps_env_print,
     .str_f = &comps_env_str
 };

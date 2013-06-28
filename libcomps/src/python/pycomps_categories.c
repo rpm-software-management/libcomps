@@ -33,34 +33,6 @@ inline void pycomps_cat_decref(void * cat) {
     ctopy_citem_decref(comps_cat_get_extra(cat)->citem);
 }
 
-inline char __pycomps_cat_idcmp(void *c1, void *c2){
-    return (strcmp(((COMPS_DocCategory*)c1)->id,
-                  ((COMPS_DocCategory*)c2)->id) == 0);
-}
-
-char comps_cat_cmp(void *c1, void *c2) {
-    COMPS_ListItem *it, *it2;
-    if (__pycomps_strcmp(((COMPS_DocCategory*)c1)->id,
-                         ((COMPS_DocCategory*)c2)->id)) return 0;
-    if (__pycomps_strcmp(((COMPS_DocCategory*)c1)->name,
-                         ((COMPS_DocCategory*)c2)->name)) return 0;
-    if (__pycomps_strcmp(((COMPS_DocCategory*)c1)->desc,
-                         ((COMPS_DocCategory*)c2)->desc)) return 0;
-    it = (((COMPS_DocCategory*)c1)->group_ids)
-         ?((COMPS_DocCategory*)c1)->group_ids->first: NULL;
-    it2 = (((COMPS_DocCategory*)c2)->group_ids)
-         ?((COMPS_DocCategory*)c2)->group_ids->first: NULL;
-    
-    for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        if (__pycomps_strcmp(it->data, it2->data))
-            return 0;
-    }
-    if (it != NULL || it2 != NULL)
-        return 0;
-    return 1;
-}
-
-
 COMPS_DocCategoryExtra * comps_doccategory_extra_create() {
     COMPS_DocCategoryExtra *ret;
     ret = malloc(sizeof(*ret));
@@ -152,9 +124,7 @@ void PyCOMPSCat_dealloc(PyObject *self)
 }
 
 void pycomps_cat_destroy(void * cat) {
-    free(((COMPS_DocCategory*)cat)->id);
-    free(((COMPS_DocCategory*)cat)->name);
-    free(((COMPS_DocCategory*)cat)->desc);
+    comps_dict_destroy(((COMPS_DocCategory*)cat)->properties);
     free(((COMPS_DocCategory*)cat)->reserved);
     free(cat);
 }
@@ -211,7 +181,8 @@ int PyCOMPSCat_init(PyCOMPS_Category *self, PyObject *args, PyObject *kwds)
         comps_doccategory_set_id(pycomps_cat_get((PyObject*)self), id, 1);
         comps_doccategory_set_name(pycomps_cat_get((PyObject*)self), name, 1);
         comps_doccategory_set_desc(pycomps_cat_get((PyObject*)self), desc, 1);
-        pycomps_cat_get((PyObject*)self)->display_order = disp_ord;
+        comps_doccategory_set_displayorder(pycomps_cat_get((PyObject*)self),
+                                           disp_ord);
         return 0;
     } else {
         return -1;
@@ -224,6 +195,8 @@ PyObject* comps_cat_str(void * cat) {
     const char *id, *name, *desc;
     char *empty;
     COMPS_ListItem *it;
+    COMPS_Prop *tmp_prop;
+    int disp_ord;
 
     emptytmp = Py_TYPE(Py_None)->tp_str(Py_None);
     if (PyUnicode_Check(emptytmp)) {
@@ -232,15 +205,19 @@ PyObject* comps_cat_str(void * cat) {
         empty = PyBytes_AsString(emptytmp);
     }
 
-    id = (((COMPS_DocCategory*)cat)->id)?((COMPS_DocCategory*)cat)->id:empty;
-    name = (((COMPS_DocCategory*)cat)->name)?((COMPS_DocCategory*)cat)->name:empty;
-    desc = (((COMPS_DocCategory*)cat)->desc)?((COMPS_DocCategory*)cat)->desc:empty;
+    tmp_prop = comps_dict_get(((COMPS_DocCategory*)cat)->properties, "id");
+    id = (tmp_prop)?tmp_prop->prop.str:empty;
+    tmp_prop = comps_dict_get(((COMPS_DocCategory*)cat)->properties, "name");
+    name = (tmp_prop)?tmp_prop->prop.str:empty;
+    tmp_prop = comps_dict_get(((COMPS_DocCategory*)cat)->properties, "desc");
+    desc = (tmp_prop)?tmp_prop->prop.str:empty;
+    tmp_prop = comps_dict_get(((COMPS_DocCategory*)cat)->properties, "display_order");
+    disp_ord = (tmp_prop)?tmp_prop->prop.num:0;
 
     ret = PyUnicode_FromFormat("<COMPS_Category: id='%s', name='%s', "
                               "description='%s', display_order=%d, name_by_lang=",
                               /*, description_by_lang=%U, %U>",*/
-                              id, name, desc,
-                              ((COMPS_DocCategory*)cat)->display_order);
+                              id, name, desc, disp_ord);
     if (PyUnicode_Check(emptytmp)) {
         free(empty);
     }
@@ -307,13 +284,21 @@ void comps_cat_print(FILE *f, void *c) {
     COMPS_ListItem *it;
     COMPS_HSList *pairlist;
     COMPS_HSListItem *hsit;
+    char *id, *name, *desc;
+    int disp_ord;
+    COMPS_Prop *tmp_prop;
+
+    tmp_prop = comps_dict_get(((COMPS_DocCategory*)c)->properties, "id");
+    id = (tmp_prop)?tmp_prop->prop.str:NULL;
+    tmp_prop = comps_dict_get(((COMPS_DocCategory*)c)->properties, "name");
+    name = (tmp_prop)?tmp_prop->prop.str:NULL;
+    tmp_prop = comps_dict_get(((COMPS_DocCategory*)c)->properties, "desc");
+    desc = (tmp_prop)?tmp_prop->prop.str:NULL;
+    tmp_prop = comps_dict_get(((COMPS_DocCategory*)c)->properties, "display_order");
+    disp_ord = (tmp_prop)?tmp_prop->prop.num:0;
 
     fprintf(f, "<COMPS_Category: id='%s', name='%s', description='%s', "
-            " display_order=%d, ",
-            ((COMPS_DocCategory*)c)->id,
-            ((COMPS_DocCategory*)c)->name,
-            ((COMPS_DocCategory*)c)->desc,
-            ((COMPS_DocCategory*)c)->display_order);
+            " display_order=%d, ", id, name, desc, disp_ord);
     fprintf(f, "name_by_lang={");
     pairlist = comps_rtree_pairs(((COMPS_DocCategory*)c)->name_by_lang);
     for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
@@ -370,8 +355,7 @@ PyObject* PyCOMPSCat_cmp(PyObject *self, PyObject *other, int op) {
     }
     CMP_NONE_CHECK(op, self, other)
 
-    ret = comps_cat_cmp((void*)pycomps_cat_get(self),
-                          (void*)pycomps_cat_get(other));
+    ret = comps_doccategory_cmp(pycomps_cat_get(self), pycomps_cat_get(other));
     if (op == Py_EQ) {
         if (!ret) Py_RETURN_FALSE;
     } else {
@@ -459,20 +443,25 @@ inline int PyCOMPSCat_set_desc_by_lang(PyObject *self, PyObject *value,
 
 int pycomps_cat_strattr_setter(PyObject *self, PyObject *val, void *closure) {
     char *tmp;
+    COMPS_Prop *tmp_prop;
     if (__pycomps_stringable_to_char(val, &tmp) < 0) {
         return -1;
     }
-    __comps_doc_char_setter((void**)&GET_FROM(pycomps_cat_get(self), (size_t)closure),
-                                      tmp, 0);
+    tmp_prop = comps_dict_get(pycomps_cat_get(self)->properties, (char*)closure);
+    if (!tmp_prop) {
+        tmp_prop = comps_doc_prop_str_create(tmp, 0);
+        comps_dict_set(pycomps_cat_get(self)->properties, (char*)closure, tmp_prop);
+    } else {
+        __comps_doc_char_setter((void**)&tmp_prop->prop.str, tmp, 0);
+    }
     return 0;
 }
 
 PyObject* pycomps_cat_strattr_getter(PyObject *self, void *closure) {
-
-    char *tmp;
-    tmp = GET_FROM(pycomps_cat_get(self), (size_t)closure);
-    if (tmp)
-        return PyUnicode_FromString(tmp);
+    COMPS_Prop *tmp_prop;
+    tmp_prop = comps_dict_get(pycomps_cat_get(self)->properties, (char*)closure);
+    if (tmp_prop)
+        return PyUnicode_FromString(tmp_prop->prop.str);
     else
         Py_RETURN_NONE;
 }
@@ -487,13 +476,13 @@ PyMethodDef PyCOMPSCat_methods[] = {
 PyGetSetDef PyCOMPSCat_getset[] = {
     {"id",
      (getter)pycomps_cat_strattr_getter, (setter)pycomps_cat_strattr_setter,
-     "Category id", (void*)offsetof(COMPS_DocCategory, id)},
+     "Category id", "id"},
     {"name",
      (getter)pycomps_cat_strattr_getter, (setter)pycomps_cat_strattr_setter,
-     "Category name", (void*)offsetof(COMPS_DocCategory, name)},
+     "Category name", "name"},
     {"desc",
      (getter)pycomps_cat_strattr_getter, (setter)pycomps_cat_strattr_setter,
-     "Category description", (void*)offsetof(COMPS_DocCategory, desc)},
+     "Category description", "desc"},
     {"group_ids",
      (getter)PyCOMPSCat_get_groupids, (setter)PyCOMPSCat_set_groupids,
      "Category group ids list", NULL},
@@ -515,7 +504,7 @@ PyCOMPS_CtoPySeqItemMan PyCOMPSCat_ItemMan = {
     .ctopy_convert = PyCOMPSCat_convert,
     .data_decref = pycomps_cat_decref,
     .data_incref = comps_cat_incref,
-    .data_cmp = comps_cat_cmp,
+    .data_cmp = comps_doccategory_cmp_v,
     .fprint_f = comps_cat_print,
     .str_f = comps_cat_str
 };
@@ -580,7 +569,7 @@ COMPS_List* comps_cats_union(COMPS_List *cats1, COMPS_List *cats2) {
     comps_list_init(res);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__pycomps_cat_idcmp);
+    comps_set_init(set, NULL, NULL, NULL, &__comps_doccategory_idcmp);
 
     for (it = cats1->first; it != NULL; it = it->next) {
         if (((COMPS_DocCategory*)it->data)->group_ids == NULL) {

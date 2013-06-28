@@ -232,8 +232,9 @@ COMPS_PackageType comps_package_get_type(const XML_Char *s)
 void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
 {
     COMPS_List *list;
-    COMPS_Dict *dict;
-    char *lang, **prop;
+    COMPS_Dict *dict, *prop_dict;
+    char *lang;
+    COMPS_Prop *prop;
 
     /* check if there's all important data for currently processed element.
        This is also done by dtd checking, but if dtd rules missing, validation
@@ -273,13 +274,13 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_ENV:
             list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
-            if (!list_last_env->id)
+            if (!comps_dict_get(list_last_env->properties, "id"))
                 comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!list_last_env->name)
+            if (!comps_dict_get(list_last_env->properties, "name"))
                 comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!list_last_env->desc)
+            if (!comps_dict_get(list_last_env->properties, "desc"))
                 comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             if (!list_last_env->group_list)
@@ -291,13 +292,15 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_GROUP:
             list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-            if (!list_last_group->id)
+            if (!comps_dict_get(list_last_group->properties, "id"))
                 comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!list_last_group->name)
+            if (comps_dict_get(list_last_group->properties, "name") == NULL) {
+                printf("name is missing\n");
                 comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!list_last_group->desc)
+            }
+            if (!comps_dict_get(list_last_group->properties, "desc"))
                 comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             if (!list_last_group->packages)
@@ -306,13 +309,13 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_CATEGORY:
             list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
-            if (!list_last_cat->id)
+            if (!comps_dict_get(list_last_cat->properties, "id"))
                 comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!list_last_cat->name)
+            if (!comps_dict_get(list_last_cat->properties, "name"))
                 comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!list_last_cat->desc)
+            if (!comps_dict_get(list_last_cat->properties, "desc"))
                 comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             if (!list_last_cat->group_ids)
@@ -328,23 +331,30 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         case COMPS_ELEM_ID:
             if (parent == COMPS_ELEM_GROUP) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-                prop = &((COMPS_DocGroup*)list->last->data)->id;
+                dict = list_last_group->properties;
+                prop = comps_dict_get(list_last_group->properties, "id");
             } else if (parent == COMPS_ELEM_CATEGORY) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
-                prop = &((COMPS_DocCategory*)list->last->data)->id;
+                dict = list_last_cat->properties;
+                prop = comps_dict_get(list_last_cat->properties, "id");
             } else if (parent == COMPS_ELEM_ENV) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
-                prop = &list_last_env->id;
+                dict = list_last_env->properties;
+                prop = comps_dict_get(list_last_env->properties, "id");
             } else {
                 free(parsed->tmp_buffer);
                 parsed->tmp_buffer = NULL;
                 break;
             }
-            if (*prop != NULL) {
-            comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
-                              parser_line, parser_col, 0);
+            if (prop != NULL) {
+                comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
+                                  parser_line, parser_col, 0);
+                __comps_doc_char_setter((void**)&prop->prop.str,
+                                        parsed->tmp_buffer, 0);
+            } else {
+                prop = comps_doc_prop_str_create(parsed->tmp_buffer, 0);
+                comps_dict_set(dict, "id", prop);
             }
-            __comps_doc_char_setter((void**)prop, parsed->tmp_buffer, 0);
             parsed->tmp_buffer = NULL;
         break;
         case COMPS_ELEM_NAME:
@@ -352,15 +362,18 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             if (parent == COMPS_ELEM_GROUP) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
                 dict = list_last_group->name_by_lang;
-                prop = &list_last_group->name;
+                prop_dict = list_last_group->properties;
+                prop = comps_dict_get(list_last_group->properties, "name");
             } else if (parent == COMPS_ELEM_CATEGORY) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
                 dict = list_last_cat->name_by_lang;
-                prop = &list_last_cat->name;
+                prop_dict = list_last_cat->properties;
+                prop = comps_dict_get(list_last_cat->properties, "name");
             } else if (parent == COMPS_ELEM_ENV) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
                 dict = list_last_env->name_by_lang;
-                prop = &list_last_env->name;
+                prop_dict = list_last_env->properties;
+                prop = comps_dict_get(list_last_env->properties, "name");
             } else {
                 free(parsed->tmp_buffer);
                 parsed->tmp_buffer = NULL;
@@ -369,11 +382,15 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             if (lang) {
                 comps_dict_set(dict, lang, parsed->tmp_buffer);
             } else {
-                if (*prop != NULL) {
+                if (prop != NULL) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
+                __comps_doc_char_setter((void**)&prop->prop.str,
+                                        parsed->tmp_buffer, 0);
+                } else {
+                    prop = comps_doc_prop_str_create(parsed->tmp_buffer, 0);
+                    comps_dict_set(prop_dict, "name", prop);
                 }
-                __comps_doc_char_setter((void**)prop, parsed->tmp_buffer, 0);
             }
             parsed->tmp_buffer = NULL;
         break;
@@ -382,15 +399,18 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             if (parent == COMPS_ELEM_GROUP) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
                 dict = list_last_group->desc_by_lang;
-                prop = &list_last_group->desc;
+                prop_dict = list_last_group->properties;
+                prop = comps_dict_get(list_last_group->properties, "desc");
             } else if (parent == COMPS_ELEM_CATEGORY) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
                 dict = list_last_cat->desc_by_lang;
-                prop = &list_last_cat->desc;
+                prop_dict = list_last_cat->properties;
+                prop = comps_dict_get(list_last_cat->properties, "desc");
             } else if (parent == COMPS_ELEM_ENV) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
                 dict = list_last_env->desc_by_lang;
-                prop = &list_last_env->desc;
+                prop_dict = list_last_env->properties;
+                prop = comps_dict_get(list_last_env->properties, "desc");
             } else {
                 free(parsed->tmp_buffer);
                 parsed->tmp_buffer = NULL;
@@ -399,11 +419,15 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             if (lang) {
                 comps_dict_set(dict, lang, parsed->tmp_buffer);
             } else {
-                if (*prop != NULL) {
-                comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
-                                  parser_line, parser_col, 0);
+                if (prop != NULL) {
+                    comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
+                                      parser_line, parser_col, 0);
+                    __comps_doc_char_setter((void**)&prop->prop.str,
+                                            parsed->tmp_buffer, 0);
+                } else {
+                    prop = comps_doc_prop_str_create(parsed->tmp_buffer, 0);
+                    comps_dict_set(prop_dict, "desc", prop);
                 }
-                __comps_doc_char_setter((void**)prop, parsed->tmp_buffer, 0);
             }
             parsed->tmp_buffer = NULL;
         break;
@@ -462,10 +486,18 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 break;
             }
             list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
+            prop = comps_dict_get(list_last_group->properties, "def");
+            if (prop) {
+                comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
+                                  parser_line, parser_col, 0);
+            } else {
+                prop = comps_doc_prop_num_create(0);
+                comps_dict_set(list_last_group->properties, "def", prop);
+            }
             if (strcmp(parsed->tmp_buffer,"false") == 0)
-                list_last_group->def = 0;
+                prop->prop.num = 0;
             else if (strcmp(parsed->tmp_buffer,"true") == 0)
-                list_last_group->def = 1;
+                prop->prop.num = 1;
             else {
                 comps_log_warning(parsed->log, parsed->tmp_buffer,
                                   COMPS_ERR_DEFAULT_PARAM,
@@ -476,17 +508,25 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_USERVISIBLE:
             if (parent != COMPS_ELEM_GROUP) {
-                comps_log_error(parsed->log, s, COMPS_ERR_NOPARENT,
-                                parser_line, parser_col, 0);
+                //comps_log_error(parsed->log, s, COMPS_ERR_NOPARENT,
+                //                parser_line, parser_col, 0);
                 free(parsed->tmp_buffer);
                 parsed->tmp_buffer = NULL;
                 break;
             }
             list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
+            prop = comps_dict_get(list_last_group->properties, "uservisible");
+            if (prop) {
+                comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
+                                  parser_line, parser_col, 0);
+            } else {
+                prop = comps_doc_prop_num_create(0);
+                comps_dict_set(list_last_group->properties, "uservisible", prop);
+            }
             if (strcmp(parsed->tmp_buffer,"false") == 0)
-                list_last_group->uservisible = 0;
+                prop->prop.num = 0;
             else if (strcmp(parsed->tmp_buffer,"true") == 0)
-                list_last_group->uservisible = 1;
+                prop->prop.num = 1;
             else {
                 comps_log_warning(parsed->log, parsed->tmp_buffer,
                                   COMPS_ERR_USERVISIBLE_PARAM,
@@ -540,12 +580,26 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         case COMPS_ELEM_DISPLAYORDER:
             if (parent == COMPS_ELEM_CATEGORY) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
-                sscanf(parsed->tmp_buffer, "%u", &list_last_cat->display_order);
+                prop = comps_dict_get(list_last_cat->properties, "display_order");
+                dict = list_last_cat->properties;
             } else if (parent == COMPS_ELEM_ENV) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
-                sscanf(parsed->tmp_buffer, "%u", &list_last_env->display_order);
+                prop = comps_dict_get(list_last_env->properties, "display_order");
+                dict = list_last_env->properties;
+            } else if (parent == COMPS_ELEM_GROUP) {
+                list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
+                prop = comps_dict_get(list_last_env->properties, "display_order");
+                dict = list_last_env->properties;
+            } 
+            if (prop) {
+                comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
+                                  parser_line, parser_col, 0);
             } else {
+                prop = comps_doc_prop_num_create(0);
+                comps_dict_set(dict, "display_order", prop);
             }
+            sscanf(parsed->tmp_buffer, "%d", &prop->prop.num);
+
             free(parsed->tmp_buffer);
             parsed->tmp_buffer = NULL;
         break;
@@ -556,12 +610,16 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 break;
             }
             list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-            if (list_last_group->lang_only != NULL) {
+            prop = comps_dict_get(list_last_cat->properties, "lang_only");
+            if (prop) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
+                __comps_doc_char_setter((void**)&prop->prop.str,
+                                        parsed->tmp_buffer, 0);
+            } else {
+                prop = comps_doc_prop_str_create(parsed->tmp_buffer, 0);
+                comps_dict_set(list_last_group->properties, "lang_only", prop);
             }
-            __comps_doc_char_setter((void**)&list_last_group->lang_only,
-                                    parsed->tmp_buffer, 0);
             parsed->tmp_buffer = NULL;
         break;
     }
