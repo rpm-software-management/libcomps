@@ -1024,13 +1024,14 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     COMPS_HSList *pairs;
 
     res = comps_docgroup_create();
-    pairs = comps_dict_pairs(g2->properties);
+    /*pairs = comps_dict_pairs(g2->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
         printf("%s = ", ((COMPS_RTreePair*)hsit->data)->key);
         printf("%s\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.str);
     }
+    comps_hslist_destroy(&pairs);*/
 
-
+    comps_dict_destroy(res->properties);
     res->properties = comps_dict_clone(g2->properties);
     pairs = comps_dict_pairs(g1->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
@@ -1070,10 +1071,12 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &comps_docpackage_cmp);
-    for (it = g1->packages->first; it != NULL; it = it->next) {
+    it = g1->packages?g1->packages->first:NULL;
+    for (; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
     }
-    for (it = g2->packages->first; it != NULL; it = it->next) {
+    it = g2->packages?g2->packages->first:NULL;
+    for (; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
     }
     res->packages = comps_list_create();
@@ -1467,6 +1470,7 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     COMPS_HSList *pairs;
 
     res = comps_doccategory_create();
+    comps_dict_destroy(res->properties);
     res->properties = comps_dict_clone(c2->properties);
     pairs = comps_dict_pairs(c1->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
@@ -1919,6 +1923,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     COMPS_HSList *pairs;
 
     res = comps_docenv_create();
+    comps_dict_destroy(res->properties);
     res->properties = comps_dict_clone(e2->properties);
     pairs = comps_dict_pairs(e1->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
@@ -2137,6 +2142,7 @@ inline COMPS_DocGroupPackage* comps_docpackage_create()
     if ((package = malloc(sizeof(COMPS_DocGroupPackage))) == NULL)
         return NULL;
     package->name = NULL;
+    package->type = COMPS_PACKAGE_UNKNOWN;
     return package;
 }
 

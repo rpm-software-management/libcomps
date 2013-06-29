@@ -232,9 +232,9 @@ COMPS_Prop * comps_doc_prop_clone(COMPS_Prop *prop) {
     ret = malloc(sizeof(COMPS_Prop));
     ret->prop_type = prop->prop_type;
     if (prop->prop_type == COMPS_PROP_STR) {
-        ret->prop.str = malloc(sizeof(char)* strlen(prop->prop.str));
+        ret->prop.str = malloc(sizeof(char)* (strlen(prop->prop.str)+1));
         memcpy(ret->prop.str, prop->prop.str,
-               sizeof(char) * strlen(prop->prop.str));
+               sizeof(char) * (strlen(prop->prop.str)+1));
     } else {
         ret->prop.num = prop->prop.num;
     }

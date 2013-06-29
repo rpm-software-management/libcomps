@@ -456,9 +456,48 @@ START_TEST(test_comps_doc_xml)
     }
     comps2xml_f(doc, "testfile.xml", 1);
     comps_doc_destroy(&doc);
-
 }
 END_TEST
+
+void* str_clonner(void *str) {
+    void *ret;
+    ret = malloc(sizeof(char) * (strlen((char*)str)+1));
+    memcpy(ret, str, sizeof(char) * (strlen((char*)str)+1));
+    return ret;
+}
+
+START_TEST(test_comps_doc_union)
+{
+    COMPS_DocGroup *g1, *g2, *g3;
+    COMPS_DocGroupPackage *p;
+
+    g1 = comps_docgroup_create();
+    comps_docgroup_set_id(g1, "g1", 1);
+    comps_docgroup_set_name(g1, "group1", 1);
+    
+    p = comps_docpackage_create();
+    comps_docpackage_set_name(p, "package1", 1);
+    
+    comps_docgroup_add_package(g1, p);
+    p = comps_docpackage_create();
+    comps_docpackage_set_name(p, "package2", 1);
+    comps_docgroup_add_package(g1, p);
+
+    g2 = comps_docgroup_create();
+    comps_docgroup_set_id(g2, "g2", 1);
+    comps_docgroup_set_name(g2, "group2", 1);
+    p = comps_docpackage_create();
+    comps_docpackage_set_name(p, "package3", 1);
+    comps_docgroup_add_package(g2, p);
+    p = comps_docpackage_create();
+    comps_docpackage_set_name(p, "package4", 1);
+    comps_docgroup_add_package(g2, p);
+
+    g3 = comps_docgroup_union(g1, g2);
+    comps_docgroup_destroy(g1);
+    comps_docgroup_destroy(g2);
+    comps_docgroup_destroy(g3);
+}END_TEST
 
 Suite* basic_suite (void)
 {
@@ -468,8 +507,8 @@ Suite* basic_suite (void)
     tcase_add_test (tc_core, test_comps_doc_basic);
     tcase_add_test (tc_core, test_comps_doc_xml);
     tcase_add_test (tc_core, test_comps_doc_setfeats);
+    tcase_add_test (tc_core, test_comps_doc_union);
     suite_add_tcase (s, tc_core);
-
     return s;
 }
 

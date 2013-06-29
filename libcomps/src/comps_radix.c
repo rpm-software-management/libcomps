@@ -127,7 +127,7 @@ COMPS_RTree * comps_rtree_clone(COMPS_RTree *rt) {
 
 
     for (it = rt->subnodes->first; it != NULL; it = it->next) {
-        rtdata = comps_rtree_data_create(rt,
+        rtdata = comps_rtree_data_create(ret,
                                       ((COMPS_RTreeData*)it->data)->key, NULL);
         new_data = rt->data_cloner(((COMPS_RTreeData*)it->data)->data);
 
