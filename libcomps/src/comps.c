@@ -656,11 +656,11 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_docgroup_idcmp);
 
-    for (it = groups->first; it != NULL; it = it->next) {
+    for (it = groups ? groups->first : NULL; it != NULL; it = it->next) {
         comps_set_add(set, comps_docgroup_clone(it->data));
     }
     groups = comps_doc_groups(c2);
-    for (it = groups->first; it != NULL; it = it->next) {
+    for (it = groups ? groups->first : NULL; it != NULL; it = it->next) {
         if (comps_set_in(set, it->data)) {
             tmpgroup = comps_docgroup_union(
                                 (COMPS_DocGroup*)it->data,
@@ -680,11 +680,11 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
     comps_set_clear(set);
 
     comps_set_init(set, NULL, NULL, NULL, &__comps_doccategory_idcmp);
-    for (it = categories->first; it != NULL; it = it->next) {
+    for (it = categories ? categories->first : NULL; it != NULL; it = it->next) {
         comps_set_add(set, comps_doccategory_clone(it->data));
     }
     categories = comps_doc_categories(c2);
-    for (it = categories->first; it != NULL; it = it->next) {
+    for (it = categories ? categories->first : NULL; it != NULL; it = it->next) {
         if (comps_set_in(set, it->data)) {
             tmpcat = comps_doccategory_union(
                                 (COMPS_DocCategory*)it->data,
