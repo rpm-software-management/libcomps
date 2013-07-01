@@ -586,10 +586,6 @@ PyTypeObject PyCOMPS_Type = {
     0,                         /* tp_alloc */
     PyCOMPS_new,                /* tp_new */};
 
-static struct module_state {
-    PyObject *error;
-} _state;
-
 #if PY_MAJOR_VERSION >= 3
     static struct PyModuleDef moduledef = {
             PyModuleDef_HEAD_INIT,
