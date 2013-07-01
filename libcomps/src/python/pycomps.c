@@ -386,69 +386,73 @@ static void PyCOMPS_dealloc(PyCOMPS* self)
 static PyObject* PyCOMPS_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyCOMPS *self;
+    char *enc = NULL; /* ignored here */
+    PyObject *c_caps = NULL;
     (void)kwds;
-    (void)args;
+
+    if (!PyArg_ParseTuple(args, "|sO!", &enc, &PyCapsule_Type, &c_caps))
+        return NULL;
 
     self = (PyCOMPS*) type->tp_alloc(type, 0);
-    if (self != NULL) {
+    if (self == NULL)
+        return NULL;
+
+    if (c_caps) {
+        self->comps = PyCapsule_GetPointer(c_caps, NULL);
+        assert(self->comps);
+    } else
         self->comps = comps_doc_create(NULL);
-        self->cats_pobj = NULL;
-        self->envs_pobj = NULL;
-        self->groups_pobj = NULL;
-        self->cats_citem = ctopy_citem_create(comps_doc_categories(self->comps),
-                                              &comps_list_destroy_v);
-        self->groups_citem = ctopy_citem_create(comps_doc_groups(self->comps),
-                                              &comps_list_destroy_v);
-        self->envs_citem = ctopy_citem_create(comps_doc_environments(self->comps),
-                                              &comps_list_destroy_v);
-        self->enc = NULL;
-    }
+    self->cats_pobj = NULL;
+    self->envs_pobj = NULL;
+    self->groups_pobj = NULL;
+    self->cats_citem = ctopy_citem_create(comps_doc_categories(self->comps),
+                                          &comps_list_destroy_v);
+    self->groups_citem = ctopy_citem_create(comps_doc_groups(self->comps),
+                                            &comps_list_destroy_v);
+    self->envs_citem = ctopy_citem_create(comps_doc_environments(self->comps),
+                                          &comps_list_destroy_v);
+    self->enc = NULL;
     return (PyObject*) self;
 }
 
 static int PyCOMPS_init(PyCOMPS *self, PyObject *args, PyObject *kwds)
 {
     char *enc = "UTF-8";
+    PyObject *c_caps = NULL; /* ignored here */
     (void)kwds;
-    (void)args;
-    if (args && PyArg_ParseTuple(args, "|s", &enc)) {
-        self->enc = PyBytes_FromString(enc);
-        return 0;
-    } else
-        return 1;
+
+    if (!PyArg_ParseTuple(args, "|sO!", &enc, &PyCapsule_Type, &c_caps))
+        return -1;
+    self->enc = PyBytes_FromString(enc);
+    return 0;
 }
 
 static PyObject* PyCOMPS_union(PyObject *self, PyObject *other) {
-    COMPS_List *unigroups, *unicats, *unienvs;
     PyCOMPS *res;
-
-    res = (PyCOMPS*)PyCOMPS_new(&PyCOMPS_Type, NULL, NULL);
-    PyCOMPS_init(res, NULL, NULL);
 
     if (Py_TYPE(other) != &PyCOMPS_Type) {
         PyErr_SetString(PyExc_TypeError, "Not COMPS instance");
         return NULL;
     }
-    unicats = NULL;
-    unienvs = NULL;
-    unigroups = NULL;
-    unigroups = comps_groups_union(comps_doc_groups(((PyCOMPS*)self)->comps),
-                                   comps_doc_groups(((PyCOMPS*)other)->comps));
-    unicats = comps_cats_union(comps_doc_categories(((PyCOMPS*)self)->comps),
-                               comps_doc_categories(((PyCOMPS*)other)->comps));
-    unienvs = comps_envs_union(comps_doc_environments(((PyCOMPS*)self)->comps),
-                              comps_doc_environments(((PyCOMPS*)other)->comps));
 
-    res->groups_citem->data = unigroups;
-    res->cats_citem->data = unicats;
-    res->envs_citem->data = unienvs;
+    PyCOMPS *self_t = (PyCOMPS *)self;
+    PyCOMPS *other_t = (PyCOMPS *)other;
 
-    comps_doc_set_cats(res->comps, unicats);
-    comps_doc_set_groups(res->comps, unigroups);
-    comps_doc_set_envs(res->comps, unienvs);
+    COMPS_Doc *un_comps = comps_doc_union(self_t->comps, other_t->comps);
+    PyObject *c_caps = PyCapsule_New(un_comps, NULL, NULL);
+    if (c_caps == NULL) {
+        comps_doc_destroy(&un_comps);
+        return NULL;
+    }
 
-    res->enc = ((PyCOMPS*)self)->enc;
-    Py_INCREF(res->enc);
+    PyObject *arglist = Py_BuildValue("OO", self_t->enc, c_caps);
+    res = (PyCOMPS*)PyObject_CallObject((PyObject*)&PyCOMPS_Type, arglist);
+    Py_DECREF(arglist);
+    Py_DECREF(c_caps);
+    if (res == NULL)
+        comps_doc_destroy(&un_comps);
+    else
+        pycomps_ctopy_comps_init((PyObject*)res);
     return (PyObject*)res;
 }
 

@@ -1878,12 +1878,12 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
-    for (it = e1->option_list->first; it != NULL; it = it->next) {
-        comps_set_add(set, it->data);
-    }
-    for (it = e2->option_list->first; it != NULL; it = it->next) {
-        comps_set_add(set, it->data);
-    }
+    if  (e1->option_list)
+        for (it = e1->option_list->first; it != NULL; it = it->next)
+            comps_set_add(set, it->data);
+    if (e2->option_list)
+        for (it = e2->option_list->first; it != NULL; it = it->next)
+            comps_set_add(set, it->data);
     res->option_list = comps_list_create();
     comps_list_init(res->option_list);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
