@@ -47,7 +47,7 @@ COMPS_DocGroupExtra * comps_docgroup_extra_create();
 
 //COMPS_DocGroup* docgroup_from_pycompsgroup(PyObject *self);
 COMPS_List* comps_groups_union(COMPS_List *groups1, COMPS_List *groups2);
-char comps_group_cmp(void *g1, void *g2);
+//char comps_group_cmp(void *g1, void *g2);
 
 void PyCOMPSGroup_dealloc(PyObject *self);
 PyObject * PyCOMPSGroup_new(PyTypeObject *type, PyObject *args, PyObject *kwds);

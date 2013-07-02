@@ -19,22 +19,34 @@ char comps_props_cmp(COMPS_Dict *p1, COMPS_Dict *p2) {
     set1 = comps_set_create();
     comps_set_init(set1, NULL, NULL, NULL, &__comps_prop_pair_cmp);
     set2 = comps_set_create();
-    comps_set_init(set1, NULL, NULL, NULL, &__comps_prop_pair_cmp);
+    comps_set_init(set2, NULL, NULL, NULL, &__comps_prop_pair_cmp);
 
     pairs1 = comps_rtree_pairs(p1);
     pairs2 = comps_rtree_pairs(p2);
     for (hsit = pairs1->first; hsit != NULL; hsit = hsit->next) {
+    //printf("%s=", ((COMPS_RTreePair*)hsit->data)->key);
+    if (((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop_type == COMPS_PROP_STR){
+        //printf("%s\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.str);
+    } else
+        //printf("%d\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.num);
+
         comps_set_add(set1, hsit->data);
     }
     for (hsit = pairs2->first; hsit != NULL; hsit = hsit->next) {
+    //printf("%s=", ((COMPS_RTreePair*)hsit->data)->key);
+    if (((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop_type == COMPS_PROP_STR){
+        //printf("%s\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.str);
+    } else
+        //printf("%d\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.num);
+
         comps_set_add(set2, hsit->data);
     }
-    comps_hslist_destroy(&pairs1);
-    comps_hslist_destroy(&pairs2);
 
-    ret = comps_set_cmp(set1, set2);
+    ret = (comps_set_cmp(set1, set2) == 0);
     comps_set_destroy(&set1);
     comps_set_destroy(&set2);
+    comps_hslist_destroy(&pairs1);
+    comps_hslist_destroy(&pairs2);
     return ret;
 }
 
@@ -50,18 +62,22 @@ void __comps_doc_char_setter(void **attr, char *val, char copy) {
 
 inline char __comps_doccategory_idcmp(void* cat1, void *cat2) {
     return __comps_strcmp(
-            comps_dict_get(((COMPS_DocCategory*)cat1)->properties, "id"),
-            comps_dict_get(((COMPS_DocCategory*)cat2)->properties, "id"));
+  ((COMPS_Prop*)
+   comps_dict_get(((COMPS_DocCategory*)cat1)->properties, "id"))->prop.str,
+  ((COMPS_Prop*)
+   comps_dict_get(((COMPS_DocCategory*)cat2)->properties, "id"))->prop.str);
 }
 inline char __comps_docgroup_idcmp(void* g1, void *g2) {
     return __comps_strcmp(
-            comps_dict_get(((COMPS_DocGroup*)g1)->properties, "id"),
-            comps_dict_get(((COMPS_DocGroup*)g2)->properties, "id"));
+    ((COMPS_Prop*)comps_dict_get(((COMPS_DocGroup*)g1)->properties, "id"))->prop.str,
+    ((COMPS_Prop*)comps_dict_get(((COMPS_DocGroup*)g2)->properties, "id"))->prop.str);
 }
 inline char __comps_docenv_idcmp(void* e1, void *e2) {
     return __comps_strcmp(
-            comps_dict_get(((COMPS_DocEnv*)e1)->properties, "id"),
-            comps_dict_get(((COMPS_DocEnv*)e2)->properties, "id"));
+        ((COMPS_Prop*)
+         comps_dict_get(((COMPS_DocEnv*)e1)->properties, "id"))->prop.str,
+        ((COMPS_Prop*)
+         comps_dict_get(((COMPS_DocEnv*)e2)->properties, "id"))->prop.str);
 }
 
 inline void __comps_doc_add_lang_prop(COMPS_Dict *dict, char *lang, char *prop,
@@ -517,10 +533,14 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
 
     for (it = groups->first; it != NULL; it = it->next) {
         comps_set_add(set, comps_docgroup_clone(it->data));
+        //printf("add roup with id: %s \n",
+       //((COMPS_Prop*)comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "id"))->prop.str);
     }
     groups = comps_doc_groups(c2);
     for (it = groups->first; it != NULL; it = it->next) {
         if (comps_set_in(set, it->data)) {
+            //printf("group with id: %s found\n",
+       //((COMPS_Prop*)comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "id"))->prop.str);
             tmpgroup = comps_docgroup_union(
                                 (COMPS_DocGroup*)it->data,
                                 (COMPS_DocGroup*)comps_set_data_at(set,
@@ -720,8 +740,10 @@ void comps_docgroup_destroy(void *group)
  * @)param copy if copy indicator
  */
 inline void comps_docgroup_set_id(COMPS_DocGroup *group, char *id, char copy) {
-    __comps_doc_add_prop(group->properties, "id",
-                         comps_doc_prop_str_create(id, copy));
+    if (id) {
+        __comps_doc_add_prop(group->properties, "id",
+                             comps_doc_prop_str_create(id, copy));
+    }
 //    __comps_doc_char_setter((void**)&group->id, id, copy);
 }
 
@@ -738,8 +760,10 @@ inline void comps_docgroup_set_id(COMPS_DocGroup *group, char *id, char copy) {
  */
 inline void comps_docgroup_set_name(COMPS_DocGroup *group, char *name,
                                     char copy) {
-    __comps_doc_add_prop(group->properties, "name",
-                         comps_doc_prop_str_create(name, copy));
+    if (name) {
+        __comps_doc_add_prop(group->properties, "name",
+                             comps_doc_prop_str_create(name, copy));
+    }
 //    __comps_doc_char_setter((void**)&group->name, name, copy);
 }
 inline void comps_docgroup_add_lang_name(COMPS_DocGroup *group, char *lang,
@@ -760,8 +784,10 @@ inline void comps_docgroup_add_lang_name(COMPS_DocGroup *group, char *lang,
  */
 inline void comps_docgroup_set_desc(COMPS_DocGroup *group, char *desc,
                                     char copy) {
-    __comps_doc_add_prop(group->properties, "desc",
-                         comps_doc_prop_str_create(desc, copy));
+    if (desc) {
+        __comps_doc_add_prop(group->properties, "desc",
+                             comps_doc_prop_str_create(desc, copy));
+    }
     //__comps_doc_char_setter((void**)&group->desc, desc, copy);
 }
 inline void comps_docgroup_add_lang_desc(COMPS_DocGroup *group, char *lang,
@@ -792,6 +818,13 @@ inline void comps_docgroup_set_uservisible(COMPS_DocGroup *group,
     //group->uservisible = uservisible;
 }
 
+inline void comps_docgroup_set_displayorder(COMPS_DocGroup *group,
+                                           unsigned display_order) {
+    __comps_doc_add_prop(group->properties, "display_order",
+                         comps_doc_prop_num_create(display_order));
+    //group->uservisible = uservisible;
+}
+
 /**
  * Set group lang_only flag
  * @param group COMPS_DocGroup
@@ -799,8 +832,10 @@ inline void comps_docgroup_set_uservisible(COMPS_DocGroup *group,
  */
 inline void comps_docgroup_set_langonly(COMPS_DocGroup *group,
                                         char *langonly, char copy) {
-    __comps_doc_add_prop(group->properties, "langonly",
-                         comps_doc_prop_str_create(langonly, copy));
+    if (langonly) {
+        __comps_doc_add_prop(group->properties, "lang_only",
+                             comps_doc_prop_str_create(langonly, copy));
+    }
     //__comps_doc_char_setter((void**)&group->lang_only, langonly, copy);
 }
 /**
@@ -918,23 +953,28 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
     tmp_prop = comps_dict_get(group->properties, "def");
     if (tmp_prop && tmp_prop->prop_type == COMPS_PROP_NUM) {
         tmp_num = tmp_prop->prop.num;
-    } else
-        tmp_num = 0;
-
-    xmlTextWriterStartElement(writer, (xmlChar*)"default");
-    xmlTextWriterWriteFormatString(writer, "%s", (tmp_num)?"true":"false");
-    xmlTextWriterEndElement(writer);
+        xmlTextWriterStartElement(writer, (xmlChar*)"default");
+        xmlTextWriterWriteFormatString(writer, "%s", (tmp_num)?"true":"false");
+        xmlTextWriterEndElement(writer);
+    }
 
     tmp_prop = comps_dict_get(group->properties, "uservisible");
     if (tmp_prop && tmp_prop->prop_type == COMPS_PROP_NUM) {
         tmp_num = tmp_prop->prop.num;
-    } else
-        tmp_num = 0;
-    xmlTextWriterStartElement(writer, (xmlChar*)"uservisible");
-    xmlTextWriterWriteFormatString(writer, "%s",(tmp_num)?"true":"false");
-    xmlTextWriterEndElement(writer);
+        xmlTextWriterStartElement(writer, (xmlChar*)"uservisible");
+        xmlTextWriterWriteFormatString(writer, "%s",(tmp_num)?"true":"false");
+        xmlTextWriterEndElement(writer);
+    }
 
-    tmp_prop = comps_dict_get(group->properties, "langonly");
+    tmp_prop = comps_dict_get(group->properties, "display_order");
+    if (tmp_prop && tmp_prop->prop_type == COMPS_PROP_NUM) {
+        tmp_num = tmp_prop->prop.num;
+        xmlTextWriterStartElement(writer, (xmlChar*)"display_order");
+        xmlTextWriterWriteFormatString(writer, "%d", tmp_num);
+        xmlTextWriterEndElement(writer);
+    }
+
+    tmp_prop = comps_dict_get(group->properties, "lang_only");
     if (tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR)
         tmp_ch = tmp_prop->prop.str;
     else tmp_ch = NULL;
@@ -1024,6 +1064,7 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     COMPS_HSList *pairs;
 
     res = comps_docgroup_create();
+    comps_dict_destroy(res->properties);
     /*pairs = comps_dict_pairs(g2->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
         printf("%s = ", ((COMPS_RTreePair*)hsit->data)->key);
@@ -1031,7 +1072,6 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     }
     comps_hslist_destroy(&pairs);*/
 
-    comps_dict_destroy(res->properties);
     res->properties = comps_dict_clone(g2->properties);
     pairs = comps_dict_pairs(g1->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
@@ -1039,35 +1079,6 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
                        comps_doc_prop_clone(((COMPS_RTreePair*)hsit->data)->data));
     }
     comps_hslist_destroy(&pairs);
-    /*if (g1->name == NULL) {
-        comps_docgroup_set_name(res, g2->name, 1);
-    } else if (g2->name == NULL) {
-        comps_docgroup_set_name(res, g1->name, 1);
-    } else
-        comps_docgroup_set_name(res, g1->name, 1);
-
-    if (g1->id == NULL) {
-        comps_docgroup_set_id(res, g2->id, 1);
-    } else if (g2->id == NULL) {
-        comps_docgroup_set_id(res, g1->id, 1);
-    } else
-        comps_docgroup_set_id(res, g1->id, 1);
-
-    if (g1->desc == NULL) {
-        comps_docgroup_set_desc(res, g2->desc, 1);
-    } else if (g2->desc == NULL) {
-        comps_docgroup_set_desc(res, g1->desc, 1);
-    } else
-        comps_docgroup_set_desc(res, g1->desc, 1);
-
-    if (g1->lang_only == NULL) {
-        comps_docgroup_set_langonly(res, g2->lang_only, 1);
-    } else if (g2->lang_only == NULL) {
-        comps_docgroup_set_langonly(res, g1->lang_only, 1);
-    } else
-        comps_docgroup_set_langonly(res, g1->lang_only, 1);
-    res->uservisible = g1->uservisible;
-    res->def = g1->def;*/
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &comps_docpackage_cmp);
@@ -1129,27 +1140,6 @@ COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,
     comps_hslist_destroy(&pairs1);
     comps_hslist_destroy(&pairs2);
     comps_set_destroy(&set);
-    /*if (g1->name == NULL) {
-        comps_docgroup_set_name(res, g2->name, 1);
-    } else if (g2->name == NULL) {
-        comps_docgroup_set_name(res, g1->name, 1);
-    } else
-        comps_docgroup_set_name(res, g1->name, 1);
-
-    if (g1->id == NULL) {
-        comps_docgroup_set_name(res, g2->id, 1);
-    } else if (g2->id == NULL) {
-        comps_docgroup_set_name(res, g1->id, 1);
-    } else
-        comps_docgroup_set_name(res, g1->id, 1);
-
-    if (g1->desc == NULL) {
-        comps_docgroup_set_name(res, g2->desc, 1);
-    } else if (g2->desc == NULL) {
-        comps_docgroup_set_name(res, g1->desc, 1);
-    } else
-        comps_docgroup_set_name(res, g1->desc, 1);
-    */
     res->packages = comps_list_create();
     comps_list_init(res->packages);
 
@@ -1177,12 +1167,14 @@ inline char comps_docgroup_cmp(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
          ?((COMPS_DocGroup*)g2)->packages->first: NULL;
     
     for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        if (__comps_strcmp(((COMPS_DocGroupPackage*)it->data)->name,
-                             ((COMPS_DocGroupPackage*)it->data)->name))
+        if (!__comps_strcmp(((COMPS_DocGroupPackage*)it->data)->name,
+                             ((COMPS_DocGroupPackage*)it2->data)->name)) {
             return 0;
+        }
         if (((COMPS_DocGroupPackage*)it->data)->type !=
-            ((COMPS_DocGroupPackage*)it2->data)->type)
+            ((COMPS_DocGroupPackage*)it2->data)->type) {
             return 0;
+        }
     }
     if (it != NULL || it2 != NULL)
         return 0;
@@ -1243,8 +1235,10 @@ void comps_doccategory_destroy(void *category)
  */
 inline void comps_doccategory_set_id(COMPS_DocCategory *category, char *id,
                                      char copy) {
-    __comps_doc_add_prop(category->properties, "id",
-                         comps_doc_prop_str_create(id, copy));
+    if (id) {
+        __comps_doc_add_prop(category->properties, "id",
+                             comps_doc_prop_str_create(id, copy));
+    }
     //__comps_doc_char_setter((void**)&category->id, id, copy);
 }
 
@@ -1261,8 +1255,10 @@ inline void comps_doccategory_set_id(COMPS_DocCategory *category, char *id,
  */
 inline void comps_doccategory_set_name(COMPS_DocCategory *category, char *name,
                                        char copy) {
-    __comps_doc_add_prop(category->properties, "name",
-                         comps_doc_prop_str_create(name, copy));
+    if (name) {
+        __comps_doc_add_prop(category->properties, "name",
+                             comps_doc_prop_str_create(name, copy));
+    }
     //__comps_doc_char_setter((void**)&category->name, name, copy);
 }
 inline void comps_doccategory_add_lang_name(COMPS_DocCategory *category,
@@ -1283,8 +1279,10 @@ inline void comps_doccategory_add_lang_name(COMPS_DocCategory *category,
  */
 inline void comps_doccategory_set_desc(COMPS_DocCategory *category, char *desc,
                                        char copy) {
-    __comps_doc_add_prop(category->properties, "desc",
-                         comps_doc_prop_str_create(desc, copy));
+    if (desc) {
+        __comps_doc_add_prop(category->properties, "desc",
+                             comps_doc_prop_str_create(desc, copy));
+    }
     //__comps_doc_char_setter((void**)&category->desc, desc, copy);
 }
 inline void comps_doccategory_add_lang_desc(COMPS_DocCategory *category,
@@ -1471,6 +1469,19 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
 
     res = comps_doccategory_create();
     comps_dict_destroy(res->properties);
+
+//    pairs = comps_dict_pairs(c2->properties);
+//    for (hsit = pairs->first; hsit != NULL; hsit= hsit->next)     {
+//        printf("%s=", ((COMPS_RTreePair*)hsit->data)->key);
+//        if (((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop_type == COMPS_PROP_STR)
+//            printf("%s\n",
+//                   ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.str);
+//        else
+//            printf("%d\n",
+//                   ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.num);
+//    }
+//    comps_hslist_destroy(&pairs);
+
     res->properties = comps_dict_clone(c2->properties);
     pairs = comps_dict_pairs(c1->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
@@ -1599,17 +1610,22 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
 
 inline char comps_doccategory_cmp(COMPS_DocCategory *c1, COMPS_DocCategory *c2) {
     COMPS_ListItem *it, *it2;
+    char ret;
 
     it = (c1->group_ids)?c1->group_ids->first: NULL;
     it2 = (c2->group_ids)?c2->group_ids->first: NULL;
     
     for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        if (__comps_strcmp(it->data, it2->data))
+        if (!__comps_strcmp(it->data, it2->data)) {
             return 0;
+        }
     }
-    if (it != NULL || it2 != NULL)
+    if (it != NULL || it2 != NULL) {
         return 0;
-    return comps_props_cmp(c1->properties, c2->properties);
+    }
+    ret = comps_props_cmp(c1->properties, c2->properties);
+    //printf("set cmp:%d\n", ret);
+    return ret;
 }
 inline char comps_doccategory_cmp_v(void *c1, void *c2) {
     return comps_doccategory_cmp((COMPS_DocCategory*)c1, (COMPS_DocCategory*)c2);
@@ -1664,8 +1680,9 @@ void comps_docenv_destroy(void *env) {
  */
 inline void comps_docenv_set_id(COMPS_DocEnv * env, char *id, char copy) {
     //return 
-    __comps_doc_add_prop(env->properties, "id",
-                         comps_doc_prop_str_create(id, copy));
+    if (id)
+        __comps_doc_add_prop(env->properties, "id",
+                             comps_doc_prop_str_create(id, copy));
     //__comps_doc_char_setter((void**)&env->id, id, copy);
 }
 
@@ -1682,8 +1699,9 @@ inline void comps_docenv_set_id(COMPS_DocEnv * env, char *id, char copy) {
  */
 inline void comps_docenv_set_name(COMPS_DocEnv * env, char *name, char copy) {
     //return 
-    __comps_doc_add_prop(env->properties, "name",
-                         comps_doc_prop_str_create(name, copy));
+    if (name)
+        __comps_doc_add_prop(env->properties, "name",
+                             comps_doc_prop_str_create(name, copy));
     //__comps_doc_char_setter((void**)&env->name, name, copy);
 }
 inline void comps_docenv_add_lang_name(COMPS_DocEnv *env,
@@ -1704,8 +1722,9 @@ inline void comps_docenv_add_lang_name(COMPS_DocEnv *env,
  */
 inline void comps_docenv_set_desc(COMPS_DocEnv * env, char *desc, char copy) {
     //return 
-    __comps_doc_add_prop(env->properties, "desc",
-                         comps_doc_prop_str_create(desc, copy));
+    if (desc)
+        __comps_doc_add_prop(env->properties, "desc",
+                             comps_doc_prop_str_create(desc, copy));
     //__comps_doc_char_setter((void**)&env->desc, desc, copy);
 }
 inline void comps_docenv_add_lang_desc(COMPS_DocEnv *env,

@@ -469,6 +469,7 @@ void* str_clonner(void *str) {
 START_TEST(test_comps_doc_union)
 {
     COMPS_DocGroup *g1, *g2, *g3;
+    COMPS_DocCategory *c1, *c2, *c3;
     COMPS_DocGroupPackage *p;
 
     g1 = comps_docgroup_create();
@@ -497,6 +498,34 @@ START_TEST(test_comps_doc_union)
     comps_docgroup_destroy(g1);
     comps_docgroup_destroy(g2);
     comps_docgroup_destroy(g3);
+
+
+    c1 = comps_doccategory_create();
+    comps_doccategory_set_id(c1, "c1", 1);
+    comps_doccategory_set_name(c1, "category 1", 1);
+    comps_doccategory_set_desc(c1, "cat desc 1", 1);
+    comps_doccategory_add_groupid(c1, "g1", 1);
+    comps_doccategory_add_groupid(c1, "g2", 1);
+
+    c2 = comps_doccategory_create();
+    comps_doccategory_set_id(c2, "c1", 1);
+    comps_doccategory_set_name(c2, "category 1", 1);
+    comps_doccategory_set_desc(c2, "cat desc 1", 1);
+    comps_doccategory_add_groupid(c2, "g1", 1);
+    comps_doccategory_add_groupid(c2, "g2", 1);
+
+    c3 = comps_doccategory_union(c1, c2);
+    //comps_doccategory_destroy(c1);
+    comps_doccategory_destroy(c2);
+    comps_doccategory_destroy(c3);
+
+    c2 = comps_doccategory_create();
+    comps_doccategory_set_id(c2, "c1", 1);
+    comps_doccategory_set_name(c2, "category 1", 1);
+    comps_doccategory_set_desc(c2, "cat desc 1", 1);
+    comps_doccategory_add_groupid(c2, "g1", 1);
+    comps_doccategory_add_groupid(c2, "g2", 1);
+
 }END_TEST
 
 Suite* basic_suite (void)

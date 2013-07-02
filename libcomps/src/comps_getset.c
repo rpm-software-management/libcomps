@@ -211,9 +211,11 @@ COMPS_Prop * comps_doc_prop_str_create(char * str, char copy) {
     COMPS_Prop *ret;
     ret = malloc(sizeof(COMPS_Prop));
     ret->prop_type = COMPS_PROP_STR;
-    if (copy) {
+    if (copy && str) {
         ret->prop.str = malloc(sizeof(char) * (strlen(str)+1));
         memcpy(ret->prop.str, str, sizeof(char) * (strlen(str)+1));
+    } else if (!str) {
+        ret->prop.str = NULL;
     } else {
         ret->prop.str = str;
     }
@@ -231,10 +233,12 @@ COMPS_Prop * comps_doc_prop_clone(COMPS_Prop *prop) {
     COMPS_Prop *ret;
     ret = malloc(sizeof(COMPS_Prop));
     ret->prop_type = prop->prop_type;
-    if (prop->prop_type == COMPS_PROP_STR) {
+    if (prop->prop_type == COMPS_PROP_STR && prop->prop.str) {
         ret->prop.str = malloc(sizeof(char)* (strlen(prop->prop.str)+1));
         memcpy(ret->prop.str, prop->prop.str,
                sizeof(char) * (strlen(prop->prop.str)+1));
+    } else if (prop->prop_type ==COMPS_PROP_STR && !prop->prop.str) {
+        ret->prop.str = NULL;
     } else {
         ret->prop.num = prop->prop.num;
     }

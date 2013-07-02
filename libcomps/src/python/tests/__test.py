@@ -155,15 +155,15 @@ class GroupListTest(unittest.TestCase):
         c2 = libcomps.Group()
         with self.assertRaises(TypeError):
             c1 = libcomps.Group("group1", "group1", "group desc", 0,0,1,1)
-        c = libcomps.Group("group1", "group1", "group desc", 0, 0, "en")
+        c = libcomps.Group("group1", "group1", "group desc", 0, 0, 0, "en")
         self.grouplist.append(c)
         z = self.grouplist[0]
         self.assertTrue(c == z)
         self.assertTrue(len(self.grouplist) == 1)
         self.grouplist.append(libcomps.Group("g2", "group2", "group desc",
-                                             0, 0, "en"))
+                                             0, 0, 0, "en"))
         self.grouplist.append(libcomps.Group("g3", "group3", "group desc",
-                                             0, 0, "en"))
+                                             0, 0, 0, "en"))
 
         del self.grouplist[0]
         self.assertTrue(len(self.grouplist) == 2)
@@ -175,8 +175,8 @@ class GroupListTest(unittest.TestCase):
 
     #@unittest.skip("skip")
     def test_append(self):
-        c1 = libcomps.Group("g1", "group1", "group desc", 0, 0, "en")
-        c2 = libcomps.Group("g2", "group2", "group desc", 0, 0, "en")
+        c1 = libcomps.Group("g1", "group1", "group desc", 0, 0, 0, "en")
+        c2 = libcomps.Group("g2", "group2", "group desc", 0, 0, 0, "en")
         self.grouplist.append(c1)
         self.assertTrue(c1 == self.grouplist[0])
         self.assertTrue(len(self.grouplist) == 1)
@@ -187,15 +187,15 @@ class GroupListTest(unittest.TestCase):
     #@unittest.skip("skip")
     def test_slice(self):
         self.grouplist.append(libcomps.Group("g1", "group1", "group desc",
-                                             0, 0, "en"))
+                                             0, 0, 0, "en"))
         self.grouplist.append(libcomps.Group("g2", "group2", "group desc",
-                                             0, 0, "en"))
+                                             0, 0, 0, "en"))
         self.grouplist.append(libcomps.Group("g3", "group3", "group desc",
-                                             0, 0, "en"))
+                                             0, 0, 0, "en"))
         self.grouplist.append(libcomps.Group("g4", "group4", "group desc",
-                                             0, 0, "en"))
+                                             0, 0, 0, "en"))
         self.grouplist.append(libcomps.Group("g5", "group5", "group desc",
-                                             0, 0, "en"))
+                                             0, 0, 0, "en"))
 
         subseq = self.grouplist[1:3]
         self.assertTrue(len(subseq) == 2)
@@ -205,8 +205,8 @@ class GroupListTest(unittest.TestCase):
         self.assertTrue(len(subseq) == 0)
 
         newseq = libcomps.GroupList()
-        newseq.append(libcomps.Group("g6", "group6", "group desc", 0, 0, "en"))
-        newseq.append(libcomps.Group("g7", "group7", "group desc", 0, 0, "en"))
+        newseq.append(libcomps.Group("g6", "group6", "group desc", 0, 0, 0, "en"))
+        newseq.append(libcomps.Group("g7", "group7", "group desc", 0, 0, 0, "en"))
 
         self.grouplist[1:3] = newseq
         self.assertTrue(self.grouplist[1] == newseq[0])
@@ -217,26 +217,29 @@ class GroupListTest(unittest.TestCase):
         self.assertTrue(self.grouplist[6] == newseq[1])
 
         newseq = libcomps.GroupList()
-        newseq.append(libcomps.Group("gX", "groupX", "group desc", 0, 0, "en"))
+        newseq.append(libcomps.Group("gX", "groupX", "group desc", 0, 0, 0, "en"))
         self.grouplist[1:5] = newseq
 
     #@unittest.skip("skip")
     def test_concat(self):
         self.grouplist.append(libcomps.Group("g1", "group1", "group desc",
-                                             0, 0, "en"))
+                                             0, 0, 0, "en"))
         self.grouplist.append(libcomps.Group("g2", "group2", "group desc",
-                                             0, 0, "en"))
+                                             0, 0, 0, "en"))
         self.grouplist.append(libcomps.Group("g3", "group3", "group desc",
-                                             0, 0, "en"))
+                                             0, 0, 0, "en"))
         self.grouplist.append(libcomps.Group("g4", "group4", "group desc",
-                                             0, 0, "en"))
+                                             0, 0, 0, "en"))
 
         newseq = libcomps.GroupList()
 
         concated = self.grouplist + newseq
+        #print self.grouplist
+        #print ""
+        #print concated
         self.assertTrue(concated == self.grouplist)
-        newseq.append(libcomps.Group("g3", "group3", "group desc", 0, 0, "en"))
-        newseq.append(libcomps.Group("g5", "group5", "group desc", 0, 0, "en"))
+        newseq.append(libcomps.Group("g3", "group3", "group desc", 0, 0, 0, "en"))
+        newseq.append(libcomps.Group("g5", "group5", "group desc", 0, 0, 0, "en"))
 
         concated = self.grouplist + newseq
         self.assertFalse(concated == self.grouplist)
@@ -259,7 +262,7 @@ class GroupListTest(unittest.TestCase):
 
     #@unittest.skip("skip")
     def test_group_packages(self):
-        group = libcomps.Group("g1","group1","group desc", 0, 0, "en")
+        group = libcomps.Group("g1","group1","group desc", 0, 0, 0, "en")
         self.assertTrue(len(group.packages) == 0)
         group.packages.append(libcomps.Package("kernel-3.2",
                                                libcomps.PACKAGE_TYPE_MANDATORY))
@@ -274,7 +277,7 @@ class GroupListTest(unittest.TestCase):
         gl = libcomps.GroupList()
         gl.clear()
         self.assertTrue(len(gl) == 0)
-        gl.append(libcomps.Group("g1","group1","group desc", 0, 0, "en"))
+        gl.append(libcomps.Group("g1","group1","group desc", 0, 0, 0, "en"))
         gl.clear()
         self.assertTrue(len(gl) == 0)
 
@@ -376,7 +379,7 @@ class EnvListTest(unittest.TestCase):
 
     #@unittest.skip("skip")
     def test_group_packages(self):
-        group = libcomps.Group("g1","group1","group desc", 0, 0, "en")
+        group = libcomps.Group("g1","group1","group desc", 0, 0, 0, "en")
         self.assertTrue(len(group.packages) == 0)
         group.packages.append(libcomps.Package("kernel-3.2",
                                                libcomps.PACKAGE_TYPE_MANDATORY))
@@ -424,7 +427,6 @@ class CategoryTest(unittest.TestCase):
         c2.group_ids.append("g1")
         c2.group_ids.append("g4")
         c2.group_ids.append("g5")
-        #print c1, c2
         c = c1 + c2
         self.assertTrue(len(c.group_ids) == 5)
         #print c.group_ids[0]
@@ -479,11 +481,11 @@ class GroupTest(unittest.TestCase):
 
     #@unittest.skip("skip")
     def test_add(self):
-        g1 = libcomps.Group("g1", "group 1", "group desc", 0, 0, "en")
+        g1 = libcomps.Group("g1", "group 1", "group desc", 0, 0, 0, "en")
         g1.packages.append(libcomps.Package("oss", libcomps.PACKAGE_TYPE_DEFAULT))
         g1.packages.append(libcomps.Package("alsa", libcomps.PACKAGE_TYPE_DEFAULT))
         g1.packages.append(libcomps.Package("pulse", libcomps.PACKAGE_TYPE_DEFAULT))
-        g2 = libcomps.Group("cat2", "category 2", "cat desc", 0, 0, "en")
+        g2 = libcomps.Group("cat2", "category 2", "cat desc", 0, 0, 0, "en")
         g2.packages.append(libcomps.Package("oss", libcomps.PACKAGE_TYPE_DEFAULT))
         g2.packages.append(libcomps.Package("jack", libcomps.PACKAGE_TYPE_DEFAULT))
         g2.packages.append(libcomps.Package("portaudio", libcomps.PACKAGE_TYPE_DEFAULT))
@@ -497,7 +499,7 @@ class GroupTest(unittest.TestCase):
                         g.packages[3] == g2.packages[1] and\
                         g.packages[4] == g2.packages[2])
         g1 = libcomps.Group()
-        g2 = libcomps.Group("g2", "group 2", "group desc", 0, 0, "en")
+        g2 = libcomps.Group("g2", "group 2", "group desc", 0, 0, 0,"en")
         g2.packages.append(libcomps.Package("oss", libcomps.PACKAGE_TYPE_DEFAULT))
         g = g1 + g2
         self.assertTrue(g == g2)
@@ -509,7 +511,7 @@ class GroupTest(unittest.TestCase):
         #print c
 
     def test_langs(self):
-        g1 = libcomps.Group("g1", "group 1", "group desc", 0, 0, "en")
+        g1 = libcomps.Group("g1", "group 1", "group desc", 0, 0, 0, "en")
         g1.name_by_lang["af"]="Administrasienutsgoed"
         g1.name_by_lang["bs"]="Administrativni alati"
         g1.name_by_lang["id"]="Peralatan Administrasi"
@@ -517,7 +519,7 @@ class GroupTest(unittest.TestCase):
         g1.name_by_lang["af"]="Afrikaanse taalsteun"
         self.assertTrue(g1.name_by_lang["af"] == "Afrikaanse taalsteun")
 
-        g2 = libcomps.Group("g2", "group 2", "group desc", 0, 0, "en")
+        g2 = libcomps.Group("g2", "group 2", "group desc", 0, 0, 0, "en")
         g2.name_by_lang["af"]="Afrikaanse taalsteun"
         g2.name_by_lang["bs"]="Administrativni alati"
         g2.name_by_lang["id"]="Peralatan Administrasi"
@@ -588,7 +590,7 @@ class EnvTest(unittest.TestCase):
         e2.name_by_lang["af"]="Afrikaanse taalsteun"
         e2.name_by_lang["bs"]="Administrativni alati"
         e2.name_by_lang["id"]="Peralatan Administrasi"
-        
+
         self.assertTrue(e1.name_by_lang, e2.name_by_lang)
 
 class COMPSTest(unittest.TestCase):
@@ -598,11 +600,11 @@ class COMPSTest(unittest.TestCase):
     #@unittest.skip("skip")
     def test_xml(self):
         self.comps.groups.append(libcomps.Group("g1", "group1", "group desc",
-                                                0, 0, "en"))
+                                                0, 0, 0, "en"))
         self.comps.groups.append(libcomps.Group("g2", "group2", "group desc",
-                                                0, 0, "en"))
+                                                0, 0, 0, "en"))
         self.comps.groups.append(libcomps.Group("g3", "group3", "group desc",
-                                                0, 0, "en"))
+                                                0, 0, 0, "en"))
         g = self.comps.groups[0]
         g.packages.append(libcomps.Package("kernel", libcomps.PACKAGE_TYPE_MANDATORY))
         g = self.comps.groups[1]
@@ -622,7 +624,7 @@ class COMPSTest(unittest.TestCase):
 
         comps2 = libcomps.Comps()
         errs = comps2.fromxml_f(fname)
-        self.assertTrue(len(errs) == 0)
+        self.assertTrue(len(errs) == 0, errs)
 
         compsdoc = comps2.xml_str()
         compsdoc = compsdoc[0:-5] # make some error
@@ -636,9 +638,12 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(len(comps3.groups) == 3)
         self.assertTrue(len(comps3.categories) == 2)
         self.assertTrue(len(comps3.environments) == 0)
-        self.assertTrue(self.comps.xml_str() == comps2.xml_str())
+        x = self.comps.xml_str()
+        y = comps2.xml_str()
+        self.assertTrue(x == y)
         os.remove(fname)
 
+    #@unittest.skip("skip")
     def test_fedora(self):
         comps = libcomps.Comps()
         comps.fromxml_f("fedora_comps.xml")
@@ -647,6 +652,7 @@ class COMPSTest(unittest.TestCase):
         comps2.fromxml_f("fed2.xml")
         self.assertTrue(comps == comps2)
 
+    #@unittest.skip("skip")
     def test_sample(self):
         comps = libcomps.Comps()
         comps.fromxml_f("sample_comps.xml")
@@ -655,6 +661,27 @@ class COMPSTest(unittest.TestCase):
         comps2.fromxml_f("sample2.xml")
         self.assertTrue(comps == comps2)
 
+    #@unittest.skip("skip")
+    def test_main(self):
+        comps = libcomps.Comps()
+        comps.fromxml_f("main_comps.xml")
+        comps.xml_f("main2.xml")
+        comps2 = libcomps.Comps()
+        comps2.fromxml_f("main2.xml")
+        x = comps.xml_str()
+        y = comps2.xml_str()
+        self.assertTrue(comps == comps2)
+        self.assertTrue(y == x)
+        #os.remove("main2.xml")
+
+    #@unittest.skip("skip")
+    def test_main_union(self):
+        c1 = libcomps.Comps()
+        c2 = libcomps.Comps()
+        c2.fromxml_f('main_comps.xml')
+        c = c1 + c2 # <--- sigsegvs here
+
+    #@unittest.skip("skip")
     def test_union(self):
         comps = libcomps.Comps()
         comps.fromxml_f("sample_comps.xml")
@@ -694,7 +721,7 @@ class COMPSTest(unittest.TestCase):
             cids3_set.add(c.id)
         for e in comps3.environments:
             eids3_set.add(e.id)
-        
+
         self.assertTrue(gids3_set == gids_set)
         self.assertTrue(cids3_set == cids_set)
         self.assertTrue(eids3_set == eids_set)

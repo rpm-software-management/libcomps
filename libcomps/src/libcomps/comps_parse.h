@@ -23,26 +23,9 @@ typedef struct {
     char *tmp_buffer;
     COMPS_Logger *log;
     XML_Parser parser;
-    //COMPS_DTDRuleList * dtd_rules;
     const char *enc;
 } COMPS_Parsed;
 
-
-/*const char * comps_elem_names[] ={[COMPS_ELEM_UNKNOWN] = "",
-                                 [COMPS_ELEM_DOC] = "comps",
-                                 [COMPS_ELEM_GROUP] = "group",
-                                 [COMPS_ELEM_ID] = "id",
-                                 [COMPS_ELEM_NAME] = "name",
-                                 [COMPS_ELEM_DESC] = "description",
-                                 [COMPS_ELEM_DEFAULT] = "default",
-                                 [COMPS_ELEM_USERVISIBLE] = "uservisible",
-                                 [COMPS_ELEM_PACKAGELIST] = "packagelist",
-                                 [COMPS_ELEM_PACKAGE] = "packagereq",
-                                 [COMPS_ELEM_CATEGORY] = "category",
-                                 [COMPS_ELEM_GROUPLIST] = "grouplist",
-                                 [COMPS_ELEM_GROUPID] = "groupid",
-                                 [COMPS_ELEM_NONE] = NULL};
-*/
 COMPS_Parsed* comps_parse_parsed_create();
 void comps_parse_parsed_reinit(COMPS_Parsed *parsed);
 void comps_parse_parsed_destroy(COMPS_Parsed *parsed);

@@ -129,8 +129,10 @@ COMPS_RTree * comps_rtree_clone(COMPS_RTree *rt) {
     for (it = rt->subnodes->first; it != NULL; it = it->next) {
         rtdata = comps_rtree_data_create(ret,
                                       ((COMPS_RTreeData*)it->data)->key, NULL);
-        new_data = rt->data_cloner(((COMPS_RTreeData*)it->data)->data);
-
+        if (((COMPS_RTreeData*)it->data)->data != NULL)
+            new_data = rt->data_cloner(((COMPS_RTreeData*)it->data)->data);
+        else
+            new_data = NULL;
         comps_hslist_destroy(&rtdata->subnodes);
         rtdata->subnodes = ((COMPS_RTreeData*)it->data)->subnodes;
         rtdata->data = new_data;
@@ -148,7 +150,7 @@ COMPS_RTree * comps_rtree_clone(COMPS_RTree *rt) {
         new_subnodes = comps_hslist_create();
         comps_hslist_init(new_subnodes, NULL, NULL, &comps_rtree_data_destroy_v);
         for (it = tmplist->first; it != NULL; it = it->next) {
-            rtdata = comps_rtree_data_create(rt,
+            rtdata = comps_rtree_data_create(ret,
                                       ((COMPS_RTreeData*)it->data)->key, NULL);
             if (((COMPS_RTreeData*)it->data)->data != NULL)
                 new_data = rt->data_cloner(((COMPS_RTreeData*)it->data)->data);
@@ -453,13 +455,13 @@ void comps_rtree_unset(COMPS_RTree * rt, const char * key) {
         if (ended == 3) {
             /* remove node from tree only if there's no descendant*/
             if (rtdata->subnodes->last == NULL) {
-                printf("removing all\n");
+                //printf("removing all\n");
                 comps_hslist_remove(subnodes, it);
                 comps_rtree_data_destroy(rtdata);
                 free(it);
             }
             else if (rtdata->data_destructor != NULL) {
-                printf("removing data only\n");
+                //printf("removing data only\n");
                 (*rtdata->data_destructor)(rtdata->data);
                 rtdata->is_leaf = 0;
                 rtdata->data = NULL;
@@ -474,7 +476,7 @@ void comps_rtree_unset(COMPS_RTree * rt, const char * key) {
 
             /*remove all predecessor of deleted node (recursive) with no childs*/
             while (rtdata->subnodes->last == NULL) {
-                printf("removing '%s'\n", rtdata->key);
+                //printf("removing '%s'\n", rtdata->key);
                 comps_rtree_data_destroy(rtdata);
                 comps_hslist_remove(
                             ((struct Relation*)path->last->data)->parent_nodes,

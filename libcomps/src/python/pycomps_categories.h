@@ -34,7 +34,7 @@ void comps_doccategory_extra_destroy(void *cdce);
 char __pycomps_cat_idcmp(void *c1, void *c2);
 
 COMPS_List* comps_cats_union(COMPS_List *cats1, COMPS_List *cats2);
-char comps_cat_cmp(void *c1, void *c2);
+//char comps_cat_cmp(void *c1, void *c2);
 
 void pycomps_cat_destroy(void *cat);
 void pycomps_cat_decref(void *cat);

@@ -1,8 +1,11 @@
 #include "pycomps_groups.h"
 
 char __compsgroup_id_cmp(void *g1, void *g2) {
-    return (strcmp((char*)comps_dict_get(((COMPS_DocGroup*)g1)->properties, "id"),
-                   (char*)comps_dict_get(((COMPS_DocGroup*)g2)->properties, "id"))
+    return (strcmp(
+        (char*)((COMPS_Prop*)
+               comps_dict_get(((COMPS_DocGroup*)g1)->properties, "id"))->prop.str,
+        (char*)((COMPS_Prop*)
+               comps_dict_get(((COMPS_DocGroup*)g2)->properties, "id"))->prop.str)
             == 0);
 }
 
@@ -172,7 +175,7 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
     char *id = NULL;
     char *desc = NULL;
     char *lang = NULL;
-    unsigned def=0, uservis=0;
+    unsigned def=0, uservis=0, disp_order=0;
     
     (void) kwds;
 
@@ -182,17 +185,19 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
     def = 0;
     uservis = 0;
     lang = NULL;
-    if (args && PyArg_ParseTuple(args, "|sssiis", &id,
+    if (args && PyArg_ParseTuple(args, "|sssiiis", &id,
                                           &name,
                                           &desc,
                                           &def,
                                           &uservis,
+                                          &disp_order,
                                           &lang)) {
         comps_docgroup_set_id(pycomps_group_get((PyObject*)self), id, 1);
         comps_docgroup_set_name(pycomps_group_get((PyObject*)self), name, 1);
         comps_docgroup_set_desc(pycomps_group_get((PyObject*)self), desc, 1);
         comps_docgroup_set_default(pycomps_group_get((PyObject*)self), def);
         comps_docgroup_set_uservisible(pycomps_group_get((PyObject*)self), uservis);
+        comps_docgroup_set_displayorder(pycomps_group_get((PyObject*)self), disp_order);
         comps_docgroup_set_langonly(pycomps_group_get((PyObject*)self), lang, 1);
         return 0;
     } else {
@@ -325,7 +330,7 @@ inline void comps_group_print(FILE *f, void *g) {
     uservis = (tmp_prop)?tmp_prop->prop.num: 0;
 
     fprintf(f, "<COMPS_Group: id='%s', name='%s', description='%s',  "
-            "default='%d', uservisible='%d', lang_only='%s', display_order=%d",
+            "default='%d', uservisible='%d', lang_only='%s', display_order=%d ",
             id, name, desc, def, uservis, lang, disp_ord);
     fprintf(f, "name_by_lang={");
     pairlist = comps_rtree_pairs(((COMPS_DocGroup*)g)->name_by_lang);
@@ -486,10 +491,17 @@ int pycomps_group_strattr_setter(PyObject *self, PyObject *val, void *closure) {
     }
     tmp_prop = comps_dict_get(pycomps_group_get(self)->properties, (char*)closure);
     if (!tmp_prop) {
-        tmp_prop = comps_doc_prop_str_create(tmp, 0);
-        comps_dict_set(pycomps_group_get(self)->properties, (char*)closure, tmp_prop);
+        if (tmp) {
+            tmp_prop = comps_doc_prop_str_create(tmp, 0);
+            comps_dict_set(pycomps_group_get(self)->properties,
+                           (char*)closure, tmp_prop);
+        }
     } else {
-        __comps_doc_char_setter((void**)&tmp_prop->prop.str, tmp, 0);
+        if (tmp)
+            __comps_doc_char_setter((void**)&tmp_prop->prop.str, tmp, 0);
+        else {
+            comps_dict_unset(pycomps_group_get(self)->properties, (char*)closure);
+        }
     }
     return 0;
 }
@@ -500,6 +512,64 @@ PyObject* pycomps_group_strattr_getter(PyObject *self, void *closure) {
     tmp_prop = comps_dict_get(pycomps_group_get(self)->properties, (char*)closure);
     if (tmp_prop)
         return PyUnicode_FromString(tmp_prop->prop.str);
+    else
+        Py_RETURN_NONE;
+}
+
+int pycomps_group_numattr_setter(PyObject *self, PyObject *val, void *closure) {
+    long tmp;
+    COMPS_Prop *tmp_prop;
+    if (!PyLong_Check(val)) {
+        PyErr_SetString(PyExc_TypeError, "Not int object");
+        return -1;
+    }
+    tmp = PyLong_AsLong(val);
+    tmp_prop = comps_dict_get(pycomps_group_get(self)->properties, (char*)closure);
+    if (!tmp_prop) {
+            tmp_prop = comps_doc_prop_num_create(tmp);
+            comps_dict_set(pycomps_group_get(self)->properties,
+                           (char*)closure, tmp_prop);
+    } else {
+        tmp_prop->prop.num = tmp;
+    }
+    return 0;
+}
+
+PyObject* pycomps_group_numattr_getter(PyObject *self, void *closure) {
+
+    COMPS_Prop *tmp_prop;
+    tmp_prop = comps_dict_get(pycomps_group_get(self)->properties, (char*)closure);
+    if (tmp_prop)
+        return PyLong_FromLong(tmp_prop->prop.num);
+    else
+        Py_RETURN_NONE;
+}
+
+int pycomps_group_boolattr_setter(PyObject *self, PyObject *val, void *closure) {
+    long tmp;
+    COMPS_Prop *tmp_prop;
+    if (!PyBool_Check(val)) {
+        PyErr_SetString(PyExc_TypeError, "Not bool object");
+        return -1;
+    }
+    tmp = (val == Py_True)?1:0;
+    tmp_prop = comps_dict_get(pycomps_group_get(self)->properties, (char*)closure);
+    if (!tmp_prop) {
+            tmp_prop = comps_doc_prop_num_create(tmp);
+            comps_dict_set(pycomps_group_get(self)->properties,
+                           (char*)closure, tmp_prop);
+    } else {
+        tmp_prop->prop.num = tmp;
+    }
+    return 0;
+}
+
+PyObject* pycomps_group_boolattr_getter(PyObject *self, void *closure) {
+
+    COMPS_Prop *tmp_prop;
+    tmp_prop = comps_dict_get(pycomps_group_get(self)->properties, (char*)closure);
+    if (tmp_prop)
+        return PyBool_FromLong(tmp_prop->prop.num);
     else
         Py_RETURN_NONE;
 }
@@ -521,6 +591,18 @@ PyGetSetDef PyCOMPSGroup_getset[] = {
     {"desc",
      (getter)pycomps_group_strattr_getter, (setter)pycomps_group_strattr_setter,
      "Group description", "desc"},
+    {"lang_only",
+     (getter)pycomps_group_strattr_getter, (setter)pycomps_group_strattr_setter,
+     "Group langonly", "lang_only"},
+    {"display_order",
+     (getter)pycomps_group_numattr_getter, (setter)pycomps_group_numattr_setter,
+     "Group display order attribute", "display_order"},
+    {"uservisible",
+     (getter)pycomps_group_boolattr_getter, (setter)pycomps_group_boolattr_setter,
+     "Group uservisible attribute", "uservisible"},
+    {"default",
+     (getter)pycomps_group_boolattr_getter, (setter)pycomps_group_boolattr_setter,
+     "Group default attribute", "def"},
     {"packages",
     (getter)PyCOMPSGroup_get_packages, (setter)PyCOMPSGroup_set_packages,
      "Group packages",
@@ -543,7 +625,7 @@ PyCOMPS_CtoPySeqItemMan PyCOMPSGroup_ItemMan = {
     .ctopy_convert = PyCOMPSGroup_convert,
     .data_decref = pycomps_group_decref,
     .data_incref = comps_group_incref,
-    .data_cmp = comps_docgroup_cmp,
+    .data_cmp = comps_docgroup_cmp_v,
     .fprint_f = comps_group_print,
     .str_f = comps_group_str
 };
@@ -610,7 +692,8 @@ COMPS_List* comps_groups_union(COMPS_List *groups1, COMPS_List *groups2) {
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__compsgroup_id_cmp);
 
-    for (it = groups1->first; it != NULL; it = it->next) {
+    it = groups1?groups1->first:NULL;
+    for (; it != NULL; it = it->next) {
         if (((COMPS_DocGroup*)it->data)->packages == NULL) {
             ((COMPS_DocGroup*)it->data)->packages = comps_list_create();
             comps_list_init(((COMPS_DocGroup*)it->data)->packages);
@@ -620,7 +703,8 @@ COMPS_List* comps_groups_union(COMPS_List *groups1, COMPS_List *groups2) {
         comps_group_incref(it->data);
         comps_set_add(set, it->data);
     }
-    for (it = groups2->first; it != NULL; it = it->next) {
+    it = groups2?groups2->first:NULL;
+    for (; it != NULL; it = it->next) {
         tmpgroup = it->data;
         if (tmpgroup->packages == NULL) {
             tmpgroup->packages = comps_list_create();

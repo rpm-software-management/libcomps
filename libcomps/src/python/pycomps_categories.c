@@ -449,10 +449,17 @@ int pycomps_cat_strattr_setter(PyObject *self, PyObject *val, void *closure) {
     }
     tmp_prop = comps_dict_get(pycomps_cat_get(self)->properties, (char*)closure);
     if (!tmp_prop) {
-        tmp_prop = comps_doc_prop_str_create(tmp, 0);
-        comps_dict_set(pycomps_cat_get(self)->properties, (char*)closure, tmp_prop);
+        if (tmp) {
+            tmp_prop = comps_doc_prop_str_create(tmp, 0);
+            comps_dict_set(pycomps_cat_get(self)->properties,
+                           (char*)closure, tmp_prop);
+        }
     } else {
-        __comps_doc_char_setter((void**)&tmp_prop->prop.str, tmp, 0);
+        if (tmp)
+            __comps_doc_char_setter((void**)&tmp_prop->prop.str, tmp, 0);
+        else {
+            comps_dict_unset(pycomps_cat_get(self)->properties, (char*)closure);
+        }
     }
     return 0;
 }
@@ -460,7 +467,7 @@ int pycomps_cat_strattr_setter(PyObject *self, PyObject *val, void *closure) {
 PyObject* pycomps_cat_strattr_getter(PyObject *self, void *closure) {
     COMPS_Prop *tmp_prop;
     tmp_prop = comps_dict_get(pycomps_cat_get(self)->properties, (char*)closure);
-    if (tmp_prop)
+    if (tmp_prop != NULL)
         return PyUnicode_FromString(tmp_prop->prop.str);
     else
         Py_RETURN_NONE;
@@ -571,7 +578,8 @@ COMPS_List* comps_cats_union(COMPS_List *cats1, COMPS_List *cats2) {
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_doccategory_idcmp);
 
-    for (it = cats1->first; it != NULL; it = it->next) {
+    it = cats1?cats1->first:NULL;
+    for (; it != NULL; it = it->next) {
         if (((COMPS_DocCategory*)it->data)->group_ids == NULL) {
             ((COMPS_DocCategory*)it->data)->group_ids = comps_list_create();
             comps_list_init(((COMPS_DocCategory*)it->data)->group_ids);
@@ -581,7 +589,9 @@ COMPS_List* comps_cats_union(COMPS_List *cats1, COMPS_List *cats2) {
         comps_cat_incref(it->data);
         comps_set_add(set, it->data);
     }
-    for (it = cats2->first; it != NULL; it = it->next) {
+
+    it = cats2?cats2->first:NULL;
+    for (; it != NULL; it = it->next) {
         tmpcat = it->data;
         if (tmpcat->group_ids == NULL) {
             tmpcat->group_ids = comps_list_create();

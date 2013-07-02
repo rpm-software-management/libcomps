@@ -8,8 +8,11 @@ inline COMPS_DocEnvExtra * comps_docenv_extra_create() {
 }
 
 char __compsenv_id_cmp(void *e1, void *e2) {
-    return (strcmp((char*)comps_dict_get(((COMPS_DocEnv*)e1)->properties, "id"),
-                   (char*)comps_dict_get(((COMPS_DocEnv*)e2)->properties, "id"))
+    return (strcmp(
+        (char*)((COMPS_Prop*)
+               comps_dict_get(((COMPS_DocEnv*)e1)->properties, "id"))->prop.str,
+        (char*)((COMPS_Prop*)
+               comps_dict_get(((COMPS_DocEnv*)e2)->properties, "id"))->prop.str)
             == 0);
 }
 
@@ -542,10 +545,16 @@ int pycomps_env_strattr_setter(PyObject *self, PyObject *val, void *closure) {
     }
     tmp_prop = comps_dict_get(pycomps_env_get(self)->properties, (char*)closure);
     if (!tmp_prop) {
-        tmp_prop = comps_doc_prop_str_create(tmp, 0);
-        comps_dict_set(pycomps_env_get(self)->properties, (char*)closure, tmp_prop);
+        if (tmp) {
+            tmp_prop = comps_doc_prop_str_create(tmp, 0);
+            comps_dict_set(pycomps_env_get(self)->properties,
+                                           (char*)closure, tmp_prop);
+        }
     } else {
-        __comps_doc_char_setter((void**)&tmp_prop->prop.str, tmp, 0);
+        if (tmp)
+            __comps_doc_char_setter((void**)&tmp_prop->prop.str, tmp, 0);
+        else
+            comps_dict_unset(pycomps_env_get(self)->properties, (char*)closure);
     }
     return 0;
 }
@@ -692,6 +701,7 @@ COMPS_List* comps_envs_union(COMPS_List *envs1, COMPS_List *envs2) {
         comps_env_incref(it->data);
         comps_set_add(set, it->data);
     }
+
     it = (envs2)?envs2->first:NULL;
     for (; it != NULL; it = it->next) {
         tmpenv = it->data;

@@ -122,6 +122,8 @@ void comps_docgroup_add_lang_desc(COMPS_DocGroup *group, char *lang, char *desc,
 void comps_docgroup_set_default(COMPS_DocGroup *group, unsigned def);
 void comps_docgroup_set_uservisible(COMPS_DocGroup *group,
                                     unsigned uservisible);
+void comps_docgroup_set_displayorder(COMPS_DocGroup *group,
+                                     unsigned display_order);
 void comps_docgroup_set_langonly(COMPS_DocGroup *group, char *langonly,
                                                         char copy);
 void comps_docgroup_add_package(COMPS_DocGroup *group,

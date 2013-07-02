@@ -588,8 +588,8 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 dict = list_last_env->properties;
             } else if (parent == COMPS_ELEM_GROUP) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-                prop = comps_dict_get(list_last_env->properties, "display_order");
-                dict = list_last_env->properties;
+                prop = comps_dict_get(list_last_group->properties, "display_order");
+                dict = list_last_group->properties;
             } 
             if (prop) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
@@ -647,6 +647,8 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
     COMPS_DocGroupPackage * package;
     /* prepare currently processed element. Create it, set text_buffer pointer
        to text data destination, if needed*/
+    #define parent_o parsed->elem_stack->last->prev
+    #define grandparent_o parsed->elem_stack->last->prev->prev
 
     #define parent ((COMPS_Elem*)parsed->elem_stack->last->prev->data)->type
     #define grandparent ((COMPS_Elem*)parsed->elem_stack->last->prev->prev->data)->type
@@ -654,7 +656,7 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
     #define parser_col XML_GetCurrentColumnNumber(parsed->parser)
 
     if (elem->type != COMPS_ELEM_DOC){
-        if (!parent) {
+        if (!parent_o) {
             comps_log_error(parsed->log, elem->name, COMPS_ERR_NOPARENT,
                             parser_line, parser_col, 0);
             free(parsed->tmp_buffer);
@@ -664,7 +666,7 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
     }
     if (elem->type == COMPS_ELEM_GROUPID
         || elem->type == COMPS_ELEM_PACKAGEREQ){
-        if (!parent || !grandparent) {
+        if (!parent_o || !grandparent_o) {
             comps_log_error(parsed->log, elem->name, COMPS_ERR_NOPARENT,
                             parser_line, parser_col, 0);
             free(parsed->tmp_buffer);
@@ -821,7 +823,8 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_DISPLAYORDER:
             parsed->text_buffer_pt = &parsed->tmp_buffer;
-            if (parent != COMPS_ELEM_CATEGORY && parent != COMPS_ELEM_ENV){
+            if (parent != COMPS_ELEM_CATEGORY && parent != COMPS_ELEM_ENV &&
+                parent != COMPS_ELEM_GROUP){
                 comps_log_error(parsed->log, comps_elem_get_name(elem->type),
                                 COMPS_ERR_NOPARENT, parser_line, parser_col,
                                 0);
@@ -881,6 +884,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                            XML_GetCurrentColumnNumber(parsed->parser), 0);
         break;
     }
+
+    #undef parent_o
+    #undef grandparent_o
 
     #undef parent
     #undef grandparent

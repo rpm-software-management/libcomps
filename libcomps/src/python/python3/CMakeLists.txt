@@ -10,6 +10,7 @@ FILE(COPY ${pycomps_SRCDIR}/__init__.py DESTINATION ./libcomps/)
 FILE(COPY ${pycomps_SRCDIR}/tests/__test.py DESTINATION ./libcomps/)
 FILE(COPY ${pycomps_SRCDIR}/tests/fedora_comps.xml DESTINATION ./libcomps/)
 FILE(COPY ${pycomps_SRCDIR}/tests/sample_comps.xml DESTINATION ./libcomps/)
+FILE(COPY ${pycomps_SRCDIR}/tests/main_comps.xml DESTINATION ./libcomps/)
 
 add_library(pycomps SHARED ${pycomps_SRC})
 set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
@@ -27,5 +28,7 @@ INSTALL(FILES ${pycomps_SRCDIR}/tests/__test.py DESTINATION
 INSTALL(FILES ${pycomps_SRCDIR}/tests/fedora_comps.xml DESTINATION
               ${PYTHON_INSTALL_DIR}/libcomps/)
 INSTALL(FILES ${pycomps_SRCDIR}/tests/sample_comps.xml DESTINATION
+              ${PYTHON_INSTALL_DIR}/libcomps/)
+INSTALL(FILES ${pycomps_SRCDIR}/tests/main_comps.xml DESTINATION
               ${PYTHON_INSTALL_DIR}/libcomps/)
 INSTALL (TARGETS pycomps LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)

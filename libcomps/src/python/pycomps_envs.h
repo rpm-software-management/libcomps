@@ -55,7 +55,7 @@ void comps_env_incref(void * env);
 PyObject* comps_env_str(void * env);
 
 COMPS_List* comps_envs_union(COMPS_List *envs1, COMPS_List *envs2);
-char comps_env_cmp(void *e1, void *e2);
+//char comps_env_cmp(void *e1, void *e2);
 
 PyObject* PyCOMPSEnv_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int PyCOMPSEnvs_init(PyCOMPS_CtoPySeq *self, PyObject *args, PyObject *kwds);

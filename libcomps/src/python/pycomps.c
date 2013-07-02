@@ -471,7 +471,7 @@ PyObject* PyCOMPS_cmp(PyObject *self, PyObject *other, int op) {
     l = comps_doc_categories(((PyCOMPS*)other)->comps);
     it2 = l?l->first:NULL;
     for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        res = comps_cat_cmp(it->data, it2->data);
+        res = comps_doccategory_cmp(it->data, it2->data);
         if (!res) {
             if (op == Py_EQ) {
                 Py_RETURN_FALSE;
@@ -493,7 +493,7 @@ PyObject* PyCOMPS_cmp(PyObject *self, PyObject *other, int op) {
     l = comps_doc_groups(((PyCOMPS*)other)->comps);
     it2 = l?l->first:NULL;
     for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        res = comps_group_cmp(it->data, it2->data);
+        res = comps_docgroup_cmp(it->data, it2->data);
         if (!res) {
             if (op == Py_EQ) {
                 Py_RETURN_FALSE;
@@ -515,7 +515,7 @@ PyObject* PyCOMPS_cmp(PyObject *self, PyObject *other, int op) {
     l = comps_doc_environments(((PyCOMPS*)other)->comps);
     it2 = l?l->first:NULL;
     for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        res = comps_env_cmp(it->data, it2->data);
+        res = comps_docenv_cmp(it->data, it2->data);
         if (!res) {
             if (op == Py_EQ) {
                 Py_RETURN_FALSE;
