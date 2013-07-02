@@ -28,4 +28,4 @@ include_directories(${LIBXML2_INCLUDE_DIR})
 
 add_subdirectory (src)
 add_subdirectory (tests)
-add_subdirectory (docs)
+add_subdirectory (docs EXCLUDE_FROM_ALL)

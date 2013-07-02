@@ -2,11 +2,11 @@ find_package(Doxygen)
 if(DOXYGEN_FOUND)
  configure_file(Doxyfile.user.in
                 ${PROJECT_BINARY_DIR}/docs/Doxyfile.user)
- add_custom_target (Docs ALL COMMAND ${DOXYGEN_EXECUTABLE}
+ add_custom_target (docs COMMAND ${DOXYGEN_EXECUTABLE}
                          ${PROJECT_BINARY_DIR}/docs/Doxyfile.user
                          SOURCES ${PROJECT_BINARY_DIR}/docs/Doxyfile.user)
 endif(DOXYGEN_FOUND)
-message("dir ",${PROJECT_BINARY_DIR}})
+#message("dir ",${PROJECT_BINARY_DIR}})
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/docs/libcomps-py-doc")
 
 #add_custom_target(Docs-sphinx ALL

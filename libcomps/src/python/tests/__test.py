@@ -681,6 +681,21 @@ class COMPSTest(unittest.TestCase):
         c2.fromxml_f('main_comps.xml')
         c = c1 + c2 # <--- sigsegvs here
 
+    def test_main_loc(self):
+        comps = libcomps.Comps()
+        errors = comps.fromxml_f('main_comps.xml')
+        g = comps.groups[0]
+        print(g.desc_by_lang['cs'])
+
+        comps = libcomps.Comps()
+        errors = comps.fromxml_f('main_comps.xml')
+        g = comps.groups[0]
+        g1 = comps.groups[0]
+        g.desc_by_lang = g1.desc_by_lang
+        dbl1 = g.desc_by_lang
+        dbl2 = g1.desc_by_lang
+        self.assertTrue(g1.desc_by_lang == g.desc_by_lang)
+
     #@unittest.skip("skip")
     def test_union(self):
         comps = libcomps.Comps()

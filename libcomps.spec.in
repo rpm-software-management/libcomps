@@ -70,15 +70,18 @@ libcomps bindings for python3
 %if %{with_python}
     %cmake -DPYTHON_DESIRED:STRING=2 libcomps/
     make %{?_smp_mflags}
+    make %{?_smp_mflags} docs
 %endif
 %if %{with_python3}
     pushd py3
     %cmake -DPYTHON_DESIRED:STRING=3 libcomps/
     make %{?_smp_mflags}
+    make %{?_smp_mflags} docs
     popd
 %else
     %cmake -DPYTHON_DESIRED:STRING=NO libcomps/
     make %{?_smp_mflags}
+    make %{?_smp_mflags} docs
 %endif
 
 
