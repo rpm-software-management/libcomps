@@ -3,6 +3,12 @@ import unittest
 import tempfile
 import os
 
+class PackageTest(unittest.TestCase):
+    def test_attrs(self):
+        pkg = libcomps.Package("kernel-3.2", libcomps.PACKAGE_TYPE_MANDATORY)
+        self.assertEqual(pkg.name, "kernel-3.2")
+        self.assertEqual(pkg.type, libcomps.PACKAGE_TYPE_MANDATORY)
+
 class CategoryListTest(unittest.TestCase):
     def setUp(self):
         self.catlist = libcomps.CategoryList()
@@ -742,7 +748,8 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(eids3_set == eids_set)
 
 if __name__ == "__main__":
-    #unittest.main()
+    suite = unittest.TestLoader().loadTestsFromTestCase(PackageTest)
+    unittest.TextTestRunner(verbosity=2).run(suite)
     suite = unittest.TestLoader().loadTestsFromTestCase(CategoryTest)
     unittest.TextTestRunner(verbosity=2).run(suite)
     suite = unittest.TestLoader().loadTestsFromTestCase(GroupTest)
@@ -757,6 +764,3 @@ if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(suite)
     suite = unittest.TestLoader().loadTestsFromTestCase(EnvListTest)
     unittest.TextTestRunner(verbosity=2).run(suite)
-
-
-

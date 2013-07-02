@@ -958,19 +958,10 @@ int PyCOMPSPack_set_name(PyCOMPS_Package *self, PyObject *value, void *closure) 
 
 PyObject* PyCOMPSPack_get_type(PyCOMPS_Package *self, void *closure) {
    (void) closure;
-    switch (pycomps_pkg_get((PyObject*)self)->type) {
-        case COMPS_PACKAGE_DEFAULT:
-            return Py_BuildValue("%d",0);
-        case COMPS_PACKAGE_OPTIONAL:
-            return Py_BuildValue("%d",1);
-        case COMPS_PACKAGE_MANDATORY:
-            return Py_BuildValue("%d",2);
-        case COMPS_PACKAGE_UNKNOWN:
-            return Py_BuildValue("%d",3);
-        case COMPS_PACKAGE_CONDITIONAL:
-            return Py_BuildValue("%d",4);
-    }
-    Py_RETURN_NONE;
+   int type = pycomps_pkg_get((PyObject*)self)->type;
+   if (type >= 0 && type <= COMPS_PACKAGE_UNKNOWN)
+       return Py_BuildValue("i", type);
+   Py_RETURN_NONE;
 }
 
 int PyCOMPSPack_set_type(PyCOMPS_Package *self, PyObject *value, void *closure){
