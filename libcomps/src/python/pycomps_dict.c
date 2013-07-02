@@ -134,14 +134,22 @@ PyObject* PyCOMPSDict_cmp(PyObject *self, PyObject *other, int op) {
                     ((COMPS_RTreePair*)hsit2->data)->key) ||
             strcmp((char*)((COMPS_RTreePair*)hsit->data)->data,
                    (char*)((COMPS_RTreePair*)hsit->data)->data)) {
-            if (op == Py_EQ) Py_RETURN_FALSE;
-            else Py_RETURN_TRUE;
+            comps_hslist_destroy(&pairlist);
+            comps_hslist_destroy(&pairlist2);
+            if (op == Py_EQ)
+                Py_RETURN_FALSE;
+            else
+                Py_RETURN_TRUE;
         }
     }
     if ((hsit !=NULL && hsit2==NULL) || (hsit == NULL && hsit2 != NULL)) {
+        comps_hslist_destroy(&pairlist);
+        comps_hslist_destroy(&pairlist2);
         if (op == Py_EQ) Py_RETURN_FALSE;
         else Py_RETURN_TRUE;
     }
+    comps_hslist_destroy(&pairlist);
+    comps_hslist_destroy(&pairlist2);
     if (op == Py_EQ) Py_RETURN_TRUE;
     else Py_RETURN_FALSE;
 }

@@ -3,7 +3,7 @@
 PyObject* pycomps_lang_get_dict(PyCOMPS_CtoPy_CItem *citem,
                                 PyObject **pobj) {
     PyObject *ret;
-    if (!citem->ref_count) {
+    if (!*pobj) {
         ret = PyCOMPSDict_new(&PyCOMPS_DictType, NULL, NULL);
         PyCOMPSDict_init((PyCOMPS_Dict*)ret, NULL, NULL);
         ctopy_citem_destroy(((PyCOMPS_Dict*)ret)->citem);
