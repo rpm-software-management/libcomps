@@ -49,3 +49,14 @@ set(TEST_FILES fedora_comps.xml sample-comps.xml sample_comps.xml
 foreach(file ${TEST_FILES})
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${file} DESTINATION ./)
 endforeach()
+
+#add_custom_target(test ALL)
+add_custom_target(test_comps_run ALL COMMAND ./test_comps
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                   DEPENDS test_comps
+                   COMMENT "Running comps test")
+add_custom_target(test_parse_run ALL COMMAND ./test_parse
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                   DEPENDS test_parse
+                   COMMENT "Running comps_parse test")
+

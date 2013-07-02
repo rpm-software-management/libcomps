@@ -1,0 +1,2 @@
+echo $(pwd)
+@PYTHON_EXECUTABLE@ __test.py

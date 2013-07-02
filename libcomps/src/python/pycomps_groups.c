@@ -305,7 +305,7 @@ PyObject* PyCOMPSGroup_str(PyObject *self) {
     return comps_group_str(pycomps_group_get(self));
 }
 
-inline void comps_group_print(FILE *f, void *g) {
+void comps_group_print(FILE *f, void *g) {
     COMPS_ListItem *it;
     COMPS_HSList *pairlist;
     COMPS_HSListItem *hsit;

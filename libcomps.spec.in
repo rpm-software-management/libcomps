@@ -19,7 +19,7 @@ Source0:        https://github.com/midnightercz/libcomps/archive/%{commit}/libco
 BuildRequires:  libxml2-devel
 BuildRequires:  check-devel
 BuildRequires:  expat-devel
-BuildRequires:  cmake
+BuildRequires:  cmake >= 2.7
 
 %description -n libcomps
 Alternative for yum.comps written in C

@@ -1,8 +1,8 @@
 %global with_python 1
 %global with_python3 1
 
-%global commit e401de99222bac95e61b10836b230367a92f5e4f
-%global shortcommit e401de9
+%global commit 997834ec69b72ded9acbd785502c5f3bbf888be8
+%global shortcommit 997834e
 %global name libcomps
 
 
@@ -19,7 +19,7 @@ Source0:        https://github.com/midnightercz/libcomps/archive/%{commit}/libco
 BuildRequires:  libxml2-devel
 BuildRequires:  check-devel
 BuildRequires:  expat-devel
-BuildRequires:  cmake
+BuildRequires:  cmake >= 2.6
 
 %description -n libcomps
 Alternative for yum.comps written in C
@@ -70,15 +70,18 @@ libcomps bindings for python3
 %if %{with_python}
     %cmake -DPYTHON_DESIRED:STRING=2 libcomps/
     make %{?_smp_mflags}
+    make %{?_smp_mflags} docs
 %endif
 %if %{with_python3}
     pushd py3
     %cmake -DPYTHON_DESIRED:STRING=3 libcomps/
     make %{?_smp_mflags}
+    make %{?_smp_mflags} docs
     popd
 %else
     %cmake -DPYTHON_DESIRED:STRING=NO libcomps/
     make %{?_smp_mflags}
+    make %{?_smp_mflags} docs
 %endif
 
 

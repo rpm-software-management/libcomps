@@ -749,7 +749,6 @@ if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(suite)
     suite = unittest.TestLoader().loadTestsFromTestCase(EnvTest)
     unittest.TextTestRunner(verbosity=2).run(suite)
-
     suite = unittest.TestLoader().loadTestsFromTestCase(COMPSTest)
     unittest.TextTestRunner(verbosity=2).run(suite)
     suite = unittest.TestLoader().loadTestsFromTestCase(CategoryListTest)
