@@ -145,7 +145,7 @@ void pycomps_ctopy_comps_init(PyObject *self) {
             it2->data_destructor = &pycomps_pkg_decref;
         }
     }
-    it =(comps_doc_environments(((PyCOMPS*)self)->comps))?
+    it = (comps_doc_environments(((PyCOMPS*)self)->comps))?
         comps_doc_environments(((PyCOMPS*)self)->comps)->first:NULL;
     for (; it != NULL; it = it->next) {
         ((COMPS_DocEnv*)it->data)->reserved = comps_docenv_extra_create();
@@ -677,6 +677,7 @@ PYINIT_FUNC(void) {
 
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_DEFAULT", COMPS_PACKAGE_DEFAULT);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_OPTIONAL", COMPS_PACKAGE_OPTIONAL);
+    PyModule_AddIntConstant(m, "PACKAGE_TYPE_CONDITIONAL", COMPS_PACKAGE_CONDITIONAL);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_MANDATORY", COMPS_PACKAGE_MANDATORY);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_UNKNOWN", COMPS_PACKAGE_UNKNOWN);
     #if PY_MAJOR_VERSION >= 3

@@ -694,24 +694,24 @@ COMPS_List* comps_groups_union(COMPS_List *groups1, COMPS_List *groups2) {
 
     it = groups1?groups1->first:NULL;
     for (; it != NULL; it = it->next) {
-        if (((COMPS_DocGroup*)it->data)->packages == NULL) {
+        /*if (((COMPS_DocGroup*)it->data)->packages == NULL) {
             ((COMPS_DocGroup*)it->data)->packages = comps_list_create();
             comps_list_init(((COMPS_DocGroup*)it->data)->packages);
             comps_group_get_extra(it->data)->packages_citem->data =
                                       ((COMPS_DocGroup*)it->data)->packages;
-        }
+        }*/
         comps_group_incref(it->data);
         comps_set_add(set, it->data);
     }
     it = groups2?groups2->first:NULL;
     for (; it != NULL; it = it->next) {
         tmpgroup = it->data;
-        if (tmpgroup->packages == NULL) {
+        /*if (tmpgroup->packages == NULL) {
             tmpgroup->packages = comps_list_create();
             comps_list_init(tmpgroup->packages);
             comps_group_get_extra(tmpgroup)->packages_citem->data =
                                                          tmpgroup->packages;
-        }
+        }*/
         if (comps_set_in(set, tmpgroup)) {
             tmpgroup2 = (COMPS_DocGroup*)comps_set_data_at(set, tmpgroup);
             unigroup = comps_docgroup_union(tmpgroup, tmpgroup2);
@@ -958,19 +958,7 @@ int PyCOMPSPack_set_name(PyCOMPS_Package *self, PyObject *value, void *closure) 
 
 PyObject* PyCOMPSPack_get_type(PyCOMPS_Package *self, void *closure) {
    (void) closure;
-    switch (pycomps_pkg_get((PyObject*)self)->type) {
-        case COMPS_PACKAGE_DEFAULT:
-            return Py_BuildValue("%d",0);
-        case COMPS_PACKAGE_OPTIONAL:
-            return Py_BuildValue("%d",1);
-        case COMPS_PACKAGE_MANDATORY:
-            return Py_BuildValue("%d",2);
-        case COMPS_PACKAGE_UNKNOWN:
-            return Py_BuildValue("%d",3);
-        case COMPS_PACKAGE_CONDITIONAL:
-            return Py_BuildValue("%d",4);
-    }
-    Py_RETURN_NONE;
+    return Py_BuildValue("%d", pycomps_pkg_get((PyObject*)self)->type);
 }
 
 int PyCOMPSPack_set_type(PyCOMPS_Package *self, PyObject *value, void *closure){

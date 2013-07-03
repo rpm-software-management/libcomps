@@ -1950,33 +1950,6 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
                 comps_doc_prop_clone(((COMPS_RTreePair*)hsit->data)->data));
     }
     comps_hslist_destroy(&pairs);
-    /*if (e1->name == NULL && e2->name == NULL) {
-        res->name = NULL;
-    } else if (e1->name == NULL) {
-        comps_docenv_set_name(res, e2->name, 1);
-    } else if (e2->name == NULL) {
-        comps_docenv_set_name(res, e1->name, 1);
-    } else
-        comps_docenv_set_name(res, e1->name, 1);
-
-    if (e1->id == NULL && e2->id == NULL) {
-        res->id = NULL;
-    } else if (e1->id == NULL) {
-        comps_docenv_set_id(res, e2->id, 1);
-    } else if (e2->id == NULL) {
-        comps_docenv_set_id(res, e1->id, 1);
-    } else
-        comps_docenv_set_id(res, e1->id, 1);
-
-    if (e1->desc == NULL && e2->desc == NULL) {
-        res->desc = NULL;
-    } else if (e1->desc == NULL) {
-        comps_docenv_set_desc(res, e2->desc, 1);
-    } else if (e2->desc == NULL) {
-        comps_docenv_set_desc(res, e1->desc, 1);
-    } else
-        comps_docenv_set_desc(res, e1->desc, 1);
-    */
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
