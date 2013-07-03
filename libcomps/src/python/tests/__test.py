@@ -615,7 +615,6 @@ class GroupTest(unittest.TestCase):
 
 class PackageTest(unittest.TestCase):
     def test_attrs(self):
-        print libcomps.PACKAGE_TYPE_MANDATORY
         pkg = libcomps.Package("kernel-3.2", libcomps.PACKAGE_TYPE_MANDATORY)
         self.assertEqual(pkg.name, "kernel-3.2")
         self.assertEqual(pkg.type, libcomps.PACKAGE_TYPE_MANDATORY)
@@ -772,7 +771,16 @@ class COMPSTest(unittest.TestCase):
         c1 = libcomps.Comps()
         c2 = libcomps.Comps()
         c2.fromxml_f('main_comps.xml')
-        c = c1 + c2 # <--- sigsegvs here
+        c = c1 + c2
+
+        c1 = libcomps.Comps()
+        c1.fromxml_f('main_comps.xml')
+
+        c2 = libcomps.Comps()
+        c2.fromxml_f('main_comps.xml')
+
+        c = c1 + c2
+        x = c.groups[0].packages[0].name
 
     def test_main_loc(self):
         comps = libcomps.Comps()
