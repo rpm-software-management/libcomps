@@ -1953,10 +1953,12 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
-    for (it = e1->group_list->first; it != NULL; it = it->next) {
+    it = e1->group_list?e1->group_list->first:NULL;
+    for (; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
     }
-    for (it = e2->group_list->first; it != NULL; it = it->next) {
+    it = e2->group_list?e2->group_list->first:NULL;
+    for (; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
     }
     res->group_list = comps_list_create();

@@ -5,14 +5,15 @@ import os
 import traceback
 
 class MyResult(unittest.TestResult):
-    WHITEBOLD = (1,)
-    WHITE = (38, 5, 15)
-    DRKRED = (48, 5, 9)
-    RED = (38, 5, 1)
-    GREEN = (38, 5, 10)
-    YELLOW = (38, 5, 11)
+    WHITEBOLD = {"1":(1,),  "2":(0,)}
+    WHITE = {"1": (38, 5, 15), "2": (38, 5, 7)}
+    DRKRED = {"1": (48, 5, 9), "2": (48, 5, 0)}
+    RED = {"1": (38, 5, 1), "2":(38, 5, 7)}
+    GREEN = {"1": (38, 5, 10), "2":(38, 5, 7)}
+    YELLOW = {"1": (38, 5, 11), "2":(38, 5, 7)}
     def colored(self, color, string):
-        return '\x1b[%sm%s\x1b[0m' % (";".join(map(str, color)), string)
+        return '\x1b[%sm%s\x1b[%sm' % (";".join(map(str, color["1"])), string,
+                                       ";".join(map(str, color["2"])))
 
     def __init__(self, stream, descriptions, verbosity):
         self.stream = stream
@@ -609,9 +610,15 @@ class GroupTest(unittest.TestCase):
         g2.name_by_lang["af"]="Afrikaanse taalsteun"
         g2.name_by_lang["bs"]="Administrativni alati"
         g2.name_by_lang["id"]="Peralatan Administrasi"
-        
+
         self.assertTrue(g1.name_by_lang, g2.name_by_lang)
 
+class PackageTest(unittest.TestCase):
+    def test_attrs(self):
+        print libcomps.PACKAGE_TYPE_MANDATORY
+        pkg = libcomps.Package("kernel-3.2", libcomps.PACKAGE_TYPE_MANDATORY)
+        self.assertEqual(pkg.name, "kernel-3.2")
+        self.assertEqual(pkg.type, libcomps.PACKAGE_TYPE_MANDATORY)
 
 class EnvTest(unittest.TestCase):
     def test_basic(self):

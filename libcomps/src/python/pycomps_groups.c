@@ -957,8 +957,10 @@ int PyCOMPSPack_set_name(PyCOMPS_Package *self, PyObject *value, void *closure) 
 }
 
 PyObject* PyCOMPSPack_get_type(PyCOMPS_Package *self, void *closure) {
-   (void) closure;
-    return Py_BuildValue("%d", pycomps_pkg_get((PyObject*)self)->type);
+    (void) closure;
+    int type = pycomps_pkg_get((PyObject*)self)->type;
+    if (type > 0 && type <= COMPS_PACKAGE_UNKNOWN)
+        return Py_BuildValue("i", type);
 }
 
 int PyCOMPSPack_set_type(PyCOMPS_Package *self, PyObject *value, void *closure){
