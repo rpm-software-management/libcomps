@@ -2,6 +2,92 @@ import _libpycomps as libcomps
 import unittest
 import tempfile
 import os
+import traceback
+
+class MyResult(unittest.TestResult):
+    WHITEBOLD = (1,)
+    WHITE = (38, 5, 15)
+    DRKRED = (48, 5, 9)
+    RED = (38, 5, 1)
+    GREEN = (38, 5, 10)
+    YELLOW = (38, 5, 11)
+    def colored(self, color, string):
+        return '\x1b[%sm%s\x1b[0m' % (";".join(map(str, color)), string)
+
+    def __init__(self, stream, descriptions, verbosity):
+        self.stream = stream
+        super(MyResult, self).__init__(stream, descriptions, verbosity)
+        self.last_cls = None
+        self.fail = False
+
+    def startTest(self, test):
+        if self.last_cls != test.__class__:
+            self.stream.write(
+                self.colored(self.WHITEBOLD,
+                             "[ Starting %s ]\n"%str(test.__class__.__name__)))
+            self.last_cls = test.__class__
+
+        self.stream.write(str(test))
+        self.stream.write(" ... ")
+
+    def startTestRun(self):
+        pass
+
+    def stopTest(self, test):
+        #print "done test:", test
+        pass
+
+    def addSuccess(self, test):
+        self.stream.write(self.colored(self.GREEN,"[OK]\n"))
+        self.testsRun += 1
+
+    def addFailure(self, test, error):
+        self.stream.write(self.colored(self.RED,"[FAIL]\n"))
+        (_type, value, _traceback) = error
+        tb = traceback.format_list([traceback.extract_tb(_traceback,
+                                                        limit=2)[-1]])
+        excp = traceback.format_exception_only(_type, value)
+        self.stream.write("-"*79)
+        self.stream.write("\n")
+        self.stream.write("%s"%tb[0])
+        self.stream.write("%s\n"%excp[0])
+        self.stream.write("."*79)
+        self.stream.write("\n")
+        #traceback.print_exception(_type, value, tb, limit=2, file=self.stream)
+        #self.stream.write(str(error))
+        self.testsRun += 1
+        self.failures += [(test, "".join([tb[0], excp[0]]))]
+        self.fail = True
+
+    def addError(self, test, error):
+        self.stream.write(self.colored(self.DRKRED,"[ERROR]\n"))
+        (_type, value, _traceback) = error
+        tb = traceback.format_list([traceback.extract_tb(_traceback,
+                                                        limit=2)[-1]])
+        excp = traceback.format_exception_only(_type, value)
+        self.stream.write("-"*79)
+        self.stream.write("\n")
+        self.stream.write("%s"%tb[0])
+        self.stream.write("%s\n"%excp[0])
+        self.stream.write("."*79)
+        self.stream.write("\n")
+        #traceback.print_exception(_type, value, tb, limit=2, file=self.stream)
+        #self.stream.write(str(error))
+        self.testsRun += 1
+        self.errors += [(test, "".join([tb[0], excp[0]]))]
+        self.fail = True
+
+    def addSkip(self, test, reason):
+        self.stream.write(self.colored(self.YELLOW,"[SKIPED]\n"))
+        self.stream.write(self.colored(self.YELLOW,"reason: %s\n"%reason))
+        self.errors += [(test, reason)]
+    
+    def wasSuccessful(self):
+        return not self.fail
+
+class MyRunner(unittest.TextTestRunner):
+    def _makeResult(self):
+        return MyResult(self.stream, self.descriptions, self.verbosity)
 
 class CategoryListTest(unittest.TestCase):
     def setUp(self):
@@ -742,21 +828,24 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(eids3_set == eids_set)
 
 if __name__ == "__main__":
+    unittest.main(testRunner = MyRunner)
     #unittest.main()
-    suite = unittest.TestLoader().loadTestsFromTestCase(CategoryTest)
-    unittest.TextTestRunner(verbosity=2).run(suite)
-    suite = unittest.TestLoader().loadTestsFromTestCase(GroupTest)
-    unittest.TextTestRunner(verbosity=2).run(suite)
-    suite = unittest.TestLoader().loadTestsFromTestCase(EnvTest)
-    unittest.TextTestRunner(verbosity=2).run(suite)
-    suite = unittest.TestLoader().loadTestsFromTestCase(COMPSTest)
-    unittest.TextTestRunner(verbosity=2).run(suite)
-    suite = unittest.TestLoader().loadTestsFromTestCase(CategoryListTest)
-    unittest.TextTestRunner(verbosity=2).run(suite)
-    suite = unittest.TestLoader().loadTestsFromTestCase(GroupListTest)
-    unittest.TextTestRunner(verbosity=2).run(suite)
-    suite = unittest.TestLoader().loadTestsFromTestCase(EnvListTest)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    #suite = unittest.TestLoader().loadTestsFromTestCase(CategoryTest)
+    #ret = MyRunner(verbosity=2).run(suite)
+    
+    #unittest.TextTestRunner(verbosity=2).run(suite)
+    #suite = unittest.TestLoader().loadTestsFromTestCase(GroupTest)
+    #ret = MyRunner(verbosity=2).run(suite)
+    #suite = unittest.TestLoader().loadTestsFromTestCase(EnvTest)
+    #MyRunner(verbosity=2).run(suite)
+    #suite = unittest.TestLoader().loadTestsFromTestCase(COMPSTest)
+    #MyRunner(verbosity=2).run(suite)
+    #suite = unittest.TestLoader().loadTestsFromTestCase(CategoryListTest)
+    #MyRunner(verbosity=2).run(suite)
+    #suite = unittest.TestLoader().loadTestsFromTestCase(GroupListTest)
+    #MyRunner(verbosity=2).run(suite)
+    #suite = unittest.TestLoader().loadTestsFromTestCase(EnvListTest)
+    #MyRunner(verbosity=2).run(suite)
 
 
 

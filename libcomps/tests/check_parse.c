@@ -72,7 +72,7 @@ START_TEST(test_comps_parse1)
         COMPS_HSList *keys;
         COMPS_HSListItem *hsit;
 
-        keys = comps_rtree_pairs(((COMPS_DocGroup*)it->data)->properties);
+        /*keys = comps_rtree_pairs(((COMPS_DocGroup*)it->data)->properties);
         for (hsit = keys->first; hsit != NULL; hsit = hsit->next) {
             printf("prop:%s", ((COMPS_RTreePair*)hsit->data)->key);
             if (((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop_type
@@ -82,9 +82,9 @@ START_TEST(test_comps_parse1)
                 printf(" %d\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.num);
             }
         }
-        comps_hslist_destroy(&keys);
+        comps_hslist_destroy(&keys);*/
 
-        printf("group name:%s\n", tmp_ch);
+        //printf("group name:%s\n", tmp_ch);
 
         tmp_prop = comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "id");
         tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
