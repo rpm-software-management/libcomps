@@ -34,9 +34,12 @@ typedef struct COMPS_DocGroupExtra {
     PyCOMPS_CtoPy_CItem * desc_by_lang_citem;
 } COMPS_DocGroupExtra;
 
-COMPS_DocGroup *pycomps_group_get(PyObject *pygroup);
+COMPS_DocGroup* pycomps_group_oget(PyObject *pygroup);
+COMPS_DocGroup* pycomps_group_gget(PyCOMPS_Group *pygroup);
 void pycomps_group_destroy(void * group);
 void pycomps_group_decref(void * cat);
+void pycomps_group_incref(PyObject * pygroup);
+
 COMPS_DocGroupExtra* pycomps_group_get_extra(PyObject *pygroup);
 COMPS_DocGroupExtra* comps_group_get_extra(void* group);
 void comps_group_incref(void * group);
@@ -45,9 +48,7 @@ void comps_group_print(FILE *f, void *g);
 
 COMPS_DocGroupExtra * comps_docgroup_extra_create();
 
-//COMPS_DocGroup* docgroup_from_pycompsgroup(PyObject *self);
 COMPS_List* comps_groups_union(COMPS_List *groups1, COMPS_List *groups2);
-//char comps_group_cmp(void *g1, void *g2);
 
 void PyCOMPSGroup_dealloc(PyObject *self);
 PyObject * PyCOMPSGroup_new(PyTypeObject *type, PyObject *args, PyObject *kwds);

@@ -186,15 +186,16 @@ void comps_doc_destroy(COMPS_Doc **doc) {
     }
 }
 
-void comps_doc_destroy_v(void *doc)
+inline void comps_doc_destroy_v(void *doc)
 {
-    if (doc) {
+    comps_doc_destroy((COMPS_Doc**)&doc);
+    /*if (doc) {
         comps_dict_destroy(((COMPS_Doc*)doc)->lobjects);
         comps_dict_destroy(((COMPS_Doc*)doc)->dobjects);
         comps_dict_destroy(((COMPS_Doc*)doc)->mdobjects);
         comps_log_destroy(((COMPS_Doc*)doc)->log);
         free(doc);
-    }
+    }*/
 }
 
 /**
@@ -692,6 +693,64 @@ COMPS_Doc* comps_doc_intersect(COMPS_Doc *c1, COMPS_Doc *c2) {
     }
     comps_set_destroy(&set);
     return res;
+}
+
+char comps_doc_cmp(COMPS_Doc *c1, COMPS_Doc *c2) {
+    COMPS_ListItem *it;
+    COMPS_Set *set;
+    COMPS_DocGroup *tmpgroup;
+    COMPS_DocCategory *tmpcat;
+    COMPS_DocEnv *tmpenv;
+    COMPS_List *groups = comps_doc_groups(c1);
+    COMPS_List *categories = comps_doc_categories(c1);
+    COMPS_List *envs = comps_doc_environments(c1);
+
+    set = comps_set_create();
+    comps_set_init(set, NULL, NULL, NULL, &__comps_docgroup_idcmp);
+
+    for (it = groups?groups->first:NULL; it != NULL; it = it->next) {
+        comps_set_add(set, it->data);
+    }
+    groups = comps_doc_groups(c2);
+    for (it = groups?groups->first:NULL; it != NULL; it = it->next) {
+        tmpgroup = comps_set_data_at(set, it->data);
+        if (!tmpgroup || !comps_docgroup_cmp(tmpgroup, it->data)) {
+            comps_set_destroy(&set);
+            return 0;
+        }
+    }
+    comps_set_clear(set);
+
+    comps_set_init(set, NULL, NULL, NULL, &__comps_doccategory_idcmp);
+    for (it = categories?categories->first:NULL; it != NULL; it = it->next) {
+        comps_set_add(set, it->data);
+    }
+    categories = comps_doc_categories(c2);
+    for (it = categories->first; it != NULL; it = it->next) {
+        tmpcat = comps_set_data_at(set, it->data);
+        if (!tmpcat || !comps_doccategory_cmp(tmpcat, it->data)) {
+            printf("cat differ\n");
+            comps_set_destroy(&set);
+            return 0;
+        }
+    }
+    comps_set_clear(set);
+
+    comps_set_init(set, NULL, NULL, NULL, &__comps_docenv_idcmp);
+    for (it = envs?envs->first:NULL; it != NULL; it = it->next) {
+        comps_set_add(set, it->data);
+    }
+    envs = comps_doc_environments(c2);
+    for (it = envs?envs->first:NULL; it != NULL; it = it->next) {
+        tmpenv = comps_set_data_at(set, it->data);
+        if (!tmpenv || !comps_docenv_cmp(tmpenv, it->data)) {
+            printf("env differ\n");
+            comps_set_destroy(&set);
+            return 0;
+        }
+    }
+    comps_set_destroy(&set);
+    return 1;
 }
 
 /**

@@ -110,6 +110,7 @@ char comps_doc_del_env(COMPS_Doc * doc, COMPS_DocEnv *env);
 void comps_doc_xml(COMPS_Doc * doc, xmlTextWriterPtr writer);
 COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2);
 COMPS_Doc* comps_doc_intersect(COMPS_Doc *c1, COMPS_Doc *c2);
+char comps_doc_cmp(COMPS_Doc *c1, COMPS_Doc *c2);
 
 COMPS_DocGroup* comps_docgroup_create();
 void comps_docgroup_destroy(void *group);

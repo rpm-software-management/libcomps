@@ -19,6 +19,7 @@ Py_ssize_t PyCOMPSCtoPySeq_len(PyObject *self) {
 inline PyObject *ctopy_list_getitem(PyObject *self, Py_ssize_t index) {
     COMPS_ListItem *it;
     PyObject *ret, *ret2;
+    PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
     void *key;
 
     it = comps_list_at(ctopy_get_list(self), index);
@@ -27,10 +28,10 @@ inline PyObject *ctopy_list_getitem(PyObject *self, Py_ssize_t index) {
         return NULL;
     }
     key = ctopy_make_key(it->data);
-    ret = (PyObject*)comps_brtree_get(((PyCOMPS_CtoPySeq*)self)->ctopy_map, key);
+    ret = (PyObject*)comps_brtree_get(self_seq->ctopy_map, key);
     if (!ret) {
-        ret2 = ((PyCOMPS_CtoPySeq*)self)->item_man->ctopy_convert(it->data);
-        comps_brtree_set(((PyCOMPS_CtoPySeq*)self)->ctopy_map, key, ret2);
+        ret2 = self_seq->item_man->ctopy_convert(it->data);
+        comps_brtree_set(self_seq->ctopy_map, key, ret2);
         Py_INCREF(ret2);
         ctopy_key_destroy(key);
         return ret2;
@@ -44,6 +45,7 @@ inline PyObject *ctopy_list_getitem(PyObject *self, Py_ssize_t index) {
 inline int ctopy_list_setitem(PyObject *self, Py_ssize_t index, PyObject *item){
     COMPS_ListItem *it;
     void *key;
+    PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
 
     if ((int)index > (int)(ctopy_get_list(self)->len-1)) {
         PyErr_SetString(PyExc_IndexError,"Index out of range");
@@ -55,12 +57,12 @@ inline int ctopy_list_setitem(PyObject *self, Py_ssize_t index, PyObject *item){
         it->data_destructor(it->data);
 
         it->data = ((PyCOMPS_CtoPy_PItem*)item)->citem->data;
-        ((PyCOMPS_CtoPySeq*)self)->item_man->data_incref(
+        self_seq->item_man->data_incref(
                                     ((PyCOMPS_CtoPy_PItem*)item)->citem->data);
 
         key = ctopy_make_key(it->data);
         Py_INCREF(item);
-        comps_brtree_set(((PyCOMPS_CtoPySeq*)self)->ctopy_map, key, item);
+        comps_brtree_set(self_seq->ctopy_map, key, item);
         ctopy_key_destroy(key);
     } else {
         it = comps_list_remove_pos_r(ctopy_get_list(self), index);
@@ -137,6 +139,7 @@ PyObject *PyCOMPSCtoPySeq_get(PyObject *self, PyObject *key) {
     int i;
     unsigned int n, uret, clen;
     Py_ssize_t istart, istop, istep, ilen;
+    PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
 
     if (PySlice_Check(key)) {
         n = ctopy_get_list(self)->len;
@@ -156,9 +159,8 @@ PyObject *PyCOMPSCtoPySeq_get(PyObject *self, PyObject *key) {
         while (clen != ilen) {
             newit = comps_list_item_create(it->data,
                                            NULL,
-                              ((PyCOMPS_CtoPySeq*)self)
-                              ->item_man->data_decref);
-            ((PyCOMPS_CtoPySeq*)self)->item_man->data_incref(it->data);
+                                           self_seq->item_man->data_decref);
+            self_seq->item_man->data_incref(it->data);
 
             comps_list_append(ctopy_get_list((PyObject*)result), newit);
             clen+=1;
@@ -181,6 +183,7 @@ int PyCOMPSCtoPySeq_set(PyObject *self, PyObject *key, PyObject *val) {
     int i;
     unsigned int n, c, uret, clen;
     Py_ssize_t istart, istop, istep, ilen;
+    PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
 
     if (PySlice_Check(key)) {
         n = ctopy_get_list(self)->len;
@@ -211,8 +214,8 @@ int PyCOMPSCtoPySeq_set(PyObject *self, PyObject *key, PyObject *val) {
             for (i=0 ; i<istart && it != NULL; it=it->next, i++);
             if (istep != 1) {
                 while (clen != ilen) {
-                    ((PyCOMPS_CtoPySeq*)self)->item_man->data_decref(it->data);
-                    ((PyCOMPS_CtoPySeq*)self)->item_man->data_incref(it2->data);
+                    self_seq->item_man->data_decref(it->data);
+                    self_seq->item_man->data_incref(it2->data);
                     it->data = it2->data;
                     clen+=1;
                     it2 = it2->next;
@@ -226,16 +229,16 @@ int PyCOMPSCtoPySeq_set(PyObject *self, PyObject *key, PyObject *val) {
 
                 for (; it2 != NULL && it != NULL;
                        it2 = it2->next, it = it->next, i++) {
-                    ((PyCOMPS_CtoPySeq*)self)->item_man->data_decref(it->data);
-                    ((PyCOMPS_CtoPySeq*)self)->item_man->data_incref(it2->data);
+                    self_seq->item_man->data_decref(it->data);
+                    self_seq->item_man->data_incref(it2->data);
                     it->data = it2->data;
                 }
                 if (it == NULL) {
                     for (;it2 != NULL; it2 = it2->next) {
-                        ((PyCOMPS_CtoPySeq*)self)->item_man->data_incref(it2->data);
+                        self_seq->item_man->data_incref(it2->data);
                         newit = comps_list_item_create(it2->data,
                                                    NULL,
-                                                   ((PyCOMPS_CtoPySeq*)self)
+                                                   self_seq
                                                    ->item_man->data_decref);
                         comps_list_append(ctopy_get_list(self), newit);
                     }
@@ -243,7 +246,7 @@ int PyCOMPSCtoPySeq_set(PyObject *self, PyObject *key, PyObject *val) {
                 if (it != NULL) {
                     for (c = i; c < istop; c++) {
                         it = comps_list_remove_pos_r(ctopy_get_list(self), i);
-                        ((PyCOMPS_CtoPySeq*)self)->item_man->data_decref(it->data);
+                        self_seq->item_man->data_decref(it->data);
                         free(it);
                     }
                 }
@@ -255,7 +258,7 @@ int PyCOMPSCtoPySeq_set(PyObject *self, PyObject *key, PyObject *val) {
             for (i=0 ; i<istart && it != NULL; it=it->next, i++);
             while (clen != ilen) {
                 if (it->data) {
-                    ((PyCOMPS_CtoPySeq*)self)->item_man->data_decref(it->data);
+                    self_seq->item_man->data_decref(it->data);
                     it->data = NULL;
                 }
                 clen+=1;
@@ -291,23 +294,25 @@ int PyCOMPSCtoPySeq_set(PyObject *self, PyObject *key, PyObject *val) {
 PyObject* PyCOMPSCtoPySeq_append(PyObject * self, PyObject *item) {
     COMPS_ListItem *it;
     void *key;
-    if (Py_TYPE(item) != ((PyCOMPS_CtoPySeq*)self)->item_man->item_type) {
+    PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
+
+    if (Py_TYPE(item) != self_seq->item_man->item_type) {
         PyErr_Format(PyExc_TypeError, "Cannot append %s to %s %s|",
                       Py_TYPE(item)->tp_name,
                       Py_TYPE(self)->tp_name,
-                      ((PyCOMPS_CtoPySeq*)self)->item_man->item_type->tp_name);
+                      self_seq->item_man->item_type->tp_name);
         return NULL;
     }
 
-    ((PyCOMPS_CtoPySeq*)self)->item_man->data_incref(
+    self_seq->item_man->data_incref(
                                     ((PyCOMPS_CtoPy_PItem*)item)->citem->data);
 
     it = comps_list_item_create(((PyCOMPS_CtoPy_PItem*)item)->citem->data,
                                  NULL,
-                                ((PyCOMPS_CtoPySeq*)self)->item_man
+                                self_seq->item_man
                                 ->data_decref);
     key = ctopy_make_key(it->data);
-    comps_brtree_set(((PyCOMPS_CtoPySeq*)self)->ctopy_map, key, item);
+    comps_brtree_set(self_seq->ctopy_map, key, item);
     Py_INCREF(item);
     ctopy_key_destroy(key);
     if (!comps_list_append(ctopy_get_list(self), it)) {
@@ -384,16 +389,17 @@ PyObject* PyCOMPSCtoPySeq_str(PyObject *self) {
 }
 int PyCOMPSCtoPySeq_print(PyObject *self, FILE *f, int flags) {
     COMPS_ListItem *it;
+    PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
 
     (void)flags;
     fprintf(f, "[");
         it = ctopy_get_list(self)?ctopy_get_list(self)->first:NULL;
         for (;it != NULL && it != ctopy_get_list(self)->last; it = it->next) {
-            ((PyCOMPS_CtoPySeq*)self)->item_man->fprint_f(f, it->data);
+            self_seq->item_man->fprint_f(f, it->data);
             fprintf(f, ", ");
         }
     if (it) {
-        ((PyCOMPS_CtoPySeq*)self)->item_man->fprint_f(f, it->data);
+        self_seq->item_man->fprint_f(f, it->data);
     }
     fprintf(f, "]");
     return 0;

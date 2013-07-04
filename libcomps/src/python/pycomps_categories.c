@@ -1,6 +1,9 @@
 #include "pycomps_categories.h"
 
-inline COMPS_DocCategory* pycomps_cat_get(PyObject *pycat) {
+inline COMPS_DocCategory* pycomps_cat_gget(PyCOMPS_Category *pycat) {
+    return (COMPS_DocCategory*)pycat->citem->data;
+}
+inline COMPS_DocCategory* pycomps_cat_oget(PyObject *pycat) {
     return (COMPS_DocCategory*)((PyCOMPS_Category*)pycat)->citem->data;
 }
 inline COMPS_DocCategoryExtra* pycomps_cat_get_extra(PyObject *pycat) {
@@ -16,7 +19,7 @@ inline COMPS_DocCategory** pycomps_cat_getp(PyObject *pycat) {
 }
 
 inline void pycomps_cat_incref(PyObject * pycat) {
-    comps_cat_incref(pycomps_cat_get(pycat));
+    comps_cat_incref(pycomps_cat_oget(pycat));
 }
 
 inline void comps_cat_incref(void * cat) {
@@ -53,11 +56,7 @@ PyObject* PyCOMPSCat_convert(void *c) {
     ret = PyCOMPSCat_new(&PyCOMPS_CatType, NULL, NULL);
     PyCOMPSCat_init((PyCOMPS_Category*)ret, NULL, NULL);
 
-    ctopy_citem_decref(pycomps_cat_get_extra(ret)->group_ids_citem);
-    ctopy_citem_decref(pycomps_cat_get_extra(ret)->name_by_lang_citem);
-    ctopy_citem_decref(pycomps_cat_get_extra(ret)->desc_by_lang_citem);
-    ctopy_citem_decref(((PyCOMPS_Category*)ret)->citem);
-    
+    pycomps_cat_decref(pycomps_cat_oget(ret));
 
     ((PyCOMPS_Category*)ret)->citem = comps_cat_get_extra(c)->citem;
     pycomps_cat_get_extra(ret)->group_ids_citem =
@@ -67,11 +66,7 @@ PyObject* PyCOMPSCat_convert(void *c) {
     pycomps_cat_get_extra(ret)->desc_by_lang_citem =
                                      comps_cat_get_extra(c)->desc_by_lang_citem;
 
-    ctopy_citem_incref(((PyCOMPS_Category*)ret)->citem);
-    ctopy_citem_incref(pycomps_cat_get_extra(ret)->group_ids_citem);
-    ctopy_citem_incref(pycomps_cat_get_extra(ret)->name_by_lang_citem);
-    ctopy_citem_incref(pycomps_cat_get_extra(ret)->desc_by_lang_citem);
-    
+    pycomps_cat_incref(ret);
     return ret;
 }
 
@@ -83,24 +78,12 @@ PyObject* PyCOMPSCat_union(PyObject *self, PyObject *other) {
         PyErr_SetString(PyExc_TypeError, "Not Category instance");
         return NULL;
     }
-    if (pycomps_cat_get(self)->group_ids == NULL) {
-        pycomps_cat_get(self)->group_ids = comps_list_create();
-        comps_list_init(pycomps_cat_get(self)->group_ids);
-        pycomps_cat_get_extra(self)->group_ids_citem->data =
-                                              pycomps_cat_get(self)->group_ids;
-    }
-    if (pycomps_cat_get(other)->group_ids == NULL) {
-        pycomps_cat_get(other)->group_ids = comps_list_create();
-        comps_list_init(pycomps_cat_get(other)->group_ids);
-        pycomps_cat_get_extra(other)->group_ids_citem->data =
-                                              pycomps_cat_get(other)->group_ids;
-    }
-    c = comps_doccategory_union(pycomps_cat_get(self),
-                                pycomps_cat_get(other));
+    c = comps_doccategory_union(pycomps_cat_oget(self),
+                                pycomps_cat_oget(other));
     res = PyCOMPSCat_new(&PyCOMPS_CatType, NULL, NULL);
     PyCOMPSCat_init((PyCOMPS_Category*)res, NULL, NULL);
     c->reserved = pycomps_cat_get_extra(res);
-    comps_doccategory_destroy(pycomps_cat_get(res));
+    comps_doccategory_destroy(pycomps_cat_oget(res));
     ((PyCOMPS_Category*)res)->citem->data = c;
     pycomps_cat_get_extra(res)->group_ids_citem->data = c->group_ids;
     pycomps_cat_get_extra(res)->name_by_lang_citem->data = c->name_by_lang;
@@ -110,10 +93,7 @@ PyObject* PyCOMPSCat_union(PyObject *self, PyObject *other) {
 
 void PyCOMPSCat_dealloc(PyObject *self)
 {
-    ctopy_citem_destroy(pycomps_cat_get_extra(self)->name_by_lang_citem);
-    ctopy_citem_destroy(pycomps_cat_get_extra(self)->desc_by_lang_citem);
-    ctopy_citem_destroy(pycomps_cat_get_extra(self)->group_ids_citem);
-    ctopy_citem_destroy(((PyCOMPS_Category*)self)->citem);
+    pycomps_cat_decref(pycomps_cat_oget(self));
     if (((PyCOMPS_Category*)self)->group_ids_pobj)
         Py_XDECREF(((PyCOMPS_Category*)self)->group_ids_pobj);
     if (((PyCOMPS_Category*)self)->name_by_lang_pobj)
@@ -178,11 +158,10 @@ int PyCOMPSCat_init(PyCOMPS_Category *self, PyObject *args, PyObject *kwds)
                                          &name,
                                          &desc,
                                          &disp_ord)) {
-        comps_doccategory_set_id(pycomps_cat_get((PyObject*)self), id, 1);
-        comps_doccategory_set_name(pycomps_cat_get((PyObject*)self), name, 1);
-        comps_doccategory_set_desc(pycomps_cat_get((PyObject*)self), desc, 1);
-        comps_doccategory_set_displayorder(pycomps_cat_get((PyObject*)self),
-                                           disp_ord);
+        comps_doccategory_set_id(pycomps_cat_gget(self), id, 1);
+        comps_doccategory_set_name(pycomps_cat_gget(self), name, 1);
+        comps_doccategory_set_desc(pycomps_cat_gget(self), desc, 1);
+        comps_doccategory_set_displayorder(pycomps_cat_gget(self), disp_ord);
         return 0;
     } else {
         return -1;
@@ -276,7 +255,7 @@ PyObject* comps_cat_str(void * cat) {
 }
 
 PyObject* PyCOMPSCat_str(PyObject *self) {
-    return comps_cat_str(pycomps_cat_get(self));
+    return comps_cat_str(pycomps_cat_oget(self));
 }
 
 void comps_cat_print(FILE *f, void *c) {
@@ -338,7 +317,7 @@ void comps_cat_print(FILE *f, void *c) {
 
 int PyCOMPSCat_print(PyObject *self, FILE *f, int flags) {
     (void) flags;
-    comps_cat_print(f, pycomps_cat_get(self));
+    comps_cat_print(f, pycomps_cat_oget(self));
     return 0;
 }
 
@@ -354,7 +333,7 @@ PyObject* PyCOMPSCat_cmp(PyObject *self, PyObject *other, int op) {
     }
     CMP_NONE_CHECK(op, self, other)
 
-    ret = comps_doccategory_cmp(pycomps_cat_get(self), pycomps_cat_get(other));
+    ret = comps_doccategory_cmp(pycomps_cat_oget(self), pycomps_cat_oget(other));
     if (op == Py_EQ) {
         if (!ret) Py_RETURN_FALSE;
     } else {
@@ -369,11 +348,11 @@ PyObject* PyCOMPSCat_get_groupids(PyCOMPS_Category *self, void *closure) {
     if (!self->group_ids_pobj) {
         ret = PyCOMPSSeq_new(&PyCOMPS_IDsType, NULL, NULL);
         PyCOMPSIDs_init((PyCOMPS_Sequence*)ret, NULL, NULL);
-        if (pycomps_cat_get((PyObject*)self)->group_ids == NULL) {
-            pycomps_cat_get((PyObject*)self)->group_ids = comps_list_create();
-            comps_list_init(pycomps_cat_get((PyObject*)self)->group_ids);
+        if (pycomps_cat_gget(self)->group_ids == NULL) {
+            pycomps_cat_gget(self)->group_ids = comps_list_create();
+            comps_list_init(pycomps_cat_gget(self)->group_ids);
             pycomps_cat_get_extra((PyObject*)self)->group_ids_citem->data =
-                                    pycomps_cat_get((PyObject*)self)->group_ids;
+                                    pycomps_cat_gget(self)->group_ids;
         }
         ctopy_citem_destroy(((PyCOMPS_Sequence*)ret)->citem);
         ((PyCOMPS_Sequence*)ret)->citem =
@@ -400,7 +379,7 @@ int PyCOMPSCat_set_groupids(PyCOMPS_Category *self,
     pycomps_cat_get_extra((PyObject*)self)->group_ids_citem =
                                               ((PyCOMPS_Sequence*)value)->citem;
     ctopy_citem_incref(pycomps_cat_get_extra((PyObject*)self)->group_ids_citem);
-    pycomps_cat_get((PyObject*)self)->group_ids =
+    pycomps_cat_gget(self)->group_ids =
                     (COMPS_List*)((PyCOMPS_Sequence*)value)->citem->data;
     if (self->group_ids_pobj) {
         Py_XDECREF(self->group_ids_pobj);
@@ -422,7 +401,7 @@ inline int PyCOMPSCat_set_name_by_lang(PyObject *self, PyObject *value,
     return pycomps_lang_set_dict(&pycomps_cat_get_extra(self)->name_by_lang_citem,
                                  &((PyCOMPS_Category*)self)->name_by_lang_pobj,
                                  value,
-                       (void**)&pycomps_cat_get(self)->name_by_lang);
+                       (void**)&pycomps_cat_oget(self)->name_by_lang);
 }
 
 inline PyObject* PyCOMPSCat_get_desc_by_lang(PyObject *self, void *closure) {
@@ -437,7 +416,7 @@ inline int PyCOMPSCat_set_desc_by_lang(PyObject *self, PyObject *value,
     return pycomps_lang_set_dict(&pycomps_cat_get_extra(self)->desc_by_lang_citem,
                                  &((PyCOMPS_Category*)self)->desc_by_lang_pobj,
                                  value,
-                       (void**)&pycomps_cat_get(self)->desc_by_lang);
+                       (void**)&pycomps_cat_oget(self)->desc_by_lang);
 }
 
 int pycomps_cat_strattr_setter(PyObject *self, PyObject *val, void *closure) {
@@ -446,18 +425,18 @@ int pycomps_cat_strattr_setter(PyObject *self, PyObject *val, void *closure) {
     if (__pycomps_stringable_to_char(val, &tmp) < 0) {
         return -1;
     }
-    tmp_prop = comps_dict_get(pycomps_cat_get(self)->properties, (char*)closure);
+    tmp_prop = comps_dict_get(pycomps_cat_oget(self)->properties, (char*)closure);
     if (!tmp_prop) {
         if (tmp) {
             tmp_prop = comps_doc_prop_str_create(tmp, 0);
-            comps_dict_set(pycomps_cat_get(self)->properties,
+            comps_dict_set(pycomps_cat_oget(self)->properties,
                            (char*)closure, tmp_prop);
         }
     } else {
         if (tmp)
             __comps_doc_char_setter((void**)&tmp_prop->prop.str, tmp, 0);
         else {
-            comps_dict_unset(pycomps_cat_get(self)->properties, (char*)closure);
+            comps_dict_unset(pycomps_cat_oget(self)->properties, (char*)closure);
         }
     }
     return 0;
@@ -465,7 +444,7 @@ int pycomps_cat_strattr_setter(PyObject *self, PyObject *val, void *closure) {
 
 PyObject* pycomps_cat_strattr_getter(PyObject *self, void *closure) {
     COMPS_Prop *tmp_prop;
-    tmp_prop = comps_dict_get(pycomps_cat_get(self)->properties, (char*)closure);
+    tmp_prop = comps_dict_get(pycomps_cat_oget(self)->properties, (char*)closure);
     if (tmp_prop != NULL)
         return PyUnicode_FromString(tmp_prop->prop.str);
     else
@@ -579,12 +558,6 @@ COMPS_List* comps_cats_union(COMPS_List *cats1, COMPS_List *cats2) {
 
     it = cats1?cats1->first:NULL;
     for (; it != NULL; it = it->next) {
-        /*if (((COMPS_DocCategory*)it->data)->group_ids == NULL) {
-            ((COMPS_DocCategory*)it->data)->group_ids = comps_list_create();
-            comps_list_init(((COMPS_DocCategory*)it->data)->group_ids);
-            comps_cat_get_extra(it->data)->group_ids_citem->data =
-                                      ((COMPS_DocCategory*)it->data)->group_ids;
-        }*/
         comps_cat_incref(it->data);
         comps_set_add(set, it->data);
     }
@@ -642,8 +615,7 @@ PyObject* PyCOMPSCats_union(PyObject *self, PyObject *other) {
     res = (PyCOMPS_CtoPySeq*) Py_TYPE(self)->tp_new(Py_TYPE(self), NULL, NULL);
     PyCOMPSCats_init(res, NULL, NULL);
 
-    res_list = comps_cats_union(((PyCOMPS_CtoPySeq*)self)->citem->data,
-                                ((PyCOMPS_CtoPySeq*)other)->citem->data);
+    res_list = comps_cats_union(ctopy_get_list(self), ctopy_get_list(other));
     comps_list_destroy((COMPS_List**)&res->citem->data);
     res->citem->data = res_list;
     return (PyObject*)res;

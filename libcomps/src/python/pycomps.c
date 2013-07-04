@@ -21,15 +21,16 @@ PyObject* PyCOMPS_toxml_f(PyObject *self, PyObject *other) {
     int i;
     COMPS_ListItem *it;
     PyObject *ret, *tmp;
+    PyCOMPS *self_comps = (PyCOMPS*)self;
 
     if (__pycomps_arg_to_char(other, &tmps)) return NULL;
-    if (!((PyCOMPS*)self)->comps->encoding)
-       ((PyCOMPS*)self)->comps->encoding = "UTF-8";
-    comps2xml_f(((PyCOMPS*)self)->comps, tmps, 0);
+    if (!self_comps->comps->encoding)
+       self_comps->comps->encoding = "UTF-8";
+    comps2xml_f(self_comps->comps, tmps, 0);
     free(tmps);
 
-    ret = PyList_New(((PyCOMPS*)self)->comps->log->logger_data->len);
-    for (i = 0, it = ((PyCOMPS*)self)->comps->log->logger_data->first;
+    ret = PyList_New(self_comps->comps->log->logger_data->len);
+    for (i = 0, it = self_comps->comps->log->logger_data->first;
          it != NULL; it = it->next, i++) {
         tmps = comps_log_entry_str(it->data);
         tmp = PyUnicode_DecodeUTF8(tmps, strlen(tmps), errors);
@@ -50,60 +51,65 @@ PyObject* PyCOMPS_toxml_str(PyObject *self) {
 }
 
 void pycomps_clear(PyObject *self) {
-    if (((PyCOMPS*)self)->cats_pobj)
-        Py_XDECREF(((PyCOMPS*)self)->cats_pobj);
-    if (((PyCOMPS*)self)->groups_pobj)
-        Py_XDECREF(((PyCOMPS*)self)->groups_pobj);
-    if (((PyCOMPS*)self)->envs_pobj)
-        Py_XDECREF(((PyCOMPS*)self)->envs_pobj);
+    PyCOMPS *self_comps = (PyCOMPS*)self;
+    if (self_comps->cats_pobj)
+        Py_XDECREF(self_comps->cats_pobj);
+    if (self_comps->groups_pobj)
+        Py_XDECREF(self_comps->groups_pobj);
+    if (self_comps->envs_pobj)
+        Py_XDECREF(self_comps->envs_pobj);
 
-    ctopy_citem_destroy(((PyCOMPS*)self)->groups_citem);
-    ctopy_citem_destroy(((PyCOMPS*)self)->cats_citem);
-    ctopy_citem_destroy(((PyCOMPS*)self)->envs_citem);
-    Py_XDECREF(((PyCOMPS*)self)->enc);
+    ctopy_citem_destroy(self_comps->groups_citem);
+    ctopy_citem_destroy(self_comps->cats_citem);
+    ctopy_citem_destroy(self_comps->envs_citem);
+    Py_XDECREF(self_comps->enc);
 
-    ((PyCOMPS*)self)->cats_pobj = NULL;
-    ((PyCOMPS*)self)->groups_pobj = NULL;
-    ((PyCOMPS*)self)->envs_pobj = NULL;
+    self_comps->cats_pobj = NULL;
+    self_comps->groups_pobj = NULL;
+    self_comps->envs_pobj = NULL;
 }
 
 PyObject* PyCOMPS_clear(PyObject *self) {
+    PyCOMPS *self_comps = (PyCOMPS*)self_comps;
+
     pycomps_clear(self);
 
-    ((PyCOMPS*)self)->comps->lobjects->data_destructor = NULL;
-    comps_dict_destroy(((PyCOMPS*)self)->comps->lobjects);
-    comps_dict_destroy(((PyCOMPS*)self)->comps->dobjects);
-    comps_dict_destroy(((PyCOMPS*)self)->comps->mdobjects);
-    comps_log_destroy(((PyCOMPS*)self)->comps->log);
+    self_comps->comps->lobjects->data_destructor = NULL;
+    comps_dict_destroy(self_comps->comps->lobjects);
+    comps_dict_destroy(self_comps->comps->dobjects);
+    comps_dict_destroy(self_comps->comps->mdobjects);
+    comps_log_destroy(self_comps->comps->log);
 
-    ((PyCOMPS*)self)->comps->lobjects = comps_dict_create(NULL, NULL,
+    self_comps->comps->lobjects = comps_dict_create(NULL, NULL,
                                                           &comps_list_destroy_v);
-    ((PyCOMPS*)self)->comps->dobjects = comps_dict_create(NULL,
+    self_comps->comps->dobjects = comps_dict_create(NULL,
                                                          &comps_dict_clone_v,
                                                          &comps_dict_destroy_v);
-    ((PyCOMPS*)self)->comps->mdobjects = comps_dict_create(NULL,
+    self_comps->comps->mdobjects = comps_dict_create(NULL,
                                                         &comps_mdict_clone_v,
                                                         &comps_mdict_destroy_v);
-    ((PyCOMPS*)self)->comps->log = comps_log_create(0);
+    self_comps->comps->log = comps_log_create(0);
 
 
-    ((PyCOMPS*)self)->cats_citem = ctopy_citem_create(
-                                comps_doc_categories(((PyCOMPS*)self)->comps),
+    self_comps->cats_citem = ctopy_citem_create(
+                                comps_doc_categories(self_comps->comps),
                                 &comps_list_destroy_v);
-    ((PyCOMPS*)self)->groups_citem = ctopy_citem_create(
-                                comps_doc_groups(((PyCOMPS*)self)->comps),
+    self_comps->groups_citem = ctopy_citem_create(
+                                comps_doc_groups(self_comps->comps),
                                 &comps_list_destroy_v);
-    ((PyCOMPS*)self)->envs_citem = ctopy_citem_create(
-                                comps_doc_environments(((PyCOMPS*)self)->comps),
+    self_comps->envs_citem = ctopy_citem_create(
+                                comps_doc_environments(self_comps->comps),
                                 &comps_list_destroy_v);
-    ((PyCOMPS*)self)->enc = PyUnicode_FromString("");
+    self_comps->enc = PyUnicode_FromString("");
     Py_RETURN_NONE;
 }
 
 void pycomps_ctopy_comps_init(PyObject *self) {
     COMPS_ListItem *it, *it2;
-    it =(comps_doc_categories(((PyCOMPS*)self)->comps))?
-        comps_doc_categories(((PyCOMPS*)self)->comps)->first:NULL;
+    PyCOMPS *self_comps = (PyCOMPS*)self;
+
+    it =(comps_doc_categories(self_comps->comps))?
+        comps_doc_categories(self_comps->comps)->first:NULL;
     for (; it != NULL; it = it->next) {
         ((COMPS_DocCategory*)it->data)->reserved = comps_doccategory_extra_create();
         comps_cat_get_extra(it->data)->citem = ctopy_citem_create(it->data,
@@ -119,8 +125,8 @@ void pycomps_ctopy_comps_init(PyObject *self) {
                                    &comps_dict_destroy_v);
         it->data_destructor = &pycomps_cat_decref;
     }
-    it =(comps_doc_groups(((PyCOMPS*)self)->comps))?
-        comps_doc_groups(((PyCOMPS*)self)->comps)->first:NULL;
+    it =(comps_doc_groups(self_comps->comps))?
+        comps_doc_groups(self_comps->comps)->first:NULL;
     for (; it != NULL; it = it->next) {
         ((COMPS_DocGroup*)it->data)->reserved = (void*)comps_docgroup_extra_create();
         comps_group_get_extra(it->data)->citem = ctopy_citem_create(it->data,
@@ -145,8 +151,8 @@ void pycomps_ctopy_comps_init(PyObject *self) {
             it2->data_destructor = &pycomps_pkg_decref;
         }
     }
-    it = (comps_doc_environments(((PyCOMPS*)self)->comps))?
-        comps_doc_environments(((PyCOMPS*)self)->comps)->first:NULL;
+    it = (comps_doc_environments(self_comps->comps))?
+        comps_doc_environments(self_comps->comps)->first:NULL;
     for (; it != NULL; it = it->next) {
         ((COMPS_DocEnv*)it->data)->reserved = comps_docenv_extra_create();
         comps_env_get_extra(it->data)->citem = ctopy_citem_create(it->data,
@@ -166,14 +172,14 @@ void pycomps_ctopy_comps_init(PyObject *self) {
         it->data_destructor = &pycomps_env_decref;
     }
 
-    ((PyCOMPS*)self)->cats_citem = ctopy_citem_create(
-                                comps_doc_categories(((PyCOMPS*)self)->comps),
+    self_comps->cats_citem = ctopy_citem_create(
+                                comps_doc_categories(self_comps->comps),
                                 &comps_list_destroy_v);
-    ((PyCOMPS*)self)->groups_citem = ctopy_citem_create(
-                                comps_doc_groups(((PyCOMPS*)self)->comps),
+    self_comps->groups_citem = ctopy_citem_create(
+                                comps_doc_groups(self_comps->comps),
                                 &comps_list_destroy_v);
-    ((PyCOMPS*)self)->envs_citem = ctopy_citem_create(
-                                comps_doc_environments(((PyCOMPS*)self)->comps),
+    self_comps->envs_citem = ctopy_citem_create(
+                                comps_doc_environments(self_comps->comps),
                                 &comps_list_destroy_v);
 }
 
@@ -185,6 +191,7 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
     PyObject *ret, *tmp;
     char *tmps, *fname;
     const char *errors = NULL;
+    PyCOMPS *self_comps = (PyCOMPS*)self;
 
     if (__pycomps_arg_to_char(other, &fname)) return NULL;
 
@@ -199,8 +206,8 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
     }
     comps_parse_file(parsed, f);
     pycomps_clear(self);
-    pycomps_doc_destroy((void*)((PyCOMPS*)self)->comps);
-    ((PyCOMPS*)self)->comps = parsed->comps_doc;
+    pycomps_doc_destroy((void*)self_comps->comps);
+    self_comps->comps = parsed->comps_doc;
 
     pycomps_ctopy_comps_init(self);
 
@@ -213,7 +220,7 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
         free(tmps);
     }
     free(fname);
-    ((PyCOMPS*)self)->enc = PyBytes_FromString(parsed->comps_doc->encoding);
+    self_comps->enc = PyBytes_FromString(parsed->comps_doc->encoding);
     parsed->comps_doc = NULL;
     comps_parse_parsed_destroy(parsed);
 
@@ -225,6 +232,7 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
     unsigned int i;
     char *tmps;
     COMPS_ListItem *it;
+    PyCOMPS *self_comps = (PyCOMPS*)self;
 
     if (__pycomps_arg_to_char(other, &tmps)) return NULL;
 
@@ -235,8 +243,8 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
     free(tmps);
 
     pycomps_clear(self);
-    pycomps_doc_destroy((void*)((PyCOMPS*)self)->comps);
-    ((PyCOMPS*)self)->comps = parsed->comps_doc;
+    pycomps_doc_destroy((void*)self_comps->comps);
+    self_comps->comps = parsed->comps_doc;
     pycomps_ctopy_comps_init(self);
 
     ret = PyList_New(parsed->log->logger_data->len);
@@ -246,7 +254,7 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
         PyList_SetItem(ret, i, PyUnicode_FromString(tmps));
         free(tmps);
     }
-    ((PyCOMPS*)self)->enc = PyBytes_FromString(parsed->comps_doc->encoding);
+    self_comps->enc = PyBytes_FromString(parsed->comps_doc->encoding);
     parsed->comps_doc = NULL;
     comps_parse_parsed_destroy(parsed);
 
@@ -460,88 +468,17 @@ static PyObject* PyCOMPS_union(PyObject *self, PyObject *other) {
 }
 
 PyObject* PyCOMPS_cmp(PyObject *self, PyObject *other, int op) {
-    COMPS_ListItem *it, *it2;
-    COMPS_List *l;
     char res;
 
     CMP_OP_EQ_NE_CHECK(op)
-
-    if (other == NULL || ( Py_TYPE(other) != &PyCOMPS_Type
-                           && other != Py_None)) {
-        PyErr_SetString(PyExc_TypeError, "Not Comps instance");
-        return NULL;
-    }
-    CMP_NONE_CHECK(op, self, other)
-
-    l = comps_doc_categories(((PyCOMPS*)self)->comps);
-    it = l?l->first:NULL;
-    l = comps_doc_categories(((PyCOMPS*)other)->comps);
-    it2 = l?l->first:NULL;
-    for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        res = comps_doccategory_cmp(it->data, it2->data);
-        if (!res) {
-            if (op == Py_EQ) {
-                Py_RETURN_FALSE;
-            } else {
-                Py_RETURN_TRUE;
-            }
-        }
-    }
-    if ((it != NULL && it2 == NULL) || (it == NULL && it2 != NULL)) {
-        if (op == Py_EQ) {
-            Py_RETURN_FALSE;
-        } else {
-            Py_RETURN_TRUE;
-        }
-    }
-
-    l = comps_doc_groups(((PyCOMPS*)self)->comps);
-    it = l?l->first:NULL;
-    l = comps_doc_groups(((PyCOMPS*)other)->comps);
-    it2 = l?l->first:NULL;
-    for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        res = comps_docgroup_cmp(it->data, it2->data);
-        if (!res) {
-            if (op == Py_EQ) {
-                Py_RETURN_FALSE;
-            } else {
-                Py_RETURN_TRUE;
-            }
-        }
-    }
-    if ((it != NULL && it2 == NULL) || (it == NULL && it2 != NULL)) {
-        if (op == Py_EQ) {
-            Py_RETURN_FALSE;
-        } else {
-            Py_RETURN_TRUE;
-        }
-    }
-
-    l = comps_doc_environments(((PyCOMPS*)self)->comps);
-    it = l?l->first:NULL;
-    l = comps_doc_environments(((PyCOMPS*)other)->comps);
-    it2 = l?l->first:NULL;
-    for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        res = comps_docenv_cmp(it->data, it2->data);
-        if (!res) {
-            if (op == Py_EQ) {
-                Py_RETURN_FALSE;
-            } else {
-                Py_RETURN_TRUE;
-            }
-        }
-    }
-    if ((it != NULL && it2 == NULL) || (it == NULL && it2 != NULL)) {
-        if (op == Py_EQ) {
-            Py_RETURN_FALSE;
-        } else {
-            Py_RETURN_TRUE;
-        }
-    }
-    if (op == Py_EQ)
+    res = comps_doc_cmp(((PyCOMPS*)self)->comps, ((PyCOMPS*)other)->comps);
+    if (op == Py_EQ && res) {
         Py_RETURN_TRUE;
-    else
-       Py_RETURN_FALSE;
+    } else if (op == Py_NE && !res){
+        Py_RETURN_TRUE;
+    } else {
+        Py_RETURN_FALSE;
+    }
 }
 
 PyNumberMethods PyCOMPS_Nums = {

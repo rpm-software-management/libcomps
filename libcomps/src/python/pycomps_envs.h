@@ -45,17 +45,18 @@ typedef struct COMPS_DocEnvExtra {
 } COMPS_DocEnvExtra;
 COMPS_DocEnvExtra * comps_docenv_extra_create();
 
-COMPS_DocEnv* pycomps_env_get(PyObject *pyenv);
+COMPS_DocEnv* pycomps_env_oget(PyObject *pyenv);
+COMPS_DocEnv* pycomps_env_gget(PyCOMPS_Env *pyenv);
 COMPS_DocEnv** pycomps_env_getp(PyObject *pyenv);
 COMPS_DocEnvExtra* pycomps_env_get_extra(PyObject *pyenv);
 COMPS_DocEnvExtra* comps_env_get_extra(void *docenv);
 void pycomps_env_destroy(void * env);
 void pycomps_env_decref(void * env);
+void pycomps_env_incref(PyObject * pyenv);
 void comps_env_incref(void * env);
 PyObject* comps_env_str(void * env);
 
 COMPS_List* comps_envs_union(COMPS_List *envs1, COMPS_List *envs2);
-//char comps_env_cmp(void *e1, void *e2);
 
 PyObject* PyCOMPSEnv_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int PyCOMPSEnvs_init(PyCOMPS_CtoPySeq *self, PyObject *args, PyObject *kwds);

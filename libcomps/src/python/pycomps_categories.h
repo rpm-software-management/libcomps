@@ -34,13 +34,13 @@ void comps_doccategory_extra_destroy(void *cdce);
 char __pycomps_cat_idcmp(void *c1, void *c2);
 
 COMPS_List* comps_cats_union(COMPS_List *cats1, COMPS_List *cats2);
-//char comps_cat_cmp(void *c1, void *c2);
 
 void pycomps_cat_destroy(void *cat);
 void pycomps_cat_decref(void *cat);
 void pycomps_cat_incref(PyObject *pycat);
 void comps_cat_incref(void *cat);
-COMPS_DocCategory *pycomps_cat_get(PyObject *pycat);
+COMPS_DocCategory* pycomps_cat_oget(PyObject *pycat);
+COMPS_DocCategory* pycomps_cat_gget(PyCOMPS_Category *pycat);
 COMPS_DocCategoryExtra* pycomps_cat_get_extra(PyObject *pycat);
 COMPS_DocCategoryExtra* comps_cat_get_extra(void *doccat);
 PyObject* comps_cat_str(void * cat);
