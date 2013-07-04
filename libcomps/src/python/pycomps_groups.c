@@ -1,14 +1,5 @@
 #include "pycomps_groups.h"
 
-char __compsgroup_id_cmp(void *g1, void *g2) {
-    return (strcmp(
-        (char*)((COMPS_Prop*)
-               comps_dict_get(((COMPS_DocGroup*)g1)->properties, "id"))->prop.str,
-        (char*)((COMPS_Prop*)
-               comps_dict_get(((COMPS_DocGroup*)g2)->properties, "id"))->prop.str)
-            == 0);
-}
-
 inline COMPS_DocGroup* pycomps_group_get(PyObject *pygroup) {
     return (COMPS_DocGroup*)((PyCOMPS_Group*)pygroup)->citem->data;
 }
@@ -24,20 +15,18 @@ inline COMPS_DocGroupExtra* comps_group_get_extra(void* group) {
     return (COMPS_DocGroupExtra*)((COMPS_DocGroup*)group)->reserved;
 }
 inline void pycomps_group_incref(PyObject * pygroup) {
-    ctopy_citem_incref(pycomps_group_get_extra(pygroup)->name_by_lang_citem);
-    ctopy_citem_incref(pycomps_group_get_extra(pygroup)->desc_by_lang_citem);
-    ctopy_citem_incref(pycomps_group_get_extra(pygroup)->packages_citem);
-    ctopy_citem_incref(pycomps_group_get_extra(pygroup)->citem);
+    comps_group_incref(pycomps_group_get(pygroup));
 }
 
-inline void comps_group_incref(void * group) {
+void comps_group_incref(void * group) {
+
     ctopy_citem_incref(comps_group_get_extra(group)->name_by_lang_citem);
     ctopy_citem_incref(comps_group_get_extra(group)->desc_by_lang_citem);
     ctopy_citem_incref(comps_group_get_extra(group)->packages_citem);
     ctopy_citem_incref(comps_group_get_extra(group)->citem);
 }
 
-inline void pycomps_group_decref(void * group) {
+void pycomps_group_decref(void * group) {
     ctopy_citem_decref(comps_group_get_extra(group)->name_by_lang_citem);
     ctopy_citem_decref(comps_group_get_extra(group)->desc_by_lang_citem);
     ctopy_citem_decref(comps_group_get_extra(group)->packages_citem);
@@ -221,19 +210,19 @@ PyObject* comps_group_str(void * group) {
         empty = PyBytes_AsString(emptytmp);
     }
 
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)group)->properties, "id");
+    tmp_prop = __comps_docgroup_get_prop(group, "id");
     id = (tmp_prop)?tmp_prop->prop.str: empty;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)group)->properties, "name");
+    tmp_prop = __comps_docgroup_get_prop(group, "name");
     name = (tmp_prop)?tmp_prop->prop.str: empty;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)group)->properties, "desc");
+    tmp_prop = __comps_docgroup_get_prop(group, "desc");
     desc = (tmp_prop)?tmp_prop->prop.str: empty;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)group)->properties, "lang_only");
+    tmp_prop = __comps_docgroup_get_prop(group, "lang_only");
     lang = (tmp_prop)?tmp_prop->prop.str: empty;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)group)->properties, "def");
+    tmp_prop = __comps_docgroup_get_prop(group, "def");
     def = (tmp_prop)?tmp_prop->prop.num: 0;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)group)->properties, "display_order");
+    tmp_prop = __comps_docgroup_get_prop(group, "display_order");
     disp_ord = (tmp_prop)?tmp_prop->prop.num: 0;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)group)->properties, "uservisible");
+    tmp_prop = __comps_docgroup_get_prop(group, "uservisible");
     uservis = (tmp_prop)?tmp_prop->prop.num: 0;
 
     ret = PyUnicode_FromFormat("<COMPS_Group: id='%s', name='%s', description='%s',"
@@ -314,19 +303,19 @@ void comps_group_print(FILE *f, void *g) {
     int disp_ord;
     COMPS_Prop* tmp_prop;
 
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)g)->properties, "id");
+    tmp_prop = __comps_docgroup_get_prop(g, "id");
     id = (tmp_prop)?tmp_prop->prop.str: NULL;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)g)->properties, "name");
+    tmp_prop = __comps_docgroup_get_prop(g, "name");
     name = (tmp_prop)?tmp_prop->prop.str: NULL;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)g)->properties, "desc");
+    tmp_prop = __comps_docgroup_get_prop(g, "desc");
     desc = (tmp_prop)?tmp_prop->prop.str: NULL;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)g)->properties, "lang_only");
+    tmp_prop = __comps_docgroup_get_prop(g, "lang_only");
     lang = (tmp_prop)?tmp_prop->prop.str: NULL;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)g)->properties, "def");
+    tmp_prop = __comps_docgroup_get_prop(g, "def");
     def = (tmp_prop)?tmp_prop->prop.num: 0;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)g)->properties, "display_order");
+    tmp_prop = __comps_docgroup_get_prop(g, "display_order");
     disp_ord = (tmp_prop)?tmp_prop->prop.num: 0;
-    tmp_prop = comps_dict_get(((COMPS_DocGroup*)g)->properties, "uservisible");
+    tmp_prop = __comps_docgroup_get_prop(g, "uservisible");
     uservis = (tmp_prop)?tmp_prop->prop.num: 0;
 
     fprintf(f, "<COMPS_Group: id='%s', name='%s', description='%s',  "
@@ -690,7 +679,7 @@ COMPS_List* comps_groups_union(COMPS_List *groups1, COMPS_List *groups2) {
     comps_list_init(res);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__compsgroup_id_cmp);
+    comps_set_init(set, NULL, NULL, NULL, &__comps_docgroup_idcmp);
 
     it = groups1?groups1->first:NULL;
     for (; it != NULL; it = it->next) {

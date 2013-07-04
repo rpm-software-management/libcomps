@@ -22,6 +22,9 @@
 #include <libxml/xmlwriter.h>
 #include <libxml/tree.h>
 
+COMPS_Prop * __comps_doccat_get_prop(void *cat, const char *key);
+COMPS_Prop * __comps_docenv_get_prop(void *env, const char *key);
+COMPS_Prop * __comps_docgroup_get_prop(void *group, const char *key);
 
 
 void __comps_doc_char_setter(void **attr, char *val, char copy);

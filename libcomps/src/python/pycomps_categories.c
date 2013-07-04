@@ -205,18 +205,17 @@ PyObject* comps_cat_str(void * cat) {
         empty = PyBytes_AsString(emptytmp);
     }
 
-    tmp_prop = comps_dict_get(((COMPS_DocCategory*)cat)->properties, "id");
+    tmp_prop = __comps_doccat_get_prop(cat, "id");
     id = (tmp_prop)?tmp_prop->prop.str:empty;
-    tmp_prop = comps_dict_get(((COMPS_DocCategory*)cat)->properties, "name");
+    tmp_prop = __comps_doccat_get_prop(cat, "name");
     name = (tmp_prop)?tmp_prop->prop.str:empty;
-    tmp_prop = comps_dict_get(((COMPS_DocCategory*)cat)->properties, "desc");
+    tmp_prop = __comps_doccat_get_prop(cat, "desc");
     desc = (tmp_prop)?tmp_prop->prop.str:empty;
-    tmp_prop = comps_dict_get(((COMPS_DocCategory*)cat)->properties, "display_order");
+    tmp_prop = __comps_doccat_get_prop(cat, "display_order");
     disp_ord = (tmp_prop)?tmp_prop->prop.num:0;
 
     ret = PyUnicode_FromFormat("<COMPS_Category: id='%s', name='%s', "
-                              "description='%s', display_order=%d, name_by_lang=",
-                              /*, description_by_lang=%U, %U>",*/
+                          "description='%s', display_order=%d, name_by_lang=",
                               id, name, desc, disp_ord);
     if (PyUnicode_Check(emptytmp)) {
         free(empty);
@@ -288,13 +287,13 @@ void comps_cat_print(FILE *f, void *c) {
     int disp_ord;
     COMPS_Prop *tmp_prop;
 
-    tmp_prop = comps_dict_get(((COMPS_DocCategory*)c)->properties, "id");
+    tmp_prop = __comps_doccat_get_prop(c, "id");
     id = (tmp_prop)?tmp_prop->prop.str:NULL;
-    tmp_prop = comps_dict_get(((COMPS_DocCategory*)c)->properties, "name");
+    tmp_prop = __comps_doccat_get_prop(c, "name");
     name = (tmp_prop)?tmp_prop->prop.str:NULL;
-    tmp_prop = comps_dict_get(((COMPS_DocCategory*)c)->properties, "desc");
+    tmp_prop = __comps_doccat_get_prop(c, "desc");
     desc = (tmp_prop)?tmp_prop->prop.str:NULL;
-    tmp_prop = comps_dict_get(((COMPS_DocCategory*)c)->properties, "display_order");
+    tmp_prop = __comps_doccat_get_prop(c, "display_order");
     disp_ord = (tmp_prop)?tmp_prop->prop.num:0;
 
     fprintf(f, "<COMPS_Category: id='%s', name='%s', description='%s', "
@@ -580,12 +579,12 @@ COMPS_List* comps_cats_union(COMPS_List *cats1, COMPS_List *cats2) {
 
     it = cats1?cats1->first:NULL;
     for (; it != NULL; it = it->next) {
-        if (((COMPS_DocCategory*)it->data)->group_ids == NULL) {
+        /*if (((COMPS_DocCategory*)it->data)->group_ids == NULL) {
             ((COMPS_DocCategory*)it->data)->group_ids = comps_list_create();
             comps_list_init(((COMPS_DocCategory*)it->data)->group_ids);
             comps_cat_get_extra(it->data)->group_ids_citem->data =
                                       ((COMPS_DocCategory*)it->data)->group_ids;
-        }
+        }*/
         comps_cat_incref(it->data);
         comps_set_add(set, it->data);
     }

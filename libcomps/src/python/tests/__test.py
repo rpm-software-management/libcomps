@@ -781,6 +781,7 @@ class COMPSTest(unittest.TestCase):
 
         c = c1 + c2
         x = c.groups[0].packages[0].name
+        self.assertTrue(x == "pepper")
 
     def test_main_loc(self):
         comps = libcomps.Comps()

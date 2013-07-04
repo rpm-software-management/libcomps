@@ -24,21 +24,9 @@ char comps_props_cmp(COMPS_Dict *p1, COMPS_Dict *p2) {
     pairs1 = comps_rtree_pairs(p1);
     pairs2 = comps_rtree_pairs(p2);
     for (hsit = pairs1->first; hsit != NULL; hsit = hsit->next) {
-    //printf("%s=", ((COMPS_RTreePair*)hsit->data)->key);
-    if (((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop_type == COMPS_PROP_STR){
-        //printf("%s\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.str);
-    } else
-        //printf("%d\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.num);
-
         comps_set_add(set1, hsit->data);
     }
     for (hsit = pairs2->first; hsit != NULL; hsit = hsit->next) {
-    //printf("%s=", ((COMPS_RTreePair*)hsit->data)->key);
-    if (((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop_type == COMPS_PROP_STR){
-        //printf("%s\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.str);
-    } else
-        //printf("%d\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.num);
-
         comps_set_add(set2, hsit->data);
     }
 
@@ -60,24 +48,45 @@ void __comps_doc_char_setter(void **attr, char *val, char copy) {
     *attr = new;
 }
 
-inline char __comps_doccategory_idcmp(void* cat1, void *cat2) {
-    return __comps_strcmp(
-  ((COMPS_Prop*)
-   comps_dict_get(((COMPS_DocCategory*)cat1)->properties, "id"))->prop.str,
-  ((COMPS_Prop*)
-   comps_dict_get(((COMPS_DocCategory*)cat2)->properties, "id"))->prop.str);
+inline COMPS_Prop * __comps_doccat_get_prop(void *cat, const char *key) {
+    return (COMPS_Prop*)comps_dict_get(((COMPS_DocCategory*)cat)->properties, key);
 }
-inline char __comps_docgroup_idcmp(void* g1, void *g2) {
-    return __comps_strcmp(
-    ((COMPS_Prop*)comps_dict_get(((COMPS_DocGroup*)g1)->properties, "id"))->prop.str,
-    ((COMPS_Prop*)comps_dict_get(((COMPS_DocGroup*)g2)->properties, "id"))->prop.str);
+
+inline COMPS_Prop * __comps_docenv_get_prop(void *env, const char *key) {
+    return (COMPS_Prop*)comps_dict_get(((COMPS_DocEnv*)env)->properties, key);
 }
-inline char __comps_docenv_idcmp(void* e1, void *e2) {
-    return __comps_strcmp(
-        ((COMPS_Prop*)
-         comps_dict_get(((COMPS_DocEnv*)e1)->properties, "id"))->prop.str,
-        ((COMPS_Prop*)
-         comps_dict_get(((COMPS_DocEnv*)e2)->properties, "id"))->prop.str);
+
+inline COMPS_Prop * __comps_docgroup_get_prop(void *group, const char *key) {
+    return (COMPS_Prop*)comps_dict_get(((COMPS_DocGroup*)group)->properties, key);
+}
+
+char __comps_doccategory_idcmp(void* cat1, void *cat2) {
+    COMPS_Prop *prop1, *prop2;
+    prop1 = __comps_doccat_get_prop(cat1, "id");
+    prop2 = __comps_doccat_get_prop(cat2, "id");
+
+    if (prop1->prop_type != COMPS_PROP_STR ||
+        prop2->prop_type != COMPS_PROP_STR) return 0;
+    return __comps_strcmp(prop1->prop.str, prop2->prop.str);
+}
+
+char __comps_docgroup_idcmp(void* g1, void *g2) {
+    COMPS_Prop *prop1, *prop2;
+    prop1 = __comps_docgroup_get_prop(g1, "id");
+    prop2 = __comps_docgroup_get_prop(g2, "id");
+
+    if (prop1->prop_type != COMPS_PROP_STR ||
+        prop2->prop_type != COMPS_PROP_STR) return 0;
+    return __comps_strcmp(prop1->prop.str, prop2->prop.str);
+}
+char __comps_docenv_idcmp(void* e1, void *e2) {
+    COMPS_Prop *prop1, *prop2;
+    prop1 = __comps_docenv_get_prop(e1, "id");
+    prop2 = __comps_docenv_get_prop(e2, "id");
+
+    if (prop1->prop_type != COMPS_PROP_STR ||
+        prop2->prop_type != COMPS_PROP_STR) return 0;
+    return __comps_strcmp(prop1->prop.str, prop2->prop.str);
 }
 
 inline void __comps_doc_add_lang_prop(COMPS_Dict *dict, char *lang, char *prop,
@@ -223,11 +232,11 @@ COMPS_List* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
 
     for (it = groups->first; it != NULL; it = it->next) {
         matched = 0;
-        tmp_prop = comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "id");
+        tmp_prop = __comps_docgroup_get_prop(it->data, "id");
         if (id != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
             && __comps_strcmp(tmp_prop->prop.str, id) == 0)
             matched++;
-        tmp_prop = comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "name");
+        tmp_prop = __comps_docgroup_get_prop(it->data, "name");
         if (name != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
             && __comps_strcmp(tmp_prop->prop.str, name) == 0)
             matched++;
@@ -237,7 +246,7 @@ COMPS_List* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
                                 lang);
             if (__comps_strcmp(lang_match, name)) matched++;
         }
-        tmp_prop = comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "desc");
+        tmp_prop = __comps_docgroup_get_prop(it->data, "desc");
         if (desc != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
             && __comps_strcmp(tmp_prop->prop.str, desc) == 0)
             matched++;
@@ -291,11 +300,11 @@ COMPS_List* comps_doc_get_categories(COMPS_Doc *doc, char *id, char *name,
 
     for (it = categories->first; it != NULL; it = it->next) {
         matched = 0;
-        tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "id");
+        tmp_prop = __comps_doccat_get_prop(it->data, "id");
         if (id != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
             && __comps_strcmp(tmp_prop->prop.str, id) == 0)
             matched++;
-        tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "name");
+        tmp_prop = __comps_doccat_get_prop(it->data, "name");
         if (name != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
             && __comps_strcmp(tmp_prop->prop.str, name) == 0)
             matched++;
@@ -305,7 +314,7 @@ COMPS_List* comps_doc_get_categories(COMPS_Doc *doc, char *id, char *name,
                                 lang);
             if (__comps_strcmp(lang_match, name)) matched++;
         }
-        tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "desc");
+        tmp_prop = __comps_doccat_get_prop(it->data, "desc");
         if (desc != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
             && __comps_strcmp(tmp_prop->prop.str, desc) == 0)
             matched++;
@@ -360,11 +369,11 @@ COMPS_List* comps_doc_get_envs(COMPS_Doc *doc, char *id, char *name,
 
     for (it = envs->first; it != NULL; it = it->next) {
         matched = 0;
-        tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "id");
+        tmp_prop = __comps_docenv_get_prop(it->data, "id");
         if (id != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
             && __comps_strcmp(tmp_prop->prop.str, id) == 0)
             matched++;
-        tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "name");
+        tmp_prop = __comps_docenv_get_prop(it->data, "name");
         if (name != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
             && __comps_strcmp(tmp_prop->prop.str, name) == 0)
             matched++;
@@ -374,7 +383,7 @@ COMPS_List* comps_doc_get_envs(COMPS_Doc *doc, char *id, char *name,
                                 lang);
             if (__comps_strcmp(lang_match, name)) matched++;
         }
-        tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "desc");
+        tmp_prop = __comps_docenv_get_prop(it->data, "desc");
         if (desc != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
             && __comps_strcmp(tmp_prop->prop.str, desc) == 0)
             matched++;
@@ -533,14 +542,10 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
 
     for (it = groups ? groups->first : NULL; it != NULL; it = it->next) {
         comps_set_add(set, comps_docgroup_clone(it->data));
-        //printf("add roup with id: %s \n",
-       //((COMPS_Prop*)comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "id"))->prop.str);
     }
     groups = comps_doc_groups(c2);
     for (it = groups ? groups->first : NULL; it != NULL; it = it->next) {
         if (comps_set_in(set, it->data)) {
-            //printf("group with id: %s found\n",
-       //((COMPS_Prop*)comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "id"))->prop.str);
             tmpgroup = comps_docgroup_union(
                                 (COMPS_DocGroup*)it->data,
                                 (COMPS_DocGroup*)comps_set_data_at(set,
@@ -1193,15 +1198,11 @@ COMPS_DocCategory* comps_doccategory_create()
     COMPS_DocCategory *category;
     if ((category = malloc(sizeof(COMPS_DocCategory))) == NULL)
         return NULL;
-    //category->id = NULL;
-    //category->name = NULL;
-    //category->desc = NULL;
     category->properties = comps_dict_create(NULL, &comps_doc_prop_clone_v,
                                                    &comps_doc_prop_destroy_v);
     category->name_by_lang = comps_dict_create(NULL, &__comps_str_clone, &free);
     category->desc_by_lang = comps_dict_create(NULL, &__comps_str_clone, &free);
     category->group_ids = NULL;
-    //category->display_order = 0;
     return category;
 }
 
@@ -1212,9 +1213,6 @@ COMPS_DocCategory* comps_doccategory_create()
 void comps_doccategory_destroy(void *category)
 {
     if (category == NULL) return;
-    //free(((COMPS_DocCategory*)category)->id);
-    //free(((COMPS_DocCategory*)category)->name);
-    //free(((COMPS_DocCategory*)category)->desc);
     comps_dict_destroy(((COMPS_DocGroup*)category)->properties);
     comps_dict_destroy(((COMPS_DocCategory*)category)->name_by_lang);
     comps_dict_destroy(((COMPS_DocCategory*)category)->desc_by_lang);
@@ -1239,7 +1237,6 @@ inline void comps_doccategory_set_id(COMPS_DocCategory *category, char *id,
         __comps_doc_add_prop(category->properties, "id",
                              comps_doc_prop_str_create(id, copy));
     }
-    //__comps_doc_char_setter((void**)&category->id, id, copy);
 }
 
 /**
@@ -1259,7 +1256,6 @@ inline void comps_doccategory_set_name(COMPS_DocCategory *category, char *name,
         __comps_doc_add_prop(category->properties, "name",
                              comps_doc_prop_str_create(name, copy));
     }
-    //__comps_doc_char_setter((void**)&category->name, name, copy);
 }
 inline void comps_doccategory_add_lang_name(COMPS_DocCategory *category,
                                             char *lang, char *name, char copy){
@@ -1283,7 +1279,6 @@ inline void comps_doccategory_set_desc(COMPS_DocCategory *category, char *desc,
         __comps_doc_add_prop(category->properties, "desc",
                              comps_doc_prop_str_create(desc, copy));
     }
-    //__comps_doc_char_setter((void**)&category->desc, desc, copy);
 }
 inline void comps_doccategory_add_lang_desc(COMPS_DocCategory *category,
                                             char *lang, char *desc, char copy){
@@ -1299,7 +1294,6 @@ inline void comps_doccategory_set_displayorder(COMPS_DocCategory *category,
                                         int display_order) {
     __comps_doc_add_prop(category->properties, "display_order",
                          comps_doc_prop_num_create(display_order));
-    //category->display_order = display_order;
 }
 
 /**
@@ -1424,10 +1418,6 @@ COMPS_DocCategory* comps_doccategory_clone(COMPS_DocCategory *c) {
     COMPS_ListItem *it;
 
     res = comps_doccategory_create();
-    //comps_doccategory_set_name(res, c->name, 1);
-    //comps_doccategory_set_id(res, c->id, 1);
-    //comps_doccategory_set_desc(res, c->desc, 1);
-    //res->display_order = c->display_order;
 
     comps_dict_destroy(res->properties);
     comps_dict_destroy(res->name_by_lang);
@@ -1438,7 +1428,7 @@ COMPS_DocCategory* comps_doccategory_clone(COMPS_DocCategory *c) {
 
     res->group_ids = comps_list_create();
     comps_list_init(res->group_ids);
-    if (c->group_ids) { 
+    if (c->group_ids) {
         for (it = c->group_ids->first; it != NULL; it = it->next) {
             comps_doccategory_add_groupid(res, it->data, 1);
         }
@@ -1470,17 +1460,6 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     res = comps_doccategory_create();
     comps_dict_destroy(res->properties);
 
-//    pairs = comps_dict_pairs(c2->properties);
-//    for (hsit = pairs->first; hsit != NULL; hsit= hsit->next)     {
-//        printf("%s=", ((COMPS_RTreePair*)hsit->data)->key);
-//        if (((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop_type == COMPS_PROP_STR)
-//            printf("%s\n",
-//                   ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.str);
-//        else
-//            printf("%d\n",
-//                   ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.num);
-//    }
-//    comps_hslist_destroy(&pairs);
 
     res->properties = comps_dict_clone(c2->properties);
     pairs = comps_dict_pairs(c1->properties);
@@ -1489,34 +1468,14 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
                    comps_doc_prop_clone(((COMPS_RTreePair*)hsit->data)->data));
     }
     comps_hslist_destroy(&pairs);
-    /*if (c1->name == NULL || c1->name[0] == 0) {
-        comps_doccategory_set_name(res, c2->name, 1);
-    } else if (c2->name == NULL || c2->name[0] == 0) {
-        comps_doccategory_set_name(res, c1->name, 1);
-    } else
-        comps_doccategory_set_name(res, c1->name, 1);
-
-    if (c1->id == NULL || c1->id[0] == 0) {
-        comps_doccategory_set_id(res, c2->id, 1);
-    } else if (c2->id == NULL || c2->id[0] == 0) {
-        comps_doccategory_set_id(res, c1->id, 1);
-    } else
-        comps_doccategory_set_id(res, c1->id, 1);
-
-    if (c1->desc == NULL || c1->desc[0] == 0) {
-        comps_doccategory_set_desc(res, c2->desc, 1);
-    } else if (c2->desc == NULL || c2->desc[0] == 0) {
-        comps_doccategory_set_desc(res, c1->desc, 1);
-    } else
-        comps_doccategory_set_desc(res, c1->desc, 1);
-    res->display_order = c1->display_order;
-    */
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
-    for (it = c1->group_ids->first; it != NULL; it = it->next) {
+    it = c1->group_ids?c1->group_ids->first:NULL;
+    for (; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
     }
-    for (it = c2->group_ids->first; it != NULL; it = it->next) {
+    it = c2->group_ids?c2->group_ids->first:NULL;
+    for (; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
     }
     res->group_ids = comps_list_create();
@@ -1568,28 +1527,7 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
     comps_hslist_destroy(&pairs1);
     comps_hslist_destroy(&pairs2);
     comps_set_destroy(&set);
-    /*if (c1->name == NULL) {
-        comps_doccategory_set_name(res, c2->name, 1);
-    } else if (c2->name == NULL) {
-        comps_doccategory_set_name(res, c1->name, 1);
-    } else
-        comps_doccategory_set_name(res, c1->name, 1);
 
-    if (c1->id == NULL) {
-        comps_doccategory_set_name(res, c2->id, 1);
-    } else if (c2->id == NULL) {
-        comps_doccategory_set_name(res, c1->id, 1);
-    } else
-        comps_doccategory_set_name(res, c1->id, 1);
-
-    if (c1->desc == NULL) {
-        comps_doccategory_set_name(res, c2->desc, 1);
-    } else if (c2->desc == NULL) {
-        comps_doccategory_set_name(res, c1->desc, 1);
-    } else
-        comps_doccategory_set_name(res, c1->desc, 1);
-    */
-    
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
 
@@ -1614,7 +1552,7 @@ inline char comps_doccategory_cmp(COMPS_DocCategory *c1, COMPS_DocCategory *c2) 
 
     it = (c1->group_ids)?c1->group_ids->first: NULL;
     it2 = (c2->group_ids)?c2->group_ids->first: NULL;
-    
+
     for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
         if (!__comps_strcmp(it->data, it2->data)) {
             return 0;
@@ -1624,7 +1562,6 @@ inline char comps_doccategory_cmp(COMPS_DocCategory *c1, COMPS_DocCategory *c2) 
         return 0;
     }
     ret = comps_props_cmp(c1->properties, c2->properties);
-    //printf("set cmp:%d\n", ret);
     return ret;
 }
 inline char comps_doccategory_cmp_v(void *c1, void *c2) {
@@ -1639,9 +1576,6 @@ COMPS_DocEnv *comps_docenv_create() {
     COMPS_DocEnv *env;
     if ((env = malloc(sizeof(COMPS_DocEnv))) == NULL)
         return NULL;
-    //env->id = NULL;
-    //env->name = NULL;
-    //env->desc = NULL;
     env->properties = comps_dict_create(NULL, &comps_doc_prop_clone_v,
                                               &comps_doc_prop_destroy_v);
     env->name_by_lang = comps_dict_create(NULL, &__comps_str_clone, &free);
@@ -1656,9 +1590,6 @@ COMPS_DocEnv *comps_docenv_create() {
  * @param env COMPS_DocEnv object
  */
 void comps_docenv_destroy(void *env) {
-    //free(((COMPS_DocEnv*)env)->id);
-    //free(((COMPS_DocEnv*)env)->desc);
-    //free(((COMPS_DocEnv*)env)->name);
     comps_dict_destroy(((COMPS_DocEnv*)env)->properties);
     comps_list_destroy(&((COMPS_DocEnv*)env)->group_list);
     comps_list_destroy(&((COMPS_DocEnv*)env)->option_list);
@@ -1679,11 +1610,9 @@ void comps_docenv_destroy(void *env) {
  * @param copy copy indicator
  */
 inline void comps_docenv_set_id(COMPS_DocEnv * env, char *id, char copy) {
-    //return 
     if (id)
         __comps_doc_add_prop(env->properties, "id",
                              comps_doc_prop_str_create(id, copy));
-    //__comps_doc_char_setter((void**)&env->id, id, copy);
 }
 
 /**
@@ -1698,11 +1627,9 @@ inline void comps_docenv_set_id(COMPS_DocEnv * env, char *id, char copy) {
  * @param copy copy indicator
  */
 inline void comps_docenv_set_name(COMPS_DocEnv * env, char *name, char copy) {
-    //return 
     if (name)
         __comps_doc_add_prop(env->properties, "name",
                              comps_doc_prop_str_create(name, copy));
-    //__comps_doc_char_setter((void**)&env->name, name, copy);
 }
 inline void comps_docenv_add_lang_name(COMPS_DocEnv *env,
                                        char *lang, char *name, char copy){
@@ -1721,11 +1648,9 @@ inline void comps_docenv_add_lang_name(COMPS_DocEnv *env,
  * @param copy copy indicator
  */
 inline void comps_docenv_set_desc(COMPS_DocEnv * env, char *desc, char copy) {
-    //return 
     if (desc)
         __comps_doc_add_prop(env->properties, "desc",
                              comps_doc_prop_str_create(desc, copy));
-    //__comps_doc_char_setter((void**)&env->desc, desc, copy);
 }
 inline void comps_docenv_add_lang_desc(COMPS_DocEnv *env,
                                        char *lang, char *desc, char copy){
@@ -1893,9 +1818,6 @@ COMPS_DocEnv* comps_docenv_clone(COMPS_DocEnv *e) {
     COMPS_ListItem *it;
 
     res = comps_docenv_create();
-    //comps_docenv_set_name(res, e->name, 1);
-    //comps_docenv_set_id(res, e->id, 1);
-    //comps_docenv_set_desc(res, e->desc, 1);
 
     comps_dict_destroy(res->properties);
     comps_dict_destroy(res->name_by_lang);
@@ -2024,28 +1946,6 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     comps_hslist_destroy(&pairs2);
     comps_set_destroy(&set);
 
-    /*if (e1->name == NULL) {
-        comps_docenv_set_name(res, e2->name, 1);
-    } else if (e2->name == NULL) {
-        comps_docenv_set_name(res, e1->name, 1);
-    } else
-        comps_docenv_set_name(res, e1->name, 1);
-
-    if (e1->id == NULL) {
-        comps_docenv_set_id(res, e2->id, 1);
-    } else if (e2->id == NULL) {
-        comps_docenv_set_id(res, e1->id, 1);
-    } else
-        comps_docenv_set_id(res, e1->id, 1);
-
-    if (e1->desc == NULL) {
-        comps_docenv_set_desc(res, e2->desc, 1);
-    } else if (e2->desc == NULL) {
-        comps_docenv_set_desc(res, e1->desc, 1);
-    } else
-        comps_docenv_set_desc(res, e1->desc, 1);
-    */
-
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
     set2 = comps_set_create();
@@ -2168,7 +2068,6 @@ COMPS_DocGroupPackage* comps_docpackage_clone(COMPS_DocGroupPackage * pkg) {
  */
 inline void comps_docpackage_set_name(COMPS_DocGroupPackage *package, char *name,
                                char copy) {
-    //return 
     __comps_doc_char_setter((void**)&package->name, name, copy);
 }
 

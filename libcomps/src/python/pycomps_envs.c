@@ -222,13 +222,13 @@ void pycomps_env_print(FILE *f, void *e) {
     char *id, *name, *desc;
     int display_order;
     COMPS_Prop* tmp_prop;
-    tmp_prop = comps_dict_get(((COMPS_DocEnv*)e)->properties, "id");
+    tmp_prop = __comps_docenv_get_prop(e, "id");
     id = (tmp_prop)?tmp_prop->prop.str: NULL;
-    tmp_prop = comps_dict_get(((COMPS_DocEnv*)e)->properties, "name");
+    tmp_prop = __comps_docenv_get_prop(e, "name");
     name = (tmp_prop)?tmp_prop->prop.str: NULL;
-    tmp_prop = comps_dict_get(((COMPS_DocEnv*)e)->properties, "desc");
+    tmp_prop = __comps_docenv_get_prop(e, "desc");
     desc = (tmp_prop)?tmp_prop->prop.str: NULL;
-    tmp_prop = comps_dict_get(((COMPS_DocEnv*)e)->properties, "display_order");
+    tmp_prop = __comps_docenv_get_prop(e, "display_order");
     display_order = (tmp_prop)?tmp_prop->prop.num: 0;
 
     fprintf(f, "<COMPS_Environment: id='%s'"
@@ -287,6 +287,7 @@ int PyCOMPSEnv_print(PyObject *self, FILE *f, int flags) {
 PyObject* comps_env_str(void * env) {
     PyObject *ret, *tmp, *tmp2, *emptytmp;
     const char *id, *name, *desc;
+    int display_order;
     char *empty;
     COMPS_ListItem *it;
     COMPS_Prop *tmp_prop;
@@ -298,17 +299,19 @@ PyObject* comps_env_str(void * env) {
         empty = PyBytes_AsString(emptytmp);
     }
 
-    tmp_prop = comps_dict_get(((COMPS_DocEnv*)env)->properties, "id");
+    tmp_prop = __comps_docenv_get_prop(env, "id");
     id = (tmp_prop)?tmp_prop->prop.str:empty;
-    tmp_prop = comps_dict_get(((COMPS_DocEnv*)env)->properties, "name");
+    tmp_prop = __comps_docenv_get_prop(env, "name");
     name = (tmp_prop)?tmp_prop->prop.str:empty;
-    tmp_prop = comps_dict_get(((COMPS_DocEnv*)env)->properties, "desc");
+    tmp_prop = __comps_docenv_get_prop(env, "desc");
     desc = (tmp_prop)?tmp_prop->prop.str:empty;
+    tmp_prop = __comps_docenv_get_prop(env, "display_order");
+    display_order = (tmp_prop)?tmp_prop->prop.num: 0;
 
     ret = PyUnicode_FromFormat("<COMPS_Env: id='%s', name='%s', description='%s',"
-                              "name_by_lang=",
+                              "display_order='%d', name_by_lang=",
                               /*, description_by_lang=%U, %U>",*/
-                              id, name, desc);
+                              id, name, desc, display_order);
     if (PyUnicode_Check(emptytmp)) {
         free(empty);
     }
@@ -686,7 +689,7 @@ COMPS_List* comps_envs_union(COMPS_List *envs1, COMPS_List *envs2) {
 
     it = (envs1)?envs1->first:NULL;
     for (; it != NULL; it = it->next) {
-        if (((COMPS_DocEnv*)it->data)->group_list == NULL) {
+        /*if (((COMPS_DocEnv*)it->data)->group_list == NULL) {
             ((COMPS_DocEnv*)it->data)->group_list = comps_list_create();
             comps_list_init(((COMPS_DocEnv*)it->data)->group_list);
             comps_env_get_extra(it->data)->group_list_citem->data =
@@ -697,7 +700,7 @@ COMPS_List* comps_envs_union(COMPS_List *envs1, COMPS_List *envs2) {
             comps_list_init(((COMPS_DocEnv*)it->data)->option_list);
             comps_env_get_extra(it->data)->option_list_citem->data =
                                       ((COMPS_DocEnv*)it->data)->option_list;
-        }
+        }*/
         comps_env_incref(it->data);
         comps_set_add(set, it->data);
     }

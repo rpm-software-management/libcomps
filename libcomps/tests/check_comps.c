@@ -515,17 +515,9 @@ START_TEST(test_comps_doc_union)
     comps_doccategory_add_groupid(c2, "g2", 1);
 
     c3 = comps_doccategory_union(c1, c2);
-    //comps_doccategory_destroy(c1);
+    comps_doccategory_destroy(c1);
     comps_doccategory_destroy(c2);
     comps_doccategory_destroy(c3);
-
-    c2 = comps_doccategory_create();
-    comps_doccategory_set_id(c2, "c1", 1);
-    comps_doccategory_set_name(c2, "category 1", 1);
-    comps_doccategory_set_desc(c2, "cat desc 1", 1);
-    comps_doccategory_add_groupid(c2, "g1", 1);
-    comps_doccategory_add_groupid(c2, "g2", 1);
-
 }END_TEST
 
 Suite* basic_suite (void)

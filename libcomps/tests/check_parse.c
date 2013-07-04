@@ -89,7 +89,7 @@ START_TEST(test_comps_parse1)
         tmp_prop = comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "id");
         tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
         fail_if(tmp_ch == NULL, "id null");
-        printf("group id:%s\n", tmp_ch);
+        //printf("group id:%s\n", tmp_ch);
         fail_if(strcmp(tmp_ch, groups_ids[i])!=0,
                 "Wrong #%d group id(%s). Should be %s", i,
                 tmp_ch, groups_ids[i]);

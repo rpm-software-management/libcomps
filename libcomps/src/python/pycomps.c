@@ -405,12 +405,14 @@ static PyObject* PyCOMPS_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     self->cats_pobj = NULL;
     self->envs_pobj = NULL;
     self->groups_pobj = NULL;
-    self->cats_citem = ctopy_citem_create(comps_doc_categories(self->comps),
-                                          &comps_list_destroy_v);
-    self->groups_citem = ctopy_citem_create(comps_doc_groups(self->comps),
-                                            &comps_list_destroy_v);
-    self->envs_citem = ctopy_citem_create(comps_doc_environments(self->comps),
-                                          &comps_list_destroy_v);
+    if (!c_caps) {
+        self->cats_citem = ctopy_citem_create(comps_doc_categories(self->comps),
+                                              &comps_list_destroy_v);
+        self->groups_citem = ctopy_citem_create(comps_doc_groups(self->comps),
+                                                &comps_list_destroy_v);
+        self->envs_citem = ctopy_citem_create(comps_doc_environments(self->comps),
+                                              &comps_list_destroy_v);
+    }
     self->enc = NULL;
     return (PyObject*) self;
 }
@@ -444,6 +446,7 @@ static PyObject* PyCOMPS_union(PyObject *self, PyObject *other) {
         comps_doc_destroy(&un_comps);
         return NULL;
     }
+
 
     PyObject *arglist = Py_BuildValue("OO", self_t->enc, c_caps);
     res = (PyCOMPS*)PyObject_CallObject((PyObject*)&PyCOMPS_Type, arglist);
