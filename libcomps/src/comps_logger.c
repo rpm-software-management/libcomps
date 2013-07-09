@@ -163,7 +163,10 @@ char * comps_log_entry_str(COMPS_LoggerEntry *entry) {
 
     len = strlen(COMPS_LogMessages[entry->code].format);
     if (COMPS_LogMessages[entry->code].usedm != 0) {
-        len += strlen(entry->log_message) -2;
+        if (entry->log_message)
+            len += strlen(entry->log_message) -2;
+        else
+            len += -2; // empty message
     }
     if (COMPS_LogMessages[entry->code].used1 != 0) {
         if (entry->opt_code1)
@@ -189,7 +192,9 @@ char * comps_log_entry_str(COMPS_LoggerEntry *entry) {
     ret = malloc(sizeof(char)*(len+1));
     if (ret == NULL) return NULL;
     if (COMPS_LogMessages[entry->code].usedm)
-        pitem[COMPS_LogMessages[entry->code].usedm-1].s = entry->log_message;
+        pitem[COMPS_LogMessages[entry->code].usedm-1].s = entry->log_message?
+                                                          entry->log_message:
+                                                          "";
     if (COMPS_LogMessages[entry->code].used1)
         pitem[COMPS_LogMessages[entry->code].used1-1].i = entry->opt_code1;
     if (COMPS_LogMessages[entry->code].used2)
