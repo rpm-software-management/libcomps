@@ -1512,7 +1512,7 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     res->display_order = c1->display_order;
     */
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp_v);
     for (it = c1->group_ids->first; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
     }
@@ -1591,7 +1591,7 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
     */
     
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp_v);
 
     res->group_ids = comps_list_create();
     comps_list_init(res->group_ids);
@@ -1979,7 +1979,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     */
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp_v);
     for (it = e1->group_list->first; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
     }
@@ -1994,7 +1994,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     comps_set_destroy(&set);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp_v);
     for (it = e1->option_list->first; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
     }
@@ -2072,9 +2072,9 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     */
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp_v);
     set2 = comps_set_create();
-    comps_set_init(set2, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set2, NULL, NULL, NULL, &__comps_strcmp_v);
 
     for (it = e1->group_list->first; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
@@ -2092,9 +2092,9 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     comps_set_destroy(&set2);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp_v);
     set2 = comps_set_create();
-    comps_set_init(set2, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set2, NULL, NULL, NULL, &__comps_strcmp_v);
 
     for (it = e1->option_list->first; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
@@ -2118,7 +2118,7 @@ inline char comps_docenv_cmp(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     COMPS_Set *set;
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp_v);
 
     it = (e1->group_list)?e1->group_list->first: NULL;
     for (; it!= NULL; it = it->next) {
