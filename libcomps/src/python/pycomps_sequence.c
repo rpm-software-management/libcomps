@@ -433,7 +433,7 @@ PyObject* PyCOMPSSeq_getiter(PyObject *self) {
     PyObject *res;
     res = PyCOMPSSeqIter_new(&PyCOMPS_SeqIterType, NULL, NULL);
     ((PyCOMPS_SeqIter*)res)->it = get_list(self)->first;
-    ((PyCOMPS_SeqIter*)res)->seq = self;
+    ((PyCOMPS_SeqIter*)res)->seq = (PyCOMPS_Sequence*)self;
     return res;
 }
 

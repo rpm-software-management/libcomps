@@ -15,7 +15,7 @@ __COMPS_LoggerMsg COMPS_LogMessages[] = {
                             .usedm=3,.used1=1,.used2=2,.used3=0},
       [COMPS_ERR_DEFAULT_PARAM] = {.format="WARNING: Wrong default param value '%s' "
                                    "at line:%d col:%d\n",
-                                   .usedm=3,.used1=1,.used2=2,.used3=0},
+                                   .usedm=1,.used1=2,.used2=3,.used3=0},
       [COMPS_ERR_USERVISIBLE_PARAM] = {.format="WARNING: Wrong uservisible param value"
                                         "'%s' at line:%d col:%d\n",
                                         .usedm=1,.used1=2,.used2=3,.used3=0},
@@ -59,11 +59,14 @@ __COMPS_LoggerMsg COMPS_LogMessages[] = {
       [COMPS_ERR_ELEM_REQUIRED] = {.format="Element %s is required at line:%d "
                                     "column :%d but missing\n", .usedm=1,
                                     .used1=2, .used2=3, .used3=0},
-      [COMPS_ERR_LIST_EMPTY] = {.format="%s is empty at line:%d column :%d\n",
+      [COMPS_ERR_LIST_EMPTY] = {.format="%s is empty at line:%d column :%d",
                                 .usedm=1, .used1=2, .used2=3, .used3=0},
       [COMPS_ERR_TEXT_BETWEEN] = {.format="'%s' found between elements at line:"
-                                  "%d column :%d\n",
-                                .usedm=1, .used1=2, .used2=3, .used3=0}
+                                  "%d column :%d",
+                                .usedm=1, .used1=2, .used2=3, .used3=0},
+      [COMPS_ERR_NOCONTENT] = {.format="<%s> content missing at line:%d "
+                               "column:%d", .usedm=1, .used1=2, .used2=3,
+                               .used3=0}
 };
 
 
@@ -222,7 +225,8 @@ void comps_log_error(COMPS_Logger * log, const char * msg,
     COMPS_LoggerEntry *lentry;
     if (log == NULL) return;
 
-    lentry = comps_log_entry_create(msg, 1, code, optcode1, optcode2, optcode3);
+    lentry = comps_log_entry_create(msg, COMPS_LOG_ERROR, code,
+                                    optcode1, optcode2, optcode3);
     it = comps_list_item_create(lentry, NULL, &comps_log_entry_destroy_v);
 
     comps_list_append(log->logger_data, it);
@@ -249,7 +253,8 @@ void comps_log_warning(COMPS_Logger * log, const char * msg,
     COMPS_LoggerEntry *lentry;
     if (log == NULL) return;
 
-    lentry = comps_log_entry_create(msg, 1, code, optcode1, optcode2, optcode3);
+    lentry = comps_log_entry_create(msg, COMPS_LOG_WARNING, code,
+                                    optcode1, optcode2, optcode3);
     it = comps_list_item_create(lentry, NULL, &comps_log_entry_destroy_v);
     comps_list_append(log->logger_data, it);
     if (log->redirect2output)
@@ -270,7 +275,8 @@ void comps_log_info(COMPS_Logger * log, const char * msg, COMPS_LogErrCode code,
                      unsigned int optcode3) {
     if (log == NULL) return;
     COMPS_ListItem * it;
-    it = comps_list_item_create(comps_log_entry_create(msg, 0, code, optcode1,
+    it = comps_list_item_create(comps_log_entry_create(msg, COMPS_LOG_INFO,
+                                                       code, optcode1,
                                                        optcode2, optcode3),
                                 NULL, &comps_log_entry_destroy_v);
     comps_list_append(log->logger_data, it);

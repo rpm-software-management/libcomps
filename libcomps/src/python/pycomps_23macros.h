@@ -14,6 +14,7 @@
     #define IS_PY3K
     #define PyINT_CHECK(OB) PyLong_Check(OB)
     #define PyINT_ASLONG(OB) PyLong_AsLong(OB)
+    #define PyINT_FROM_LONG(OB) PyLong_FromLong(OB)
     #define SLICE_CAST PyObject*
 #else
     #define MODINIT_RET_NONE return
@@ -21,6 +22,7 @@
                              0,
     #define PyINT_CHECK(OB) PyInt_Check(OB)
     #define PyINT_ASLONG(OB) PyInt_AsLong(OB)
+    #define PyINT_FROM_LONG(OB) PyInt_FromLong(OB)
 
     #define SLICE_CAST PySliceObject*
 #endif

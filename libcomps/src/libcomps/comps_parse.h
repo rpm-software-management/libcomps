@@ -22,6 +22,7 @@ typedef struct {
     char **text_buffer_pt;
     char *tmp_buffer;
     COMPS_Logger *log;
+    char fatal_error;
     XML_Parser parser;
     const char *enc;
 } COMPS_Parsed;
@@ -46,8 +47,8 @@ void comps_parse_char_data_handler(void *userData,
 void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed);
 void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed);
 
-void comps_parse_file(COMPS_Parsed *parsed, FILE *f);
-void comps_parse_str(COMPS_Parsed *parsed, char *str);
+char comps_parse_file(COMPS_Parsed *parsed, FILE *f);
+char comps_parse_str(COMPS_Parsed *parsed, char *str);
 
 unsigned comps_parse_init_parser(XML_Parser *p);//, COMPS_DTDRuleList * rules);
 void comps_parse_parsed_destroy(COMPS_Parsed *parsed);

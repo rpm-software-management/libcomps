@@ -185,12 +185,8 @@ void pycomps_ctopy_comps_init(PyObject *self) {
 
 PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
     FILE *f;
-    int i;
-    COMPS_ListItem *it;
     COMPS_Parsed *parsed;
-    PyObject *ret, *tmp;
-    char *tmps, *fname;
-    const char *errors = NULL;
+    char *fname, parsed_ret;
     PyCOMPS *self_comps = (PyCOMPS*)self;
 
     if (__pycomps_arg_to_char(other, &fname)) return NULL;
@@ -204,34 +200,68 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
         comps_parse_parsed_destroy(parsed);
         return NULL;
     }
-    comps_parse_file(parsed, f);
+    parsed_ret = comps_parse_file(parsed, f);
     pycomps_clear(self);
     pycomps_doc_destroy((void*)self_comps->comps);
     self_comps->comps = parsed->comps_doc;
+    comps_log_destroy(self_comps->comps->log);
+    self_comps->comps->log = parsed->log;
+    parsed->log = NULL;
 
     pycomps_ctopy_comps_init(self);
-
-    ret = PyList_New(parsed->log->logger_data->len);
-    for (i = 0, it = parsed->log->logger_data->first;
-         it != NULL; it = it->next, i++) {
-        tmps = comps_log_entry_str(it->data);
-        tmp = PyUnicode_DecodeUTF8(tmps, strlen(tmps), errors);
-        PyList_SetItem(ret, i, tmp);
-        free(tmps);
-    }
-    free(fname);
     self_comps->enc = PyBytes_FromString(parsed->comps_doc->encoding);
+
     parsed->comps_doc = NULL;
     comps_parse_parsed_destroy(parsed);
 
+    return PyINT_FROM_LONG((long)parsed_ret);
+}
+
+PyObject* PyCOMPS_get_last_errors(PyObject *self, void *closure)
+{
+    PyObject *ret;
+    COMPS_ListItem *it;
+    char *tmps;
+    PyObject *tmp;
+    const char *errors = NULL;
+
+    (void)closure;
+
+    ret = PyList_New(0);
+    for (it = ((PyCOMPS*)self)->comps->log->logger_data->first;
+         it != NULL; it = it->next) {
+        if (((COMPS_LoggerEntry*)it->data)->type == COMPS_LOG_ERROR) {
+            tmps = comps_log_entry_str(it->data);
+            tmp = PyUnicode_DecodeUTF8(tmps, strlen(tmps), errors);
+            PyList_Append(ret, tmp);
+            free(tmps);
+        }
+    }
+    return ret;
+}
+PyObject* PyCOMPS_get_last_log(PyObject *self, void *closure)
+{
+    PyObject *ret;
+    COMPS_ListItem *it;
+    char *tmps;
+    PyObject *tmp;
+    const char *errors = NULL;
+
+    (void)closure;
+
+    ret = PyList_New(0);
+    for (it = ((PyCOMPS*)self)->comps->log->logger_data->first;
+         it != NULL; it = it->next) {
+        tmps = comps_log_entry_str(it->data);
+        tmp = PyUnicode_DecodeUTF8(tmps, strlen(tmps), errors);
+        PyList_Append(ret, tmp);
+        free(tmps);
+        }
     return ret;
 }
 
 PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
-    PyObject * ret;
-    unsigned int i;
-    char *tmps;
-    COMPS_ListItem *it;
+    char *tmps, parsed_ret;
     PyCOMPS *self_comps = (PyCOMPS*)self;
 
     if (__pycomps_arg_to_char(other, &tmps)) return NULL;
@@ -239,26 +269,21 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
     COMPS_Parsed *parsed;
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 0);
-    comps_parse_str(parsed, tmps);
+    parsed_ret = comps_parse_str(parsed, tmps);
     free(tmps);
 
     pycomps_clear(self);
     pycomps_doc_destroy((void*)self_comps->comps);
     self_comps->comps = parsed->comps_doc;
+    comps_log_destroy(self_comps->comps->log);
+    self_comps->comps->log = parsed->log;
+    parsed->log = NULL;
     pycomps_ctopy_comps_init(self);
-
-    ret = PyList_New(parsed->log->logger_data->len);
-    for (i = 0, it = parsed->log->logger_data->first;
-         it != NULL; it = it->next, i++) {
-        tmps = comps_log_entry_str(it->data);
-        PyList_SetItem(ret, i, PyUnicode_FromString(tmps));
-        free(tmps);
-    }
     self_comps->enc = PyBytes_FromString(parsed->comps_doc->encoding);
     parsed->comps_doc = NULL;
     comps_parse_parsed_destroy(parsed);
 
-    return ret;
+    return PyINT_FROM_LONG((long)parsed_ret);
 }
 
 PyObject* PyCOMPS_get_(PyCOMPS *self, void *closure) {
@@ -355,6 +380,11 @@ static PyMethodDef PyCOMPS_methods[] = {
     "Load COMPS from xml string"},
     {"clear", (PyCFunction)PyCOMPS_clear, METH_NOARGS,
     "Clear COMPS"},
+    {"get_last_parse_errors", (PyCFunction)PyCOMPS_get_last_errors,
+     METH_NOARGS,"return list of messages from log of last parse action."
+                 "Containg errors only"},
+    {"get_last_parse_log", (PyCFunction)PyCOMPS_get_last_log,
+     METH_NOARGS,"return list of messages from log of last parse action."},
     {NULL}  /* Sentinel */
 };
 

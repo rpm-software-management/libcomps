@@ -91,7 +91,7 @@ class MyRunner(unittest.TextTestRunner):
     def _makeResult(self):
         return MyResult(self.stream, self.descriptions, self.verbosity)
 
-class BaseObjClass(object):
+class BaseObjTestClass(object):
     obj_data = []
     obj_getset = {}
     obj_type = None
@@ -121,7 +121,6 @@ class BaseObjClass(object):
     def test_create(self):
         obj = self.obj_constructor(**self.obj_data[0])
         obj = self.obj_type()
-        print self.dict1
 
     #@unittest.skip("")
     def test_getset(self):
@@ -145,7 +144,7 @@ class BaseObjClass(object):
 
             with self.assertRaises(TypeError):
                 self.assertTrue(delattr(obj, x[0]), x[0])
-    
+
     def test_dictmembers(self):
         obj = self.obj_constructor(**self.obj_data[0])
         for member in self.obj_dict_members:
@@ -166,9 +165,8 @@ class BaseObjClass(object):
             for pos, val in zip(range(0, len(v)), v):
                 self.assertTrue(_list[pos] == val)
 
-    def test_union1(self):
+    def __union_prep1(self):
         obj1 = self.obj_constructor(**self.obj_data[0])
-        obj2 = self.obj_constructor(**self.obj_data[1])
         for member in self.obj_dict_members:
             _dict = getattr(obj1, member)
             _zipped = zip(self.obj_types[str][0:4:2],
@@ -181,53 +179,12 @@ class BaseObjClass(object):
             _list = getattr(obj1, member)
             for x in v[0:4]:
                 _list.append(x)
+        return obj1
 
-        obj = obj1 + obj2
-
-        for member, v in self.obj_list_members.iteritems():
-            _list = getattr(obj, member)
-            self.assertTrue(len(_list) == 4)
-
-    def test_union2(self):
-        obj1 = self.obj_constructor(**self.obj_data[0])
-        obj2 = self.obj_constructor(**self.obj_data[1])
+    def __union_prep2(self):
+        obj1 = self.obj_constructor(**self.obj_data[1])
         for member in self.obj_dict_members:
             _dict = getattr(obj1, member)
-            _zipped = zip(self.obj_types[str][0:4:2],
-                          self.obj_types[str][1:5:2])+\
-                      zip(self.obj_types[str][1:5:2],
-                          self.obj_types[str][0:4:2])
-            for x,y in _zipped:
-                _dict[x] = y
-        for member, v in self.obj_list_members.iteritems():
-            _list = getattr(obj1, member)
-            for x in v[0:4]:
-                _list.append(x)
-
-        obj = obj2 + obj1
-
-        for member, v in self.obj_list_members.iteritems():
-            _list = getattr(obj, member)
-            self.assertTrue(len(_list) == 4)
-
-    def test_union3(self):
-        obj1 = self.obj_constructor(**self.obj_data[0])
-        obj2 = self.obj_constructor(**self.obj_data[1])
-        for member in self.obj_dict_members:
-            _dict = getattr(obj1, member)
-            _zipped = zip(self.obj_types[str][0:4:2],
-                          self.obj_types[str][1:5:2])+\
-                      zip(self.obj_types[str][1:5:2],
-                          self.obj_types[str][0:4:2])
-            for x,y in _zipped:
-                _dict[x] = y
-        for member, v in self.obj_list_members.iteritems():
-            _list = getattr(obj1, member)
-            for x in v[0:4]:
-                _list.append(x)
-
-        for member in self.obj_dict_members:
-            _dict = getattr(obj2, member)
             _zipped = zip(self.obj_types[str][2::2],
                           self.obj_types[str][3::2])+\
                       zip(self.obj_types[str][3::2],
@@ -235,9 +192,33 @@ class BaseObjClass(object):
             for x,y in _zipped:
                 _dict[x] = y
         for member, v in self.obj_list_members.iteritems():
-            _list = getattr(obj2, member)
+            _list = getattr(obj1, member)
             for x in v[4:]:
                 _list.append(x)
+        return obj1
+
+
+    def test_union1(self):
+        obj1 = self.__union_prep1()
+        obj2 = self.obj_constructor(**self.obj_data[1])
+        obj = obj1 + obj2
+
+        for member, v in self.obj_list_members.iteritems():
+            _list = getattr(obj, member)
+            self.assertTrue(len(_list) == 4)
+
+    def test_union2(self):
+        obj1 = self.__union_prep1()
+        obj2 = self.obj_constructor(**self.obj_data[1])
+        obj = obj1 + obj2
+
+        for member, v in self.obj_list_members.iteritems():
+            _list = getattr(obj, member)
+            self.assertTrue(len(_list) == 4)
+
+    def test_union3(self):
+        obj1 = self.__union_prep1()
+        obj2 = self.__union_prep2()
         obj = obj1 + obj2
 
         for member, v in self.obj_list_members.iteritems():
@@ -245,7 +226,7 @@ class BaseObjClass(object):
             self.assertTrue(len(_list) == len(v))
 
 #@unittest.skip
-class Category_Test(BaseObjClass, unittest.TestCase):
+class Category_Test(BaseObjTestClass, unittest.TestCase):
     obj_type = libcomps.Category
     obj_data = [{"id":"cat1", "name": "category1", "desc": "cat desc 1",
                  "display_order": 1},
@@ -268,7 +249,7 @@ class Category_Test(BaseObjClass, unittest.TestCase):
     def obj_constructor(self, *args, **kwargs):
         return libcomps.Category(*args, **kwargs)
 
-class Group_Test(BaseObjClass, unittest.TestCase):
+class Group_Test(BaseObjTestClass, unittest.TestCase):
     obj_type = libcomps.Group
     obj_data = [{"id":"g1", "name": "group1", "desc": "group desc 1",
                  "default": False, "uservisible": True, "display_order": 0,
@@ -305,7 +286,7 @@ class Group_Test(BaseObjClass, unittest.TestCase):
     def obj_constructor(self, *args, **kwargs):
         return libcomps.Group(*args, **kwargs)
 
-class Env_Test(BaseObjClass, unittest.TestCase):
+class Env_Test(BaseObjTestClass, unittest.TestCase):
     obj_type = libcomps.Environment
     obj_data = [{"id":"e1", "name": "env1", "desc": "env desc 1",
                  "display_order": 0},
@@ -331,11 +312,206 @@ class Env_Test(BaseObjClass, unittest.TestCase):
     def obj_constructor(self, *args, **kwargs):
         return libcomps.Environment(*args, **kwargs)
 
+class BaseListTestClass(object):
+    list_type = None
+    item_type = None
+    items_data = []
+    items_extra_data = []
+
+    dict1 = libcomps.Dict()
+    dict1["foo"] = "bar"
+    dict1["Tom"] = "Jerry"
+    dict1["linux"] = "rolls!"
+
+    dict2 = libcomps.Dict()
+    dict2["red"] = "black"
+    dict2["proton"] = "electron"
+    dict2["fire"] = "water"
+
+    def test_basic(self):
+        listobj = self.list_type()
+        item = self.item_type(**self.items_data[0])
+        listobj.append(item)
+        self.assertTrue(listobj[0] == item)
+        self.assertTrue(len(listobj) == 1)
+        del listobj[0]
+        self.assertTrue(len(listobj) == 0)
+        with self.assertRaises(IndexError):
+            listobj[0]
+        listobj.append(item)
+        self.assertTrue(listobj[0] == item)
+        self.assertTrue(len(listobj) == 1)
+        with self.assertRaises(IndexError):
+            listobj[1]
+
+    def test_append(self):
+        listobj = self.list_type()
+        for x in self.items_data:
+            listobj.append(self.item_type(**x))
+        for x in range(0, len(self.items_data)):
+            self.assertTrue(listobj[x] == self.item_type(**self.items_data[x]))
+
+    def test_slice(self):
+        listobj = self.list_type()
+        for x in self.items_data:
+            listobj.append(self.item_type(**x))
+
+        sublist = listobj[0:3]
+        self.assertTrue(len(sublist) == 3)
+        for x,y in zip(sublist, listobj):
+            self.assertTrue(x == y)
+        sublist = listobj[3:6]
+        self.assertTrue(len(sublist) == 3)
+        for x,y in zip(range(0,3),range(3,6)):
+            self.assertTrue(sublist[x] == listobj[y])
+        sublist = listobj[len(self.items_data): len(self.items_data)+2]
+        self.assertTrue(len(sublist) == 0)
+        sublist = listobj[len(self.items_data)-2: len(self.items_data)+2]
+        self.assertTrue(len(sublist) == 2)
+
+        sublist = listobj[0:6:2]
+        self.assertTrue(len(sublist) == 3)
+        for x,y in zip(range(0,3), range(0,6,2)):
+            self.assertTrue(sublist[x] == listobj[y])
+
+    def test_clear(self):
+        listobj = self.list_type()
+        for x in self.items_data:
+            listobj.append(self.item_type(**x))
+        listobj.clear()
+        self.assertTrue(len(listobj) == 0)
+        with self.assertRaises(IndexError):
+            listobj[0]
+        for x in self.items_data:
+            listobj.append(self.item_type(**x))
+        self.assertTrue(len(listobj) == len(self.items_data))
+
+    def test_concat(self):
+        listobj1 = self.list_type()
+        for x in self.items_data[0:4]:
+            listobj1.append(self.item_type(**x))
+            for k,vals in self.items_extra_data.iteritems():
+                for val in vals[0:3]:
+                    self.items_extra_data_setter[k](getattr(listobj1[-1], k),
+                                                    val)
+        listobj2 = self.list_type()
+        listobj = listobj1 + listobj2
+        self.assertTrue(listobj == listobj1)
+        listobj = listobj2 + listobj1
+        self.assertTrue(listobj == listobj1)
+
+        listobj2 = self.list_type()
+        for x in self.items_data[3:]:
+            listobj2.append(self.item_type(**x))
+            for k,vals in self.items_extra_data.iteritems():
+                for val in vals[3:]:
+                    self.items_extra_data_setter[k](getattr(listobj2[-1], k),
+                                                    val)
+        listobj = listobj1 + listobj2
+        #print listobj
+        self.assertTrue(len(listobj) == len(self.items_data))
+        item = listobj[3]
+        for k, vals in self.items_extra_data.iteritems():
+            tmpobj = self.item_type()
+            for val in vals:
+                self.items_extra_data_setter[k](getattr(tmpobj,k), val)
+            if type(getattr(item,k)) == libcomps.IdList:
+                self.assertTrue(self.items_extra_data_cmp[k](
+                                    getattr(item, k),
+                                    getattr(tmpobj, k)))
+
+
+class CategoryList_Test(unittest.TestCase, BaseListTestClass):
+    list_type = libcomps.CategoryList
+    item_type = libcomps.Category
+    items_data = [{"id":"cat1", "name": "category1", "desc": "cat desc 1",
+                 "display_order": 1},
+                {"id":"cat2", "name": "category2", "desc": "cat desc 2",
+                 "display_order": 2},
+                {"id":"cat3", "name": "category3", "desc": "cat desc 3",
+                 "display_order": 3},
+                {"id":"cat4", "name": "category4", "desc": "cat desc 4",
+                 "display_order": 4},
+                {"id":"cat5", "name": "category5", "desc": "cat desc 5",
+                 "display_order": 5},
+                {"id":"cat6", "name": "category6", "desc": "cat desc 6",
+                 "display_order": 6},
+                {"id":"cat7", "name": "category7", "desc": "cat desc 7",
+                 "display_order": 7}]
+    items_extra_data_cmp = {"group_ids": lambda x,y: set(x) == set(y),
+                            "name_by_lang": lambda x,y: x == y}
+    items_extra_data_setter = {"group_ids": libcomps.IdList.append,
+                               "name_by_lang": lambda x,y: x.__setitem__(y[0], y[1])}
+    items_extra_data = {"group_ids": ["g1", "g2", "g3", "g4", "g5", "g6"],
+                        "name_by_lang": [("foo", "bar"), ("red", "black"),
+                                         ("fire", "water")]}
+
+class GroupList_Test(unittest.TestCase, BaseListTestClass):
+    list_type = libcomps.GroupList
+    item_type = libcomps.Group
+    items_data = [{"id":"g1", "name": "group1", "desc": "group desc 1",
+                 "display_order": 1, "default": False},
+                {"id":"g2", "name": "group2", "desc": "group desc 2",
+                 "display_order": 2, "default": False},
+                {"id":"g3", "name": "group3", "desc": "group desc 3",
+                 "display_order": 2, "default": False},
+                {"id":"g4", "name": "group4", "desc": "group desc 4",
+                 "display_order": 2, "default": False},
+                {"id":"g5", "name": "group5", "desc": "group desc 5",
+                 "display_order": 2, "default": False},
+                {"id":"g6", "name": "group6", "desc": "group desc 6",
+                 "display_order": 2, "default": False},
+                {"id":"g7", "name": "group7", "desc": "group desc 7",
+                 "display_order": 2, "default": False}]
+
+    items_extra_data_cmp = {"packages": lambda x,y: set(x) == set(y),
+                            "name_by_lang": lambda x,y: x == y}
+    items_extra_data_setter = {"packages": libcomps.PackageList.append,
+                               "name_by_lang": lambda x,y: x.__setitem__(y[0], y[1])}
+    items_extra_data = {"packages": [
+                        libcomps.Package("oss", libcomps.PACKAGE_TYPE_DEFAULT),
+                        libcomps.Package("alsa", libcomps.PACKAGE_TYPE_DEFAULT),
+                        libcomps.Package("pulse", libcomps.PACKAGE_TYPE_DEFAULT),
+                        libcomps.Package("port", libcomps.PACKAGE_TYPE_DEFAULT),
+                        libcomps.Package("jack", libcomps.PACKAGE_TYPE_DEFAULT),
+                        libcomps.Package("cmix", libcomps.PACKAGE_TYPE_DEFAULT)],
+                        "name_by_lang": [("foo", "bar"), ("red", "black"),
+                                         ("fire", "water")]}
+
+class EnvList_Test(unittest.TestCase, BaseListTestClass):
+    list_type = libcomps.EnvList
+    item_type = libcomps.Environment
+    items_data = [{"id":"e1", "name": "env1", "desc": "env desc 1",
+                 "display_order": 1},
+                {"id":"e2", "name": "env2", "desc": "env desc 2",
+                 "display_order": 2},
+                {"id":"e3", "name": "env3", "desc": "env desc 3",
+                 "display_order": 3},
+                {"id":"e4", "name": "env4", "desc": "env desc 4",
+                 "display_order": 4},
+                {"id":"e5", "name": "env5", "desc": "env desc 5",
+                 "display_order": 5},
+                {"id":"e6", "name": "env6", "desc": "env desc 6",
+                 "display_order": 6},
+                {"id":"e7", "name": "env7", "desc": "env desc 7",
+                 "display_order": 7}]
+
+    items_extra_data_cmp = {"group_ids": lambda x,y: set(x) == set(y),
+                            "option_ids": lambda x,y: set(x) == set(y),
+                            "name_by_lang": lambda x,y: x == y}
+    items_extra_data_setter = {"group_ids": libcomps.IdList.append,
+                               "option_ids": libcomps.IdList.append,
+                               "name_by_lang": lambda x,y: x.__setitem__(y[0], y[1])}
+    items_extra_data = {"group_ids": ["g1", "g2", "g3", "g4", "g5", "g6"],
+                        "option_ids": ["g1", "g2", "g3", "g4", "g5", "g6"],
+                        "name_by_lang": [("foo", "bar"), ("red", "black"),
+                                         ("fire", "water")]}
+@unittest.skip
 class CategoryListTest(unittest.TestCase):
     def setUp(self):
         self.catlist = libcomps.CategoryList()
 
-    #@unittest.skip("skip")
+    #@unittestT.skip("skip")
     def test_basic(self):
         c1 = libcomps.Category()
         with self.assertRaises(TypeError):
@@ -474,6 +650,7 @@ class CategoryListTest(unittest.TestCase):
         self.assertTrue(len(cl) == 0)
 
 
+@unittest.skip
 class GroupListTest(unittest.TestCase):
     def setUp(self):
         self.grouplist = libcomps.GroupList()
@@ -725,206 +902,11 @@ class EnvListTest(unittest.TestCase):
         el.clear()
         self.assertTrue(len(el) == 0)
 
-class CategoryTest(unittest.TestCase):
-    def test_basic(self):
-        c = libcomps.Category()
-        c.name = "category1"
-        c.id = "cat1"
-        c.desc = "category 1 description"
-        self.assertTrue(c.name == "category1")
-        self.assertTrue(c.id == "cat1")
-        self.assertTrue(c.desc == "category 1 description")
-        c.id = None
-        c.name = None
-        c.desc = None
-        self.assertTrue(c.name == None)
-        self.assertTrue(c.id == None)
-        self.assertTrue(c.desc == None)
-        with self.assertRaises(TypeError):
-            c.group_ids.append(None)
-            c.group_ids.append(0)
-        
-
-    #@unittest.skip("skip")
-    def test_add(self):
-        c1 = libcomps.Category("cat1", "category 1", "cat desc", 0)
-        c1.group_ids.append("g1")
-        c1.group_ids.append("g2")
-        c1.group_ids.append("g3")
-        c2 = libcomps.Category("cat2", "category 2", "cat desc", 0)
-        c2.group_ids.append("g1")
-        c2.group_ids.append("g4")
-        c2.group_ids.append("g5")
-        c = c1 + c2
-        self.assertTrue(len(c.group_ids) == 5)
-        #print c.group_ids[0]
-        self.assertTrue(c.group_ids[0] == c1.group_ids[0] and\
-                        c.group_ids[1] == c1.group_ids[1] and\
-                        c.group_ids[2] == c1.group_ids[2] and\
-                        c.group_ids[3] == c2.group_ids[1] and\
-                        c.group_ids[4] == c2.group_ids[2])
-        c1 = libcomps.Category()
-        c2 = libcomps.Category("cat2", "category 2", "cat desc", 0)
-        c2.group_ids.append("g1")
-        c = c1 + c2
-        self.assertTrue(c == c2)
-        c1 = libcomps.Category()
-        c2 = libcomps.Category()
-        c = c1 + c2
-        self.assertTrue(c == c1)
-        self.assertTrue(c == c2)
-        #print c
-
-    def test_langs(self):
-        c1 = libcomps.Category("cat1", "category 1", "cat desc", 0)
-        c1.name_by_lang["af"]="Administrasienutsgoed"
-        c1.name_by_lang["bs"]="Administrativni alati"
-        c1.name_by_lang["id"]="Peralatan Administrasi"
-
-        c1.name_by_lang["af"]="Afrikaanse taalsteun"
-        self.assertTrue(c1.name_by_lang["af"] == "Afrikaanse taalsteun")
-
-        c2 = libcomps.Category("cat2", "category 2", "cat desc", 0)
-        c2.name_by_lang["af"]="Afrikaanse taalsteun"
-        c2.name_by_lang["bs"]="Administrativni alati"
-        c2.name_by_lang["id"]="Peralatan Administrasi"
-        
-        self.assertTrue(c1.name_by_lang, c2.name_by_lang)
-
-class GroupTest(unittest.TestCase):
-    def test_basic(self):
-        g = libcomps.Group()
-        g.name = "group 1"
-        g.id = "group1"
-        g.desc = "group 1 description"
-        self.assertTrue(g.name == "group 1")
-        self.assertTrue(g.id == "group1")
-        self.assertTrue(g.desc == "group 1 description")
-        g.id = None
-        g.name = None
-        g.desc = None
-        self.assertTrue(g.name == None)
-        self.assertTrue(g.id == None)
-        self.assertTrue(g.desc == None)
-
-    #@unittest.skip("skip")
-    def test_add(self):
-        g1 = libcomps.Group("g1", "group 1", "group desc", 0, 0, 0, "en")
-        g1.packages.append(libcomps.Package("oss", libcomps.PACKAGE_TYPE_DEFAULT))
-        g1.packages.append(libcomps.Package("alsa", libcomps.PACKAGE_TYPE_DEFAULT))
-        g1.packages.append(libcomps.Package("pulse", libcomps.PACKAGE_TYPE_DEFAULT))
-        g2 = libcomps.Group("cat2", "category 2", "cat desc", 0, 0, 0, "en")
-        g2.packages.append(libcomps.Package("oss", libcomps.PACKAGE_TYPE_DEFAULT))
-        g2.packages.append(libcomps.Package("jack", libcomps.PACKAGE_TYPE_DEFAULT))
-        g2.packages.append(libcomps.Package("portaudio", libcomps.PACKAGE_TYPE_DEFAULT))
-        #print g1, g2
-        g = g1 + g2
-        self.assertTrue(len(g.packages) == 5)
-        #print c.group_ids[0]
-        self.assertTrue(g.packages[0] == g1.packages[0] and\
-                        g.packages[1] == g1.packages[1] and\
-                        g.packages[2] == g1.packages[2] and\
-                        g.packages[3] == g2.packages[1] and\
-                        g.packages[4] == g2.packages[2])
-        g1 = libcomps.Group()
-        g2 = libcomps.Group("g2", "group 2", "group desc", 0, 0, 0,"en")
-        g2.packages.append(libcomps.Package("oss", libcomps.PACKAGE_TYPE_DEFAULT))
-        g = g1 + g2
-        self.assertTrue(g == g2)
-        g1 = libcomps.Group()
-        g2 = libcomps.Group()
-        g = g1 + g2
-        self.assertTrue(g == g1)
-        self.assertTrue(g == g2)
-        #print c
-
-    def test_langs(self):
-        g1 = libcomps.Group("g1", "group 1", "group desc", 0, 0, 0, "en")
-        g1.name_by_lang["af"]="Administrasienutsgoed"
-        g1.name_by_lang["bs"]="Administrativni alati"
-        g1.name_by_lang["id"]="Peralatan Administrasi"
-
-        g1.name_by_lang["af"]="Afrikaanse taalsteun"
-        self.assertTrue(g1.name_by_lang["af"] == "Afrikaanse taalsteun")
-
-        g2 = libcomps.Group("g2", "group 2", "group desc", 0, 0, 0, "en")
-        g2.name_by_lang["af"]="Afrikaanse taalsteun"
-        g2.name_by_lang["bs"]="Administrativni alati"
-        g2.name_by_lang["id"]="Peralatan Administrasi"
-
-        self.assertTrue(g1.name_by_lang, g2.name_by_lang)
-
 class PackageTest(unittest.TestCase):
     def test_attrs(self):
         pkg = libcomps.Package("kernel-3.2", libcomps.PACKAGE_TYPE_MANDATORY)
         self.assertEqual(pkg.name, "kernel-3.2")
         self.assertEqual(pkg.type, libcomps.PACKAGE_TYPE_MANDATORY)
-
-class EnvTest(unittest.TestCase):
-    def test_basic(self):
-        e = libcomps.Environment()
-        e.name = "environment 1"
-        e.id = "environment1"
-        e.desc = "environment 1 description"
-        self.assertTrue(e.name == "environment 1")
-        self.assertTrue(e.id == "environment1")
-        self.assertTrue(e.desc == "environment 1 description")
-        e.id = None
-        e.name = None
-        e.desc = None
-        self.assertTrue(e.name == None)
-        self.assertTrue(e.id == None)
-        self.assertTrue(e.desc == None)
-
-    #@unittest.skip("skip")
-    def test_add(self):
-        e1 = libcomps.Environment("e1", "env 1", "env desc", 0)
-        e1.group_ids.append("g1")
-        e1.group_ids.append("g2")
-        e1.group_ids.append("g3")
-        e1.option_ids.append("o2")
-        e1.option_ids.append("o3")
-        e2 = libcomps.Environment("e2", "env 2", "env desc", 0)
-        e2.group_ids.append("g3")
-        e2.group_ids.append("g4")
-        e2.group_ids.append("g5")
-        e2.option_ids.append("o1")
-        e2.option_ids.append("o3")
-        e = e1 + e2
-        self.assertTrue(len(e.group_ids) == 5)
-        self.assertTrue(len(e.option_ids) == 3)
-        self.assertTrue(e.group_ids[0] == e1.group_ids[0] and\
-                        e.group_ids[1] == e1.group_ids[1] and\
-                        e.group_ids[2] == e1.group_ids[2] and\
-                        e.group_ids[3] == e2.group_ids[1] and\
-                        e.group_ids[4] == e2.group_ids[2])
-        e1 = libcomps.Environment()
-        e2 = libcomps.Environment("e2", "env 2", "env desc", 0)
-        e2.group_ids.append("g1")
-        e = e1 + e2
-        self.assertTrue(e == e2)
-        e1 = libcomps.Group()
-        e2 = libcomps.Group()
-        e = e1 + e2
-        self.assertTrue(e == e1)
-        self.assertTrue(e == e2)
-        #print c
-
-    def test_langs(self):
-        e1 = libcomps.Environment("e1", "env 1", "env desc", 0)
-        e1.name_by_lang["af"]="Administrasienutsgoed"
-        e1.name_by_lang["bs"]="Administrativni alati"
-        e1.name_by_lang["id"]="Peralatan Administrasi"
-
-        e1.name_by_lang["af"]="Afrikaanse taalsteun"
-        self.assertTrue(e1.name_by_lang["af"] == "Afrikaanse taalsteun")
-
-        e2 = libcomps.Environment("e2", "env 2", "env desc", 0)
-        e2.name_by_lang["af"]="Afrikaanse taalsteun"
-        e2.name_by_lang["bs"]="Administrativni alati"
-        e2.name_by_lang["id"]="Peralatan Administrasi"
-
-        self.assertTrue(e1.name_by_lang, e2.name_by_lang)
 
 class COMPSTest(unittest.TestCase):
     def setUp(self):
@@ -952,12 +934,13 @@ class COMPSTest(unittest.TestCase):
         c = self.comps.categories[1]
         c.group_ids.append("g2")
         (h, fname) = tempfile.mkstemp()
-        errs = self.comps.xml_f(fname)
+        ret = self.comps.xml_f(fname)
+        self.assertTrue(not ret)
         f = open(fname, "r")
 
         comps2 = libcomps.Comps()
-        errs = comps2.fromxml_f(fname)
-        self.assertTrue(len(errs) == 0, errs)
+        ret = comps2.fromxml_f(fname)
+        self.assertTrue(ret == 0, comps2.get_last_parse_errors())
 
         compsdoc = comps2.xml_str()
         compsdoc = compsdoc[0:-5] # make some error
@@ -966,8 +949,9 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(len(comps2.environments) == 0)
 
         comps3 = libcomps.Comps()
-        errs = comps3.fromxml_str(compsdoc)
-        self.assertFalse(len(errs) == 0)
+        ret = comps3.fromxml_str(compsdoc)
+        #print comps3.get_last_parse_log()
+        self.assertTrue(ret ==  -1, comps3.get_last_parse_errors())
         self.assertTrue(len(comps3.groups) == 3)
         self.assertTrue(len(comps3.categories) == 2)
         self.assertTrue(len(comps3.environments) == 0)
@@ -976,19 +960,24 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(x == y)
         os.remove(fname)
 
-    @unittest.skip("skip")
+    #@unittest.skip("")
     def test_fedora(self):
         comps = libcomps.Comps()
-        comps.fromxml_f("fedora_comps.xml")
+        ret = comps.fromxml_f("fedora_comps.xml")
+        #for x in comps.get_last_parse_log():
+        #    print x
+        self.assertTrue(ret != -1)
         comps.xml_f("fed2.xml")
         comps2 = libcomps.Comps()
         comps2.fromxml_f("fed2.xml")
         self.assertTrue(comps == comps2)
 
-    @unittest.skip("skip")
     def test_sample(self):
         comps = libcomps.Comps()
-        comps.fromxml_f("sample_comps.xml")
+        ret = comps.fromxml_f("sample_comps.xml")
+        #print comps.get_last_parse_log()
+        self.assertTrue(ret != -1)
+
         comps.xml_f("sample2.xml")
         comps2 = libcomps.Comps()
         comps2.fromxml_f("sample2.xml")
@@ -997,7 +986,8 @@ class COMPSTest(unittest.TestCase):
     #@unittest.skip("skip")
     def test_main(self):
         comps = libcomps.Comps()
-        comps.fromxml_f("main_comps.xml")
+        ret = comps.fromxml_f("main_comps.xml")
+        self.assertTrue(ret != -1)
         comps.xml_f("main2.xml")
         comps2 = libcomps.Comps()
         comps2.fromxml_f("main2.xml")
@@ -1005,7 +995,17 @@ class COMPSTest(unittest.TestCase):
         y = comps2.xml_str()
         self.assertTrue(comps == comps2)
         self.assertTrue(y == x)
-        #os.remove("main2.xml")
+        os.remove("main2.xml")
+
+    def test_main2(self):
+        comps = libcomps.Comps()
+        ret = comps.fromxml_f("main_comps2.xml")
+        self.assertTrue(ret != -1)
+        comps.xml_f("main22.xml")
+        self.assertTrue(ret != -1)
+        comps2 = libcomps.Comps()
+        ret = comps2.fromxml_f("main22.xml")
+        self.assertTrue(ret != -1)
 
     #@unittest.skip("skip")
     def test_main_union(self):
@@ -1039,7 +1039,7 @@ class COMPSTest(unittest.TestCase):
         dbl2 = g1.desc_by_lang
         self.assertTrue(g1.desc_by_lang == g.desc_by_lang)
 
-    @unittest.skip("skip")
+    #@unittest.skip("skip")
     def test_union(self):
         comps = libcomps.Comps()
         comps.fromxml_f("sample_comps.xml")

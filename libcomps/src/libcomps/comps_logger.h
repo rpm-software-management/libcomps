@@ -9,6 +9,9 @@
 #include "comps_elem.h"
 #include "comps_types.h"
 
+typedef enum {COMPS_LOG_INFO, COMPS_LOG_ERROR,
+              COMPS_LOG_WARNING} COMPS_LogEntryType;
+
 /**
  * COMPS_Logger entry
  * @see comps_log_entry_create
@@ -81,7 +84,8 @@ typedef enum {COMPS_ERR_NO_ERR,
               COMPS_ERR_OPTIONLIST_NOTSET,
               COMPS_ERR_ELEM_REQUIRED,
               COMPS_ERR_LIST_EMPTY,
-              COMPS_ERR_TEXT_BETWEEN} COMPS_LogErrCode;
+              COMPS_ERR_TEXT_BETWEEN,
+              COMPS_ERR_NOCONTENT} COMPS_LogErrCode;
 
 COMPS_Logger * comps_log_create(unsigned redirect2out);
 void comps_log_destroy(COMPS_Logger * log);

@@ -43,6 +43,7 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
     parsed->tmp_buffer = NULL;
     parsed->log = comps_log_create(log_stdout?1:0);
     parsed->comps_doc = NULL;
+    parsed->fatal_error = 0;
     if (parsed->elem_stack == NULL || parsed->text_buffer == NULL) {
         if (!parsed->elem_stack)
             comps_list_destroy(&parsed->elem_stack);
@@ -59,6 +60,7 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
 }
 
 void comps_parse_parsed_reinit(COMPS_Parsed *parsed) {
+    parsed->fatal_error = 0;
     XML_ParserReset(parsed->parser, parsed->enc);
     XML_SetDefaultHandler(parsed->parser, &comps_parse_def_handler);
     XML_SetElementHandler(parsed->parser, &comps_parse_start_elem_handler,
@@ -74,7 +76,8 @@ void comps_parse_parsed_reinit(COMPS_Parsed *parsed) {
 void comps_parse_parsed_destroy(COMPS_Parsed *parsed) {
     comps_list_destroy(&parsed->elem_stack);
     comps_list_destroy(&parsed->text_buffer);
-    comps_log_destroy(parsed->log);
+    if (parsed->log)
+        comps_log_destroy(parsed->log);
     comps_doc_destroy(&parsed->comps_doc);
     XML_ParserFree(parsed->parser);
     free(parsed);
@@ -122,13 +125,14 @@ char comps_parse_validate_dtd(char *filename, char *dtd_file) {
         return ret;
 }
 
-void comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
+char comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
     void *buff;
     int bytes_read;
 
     if (!f) {
         comps_log_error(parsed->log, NULL, COMPS_ERR_READFD, 0, 0, 0);
-        return;
+        parsed->fatal_error = 1;
+        return -1;
     }
     comps_parse_parsed_reinit(parsed);
 
@@ -137,7 +141,7 @@ void comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
         if (buff == NULL) {
             comps_log_error(parsed->log, NULL, COMPS_ERR_MALLOC, 0, 0, 0);
             raise(SIGABRT);
-            return;
+            return -1;
         }
         bytes_read = fread(buff, sizeof(char), BUFF_SIZE, f);
         if (bytes_read < 0)
@@ -147,19 +151,33 @@ void comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
                             XML_ErrorString(XML_GetErrorCode(parsed->parser)),
                             COMPS_ERR_PARSER, XML_GetErrorCode(parsed->parser),
                             0, 0);
+            parsed->fatal_error = 1;
         }
         if (bytes_read == 0) break;
     }
     fclose(f);
+    if (parsed->fatal_error == 0 && parsed->log->logger_data->len == 0)
+        return 0;
+    else if (parsed->fatal_error != 1)
+        return 1;
+    else
+        return -1;
 }
 
-void comps_parse_str(COMPS_Parsed *parsed, char *str) {
+char comps_parse_str(COMPS_Parsed *parsed, char *str) {
     if (!XML_Parse(parsed->parser, str, strlen(str), 1)) {
         comps_log_error(parsed->log,
                         XML_ErrorString(XML_GetErrorCode(parsed->parser)),
                         COMPS_ERR_PARSER, XML_GetErrorCode(parsed->parser),
                         0, 0);
+        parsed->fatal_error = 1;
     }
+    if (parsed->fatal_error == 0 && parsed->log->logger_data->len == 0)
+        return 0;
+    else if (parsed->fatal_error != 1)
+        return 1;
+    else
+        return -1;
 }
 
 void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
@@ -168,22 +186,25 @@ void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
     int item_len, index=0;
     #define parser_line XML_GetCurrentLineNumber(((COMPS_Parsed*)userData)->parser)
     #define parser_col XML_GetCurrentColumnNumber(((COMPS_Parsed*)userData)->parser)
+    #define parsed ((COMPS_Parsed*)userData)
+
     /* check if there's some text in recent element - are we interested in?*/
-    if (((COMPS_Parsed*)userData)->text_buffer_pt) {
-        all = malloc(sizeof(char)*(((COMPS_Parsed*)userData)->text_buffer_len+1));
-        if (all == NULL)
-            comps_log_error(((COMPS_Parsed*)userData)->log, NULL,
+    if (parsed->text_buffer_pt) {
+        all = malloc(sizeof(char)*(parsed->text_buffer_len+1));
+        if (all == NULL) {
+            comps_log_error(parsed->log, NULL,
                             COMPS_ERR_MALLOC, 0, 0, 0);
+            raise(SIGABRT);
+        }
     }
     /* remove all items of "text_buffer" list and append it into one string,
        but only if we're interested in text data in current element */
-    if (all == NULL && ((COMPS_Parsed*)userData)->text_buffer->first) {
-            comps_log_error(((COMPS_Parsed*)userData)->log,
-                     (char*)((COMPS_Parsed*)userData)->text_buffer->first->data,
-                            COMPS_ERR_TEXT_BETWEEN, parser_line, parser_col, 0);
+    if (all == NULL && parsed->text_buffer->first) {
+        comps_log_error(parsed->log, (char*)parsed->text_buffer->first->data,
+                        COMPS_ERR_TEXT_BETWEEN, parser_line, parser_col, 0);
     }
 
-    while ((item = comps_list_shift(((COMPS_Parsed*)userData)->text_buffer)) != NULL) {
+    while ((item = comps_list_shift(parsed->text_buffer)) != NULL) {
         item_len = strlen((char*)item->data);
 
         if (all) memcpy(all + index, item->data, item_len * sizeof(char));
@@ -192,22 +213,25 @@ void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
     }
     /* set zero char at the end of string */
     if (all) {
-        memset(all+((COMPS_Parsed*)userData)->text_buffer_len, 0, sizeof(char));
-        *((COMPS_Parsed*)userData)->text_buffer_pt = all;
+        if (parsed->text_buffer_len == 0)
+            comps_log_error(parsed->log, s, COMPS_ERR_NOCONTENT,
+                            parser_line, parser_col, 0);
+        memset(all+parsed->text_buffer_len, 0, sizeof(char));
+        *parsed->text_buffer_pt = all;
     }
-    ((COMPS_Parsed*)userData)->text_buffer_len = 0;
-    ((COMPS_Parsed*)userData)->text_buffer_pt = NULL;
+    parsed->text_buffer_len = 0;
+    parsed->text_buffer_pt = NULL;
 
     /* start postprocess for currently processed elements */
     if (comps_elem_get_type(s) ==
-        ((COMPS_Elem*)((COMPS_Parsed*)userData)->elem_stack->last->data)->type){
+        ((COMPS_Elem*)parsed->elem_stack->last->data)->type){
         comps_parse_el_postprocess(s, userData);
 
         /* finaly, remove element from element stack */
-        item = comps_list_pop(((COMPS_Parsed*)userData)->elem_stack);
+        item = comps_list_pop(parsed->elem_stack);
         comps_list_item_destroy(item);
     }
-
+    #undef parsed
     #undef parser_line
     #undef parser_col
 }
@@ -264,6 +288,10 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             parsed->tmp_buffer = NULL;
             return;
         }
+    }
+    if (parsed->text_buffer_pt && !*parsed->text_buffer_pt) {
+        comps_log_error(parsed->log, s, COMPS_ERR_ELEM_REQUIRED,
+                        parser_line, parser_col, 0);
     }
     switch (comps_elem_get_type(s)) {
         case COMPS_ELEM_UNKNOWN:
