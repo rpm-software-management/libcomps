@@ -8,7 +8,7 @@
 #include "pycomps_23macros.h"
 #include "pycomps_ctopy_seq.h"
 
-typedef struct PyCOMPS_SeqIter{
+typedef struct PyCOMPS_CtoPy_SeqIter{
     PyObject_HEAD
     PyObject *seq;
     COMPS_ListItem *it;

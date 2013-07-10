@@ -150,8 +150,9 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
     char *desc = NULL;
     char *lang = NULL;
     unsigned def=0, uservis=0, disp_order=0;
-    
-    (void) kwds;
+
+    static char *kwlist[] = {"id", "name", "desc", "display_order", "default",
+                              "uservisible", "langonly", NULL};
 
     name = NULL;
     id = NULL;
@@ -159,13 +160,13 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
     def = 0;
     uservis = 0;
     lang = NULL;
-    if (args && PyArg_ParseTuple(args, "|sssiiis", &id,
-                                          &name,
-                                          &desc,
-                                          &def,
-                                          &uservis,
-                                          &disp_order,
-                                          &lang)) {
+    if (!args && !kwds) {
+        return 0;
+    } else if (PyArg_ParseTupleAndKeywords(args, kwds, "|sssiiis", kwlist,
+                                          &id, &name, &desc, &disp_order,
+                                          &def, &uservis, &lang)) {
+        //printf("%s %s %s %i %i %i %s\n",
+        //       id, name, desc, def, uservis, disp_order, lang);
         comps_docgroup_set_id(pycomps_group_gget(self), id, 1);
         comps_docgroup_set_name(pycomps_group_gget(self), name, 1);
         comps_docgroup_set_desc(pycomps_group_gget(self), desc, 1);
@@ -491,11 +492,11 @@ PyObject* pycomps_group_strattr_getter(PyObject *self, void *closure) {
 int pycomps_group_numattr_setter(PyObject *self, PyObject *val, void *closure) {
     long tmp;
     COMPS_Prop *tmp_prop;
-    if (!PyLong_Check(val)) {
+    if (!PyINT_CHECK(val)) {
         PyErr_SetString(PyExc_TypeError, "Not int object");
         return -1;
     }
-    tmp = PyLong_AsLong(val);
+    tmp = PyINT_ASLONG(val);
     tmp_prop = comps_dict_get(pycomps_group_oget(self)->properties, (char*)closure);
     if (!tmp_prop) {
             tmp_prop = comps_doc_prop_num_create(tmp);
@@ -520,7 +521,11 @@ PyObject* pycomps_group_numattr_getter(PyObject *self, void *closure) {
 int pycomps_group_boolattr_setter(PyObject *self, PyObject *val, void *closure) {
     long tmp;
     COMPS_Prop *tmp_prop;
-    if (!PyBool_Check(val)) {
+    if (!val) {
+        PyErr_Format(PyExc_TypeError, "Cant' delete %s", (char*)closure);
+        return -1;
+    }
+    if (val && !PyBool_Check(val)) {
         PyErr_SetString(PyExc_TypeError, "Not bool object");
         return -1;
     }
@@ -988,12 +993,12 @@ PyObject* PyCOMPSPack_cmp(PyObject *self, PyObject *other, int op) {
     ret1 = (op == Py_EQ)?Py_False:Py_True;
 
     if (__pycomps_strcmp(pycomps_pkg_get(self)->name,
-                        pycomps_pkg_get(self)->name) != 0) {
+                        pycomps_pkg_get(other)->name) != 0) {
         Py_INCREF(ret1);
         return ret1;
     }
     if (pycomps_pkg_get(self)->type !=
-        pycomps_pkg_get(self)->type) {
+        pycomps_pkg_get(other)->type) {
         Py_INCREF(ret1);
         return ret1;
     }

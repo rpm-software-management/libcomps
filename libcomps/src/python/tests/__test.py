@@ -3,6 +3,7 @@ import unittest
 import tempfile
 import os
 import traceback
+import inspect
 
 class MyResult(unittest.TestResult):
     WHITEBOLD = {"1":(1,),  "2":(0,)}
@@ -89,6 +90,246 @@ class MyResult(unittest.TestResult):
 class MyRunner(unittest.TextTestRunner):
     def _makeResult(self):
         return MyResult(self.stream, self.descriptions, self.verbosity)
+
+class BaseObjClass(object):
+    obj_data = []
+    obj_getset = {}
+    obj_type = None
+
+    dict1 = libcomps.Dict()
+    dict1["foo"] = "bar"
+    dict1["Tom"] = "Jerry"
+    dict1["linux"] = "rolls!"
+
+    idlist1 = libcomps.IdList()
+    idlist1.append("id1")
+    idlist1.append("007")
+    idlist1.append("x")
+
+    obj_types = {str: ["some string 1", "test string", "another str",
+                       "short string", "ss", "long string string string",
+                       "ls"],
+                 int: [-1000,2,0,1000],
+                 libcomps.Dict: [dict1],
+                 libcomps.IdList: [idlist1],
+                 bool: [True, False]}
+    def obj_constructor(self, *args, **kwargs):
+        raise NotImplemented
+    def setup(self):
+        raise NotImplemented
+
+    def test_create(self):
+        obj = self.obj_constructor(**self.obj_data[0])
+        obj = self.obj_type()
+        print self.dict1
+
+    #@unittest.skip("")
+    def test_getset(self):
+        obj = self.obj_constructor(**self.obj_data[0])
+        data_desc = []
+        for x in inspect.getmembers(obj.__class__):
+            if inspect.isdatadescriptor(x[1]) or inspect.isgetsetdescriptor(x[1]) or\
+               inspect.ismemberdescriptor(x[1]):
+                data_desc.append(x)
+
+        for attr in data_desc:
+            z = getattr(obj, x[0])
+            attr_types = self.obj_getset[attr[0]]
+            for _type, vals in self.obj_types.iteritems():
+                if _type not in attr_types:
+                    with self.assertRaises(TypeError):
+                        setattr(obj, attr[0], vals[0])
+                else:
+                    for val in vals:
+                        setattr(obj, attr[0], val)
+
+            with self.assertRaises(TypeError):
+                self.assertTrue(delattr(obj, x[0]), x[0])
+    
+    def test_dictmembers(self):
+        obj = self.obj_constructor(**self.obj_data[0])
+        for member in self.obj_dict_members:
+            _dict = getattr(obj, member)
+            _zipped = zip(self.obj_types[str][0::2], self.obj_types[str][1::2])+\
+                      zip(self.obj_types[str][1::2], self.obj_types[str][0::2])
+            for x,y in _zipped:
+                _dict[x] = y
+            for x,y in _zipped:
+                self.assertTrue(_dict[x] == y)
+
+    def test_listmembers(self):
+        obj = self.obj_constructor(**self.obj_data[0])
+        for member, v in self.obj_list_members.iteritems():
+            _list = getattr(obj, member)
+            for x in v:
+                _list.append(x)
+            for pos, val in zip(range(0, len(v)), v):
+                self.assertTrue(_list[pos] == val)
+
+    def test_union1(self):
+        obj1 = self.obj_constructor(**self.obj_data[0])
+        obj2 = self.obj_constructor(**self.obj_data[1])
+        for member in self.obj_dict_members:
+            _dict = getattr(obj1, member)
+            _zipped = zip(self.obj_types[str][0:4:2],
+                          self.obj_types[str][1:5:2])+\
+                      zip(self.obj_types[str][1:5:2],
+                          self.obj_types[str][0:4:2])
+            for x,y in _zipped:
+                _dict[x] = y
+        for member, v in self.obj_list_members.iteritems():
+            _list = getattr(obj1, member)
+            for x in v[0:4]:
+                _list.append(x)
+
+        obj = obj1 + obj2
+
+        for member, v in self.obj_list_members.iteritems():
+            _list = getattr(obj, member)
+            self.assertTrue(len(_list) == 4)
+
+    def test_union2(self):
+        obj1 = self.obj_constructor(**self.obj_data[0])
+        obj2 = self.obj_constructor(**self.obj_data[1])
+        for member in self.obj_dict_members:
+            _dict = getattr(obj1, member)
+            _zipped = zip(self.obj_types[str][0:4:2],
+                          self.obj_types[str][1:5:2])+\
+                      zip(self.obj_types[str][1:5:2],
+                          self.obj_types[str][0:4:2])
+            for x,y in _zipped:
+                _dict[x] = y
+        for member, v in self.obj_list_members.iteritems():
+            _list = getattr(obj1, member)
+            for x in v[0:4]:
+                _list.append(x)
+
+        obj = obj2 + obj1
+
+        for member, v in self.obj_list_members.iteritems():
+            _list = getattr(obj, member)
+            self.assertTrue(len(_list) == 4)
+
+    def test_union3(self):
+        obj1 = self.obj_constructor(**self.obj_data[0])
+        obj2 = self.obj_constructor(**self.obj_data[1])
+        for member in self.obj_dict_members:
+            _dict = getattr(obj1, member)
+            _zipped = zip(self.obj_types[str][0:4:2],
+                          self.obj_types[str][1:5:2])+\
+                      zip(self.obj_types[str][1:5:2],
+                          self.obj_types[str][0:4:2])
+            for x,y in _zipped:
+                _dict[x] = y
+        for member, v in self.obj_list_members.iteritems():
+            _list = getattr(obj1, member)
+            for x in v[0:4]:
+                _list.append(x)
+
+        for member in self.obj_dict_members:
+            _dict = getattr(obj2, member)
+            _zipped = zip(self.obj_types[str][2::2],
+                          self.obj_types[str][3::2])+\
+                      zip(self.obj_types[str][3::2],
+                          self.obj_types[str][2::2])
+            for x,y in _zipped:
+                _dict[x] = y
+        for member, v in self.obj_list_members.iteritems():
+            _list = getattr(obj2, member)
+            for x in v[4:]:
+                _list.append(x)
+        obj = obj1 + obj2
+
+        for member, v in self.obj_list_members.iteritems():
+            _list = getattr(obj, member)
+            self.assertTrue(len(_list) == len(v))
+
+#@unittest.skip
+class Category_Test(BaseObjClass, unittest.TestCase):
+    obj_type = libcomps.Category
+    obj_data = [{"id":"cat1", "name": "category1", "desc": "cat desc 1",
+                 "display_order": 1},
+                {"id":"cat2", "name": "category2", "desc": "cat desc 2",
+                 "display_order": 2},
+                {"id":"cat3", "name": "category3", "desc": "cat desc 3",
+                 "display_order": 3},
+                {"id":"cat4", "name": "category4", "desc": "cat desc 4",
+                 "display_order": 4}]
+    obj_getset = {"id": [str],
+                  "name": [str],
+                  "desc": [str],
+                  "display_order": [int, bool],
+                  "group_ids": [libcomps.IdList],
+                  "name_by_lang": [libcomps.Dict],
+                  "desc_by_lang": [libcomps.Dict]}
+    obj_dict_members = ["name_by_lang", "desc_by_lang"]
+    obj_list_members = {"group_ids":["g1", "g2", "g3", "g4", "g5", "g6"]}
+
+    def obj_constructor(self, *args, **kwargs):
+        return libcomps.Category(*args, **kwargs)
+
+class Group_Test(BaseObjClass, unittest.TestCase):
+    obj_type = libcomps.Group
+    obj_data = [{"id":"g1", "name": "group1", "desc": "group desc 1",
+                 "default": False, "uservisible": True, "display_order": 0,
+                 "langonly": "en"},
+                {"id":"g2", "name": "group2", "desc": "group desc 2",
+                 "default": False, "uservisible": True, "display_order": 0,
+                 "langonly": "en"},
+                {"id":"g3", "name": "group3", "desc": "group desc 3",
+                 "default": False, "uservisible": True, "display_order": 0,
+                 "langonly": "en"},
+                {"id":"g4", "name": "group4", "desc": "group desc 4",
+                 "default": False, "uservisible": True, "display_order": 0,
+                 "langonly": "en"}]
+    obj_getset = {"id": [str],
+                  "name": [str],
+                  "desc": [str],
+                  "uservisible": [bool],
+                  "default": [bool],
+                  "lang_only": [str],
+                  "display_order": [int, bool],
+                  "packages": [libcomps.PackageList],
+                  "name_by_lang": [libcomps.Dict],
+                  "desc_by_lang": [libcomps.Dict]
+                  }
+    obj_dict_members = ["name_by_lang", "desc_by_lang"]
+    obj_list_members = {"packages":[
+                        libcomps.Package("oss", libcomps.PACKAGE_TYPE_DEFAULT),
+                        libcomps.Package("alsa", libcomps.PACKAGE_TYPE_DEFAULT),
+                        libcomps.Package("pulse", libcomps.PACKAGE_TYPE_DEFAULT),
+                        libcomps.Package("port", libcomps.PACKAGE_TYPE_DEFAULT),
+                        libcomps.Package("jack", libcomps.PACKAGE_TYPE_DEFAULT)\
+                        ]}
+
+    def obj_constructor(self, *args, **kwargs):
+        return libcomps.Group(*args, **kwargs)
+
+class Env_Test(BaseObjClass, unittest.TestCase):
+    obj_type = libcomps.Environment
+    obj_data = [{"id":"e1", "name": "env1", "desc": "env desc 1",
+                 "display_order": 0},
+                {"id":"e2", "name": "env2", "desc": "env desc 2",
+                 "display_order": 1},
+                {"id":"e3", "name": "env3", "desc": "env desc 3",
+                 "display_order": 2},
+                {"id":"e4", "name": "env4", "desc": "env desc 4",
+                 "display_order": 3}]
+    obj_getset = {"id": [str],
+                  "name": [str],
+                  "desc": [str],
+                  "display_order": [int, bool],
+                  "option_ids": [libcomps.IdList],
+                  "group_ids": [libcomps.IdList],
+                  "name_by_lang": [libcomps.Dict],
+                  "desc_by_lang": [libcomps.Dict]
+                  }
+    obj_dict_members = ["name_by_lang", "desc_by_lang"]
+    obj_list_members = {"group_ids":["g1", "g2", "g3", "g4", "g5", "g6"]}
+    obj_list_members = {"option_ids":["g1", "g2", "g3", "g4", "g5", "g6"]}
+
+    def obj_constructor(self, *args, **kwargs):
+        return libcomps.Environment(*args, **kwargs)
 
 class CategoryListTest(unittest.TestCase):
     def setUp(self):
@@ -735,7 +976,7 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(x == y)
         os.remove(fname)
 
-    #@unittest.skip("skip")
+    @unittest.skip("skip")
     def test_fedora(self):
         comps = libcomps.Comps()
         comps.fromxml_f("fedora_comps.xml")
@@ -744,7 +985,7 @@ class COMPSTest(unittest.TestCase):
         comps2.fromxml_f("fed2.xml")
         self.assertTrue(comps == comps2)
 
-    #@unittest.skip("skip")
+    @unittest.skip("skip")
     def test_sample(self):
         comps = libcomps.Comps()
         comps.fromxml_f("sample_comps.xml")
@@ -798,7 +1039,7 @@ class COMPSTest(unittest.TestCase):
         dbl2 = g1.desc_by_lang
         self.assertTrue(g1.desc_by_lang == g.desc_by_lang)
 
-    #@unittest.skip("skip")
+    @unittest.skip("skip")
     def test_union(self):
         comps = libcomps.Comps()
         comps.fromxml_f("sample_comps.xml")

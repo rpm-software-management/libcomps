@@ -21,6 +21,8 @@ inline PyObject *ctopy_list_getitem(PyObject *self, Py_ssize_t index) {
     PyObject *ret, *ret2;
     PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
     void *key;
+    if (index < 0)
+        index = ctopy_get_list(self)->len + index;
 
     it = comps_list_at(ctopy_get_list(self), index);
     if (it == NULL) {

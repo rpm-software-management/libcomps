@@ -21,15 +21,20 @@ int pycomps_lang_set_dict(PyCOMPS_CtoPy_CItem **citem,
                           PyObject **pobj,
                           PyObject *value,
                           void **data) {
+    if (!value) {
+        printf("deleting lang\n");
+    }
     if (value->ob_type != &PyCOMPS_DictType) {
-        PyErr_SetString(PyExc_TypeError, "Not GroupIds instance");
+        PyErr_Format(PyExc_TypeError, "Not %s instance", PyCOMPS_DictType.tp_name);
         return -1;
     }
     ctopy_citem_decref(*citem);
     *citem = ((PyCOMPS_Dict*)value)->citem;
     ctopy_citem_incref(*citem);
     *data = ((PyCOMPS_Dict*)value)->citem->data;
+    Py_XDECREF(*pobj);
     *pobj = value;
+    Py_INCREF(value);
     return 0;
 }
 

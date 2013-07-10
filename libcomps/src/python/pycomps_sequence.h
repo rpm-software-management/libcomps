@@ -11,19 +11,18 @@ typedef char (*PyCOMPSSeq_cmp_func)(void*, void*);
 typedef struct PyCOMPS_Sequence {
     PyObject_HEAD
     PyCOMPS_CtoPy_CItem *citem;
-    //COMPS_List *list;
 
     PyTypeObject ** itemtypes;
     PyCOMPSSeq_in_itemconvert *in_convert_funcs;
     PyCOMPSSeq_out_itemconvert out_convert_func;
     PyCOMPSSeq_cmp_func item_cmp_func;
     unsigned item_types_len;
-    //COMPS_List *reflist;
 } PyCOMPS_Sequence;
 
-typedef struct PyCOMPS_CtoPySeqIter{
+typedef struct PyCOMPS_SeqIter{
     PyObject_HEAD
     COMPS_ListItem *it;
+    PyCOMPS_Sequence *seq;
 } PyCOMPS_SeqIter;
 
 COMPS_List * get_list(PyObject *self);

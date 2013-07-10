@@ -147,23 +147,22 @@ int PyCOMPSCat_init(PyCOMPS_Category *self, PyObject *args, PyObject *kwds)
 {
     char *name, *id, *desc;
     unsigned disp_ord;
-
-    (void) kwds;
-
+    static char *kwlist[] = {"id", "name", "desc", "display_order", NULL};
     id = NULL;
     name = NULL;
     desc = NULL;
     disp_ord = 0;
-    if (args!=NULL && PyArg_ParseTuple(args, "|sssi", &id,
-                                         &name,
-                                         &desc,
-                                         &disp_ord)) {
+    if (!args && !kwds){
+        return 0;
+    }
+    else if (PyArg_ParseTupleAndKeywords(args, kwds, "|sssi", kwlist,
+                                    &id, &name, &desc, &disp_ord)) {
         comps_doccategory_set_id(pycomps_cat_gget(self), id, 1);
         comps_doccategory_set_name(pycomps_cat_gget(self), name, 1);
         comps_doccategory_set_desc(pycomps_cat_gget(self), desc, 1);
         comps_doccategory_set_displayorder(pycomps_cat_gget(self), disp_ord);
         return 0;
-    } else {
+    }else {
         return -1;
     }
 }
@@ -371,6 +370,10 @@ PyObject* PyCOMPSCat_get_groupids(PyCOMPS_Category *self, void *closure) {
 int PyCOMPSCat_set_groupids(PyCOMPS_Category *self,
                                   PyObject *value, void *closure) {
     (void) closure;
+    if (!value) {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute group_list");
+        return -1;
+    }
     if (value->ob_type != &PyCOMPS_IDsType) {
         PyErr_SetString(PyExc_TypeError, "Not GroupIds instance");
         return -1;
@@ -390,14 +393,17 @@ int PyCOMPSCat_set_groupids(PyCOMPS_Category *self,
 }
 
 inline PyObject* PyCOMPSCat_get_name_by_lang(PyObject *self, void *closure) {
-    (void) closure;
+    (void)closure;
     return pycomps_lang_get_dict(pycomps_cat_get_extra(self)->name_by_lang_citem,
                                  &((PyCOMPS_Category*)self)->name_by_lang_pobj);
 }
 
 inline int PyCOMPSCat_set_name_by_lang(PyObject *self, PyObject *value,
                                                                 void *closure) {
-    (void)closure;
+    if (!value) {
+        PyErr_Format(PyExc_TypeError, "Cannot remove attribute '%s'",(char*)closure);
+        return -1;
+    }
     return pycomps_lang_set_dict(&pycomps_cat_get_extra(self)->name_by_lang_citem,
                                  &((PyCOMPS_Category*)self)->name_by_lang_pobj,
                                  value,
@@ -412,7 +418,10 @@ inline PyObject* PyCOMPSCat_get_desc_by_lang(PyObject *self, void *closure) {
 
 inline int PyCOMPSCat_set_desc_by_lang(PyObject *self, PyObject *value,
                                                               void *closure) {
-    (void)closure;
+    if (!value) {
+        PyErr_Format(PyExc_TypeError, "Cannot remove attribute '%s'",(char*)closure);
+        return -1;
+    }
     return pycomps_lang_set_dict(&pycomps_cat_get_extra(self)->desc_by_lang_citem,
                                  &((PyCOMPS_Category*)self)->desc_by_lang_pobj,
                                  value,
@@ -422,6 +431,11 @@ inline int PyCOMPSCat_set_desc_by_lang(PyObject *self, PyObject *value,
 int pycomps_cat_strattr_setter(PyObject *self, PyObject *val, void *closure) {
     char *tmp;
     COMPS_Prop *tmp_prop;
+    if (!val) {
+        PyErr_Format(PyExc_TypeError, "Cannot remove attribute '%s'",(char*)closure);
+        return -1;
+    }
+
     if (__pycomps_stringable_to_char(val, &tmp) < 0) {
         return -1;
     }
@@ -473,10 +487,10 @@ PyGetSetDef PyCOMPSCat_getset[] = {
      "Category group ids list", NULL},
     {"name_by_lang",
      (getter)PyCOMPSCat_get_name_by_lang, (setter)PyCOMPSCat_set_name_by_lang,
-     "Category name locales", NULL},
+     "Category name locales", "name_by_lang"},
     {"desc_by_lang",
      (getter)PyCOMPSCat_get_desc_by_lang, (setter)PyCOMPSCat_set_desc_by_lang,
-     "Category description locales", NULL},
+     "Category description locales", "desc_by_lang"},
     {NULL}  /* Sentinel */
 };
 
@@ -608,7 +622,7 @@ PyObject* PyCOMPSCats_union(PyObject *self, PyObject *other) {
     COMPS_List *res_list;
 
     if (other == NULL || Py_TYPE(other) != &PyCOMPS_CatsType) {
-        PyErr_SetString(PyExc_TypeError, "Not CategoryList instance");
+        PyErr_Format(PyExc_TypeError, "Not %s instance", Py_TYPE(self)->tp_name);
         return NULL;
     }
 

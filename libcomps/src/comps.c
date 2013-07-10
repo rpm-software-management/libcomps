@@ -64,6 +64,8 @@ char __comps_doccategory_idcmp(void* cat1, void *cat2) {
     COMPS_Prop *prop1, *prop2;
     prop1 = __comps_doccat_get_prop(cat1, "id");
     prop2 = __comps_doccat_get_prop(cat2, "id");
+    if (prop1 == NULL && prop2 == NULL) return 1;
+    if (prop1 == NULL || prop2 == NULL) return 0;
 
     if (prop1->prop_type != COMPS_PROP_STR ||
         prop2->prop_type != COMPS_PROP_STR) return 0;
@@ -74,6 +76,8 @@ char __comps_docgroup_idcmp(void* g1, void *g2) {
     COMPS_Prop *prop1, *prop2;
     prop1 = __comps_docgroup_get_prop(g1, "id");
     prop2 = __comps_docgroup_get_prop(g2, "id");
+    if (prop1 == NULL && prop2 == NULL) return 1;
+    if (prop1 == NULL || prop2 == NULL) return 0;
 
     if (prop1->prop_type != COMPS_PROP_STR ||
         prop2->prop_type != COMPS_PROP_STR) return 0;
@@ -83,6 +87,8 @@ char __comps_docenv_idcmp(void* e1, void *e2) {
     COMPS_Prop *prop1, *prop2;
     prop1 = __comps_docenv_get_prop(e1, "id");
     prop2 = __comps_docenv_get_prop(e2, "id");
+    if (prop1 == NULL && prop2 == NULL) return 1;
+    if (prop1 == NULL || prop2 == NULL) return 0;
 
     if (prop1->prop_type != COMPS_PROP_STR ||
         prop2->prop_type != COMPS_PROP_STR) return 0;
@@ -865,7 +871,7 @@ inline void comps_docgroup_add_lang_desc(COMPS_DocGroup *group, char *lang,
  * @param def default flag
  */
 inline void comps_docgroup_set_default(COMPS_DocGroup *group, unsigned def) {
-    __comps_doc_add_prop(group->properties, "default",
+    __comps_doc_add_prop(group->properties, "def",
                          comps_doc_prop_num_create(def));
     //group->def = def;
 }

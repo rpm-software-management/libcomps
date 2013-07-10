@@ -4,6 +4,7 @@
 #include "libcomps/comps_list.h"
 #include "pycomps_sequence.h"
 #include "pycomps_23macros.h"
+#include "pycomps_utils.h"
 
 void py_xdecref(void* obj) {
     Py_XDECREF((PyObject*)obj);
@@ -411,7 +412,7 @@ PyObject* PyCOMPSSeq_cmp(PyObject *self, PyObject *other, int op) {
     ret = (op == Py_EQ)?Py_True:Py_False;
 
     it = get_list(self)->first;
-    it2 = get_list(self)->first;
+    it2 = get_list(other)->first;
     for (; it!= NULL && it2 != NULL; it = it->next, it2 = it2->next) {
         cmpret = ((PyCOMPS_Sequence*)self)->item_cmp_func(it->data, it2->data); 
         if (op == Py_EQ) {
@@ -423,7 +424,6 @@ PyObject* PyCOMPSSeq_cmp(PyObject *self, PyObject *other, int op) {
     if (it != NULL || it2 != NULL) {
         if (op == Py_EQ) Py_RETURN_FALSE;
         else Py_RETURN_TRUE;
-        return NULL;
     } else {
         return Py_INCREF(ret),ret;
     }
@@ -433,18 +433,21 @@ PyObject* PyCOMPSSeq_getiter(PyObject *self) {
     PyObject *res;
     res = PyCOMPSSeqIter_new(&PyCOMPS_SeqIterType, NULL, NULL);
     ((PyCOMPS_SeqIter*)res)->it = get_list(self)->first;
+    ((PyCOMPS_SeqIter*)res)->seq = self;
     return res;
 }
 
-PyObject* PyCOMPSSeq_iternext(PyObject *iter) {
-    PyObject *ret;
-    ret = (((PyCOMPS_SeqIter*)iter)->it)?((PyCOMPS_SeqIter*)iter)->it->data: NULL;
+PyObject* PyCOMPSSeq_iternext(PyObject *iter_o) {
+    void *ret;
+    PyObject *retp;
+    PyCOMPS_SeqIter *iter = ((PyCOMPS_SeqIter*)iter_o);
+    ret = iter->it?iter->it->data: NULL;
     if (ret) {
-        Py_INCREF(ret);
+        retp = iter->seq->out_convert_func(ret);
+        iter->it = iter->it->next;
+        return retp;
     }
-    if (ret)
-        ((PyCOMPS_SeqIter*)iter)->it = ((PyCOMPS_SeqIter*)iter)->it->next;
-    return ret;
+    return NULL;
 }
 
 PyObject* PyCOMPSSeq_clear(PyObject *self) {
@@ -485,7 +488,7 @@ PyTypeObject PyCOMPS_SeqType = {
     0,                         /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     &PyCOMPSSeq_mapping,       /*tp_as_mapping*/
-    0,                         /*tp_hash */
+    &PyCOMPS_hash,             /*tp_hash */
     0,                         /*tp_call*/
     PyCOMPSSeq_str,            /*tp_str*/
     0,                         /*tp_getattro*/

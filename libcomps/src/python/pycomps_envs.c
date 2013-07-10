@@ -146,14 +146,17 @@ int PyCOMPSEnv_init(PyCOMPS_Env *self, PyObject *args, PyObject *kwds)
 {
     char *name, *id, *desc;
     unsigned disp_ord;
-
-    (void)kwds;
+    static char *kwlist[] = {"id", "name", "desc", "display_order", NULL};
 
     name = NULL;
     id = NULL;
     desc = NULL;
     disp_ord = 0;
-    if (args && PyArg_ParseTuple(args, "|sssi", &id, &name, &desc, &disp_ord)) {
+    if (!args && !kwds){
+        return 0;
+    }
+    else if (PyArg_ParseTupleAndKeywords(args, kwds, "|sssi", kwlist,
+                                    &id, &name, &desc, &disp_ord)) {
         comps_docenv_set_id(pycomps_env_gget(self), id, 1);
         comps_docenv_set_name(pycomps_env_gget(self), name, 1);
         comps_docenv_set_desc(pycomps_env_gget(self), desc, 1);
@@ -190,7 +193,8 @@ void pycomps_env_print(FILE *f, void *e) {
         printf("'%s': '%s', ", ((COMPS_RTreePair*)hsit->data)->key,
                                (char*)((COMPS_RTreePair*)hsit->data)->data);
     }
-    printf("'%s': '%s'}", ((COMPS_RTreePair*)hsit->data)->key,
+    if (hsit)
+        printf("'%s': '%s'}", ((COMPS_RTreePair*)hsit->data)->key,
                            (char*)((COMPS_RTreePair*)hsit->data)->data);
     comps_hslist_destroy(&pairlist);
 
@@ -200,7 +204,8 @@ void pycomps_env_print(FILE *f, void *e) {
         printf("'%s': '%s', ", ((COMPS_RTreePair*)hsit->data)->key,
                                (char*)((COMPS_RTreePair*)hsit->data)->data);
     }
-    printf("'%s': '%s'}", ((COMPS_RTreePair*)hsit->data)->key,
+    if (hsit)
+        printf("'%s': '%s'}", ((COMPS_RTreePair*)hsit->data)->key,
                            (char*)((COMPS_RTreePair*)hsit->data)->data);
     comps_hslist_destroy(&pairlist);
 
@@ -395,6 +400,10 @@ PyObject* PyCOMPSEnv_get_groupids(PyCOMPS_Env *self, void *closure) {
 int PyCOMPSEnv_set_groupids(PyCOMPS_Env *self,
                                   PyObject *value, void *closure) {
     (void) closure;
+    if (!value) {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute option_ids");
+        return -1;
+    }
     if (value->ob_type != &PyCOMPS_IDsType) {
         PyErr_SetString(PyExc_TypeError, "Not GroupIds instance");
         return -1;
@@ -441,8 +450,12 @@ PyObject* PyCOMPSEnv_get_optionids(PyCOMPS_Env *self, void *closure) {
 int PyCOMPSEnv_set_optionids(PyCOMPS_Env *self,
                                   PyObject *value, void *closure) {
     (void) closure;
+    if (!value) {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute option_ids");
+        return -1;
+    }
     if (value->ob_type != &PyCOMPS_IDsType) {
-        PyErr_SetString(PyExc_TypeError, "Not GroupIds instance");
+        PyErr_Format(PyExc_TypeError, "Not %s instance", PyCOMPS_IDsType.tp_name);
         return -1;
     }
     ctopy_citem_decref(pycomps_env_get_extra((PyObject*)self)->option_list_citem);

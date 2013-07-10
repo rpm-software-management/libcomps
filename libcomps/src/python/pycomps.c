@@ -614,6 +614,8 @@ PYINIT_FUNC(void) {
     PyModule_AddObject(m, "Environment", (PyObject*) &PyCOMPS_EnvType);
     Py_INCREF(&PyCOMPS_EnvsType);
     PyModule_AddObject(m, "EnvList", (PyObject*) &PyCOMPS_EnvsType);
+    Py_INCREF(&PyCOMPS_DictType);
+    PyModule_AddObject(m, "Dict", (PyObject*) &PyCOMPS_DictType);
 
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_DEFAULT", COMPS_PACKAGE_DEFAULT);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_OPTIONAL", COMPS_PACKAGE_OPTIONAL);
