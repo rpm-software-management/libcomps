@@ -205,6 +205,20 @@ int PyCOMPSDict_set(PyObject *self, PyObject *key, PyObject *val) {
     return 0;
 }
 
+PyObject* PyCOMPSDict_has_key(PyObject * self, PyObject *key) {
+    char *ckey, *val;
+
+    if (__pycomps_stringable_to_char(key, &ckey)) {
+        return NULL;
+    }
+    val = comps_dict_get(get_dict(self), ckey);
+    free(ckey);
+    if (!val)
+        Py_RETURN_FALSE;
+    else
+        Py_RETURN_TRUE;
+}
+
 PyMappingMethods PyCOMPSDict_mapping = {
     NULL, //PyCOMPSDict_len,
     PyCOMPSDict_get,
@@ -216,6 +230,10 @@ PyMemberDef PyCOMPSDict_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSDict_methods[] = {
+     {"get", (PyCFunction)PyCOMPSDict_get, METH_O,
+     "alias for libcomps.Dict[key]"},
+     {"has_key", (PyCFunction)PyCOMPSDict_has_key, METH_O,
+     "alias for key in dict"},
     {NULL}  /* Sentinel */
 };
 
