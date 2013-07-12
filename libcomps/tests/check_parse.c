@@ -226,9 +226,10 @@ START_TEST(test_comps_parse3)
     COMPS_Parsed *parsed;
     COMPS_ListItem *it;
     int ret, i;
-    COMPS_List * tmplist;
+    COMPS_List *pairlist, *tmplist;
     COMPS_LoggerEntry* known_errors[3];
     COMPS_Prop *tmp_prop;
+    COMPS_HSListItem *hsit;
 
     known_errors[0] = comps_log_entry_create("id", 0,
                                              COMPS_ERR_ELEM_REQUIRED, 188, 2, 0);
@@ -249,6 +250,14 @@ START_TEST(test_comps_parse3)
         comps_log_entry_destroy(known_errors[i]);
     }
     tmplist = comps_doc_groups(parsed->comps_doc);
+    it = tmplist->first;
+
+    /*pairlist = comps_rtree_pairs(((COMPS_DocCategory*)it->data)->properties);
+    for (hsit = pairlist->first; hsit != NULL; hsit = hsit->next){
+        printf("%s = %s\n", ((COMPS_RTreePair*)hsit->data)->key,
+                          ((COMPS_RTreePair*)hsit->data)->data);
+    }*/
+
     tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "id");
     tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
     fail_if(tmp_ch != NULL,
@@ -362,14 +371,14 @@ START_TEST(test_comps_fedora_parse)
     //char *err_str;
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
-    fp = fopen("fedora_comps.xml", "r");
+    fp = fopen("fedorax.xml", "r");
     comps_parse_file(parsed, fp);
     printf("log len:%d\n", parsed->log->logger_data->len);
     //err_str = comps_log_str(parsed->log);
     //printf("parsed err log: %s", err_str);
     //free(err_str);
     printf("fedora comps groups:%d\n", comps_doc_groups(parsed->comps_doc)->len);
-    printf("fedora comps categories:%d\n", comps_doc_categories(parsed->comps_doc)->len);
+    //printf("fedora comps categories:%d\n", comps_doc_categories(parsed->comps_doc)->len);
 
     //print_all_str(((COMPS_DocGroup*)comps_doc_groups(parsed->comps_doc)
     //                                ->first->data)->name_by_lang);
@@ -386,12 +395,12 @@ Suite* basic_suite (void)
     Suite *s = suite_create ("Basic Tests");
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
-    tcase_add_test (tc_core, test_comps_parse1);
+    //tcase_add_test (tc_core, test_comps_parse1);
     //tcase_add_test (tc_core, test_comps_parse2);
     //tcase_add_test (tc_core, test_comps_parse3);
     //tcase_add_test (tc_core, test_comps_parse4);
     //tcase_add_test (tc_core, test_comps_parse5);
-    //tcase_add_test (tc_core, test_comps_fedora_parse);
+    tcase_add_test (tc_core, test_comps_fedora_parse);
     suite_add_tcase (s, tc_core);
 
     return s;

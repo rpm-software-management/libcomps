@@ -186,6 +186,7 @@ typedef struct {
     COMPS_PackageType type;
     /** name of package */
     char *name;
+    char *requires;
     void *reserved;
 } COMPS_DocGroupPackage;
 

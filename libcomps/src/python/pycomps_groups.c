@@ -839,8 +839,7 @@ inline COMPS_DocGroupPackage* pycomps_pkg_get(PyObject *pypkg) {
 }
 
 inline void pycomps_pkg_destroy(void * pkg) {
-    free(((COMPS_DocGroupPackage*)pkg)->name);
-    free(pkg);
+    comps_docpackage_destroy(pkg);
 }
 
 inline void pycomps_pkg_incref(void * pkg) {
@@ -905,18 +904,19 @@ int PyCOMPSPack_init(PyCOMPS_Package *self, PyObject *args, PyObject *kwds)
     return 1;
 }
 
-PyObject* PyCOMPSPack_get_name(PyCOMPS_Package *self, void *closure) {
-   (void) closure;
-    return PyUnicode_FromString(pycomps_pkg_get((PyObject*)self)->name);
+PyObject* PyCOMPSPack_strget_(PyCOMPS_Package *self, void *closure) {
+    char *tmp = GET_FROM(pycomps_pkg_get((PyObject*)self),
+                                         (size_t)closure);
+    return PyUnicode_FromString(tmp);
 }
-
-int PyCOMPSPack_set_name(PyCOMPS_Package *self, PyObject *value, void *closure) {
+int PyCOMPSPack_strset_(PyCOMPS_Package *self, PyObject *value, void *closure) {
     char *tmp;
     (void) closure;
     if (__pycomps_arg_to_char(value, &tmp)) {
         return -1;
     }
-    comps_docpackage_set_name(pycomps_pkg_get((PyObject*)self), tmp, 0);
+    __comps_doc_char_setter((void**)&GET_FROM(pycomps_pkg_get((PyObject*)self),
+                                    (size_t)closure), tmp, 0);
     return 0;
 }
 
@@ -944,9 +944,13 @@ int PyCOMPSPack_set_type(PyCOMPS_Package *self, PyObject *value, void *closure){
 
 PyGetSetDef pack_getset[] = {
     {"name",
-     (getter)PyCOMPSPack_get_name, (setter)PyCOMPSPack_set_name,
+     (getter)PyCOMPSPack_strget_, (setter)PyCOMPSPack_strset_,
      "Package name",
-     NULL},
+     (void*)offsetof(COMPS_DocGroupPackage, name)},
+    {"requires",
+     (getter)PyCOMPSPack_strget_, (setter)PyCOMPSPack_strset_,
+     "Package requires",
+     (void*)offsetof(COMPS_DocGroupPackage, requires)},
     {"type",
      (getter)PyCOMPSPack_get_type, (setter)PyCOMPSPack_set_type,
      "Package type",
@@ -970,8 +974,13 @@ PyObject* PyCOMPSPack_str(PyObject *self) {
 inline void comps_pkg_print(FILE *f, void *p) {
     const char *type;
     type = comps_docpackage_type_str(((COMPS_DocGroupPackage*)p)->type);
-    fprintf(f, "<COPMS_Package name='%s' type='%s'>",
-            ((COMPS_DocGroupPackage*)p)->name, type);
+    if (((COMPS_DocGroupPackage*)p)->requires)
+        fprintf(f, "<COPMS_Package name='%s' type='%s' requires='%s'>",
+                ((COMPS_DocGroupPackage*)p)->name, type,
+                ((COMPS_DocGroupPackage*)p)->requires);
+    else
+        fprintf(f, "<COPMS_Package name='%s' type='%s'>",
+                ((COMPS_DocGroupPackage*)p)->name, type);
 }
 
 int PyCOMPSPack_print(PyObject *self, FILE *f, int flags) {
@@ -981,7 +990,6 @@ int PyCOMPSPack_print(PyObject *self, FILE *f, int flags) {
 }
 
 PyObject* PyCOMPSPack_cmp(PyObject *self, PyObject *other, int op) {
-    PyObject *ret0, *ret1;
     if (other == NULL || other->ob_type != &PyCOMPS_PackType) {
         PyErr_SetString(PyExc_TypeError, "Not COMPS_Pack instance");
         return NULL;
@@ -989,21 +997,19 @@ PyObject* PyCOMPSPack_cmp(PyObject *self, PyObject *other, int op) {
     if (op != Py_EQ && op != Py_NE) {
         return Py_NotImplemented;
     }
-    ret0 = (op == Py_EQ)?Py_True:Py_False;
-    ret1 = (op == Py_EQ)?Py_False:Py_True;
-
-    if (__pycomps_strcmp(pycomps_pkg_get(self)->name,
-                        pycomps_pkg_get(other)->name) != 0) {
-        Py_INCREF(ret1);
-        return ret1;
+    if (comps_docpackage_cmp(pycomps_pkg_get(self), pycomps_pkg_get(other))) {
+        if (op == Py_EQ){
+            Py_RETURN_TRUE;
+        } else {
+            Py_RETURN_FALSE;
+        }
+    } else {
+        if (op == Py_EQ){
+            Py_RETURN_FALSE;
+        } else {
+            Py_RETURN_TRUE;
+        }
     }
-    if (pycomps_pkg_get(self)->type !=
-        pycomps_pkg_get(other)->type) {
-        Py_INCREF(ret1);
-        return ret1;
-    }
-    Py_INCREF(ret0);
-    return ret0;
 }
 
 char pycomps_pack_cmp(void *p1, void *p2) {

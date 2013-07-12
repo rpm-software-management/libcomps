@@ -844,6 +844,8 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
             parsed->text_buffer_pt = &package->name;
             package->type = comps_package_get_type(comps_dict_get(elem->attrs,
                                                                   "type"));
+            __comps_doc_char_setter((void**)&package->requires,
+                            comps_dict_get(elem->attrs, "requires"), 1);
 
             if (package->type == COMPS_PACKAGE_UNKNOWN)
                 comps_log_warning(parsed->log,
@@ -907,7 +909,7 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
             
         break;
         case COMPS_ELEM_UNKNOWN:
-            parsed->text_buffer_pt = &parsed->tmp_buffer;
+            //parsed->text_buffer_pt = &parsed->tmp_buffer;
             comps_log_warning(parsed->log, elem->name, COMPS_ERR_ELEM_UNKNOWN,
                            XML_GetCurrentLineNumber(parsed->parser),
                            XML_GetCurrentColumnNumber(parsed->parser), 0);

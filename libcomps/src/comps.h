@@ -198,6 +198,8 @@ void comps_docpackage_set_name(COMPS_DocGroupPackage *package, char *name,
                                char copy);
 void comps_docpackage_set_type(COMPS_DocGroupPackage *package,
                                COMPS_PackageType type);
+void comps_docpackage_set_requires(COMPS_DocGroupPackage *package,
+                                   char *requires, char copy);
 
 void comps_docpackage_destroy(void *pkg);
 void comps_docpackage_xml(COMPS_DocGroupPackage *pkg, xmlTextWriterPtr writer,

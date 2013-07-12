@@ -63,7 +63,8 @@ void pycomps_clear(PyObject *self) {
     ctopy_citem_destroy(self_comps->cats_citem);
     ctopy_citem_destroy(self_comps->envs_citem);
     Py_XDECREF(self_comps->enc);
-
+    self_comps->enc = NULL;
+    
     self_comps->cats_pobj = NULL;
     self_comps->groups_pobj = NULL;
     self_comps->envs_pobj = NULL;
@@ -211,6 +212,7 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
     pycomps_ctopy_comps_init(self);
     self_comps->enc = PyBytes_FromString(parsed->comps_doc->encoding);
 
+    free(fname);
     parsed->comps_doc = NULL;
     comps_parse_parsed_destroy(parsed);
 
@@ -234,6 +236,7 @@ PyObject* PyCOMPS_get_last_errors(PyObject *self, void *closure)
             tmps = comps_log_entry_str(it->data);
             tmp = PyUnicode_DecodeUTF8(tmps, strlen(tmps), errors);
             PyList_Append(ret, tmp);
+            Py_DECREF(tmp);
             free(tmps);
         }
     }
@@ -255,8 +258,9 @@ PyObject* PyCOMPS_get_last_log(PyObject *self, void *closure)
         tmps = comps_log_entry_str(it->data);
         tmp = PyUnicode_DecodeUTF8(tmps, strlen(tmps), errors);
         PyList_Append(ret, tmp);
+        Py_DECREF(tmp);
         free(tmps);
-        }
+    }
     return ret;
 }
 

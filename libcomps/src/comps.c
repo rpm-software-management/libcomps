@@ -1237,14 +1237,7 @@ inline char comps_docgroup_cmp(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
          ?((COMPS_DocGroup*)g2)->packages->first: NULL;
     
     for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        if (!__comps_strcmp(((COMPS_DocGroupPackage*)it->data)->name,
-                             ((COMPS_DocGroupPackage*)it2->data)->name)) {
-            return 0;
-        }
-        if (((COMPS_DocGroupPackage*)it->data)->type !=
-            ((COMPS_DocGroupPackage*)it2->data)->type) {
-            return 0;
-        }
+        comps_docpackage_cmp(it->data, it2->data);
     }
     if (it != NULL || it2 != NULL)
         return 0;
@@ -2101,6 +2094,7 @@ inline COMPS_DocGroupPackage* comps_docpackage_create()
     if ((package = malloc(sizeof(COMPS_DocGroupPackage))) == NULL)
         return NULL;
     package->name = NULL;
+    package->requires = NULL;
     package->type = COMPS_PACKAGE_UNKNOWN;
     return package;
 }
@@ -2116,6 +2110,7 @@ COMPS_DocGroupPackage* comps_docpackage_clone(COMPS_DocGroupPackage * pkg) {
     if (newpkg == NULL)
         return NULL;
     comps_docpackage_set_name(newpkg, pkg->name, 1);
+    comps_docpackage_set_requires(newpkg, pkg->requires, 1);
     newpkg->type = pkg->type;
     return newpkg;
 }
@@ -2134,6 +2129,10 @@ COMPS_DocGroupPackage* comps_docpackage_clone(COMPS_DocGroupPackage * pkg) {
 inline void comps_docpackage_set_name(COMPS_DocGroupPackage *package, char *name,
                                char copy) {
     __comps_doc_char_setter((void**)&package->name, name, copy);
+}
+inline void comps_docpackage_set_requires(COMPS_DocGroupPackage *package,
+                                          char *requires, char copy) {
+    __comps_doc_char_setter((void**)&package->requires, requires, copy);
 }
 
 /**
@@ -2154,6 +2153,7 @@ void comps_docpackage_destroy(void *pkg)
 {
     if (pkg == NULL)
         return;
+    free(((COMPS_DocGroupPackage*)pkg)->requires);
     free(((COMPS_DocGroupPackage*)pkg)->name);
     free(pkg);
 }
@@ -2165,21 +2165,25 @@ void comps_docpackage_xml(COMPS_DocGroupPackage * pkg, xmlTextWriterPtr writer,
         || pkg->type == COMPS_PACKAGE_MANDATORY
         || pkg->type == COMPS_PACKAGE_DEFAULT
         || pkg->type == COMPS_PACKAGE_CONDITIONAL) {
-    xmlTextWriterStartElement(writer, (xmlChar*) "packagereq");
-    if (pkg->type == COMPS_PACKAGE_OPTIONAL)
-        xmlTextWriterWriteAttribute(writer, (xmlChar*) "type",
-                                            (xmlChar*) "optional");
-    else if (pkg->type == COMPS_PACKAGE_MANDATORY)
-        xmlTextWriterWriteAttribute(writer, (xmlChar*) "type",
-                                            (xmlChar*) "mandatory");
-    else if (pkg->type == COMPS_PACKAGE_CONDITIONAL)
-        xmlTextWriterWriteAttribute(writer, (xmlChar*) "type",
-                                            (xmlChar*) "conditional");
-    else
-        xmlTextWriterWriteAttribute(writer, (xmlChar*) "type",
-                                            (xmlChar*) "default");
-    xmlTextWriterWriteString(writer, (xmlChar*) pkg->name);
-    xmlTextWriterEndElement(writer);
+        xmlTextWriterStartElement(writer, (xmlChar*) "packagereq");
+        if (pkg->type == COMPS_PACKAGE_OPTIONAL)
+            xmlTextWriterWriteAttribute(writer, (xmlChar*) "type",
+                                                (xmlChar*) "optional");
+        else if (pkg->type == COMPS_PACKAGE_MANDATORY)
+            xmlTextWriterWriteAttribute(writer, (xmlChar*) "type",
+                                                (xmlChar*) "mandatory");
+        else if (pkg->type == COMPS_PACKAGE_CONDITIONAL)
+            xmlTextWriterWriteAttribute(writer, (xmlChar*) "type",
+                                                (xmlChar*) "conditional");
+        else
+            xmlTextWriterWriteAttribute(writer, (xmlChar*) "type",
+                                                (xmlChar*) "default");
+        if (pkg->requires) {
+            xmlTextWriterWriteAttribute(writer, (xmlChar*) "requires",
+                                                (xmlChar*) pkg->requires);
+        }
+        xmlTextWriterWriteString(writer, (xmlChar*) pkg->name);
+        xmlTextWriterEndElement(writer);
     }
 }
 
@@ -2193,8 +2197,10 @@ void comps_docpackage_xml(COMPS_DocGroupPackage * pkg, xmlTextWriterPtr writer,
 char comps_docpackage_cmp(void* pkg1, void *pkg2) {
     if (((COMPS_DocGroupPackage*)pkg1)->type
         != ((COMPS_DocGroupPackage*)pkg2)->type) return 0;
-    if (strcmp(((COMPS_DocGroupPackage*)pkg1)->name,
-               ((COMPS_DocGroupPackage*)pkg2)->name) != 0) return 0;
+    if (__comps_strcmp(((COMPS_DocGroupPackage*)pkg1)->name,
+               ((COMPS_DocGroupPackage*)pkg2)->name) == 0) return 0;
+    if (__comps_strcmp(((COMPS_DocGroupPackage*)pkg1)->requires,
+               ((COMPS_DocGroupPackage*)pkg2)->requires) == 0) return 0;
     return 1;
 }
 const char* comps_docpackage_type_str(COMPS_PackageType type) {

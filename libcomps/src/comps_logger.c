@@ -59,13 +59,13 @@ __COMPS_LoggerMsg COMPS_LogMessages[] = {
       [COMPS_ERR_ELEM_REQUIRED] = {.format="Element %s is required at line:%d "
                                     "column :%d but missing\n", .usedm=1,
                                     .used1=2, .used2=3, .used3=0},
-      [COMPS_ERR_LIST_EMPTY] = {.format="%s is empty at line:%d column :%d",
+      [COMPS_ERR_LIST_EMPTY] = {.format="%s is empty at line:%d column :%d\n",
                                 .usedm=1, .used1=2, .used2=3, .used3=0},
       [COMPS_ERR_TEXT_BETWEEN] = {.format="'%s' found between elements at line:"
-                                  "%d column :%d",
+                                  "%d column :%d\n",
                                 .usedm=1, .used1=2, .used2=3, .used3=0},
       [COMPS_ERR_NOCONTENT] = {.format="<%s> content missing at line:%d "
-                               "column:%d", .usedm=1, .used1=2, .used2=3,
+                               "column:%d\n", .usedm=1, .used1=2, .used2=3,
                                .used3=0}
 };
 
@@ -119,7 +119,6 @@ COMPS_LoggerEntry * comps_log_entry_create(const char * msg, unsigned type,
                      COMPS_LogErrCode code, unsigned int optcode1,
                      unsigned int optcode2, unsigned int optcode3) {
     COMPS_LoggerEntry * entry;
-    (void) type;
 
     if ((entry = malloc(sizeof(COMPS_LoggerEntry))) == NULL)
         return NULL;
@@ -133,6 +132,7 @@ COMPS_LoggerEntry * comps_log_entry_create(const char * msg, unsigned type,
                (void*)msg, sizeof(char)*(strlen((char*)msg)+1));
     } else
         entry->log_message = NULL;
+    entry->type = type;
     entry->code = code;
     entry->opt_code1 = optcode1;
     entry->opt_code2 = optcode2;
