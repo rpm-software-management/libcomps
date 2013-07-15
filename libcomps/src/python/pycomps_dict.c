@@ -2,7 +2,21 @@
 #include "pycomps_dict.h"
 
 
-inline COMPS_Dict * get_dict(PyObject *self) {
+PyObject* __pycomps_dict_key_out(COMPS_HSListItem *hsit) {
+    return PyUnicode_FromString((char*)hsit->data);
+}
+
+PyObject* __pycomps_dict_pair_out(COMPS_HSListItem *hsit) {
+    PyObject *key, *val, *tuple;
+    key = PyUnicode_FromString((char*) ((COMPS_RTreePair*)hsit->data)->key);
+    val = PyUnicode_FromString((char*) ((COMPS_RTreePair*)hsit->data)->data);
+    tuple = PyTuple_Pack(2, key, val);
+    Py_DECREF(key);
+    Py_DECREF(val);
+    return tuple;
+}
+
+inline COMPS_Dict* get_dict(PyObject *self) {
     return (COMPS_Dict*)((PyCOMPS_Dict*)self)->citem->data;
 }
 
@@ -219,6 +233,33 @@ PyObject* PyCOMPSDict_has_key(PyObject * self, PyObject *key) {
         Py_RETURN_TRUE;
 }
 
+PyObject* PyCOMPSDict_getiter(PyObject *self) {
+    PyObject *res;
+    res = PyCOMPSDictIter_new(&PyCOMPS_DictIterType, NULL, NULL);
+    ((PyCOMPS_DictIter*)res)->hslist = comps_dict_keys(get_dict(self));
+    ((PyCOMPS_DictIter*)res)->hsit = ((PyCOMPS_DictIter*)res)->hslist->first;
+    ((PyCOMPS_DictIter*)res)->out_func = &__pycomps_dict_key_out;
+    return res;
+}
+
+PyObject* PyCOMPSDict_getiteritems(PyObject *self) {
+    PyObject *res;
+    res = PyCOMPSDictIter_new(&PyCOMPS_DictIterType, NULL, NULL);
+    ((PyCOMPS_DictIter*)res)->hslist = comps_dict_pairs(get_dict(self));
+    ((PyCOMPS_DictIter*)res)->hsit = ((PyCOMPS_DictIter*)res)->hslist->first;
+    ((PyCOMPS_DictIter*)res)->out_func = &__pycomps_dict_pair_out;
+    return res;
+}
+
+PyObject* PyCOMPSDict_getitervalues(PyObject *self) {
+    PyObject *res;
+    res = PyCOMPSDictIter_new(&PyCOMPS_DictIterType, NULL, NULL);
+    ((PyCOMPS_DictIter*)res)->hslist = comps_dict_values(get_dict(self));
+    ((PyCOMPS_DictIter*)res)->hsit = ((PyCOMPS_DictIter*)res)->hslist->first;
+    ((PyCOMPS_DictIter*)res)->out_func = &__pycomps_dict_key_out;
+    return res;
+}
+
 PyMappingMethods PyCOMPSDict_mapping = {
     NULL, //PyCOMPSDict_len,
     PyCOMPSDict_get,
@@ -234,45 +275,134 @@ PyMethodDef PyCOMPSDict_methods[] = {
      "alias for libcomps.Dict[key]"},
      {"has_key", (PyCFunction)PyCOMPSDict_has_key, METH_O,
      "alias for key in dict"},
+     {"iteritems", (getiterfunc)PyCOMPSDict_getiteritems, METH_NOARGS,
+     "return iterator returning (key, value) tuple"},
+     {"itervalues", (getiterfunc)PyCOMPSDict_getitervalues, METH_NOARGS,
+     "return iterator returning (key, value) tuple"},
     {NULL}  /* Sentinel */
 };
 
 PyTypeObject PyCOMPS_DictType = {
     PY_OBJ_HEAD_INIT
-    "libcomps.Dict",   /*tp_name*/
-    sizeof(PyCOMPS_Dict), /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
+    "libcomps.Dict",            /*tp_name*/
+    sizeof(PyCOMPS_Dict),       /*tp_basicsize*/
+    0,                          /*tp_itemsize*/
     (destructor)PyCOMPSDict_dealloc, /*tp_dealloc*/
-    &PyCOMPSDict_print,        /*tp_print*/
+    &PyCOMPSDict_print,         /*tp_print*/
+    0,                          /*tp_getattr*/
+    0,                          /*tp_setattr*/
+    0,                          /*tp_compare*/
+    0,                          /*tp_repr*/
+    0,                          /*tp_as_number*/
+    0,                          /*tp_as_sequence*/
+    &PyCOMPSDict_mapping,       /*tp_as_mapping*/
+    0,                          /*tp_hash */
+    0,                          /*tp_call*/
+    PyCOMPSDict_str,            /*tp_str*/
+    0,                          /*tp_getattro*/
+    0,                          /*tp_setattro*/
+    0,                          /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "Comps Dict",               /* tp_doc */
+    0,                          /* tp_traverse */
+    0,                          /* tp_clear */
+    &PyCOMPSDict_cmp,           /* tp_richcompare */
+    0,                          /* tp_weaklistoffset */
+    &PyCOMPSDict_getiter,       /* tp_iter */
+    0,                          /* tp_iternext */
+    PyCOMPSDict_methods,        /* tp_methods */
+    PyCOMPSDict_members,        /* tp_members */
+    0,                          /* tp_getset */
+    0,                          /* tp_base */
+    0,                          /* tp_dict */
+    0,                          /* tp_descr_get */
+    0,                          /* tp_descr_set */
+    0,                          /* tp_dictoffset */
+    (initproc)PyCOMPSDict_init,      /* tp_init */
+    0,                               /* tp_alloc */
+    PyCOMPSDict_new,                 /* tp_new */};
+
+
+PyMemberDef PyCOMPSDictIter_members[] = {
+    {NULL}};
+
+PyMethodDef PyCOMPSDictIter_methods[] = {
+    {NULL}  /* Sentinel */
+};
+
+PyObject* PyCOMPSDictIter_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    (void)args;
+    (void)kwds;
+    PyCOMPS_DictIter *self;
+    self = (PyCOMPS_DictIter*)type->tp_alloc(type, 0);
+    return (PyObject*) self;
+}
+
+void PyCOMPSDictIter_dealloc(PyCOMPS_DictIter *self)
+{
+    comps_hslist_destroy(&self->hslist);
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+PyObject* PyCOMPSDict_iternext(PyObject *iter_o) {
+    void *ret;
+    PyObject *retp;
+    PyCOMPS_DictIter *iter = ((PyCOMPS_DictIter*)iter_o);
+    ret = iter->hsit?iter->hsit->data: NULL;
+    if (ret) {
+        retp = iter->out_func(iter->hsit);
+        iter->hsit = iter->hsit->next;
+        return retp;
+    }
+    return NULL;
+}
+
+int PyCOMPSDictIter_init(PyCOMPS_DictIter *self, PyObject *args, PyObject *kwds)
+{
+    (void)args;
+    (void)kwds;
+    self->hsit = NULL;
+    self->hslist = NULL;
+    return 0;
+}
+
+PyTypeObject PyCOMPS_DictIterType = {
+    PY_OBJ_HEAD_INIT
+    "libcomps.DictIter",   /*tp_name*/
+    sizeof(PyCOMPS_DictIter), /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)PyCOMPSDictIter_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/
     0,                         /*tp_repr*/
     0,                         /*tp_as_number*/
     0,                         /*tp_as_sequence*/
-    &PyCOMPSDict_mapping,       /*tp_as_mapping*/
+    0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
-    PyCOMPSDict_str,            /*tp_str*/
+    0,                         /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    "Comps Dict",          /* tp_doc */
-    0,                    /* tp_traverse */
-    0,                     /* tp_clear */
-    &PyCOMPSDict_cmp,        /* tp_richcompare */
-    0,                     /* tp_weaklistoffset */
-    0,                     /* tp_iter */
-    0,                     /* tp_iternext */
-    PyCOMPSDict_methods,        /* tp_methods */
-    PyCOMPSDict_members,        /* tp_members */
-    0,                        /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)PyCOMPSDict_init,      /* tp_init */
-    0,                               /* tp_alloc */
-    PyCOMPSDict_new,                 /* tp_new */};
+    "Comps Dict Iterator",           /* tp_doc */
+    0,                          /* tp_traverse */
+    0,                          /* tp_clear */
+    0,                          /* tp_richcompare */
+    0,                          /* tp_weaklistoffset */
+    0,         /* tp_iter */
+    PyCOMPSDict_iternext,         /* tp_iternext */
+    PyCOMPSDictIter_methods,         /* tp_methods */
+    PyCOMPSDictIter_members,         /* tp_members */
+    0,                          /* tp_getset */
+    &PySeqIter_Type,                          /* tp_base */
+    0,                          /* tp_dict */
+    0,                          /* tp_descr_get */
+    0,                          /* tp_descr_set */
+    0,                          /* tp_dictoffset */
+    (initproc)PyCOMPSDictIter_init,  /* tp_init */
+    0,                              /* tp_alloc */
+    PyCOMPSDictIter_new,             /* tp_new */};

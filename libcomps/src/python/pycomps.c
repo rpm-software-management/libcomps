@@ -620,6 +620,9 @@ PYINIT_FUNC(void) {
     if (PyType_Ready(&PyCOMPS_SeqIterType) < 0 ) {
         MODINIT_RET_NONE;
     }
+    if (PyType_Ready(&PyCOMPS_DictIterType) < 0 ) {
+        MODINIT_RET_NONE;
+    }
     if (PyType_Ready(&PyCOMPS_CtoPySeqIterType) < 0 ) {
         MODINIT_RET_NONE;
     }
