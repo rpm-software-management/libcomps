@@ -376,7 +376,7 @@ START_TEST(test_comps_fedora_parse)
     char *tmp;
     //char *err_str;
     parsed = comps_parse_parsed_create();
-    comps_parse_parsed_init(parsed, "UTF-8", 1);
+    comps_parse_parsed_init(parsed, "UTF-8", 0);
     fp = fopen("fedora_comps.xml", "r");
     comps_parse_file(parsed, fp);
     printf("log len:%d\n", parsed->log->logger_data->len);
@@ -390,7 +390,7 @@ START_TEST(test_comps_fedora_parse)
 
     //print_all_str(((COMPS_DocGroup*)comps_doc_groups(parsed->comps_doc)
     //                                ->first->data)->name_by_lang);
-    comps2xml_f(parsed->comps_doc, "fed2.xml", 1);
+    comps2xml_f(parsed->comps_doc, "fed2.xml", 0);
     //printf("%s\n", tmp);
 
     //free(tmp);

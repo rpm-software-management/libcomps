@@ -1167,6 +1167,10 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
         comps_docgroup_add_package(res, newpkg);
     }
     comps_set_destroy(&set);
+    comps_dict_destroy(res->name_by_lang);
+    comps_dict_destroy(res->desc_by_lang);
+    res->name_by_lang = comps_dict_union(g1->name_by_lang, g2->name_by_lang);
+    res->desc_by_lang = comps_dict_union(g1->desc_by_lang, g2->desc_by_lang);
     return res;
 }
 
@@ -1542,6 +1546,10 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
         comps_doccategory_add_groupid(res, (char*)hsit->data, 1);
     }
     comps_set_destroy(&set);
+    comps_dict_destroy(res->name_by_lang);
+    comps_dict_destroy(res->desc_by_lang);
+    res->name_by_lang = comps_dict_union(c1->name_by_lang, c2->name_by_lang);
+    res->desc_by_lang = comps_dict_union(c1->desc_by_lang, c2->desc_by_lang);
     return res;
 }
 
@@ -1962,6 +1970,10 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
         comps_docenv_add_optionid(res, (char*)hsit->data, 1);
     }
     comps_set_destroy(&set);
+    comps_dict_destroy(res->name_by_lang);
+    comps_dict_destroy(res->desc_by_lang);
+    res->name_by_lang = comps_dict_union(e1->name_by_lang, e2->name_by_lang);
+    res->desc_by_lang = comps_dict_union(e1->desc_by_lang, e2->desc_by_lang);
     return res;
 }
 

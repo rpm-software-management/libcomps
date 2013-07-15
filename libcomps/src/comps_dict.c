@@ -49,6 +49,9 @@ inline COMPS_HSList* comps_dict_keys(COMPS_Dict * rt) {
 inline COMPS_HSList* comps_dict_pairs(COMPS_Dict *rt) {
     return comps_rtree_pairs((COMPS_RTree*)rt);
 }
+inline COMPS_Dict* comps_dict_union(COMPS_Dict *d1, COMPS_Dict *d2) {
+    return comps_rtree_union((COMPS_RTree*)d1, (COMPS_RTree*)d2);
+}
 
 
 inline COMPS_MDict* comps_mdict_create(void* (*data_constructor)(void*),
@@ -90,6 +93,7 @@ inline void comps_mdict_values_walk(COMPS_MDict * rt, void* udata,
                               void (*walk_f)(void*, void*)) {
     comps_mrtree_values_walk((COMPS_MRTree*)rt, udata, walk_f);
 }
+
 inline COMPS_MDict* comps_mdict_clone(COMPS_MDict * rt) {
     return (COMPS_MRTree*) comps_mrtree_clone((COMPS_MRTree*)rt);
 }

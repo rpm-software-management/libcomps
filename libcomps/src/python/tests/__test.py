@@ -1,3 +1,5 @@
+ # -*- coding: UTF-8 -*-
+
 import _libpycomps as libcomps
 import unittest
 import tempfile
@@ -175,6 +177,7 @@ class BaseObjTestClass(object):
                           self.obj_types[str][0:4:2])
             for x,y in _zipped:
                 _dict[x] = y
+
         for member, v in self.obj_list_members.iteritems():
             _list = getattr(obj1, member)
             for x in v[0:4]:
@@ -207,6 +210,14 @@ class BaseObjTestClass(object):
             _list = getattr(obj, member)
             self.assertTrue(len(_list) == 4)
 
+        for member, v in self.obj_dict_members.iteritems():
+            _d1 = {k: v for k,v in getattr(obj1, member).iteritems()}
+            _d2 = {k: v for k,v in getattr(obj2, member).iteritems()}
+            _d1.update(_d2)
+            _dict = getattr(obj, member)
+            _d = {k:v for k,v in _dict.iteritems()}
+            self.assertTrue(_d == _d1)
+
     def test_union2(self):
         obj1 = self.__union_prep1()
         obj2 = self.obj_constructor(**self.obj_data[1])
@@ -216,6 +227,14 @@ class BaseObjTestClass(object):
             _list = getattr(obj, member)
             self.assertTrue(len(_list) == 4)
 
+        for member, v in self.obj_dict_members.iteritems():
+            _d1 = {k: v for k,v in getattr(obj1, member).iteritems()}
+            _d2 = {k: v for k,v in getattr(obj2, member).iteritems()}
+            _d1.update(_d2)
+            _dict = getattr(obj, member)
+            _d = {k:v for k,v in _dict.iteritems()}
+            self.assertTrue(_d == _d1)
+
     def test_union3(self):
         obj1 = self.__union_prep1()
         obj2 = self.__union_prep2()
@@ -224,6 +243,14 @@ class BaseObjTestClass(object):
         for member, v in self.obj_list_members.iteritems():
             _list = getattr(obj, member)
             self.assertTrue(len(_list) == len(v))
+
+        for member, v in self.obj_dict_members.iteritems():
+            _d1 = {k: v for k,v in getattr(obj1, member).iteritems()}
+            _d2 = {k: v for k,v in getattr(obj2, member).iteritems()}
+            _d1.update(_d2)
+            _dict = getattr(obj, member)
+            _d = {k:v for k,v in _dict.iteritems()}
+            self.assertTrue(_d == _d1)
 
 #@unittest.skip(" ")
 class Category_Test(BaseObjTestClass, unittest.TestCase):
@@ -243,7 +270,20 @@ class Category_Test(BaseObjTestClass, unittest.TestCase):
                   "group_ids": [libcomps.IdList],
                   "name_by_lang": [libcomps.Dict],
                   "desc_by_lang": [libcomps.Dict]}
-    obj_dict_members = ["name_by_lang", "desc_by_lang"]
+    obj_dict_members = {"name_by_lang":{"cs": "administrace",
+                                        "en": "administration",
+                                        "de": "Verwaltung",
+                                        "it": "Amministrazione",
+                                        "fr": "administration",
+                                        "fi": "hallinto",
+                                        "no": "administrasjon"},
+                        "desc_by_lang":{"cs": "administrace systemu",
+                                        "en": "system administration",
+                                        "de": "Systemadministration",
+                                        "it": "amministrazione del sistema",
+                                        "fr": "administration système",
+                                        "fi": "-järjestelmä hallinto",
+                                        "no": "systemadministrasjon"}}
     obj_list_members = {"group_ids":["g1", "g2", "g3", "g4", "g5", "g6"]}
 
     def obj_constructor(self, *args, **kwargs):
@@ -275,7 +315,20 @@ class Group_Test(BaseObjTestClass, unittest.TestCase):
                   "name_by_lang": [libcomps.Dict],
                   "desc_by_lang": [libcomps.Dict]
                   }
-    obj_dict_members = ["name_by_lang", "desc_by_lang"]
+    obj_dict_members = {"name_by_lang":{"cs": "administrace",
+                                        "en": "administration",
+                                        "de": "Verwaltung",
+                                        "it": "Amministrazione",
+                                        "fr": "administration",
+                                        "fi": "hallinto",
+                                        "no": "administrasjon"},
+                        "desc_by_lang":{"cs": "administrace systemu",
+                                        "en": "system administration",
+                                        "de": "Systemadministration",
+                                        "it": "amministrazione del sistema",
+                                        "fr": "administration système",
+                                        "fi": "-järjestelmä hallinto",
+                                        "no": "systemadministrasjon"}}
     obj_list_members = {"packages":[
                         libcomps.Package("oss", libcomps.PACKAGE_TYPE_DEFAULT),
                         libcomps.Package("alsa", libcomps.PACKAGE_TYPE_DEFAULT),
@@ -307,9 +360,22 @@ class Env_Test(BaseObjTestClass, unittest.TestCase):
                   "name_by_lang": [libcomps.Dict],
                   "desc_by_lang": [libcomps.Dict]
                   }
-    obj_dict_members = ["name_by_lang", "desc_by_lang"]
-    obj_list_members = {"group_ids":["g1", "g2", "g3", "g4", "g5", "g6"]}
-    obj_list_members = {"option_ids":["g1", "g2", "g3", "g4", "g5", "g6"]}
+    obj_dict_members = {"name_by_lang":{"cs": "administrace",
+                                        "en": "administration",
+                                        "de": "Verwaltung",
+                                        "it": "Amministrazione",
+                                        "fr": "administration",
+                                        "fi": "hallinto",
+                                        "no": "administrasjon"},
+                        "desc_by_lang":{"cs": "administrace systemu",
+                                        "en": "system administration",
+                                        "de": "Systemadministration",
+                                        "it": "amministrazione del sistema",
+                                        "fr": "administration système",
+                                        "fi": "-järjestelmä hallinto",
+                                        "no": "systemadministrasjon"}}
+    obj_list_members = {"group_ids":["g1", "g2", "g3", "g4", "g5", "g6"],
+                        "option_ids":["g1", "g2", "g3", "g4", "g5", "g6"]}
 
     def obj_constructor(self, *args, **kwargs):
         return libcomps.Environment(*args, **kwargs)

@@ -58,6 +58,9 @@ COMPS_HSList * comps_rtree_values(COMPS_RTree *rt);
 COMPS_HSList* comps_rtree_keys(COMPS_RTree * rt);
 COMPS_HSList* comps_rtree_pairs(COMPS_RTree * rt);
 COMPS_RTree * comps_rtree_clone(COMPS_RTree * rt);
+COMPS_RTree* comps_rtree_union(COMPS_RTree *rt1, COMPS_RTree *rt2);
+void comps_rtree_unite(COMPS_RTree *rt1, COMPS_RTree *rt2);
+COMPS_RTree* comps_rtree_union(COMPS_RTree *rt1, COMPS_RTree *rt2);
 
 COMPS_RTreePair * comps_rtree_pair_create(char * key, void * data,
                                           void (*data_destructor(void*)));
