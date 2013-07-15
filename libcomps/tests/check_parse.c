@@ -191,16 +191,22 @@ START_TEST(test_comps_parse2)
     int ret, i;
 
     COMPS_List * tmplist;
-    COMPS_LoggerEntry* known_errors[5];
-    known_errors[0] = comps_log_entry_create("packagelist", 0,
-                                             COMPS_ERR_LIST_EMPTY, 270, 4, 0);
+    COMPS_LoggerEntry* known_errors[8];
+    known_errors[0] = comps_log_entry_create("description", 0,
+                                             COMPS_ERR_NOCONTENT, 265, 18, 0);
     known_errors[1] = comps_log_entry_create("packagelist", 0,
-                                             COMPS_ERR_LIST_EMPTY, 320, 4, 0);
+                                             COMPS_ERR_LIST_EMPTY, 270, 4, 0);
     known_errors[2] = comps_log_entry_create("packagelist", 0,
+                                             COMPS_ERR_LIST_EMPTY, 320, 4, 0);
+    known_errors[3] = comps_log_entry_create("description", 0,
+                                             COMPS_ERR_NOCONTENT, 379, 18, 0);
+    known_errors[4] = comps_log_entry_create("packagelist", 0,
                                              COMPS_ERR_LIST_EMPTY, 384, 4, 0);
-    known_errors[3] = comps_log_entry_create("packagelist", 0,
+    known_errors[5] = comps_log_entry_create("description", 0,
+                                             COMPS_ERR_NOCONTENT, 440, 18, 0);
+    known_errors[6] = comps_log_entry_create("packagelist", 0,
                                              COMPS_ERR_LIST_EMPTY, 445, 4, 0);
-    known_errors[4] = comps_log_entry_create("optionlist", 0,
+    known_errors[7] = comps_log_entry_create("optionlist", 0,
                                              COMPS_ERR_ELEM_REQUIRED, 1201, 2, 0);
 
     parsed = comps_parse_parsed_create();
@@ -209,11 +215,11 @@ START_TEST(test_comps_parse2)
     comps_parse_file(parsed, fp);
 
     fail_if(parsed->log->logger_data->len == 0);
-    i = check_errors(parsed->log, known_errors, 5);
+    i = check_errors(parsed->log, known_errors, 8);
 
-    fail_if(i != 5);
+    fail_if(i != 8);
     comps_parse_parsed_destroy(parsed);
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < 8; i++) {
         comps_log_entry_destroy(known_errors[i]);
     }
 }
@@ -371,8 +377,10 @@ START_TEST(test_comps_fedora_parse)
     //char *err_str;
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
-    fp = fopen("fedorax.xml", "r");
+    fp = fopen("fedora_comps.xml", "r");
     comps_parse_file(parsed, fp);
+    printf("log len:%d\n", parsed->log->logger_data->len);
+    fail_if(parsed->fatal_error != 0, "Some fatal errors found after parsing");
     printf("log len:%d\n", parsed->log->logger_data->len);
     //err_str = comps_log_str(parsed->log);
     //printf("parsed err log: %s", err_str);
@@ -395,11 +403,11 @@ Suite* basic_suite (void)
     Suite *s = suite_create ("Basic Tests");
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
-    //tcase_add_test (tc_core, test_comps_parse1);
-    //tcase_add_test (tc_core, test_comps_parse2);
-    //tcase_add_test (tc_core, test_comps_parse3);
-    //tcase_add_test (tc_core, test_comps_parse4);
-    //tcase_add_test (tc_core, test_comps_parse5);
+    tcase_add_test (tc_core, test_comps_parse1);
+    tcase_add_test (tc_core, test_comps_parse2);
+    tcase_add_test (tc_core, test_comps_parse3);
+    tcase_add_test (tc_core, test_comps_parse4);
+    tcase_add_test (tc_core, test_comps_parse5);
     tcase_add_test (tc_core, test_comps_fedora_parse);
     suite_add_tcase (s, tc_core);
 

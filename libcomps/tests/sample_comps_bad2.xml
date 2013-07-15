@@ -264,7 +264,7 @@
     <name xml:lang="zh_CN">南非荷兰语支持</name>
     <name xml:lang="zh_TW">南非荷蘭文支援</name>
     <name xml:lang="zu">Ukuxhasa KwesiBhunu</name>
-    <description/>
+    <description>-</description>
     <default>false</default>
     <uservisible>true</uservisible>
     <langonly>af</langonly>
@@ -316,7 +316,7 @@
     <name xml:lang="uk">Підтримка аканської мови</name>
     <name xml:lang="zh_CN">库阿语支持</name>
     <name xml:lang="zh_TW">迦納文支援</name>
-    <description/>
+    <description>-</description>
     <default>false</default>
     <uservisible>true</uservisible>
     <langonly>ak</langonly>
@@ -381,7 +381,7 @@
     <name xml:lang="uk">Підтримка албанської</name>
     <name xml:lang="zh_CN">阿尔巴尼亚语支持</name>
     <name xml:lang="zh_TW">阿爾巴尼亞文支援</name>
-    <description/>
+    <description>-</description>
     <default>false</default>
     <uservisible>true</uservisible>
     <langonly>sq</langonly>
@@ -443,7 +443,7 @@
     <name xml:lang="uk">Підтримка берберської мови</name>
     <name xml:lang="zh_CN">阿马齐格语支持</name>
     <name xml:lang="zh_TW">阿馬茲格文支援</name>
-    <description/>
+    <description>-</description>
     <default>false</default>
     <uservisible>true</uservisible>
     <langonly>ber</langonly>
