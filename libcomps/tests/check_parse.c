@@ -379,13 +379,13 @@ START_TEST(test_comps_fedora_parse)
     comps_parse_parsed_init(parsed, "UTF-8", 0);
     fp = fopen("fedora_comps.xml", "r");
     comps_parse_file(parsed, fp);
-    printf("log len:%d\n", parsed->log->logger_data->len);
+    //printf("log len:%d\n", parsed->log->logger_data->len);
     fail_if(parsed->fatal_error != 0, "Some fatal errors found after parsing");
-    printf("log len:%d\n", parsed->log->logger_data->len);
+    //printf("log len:%d\n", parsed->log->logger_data->len);
     //err_str = comps_log_str(parsed->log);
     //printf("parsed err log: %s", err_str);
     //free(err_str);
-    printf("fedora comps groups:%d\n", comps_doc_groups(parsed->comps_doc)->len);
+    //printf("fedora comps groups:%d\n", comps_doc_groups(parsed->comps_doc)->len);
     //printf("fedora comps categories:%d\n", comps_doc_categories(parsed->comps_doc)->len);
 
     //print_all_str(((COMPS_DocGroup*)comps_doc_groups(parsed->comps_doc)

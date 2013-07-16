@@ -607,6 +607,8 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             parsed->tmp_buffer = NULL;
         break;
         case COMPS_ELEM_DISPLAYORDER:
+            prop = NULL;
+            dict = NULL;
             if (parent == COMPS_ELEM_CATEGORY) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
                 prop = comps_dict_get(list_last_cat->properties, "display_order");
@@ -623,11 +625,12 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             if (prop) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
-            } else {
+            } else if (dict) {
                 prop = comps_doc_prop_num_create(0);
                 comps_dict_set(dict, "display_order", prop);
             }
-            sscanf(parsed->tmp_buffer, "%d", &prop->prop.num);
+            if (prop)
+                sscanf(parsed->tmp_buffer, "%d", &prop->prop.num);
 
             free(parsed->tmp_buffer);
             parsed->tmp_buffer = NULL;

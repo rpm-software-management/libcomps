@@ -734,7 +734,7 @@ class COMPSTest(unittest.TestCase):
         comps = libcomps.Comps()
         errors = comps.fromxml_f('main_comps.xml')
         g = comps.groups[0]
-        print(g.desc_by_lang['cs'])
+        #print(g.desc_by_lang['cs'])
 
         comps = libcomps.Comps()
         errors = comps.fromxml_f('main_comps.xml')

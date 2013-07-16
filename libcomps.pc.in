@@ -1,0 +1,10 @@
+prefix=/usr/local
+includedir=${prefix}/include
+libdir=${prefix}/lib@LIB_SUFFIX@
+
+Name: libcomps
+Description: alternative for yum.libcomps written in C
+Version: @VERSION@
+Requires: -L${libdir} -lcomps
+Reuires.private: -lxml2 -lexpat
+CFlags: -I${includedir}

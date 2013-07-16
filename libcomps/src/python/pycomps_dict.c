@@ -275,9 +275,9 @@ PyMethodDef PyCOMPSDict_methods[] = {
      "alias for libcomps.Dict[key]"},
      {"has_key", (PyCFunction)PyCOMPSDict_has_key, METH_O,
      "alias for key in dict"},
-     {"iteritems", (getiterfunc)PyCOMPSDict_getiteritems, METH_NOARGS,
+     {"iteritems", (PyCFunction)PyCOMPSDict_getiteritems, METH_NOARGS,
      "return iterator returning (key, value) tuple"},
-     {"itervalues", (getiterfunc)PyCOMPSDict_getitervalues, METH_NOARGS,
+     {"itervalues", (PyCFunction)PyCOMPSDict_getitervalues, METH_NOARGS,
      "return iterator returning (key, value) tuple"},
     {NULL}  /* Sentinel */
 };

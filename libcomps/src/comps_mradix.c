@@ -506,7 +506,7 @@ void comps_mrtree_set_n(COMPS_MRTree *rt, char *key,
 
 COMPS_HSList * comps_mrtree_get(COMPS_MRTree * rt, const char * key) {
     COMPS_HSList * subnodes;
-    COMPS_HSListItem * it;
+    COMPS_HSListItem * it = NULL;
     COMPS_MRTreeData * rtdata;
     unsigned int offset, len, x;
     char found, ended;
@@ -538,12 +538,14 @@ COMPS_HSList * comps_mrtree_get(COMPS_MRTree * rt, const char * key) {
         else return NULL;
         subnodes = ((COMPS_MRTreeData*)it->data)->subnodes;
     }
-    return ((COMPS_MRTreeData*)it->data)->data;
+    if (it)
+        return ((COMPS_MRTreeData*)it->data)->data;
+    else return NULL;
 }
 
 COMPS_HSList ** comps_mrtree_getp(COMPS_MRTree * rt, const char * key) {
     COMPS_HSList * subnodes;
-    COMPS_HSListItem * it;
+    COMPS_HSListItem * it = NULL;
     COMPS_MRTreeData * rtdata;
     unsigned int offset, len, x;
     char found, ended;
@@ -575,7 +577,9 @@ COMPS_HSList ** comps_mrtree_getp(COMPS_MRTree * rt, const char * key) {
         else return NULL;
         subnodes = ((COMPS_MRTreeData*)it->data)->subnodes;
     }
-    return &((COMPS_MRTreeData*)it->data)->data;
+    if (it)
+        return &((COMPS_MRTreeData*)it->data)->data;
+    else return NULL;
 }
 
 void comps_mrtree_unset(COMPS_MRTree * rt, const char * key) {

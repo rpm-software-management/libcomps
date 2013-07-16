@@ -52,6 +52,6 @@ COMPS_HSList* comps_mdict_keys(COMPS_MDict *rt);
 COMPS_HSList* comps_dict_keys(COMPS_Dict *rt);
 COMPS_HSList* comps_dict_pairs(COMPS_Dict *rt);
 void comps_mdict_unite(COMPS_MDict *d1, COMPS_MDict *d2);
-COMPS_Dict* comps_rtree_union(COMPS_Dict *d1, COMPS_Dict *d2);
+COMPS_Dict* comps_dict_union(COMPS_Dict *d1, COMPS_Dict *d2);
 
 #endif
