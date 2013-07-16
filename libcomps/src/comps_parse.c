@@ -1,3 +1,22 @@
+/* libcomps - C alternative to yum.comps library
+ * Copyright (C) 2013 Jindrich Luza
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307 USA
+ */
+
 #include <stdio.h>
 #include <ctype.h>
 #include <signal.h>
@@ -621,7 +640,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
                 prop = comps_dict_get(list_last_group->properties, "display_order");
                 dict = list_last_group->properties;
-            } 
+            }
             if (prop) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);

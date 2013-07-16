@@ -84,6 +84,8 @@ libcomps bindings for python3
     make %{?_smp_mflags} docs
 %endif
 
+%check
+make test
 
 
 %install

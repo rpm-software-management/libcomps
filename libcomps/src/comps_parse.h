@@ -1,12 +1,29 @@
+/* libcomps - C alternative to yum.comps library
+ * Copyright (C) 2013 Jindrich Luza
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307 USA
+ */
+
 #ifndef COMPS_PARSE_H
 #define COMPS_PARSE_H
 #include <stdio.h>
 #include <signal.h>
 
-//#include "comps_dict.h"
 #include "comps_list.h"
 #include "comps.h"
-//#include "comps_dtd.h"
 #include "comps_types.h"
 #include "comps_logger.h"
 #include "comps_elem.h"
