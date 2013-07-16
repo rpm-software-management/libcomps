@@ -26,16 +26,10 @@ target_link_libraries(pycomps ${EXPAT_LIBRARIES})
 target_link_libraries(pycomps ${LIBXML2_LIBRARIES})
 target_link_libraries(pycomps ${PYTHON_LIBRARIES})
 
-#message(SEND_ERROR "cbin dir ${CMAKE_CURRENT_BINARY_DIR}")
-
 add_custom_target(pytest_run ALL COMMAND ./run_tests.sh
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
                    DEPENDS pycomps
                    COMMENT "Running python binding tests")
-
-#add_custom_command(TARGET test POST_BUILD COMMAND ./run_tests.sh
-#                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
-#                   COMMENT "Running python binding tests")
 
 INSTALL(FILES ${pycomps_SRCDIR}/__init__.py DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
 INSTALL(FILES ${pycomps_SRCDIR}/tests/__test.py DESTINATION
