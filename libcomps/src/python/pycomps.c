@@ -450,10 +450,10 @@ static PyObject* PyCOMPS_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     char *enc = NULL; /* ignored here */
     PyObject *c_caps = NULL;
     (void)kwds;
-
-    if (!PyArg_ParseTuple(args, "|sO!", &enc, &PyCapsule_Type, &c_caps))
+    if (!args && !kwds) {
+    } else if (!PyArg_ParseTuple(args, "|sO!", &enc, &PyCapsule_Type, &c_caps))
         return NULL;
-
+    
     self = (PyCOMPS*) type->tp_alloc(type, 0);
     if (self == NULL)
         return NULL;
@@ -483,8 +483,9 @@ static int PyCOMPS_init(PyCOMPS *self, PyObject *args, PyObject *kwds)
     char *enc = "UTF-8";
     PyObject *c_caps = NULL; /* ignored here */
     (void)kwds;
-
-    if (!PyArg_ParseTuple(args, "|sO!", &enc, &PyCapsule_Type, &c_caps))
+    if (!args && !kwds) {
+    }
+    else if (!PyArg_ParseTuple(args, "|sO!", &enc, &PyCapsule_Type, &c_caps))
         return -1;
     self->enc = PyBytes_FromString(enc);
     return 0;
@@ -507,9 +508,12 @@ static PyObject* PyCOMPS_union(PyObject *self, PyObject *other) {
         comps_doc_destroy(&un_comps);
         return NULL;
     }
-
-
-    PyObject *arglist = Py_BuildValue("OO", self_t->enc, c_caps);
+    PyObject *arglist = Py_BuildValue("sO", self_t->enc, c_caps);
+    if (!arglist) {
+        return NULL;
+    }
+    //res = PyCOMPS_new(&PyCOMPS_Type, NULL, NULL);
+    //PyCOMPS_init(res, NULL, NULL);
     res = (PyCOMPS*)PyObject_CallObject((PyObject*)&PyCOMPS_Type, arglist);
     Py_DECREF(arglist);
     Py_DECREF(c_caps);

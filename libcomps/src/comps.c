@@ -751,7 +751,7 @@ char comps_doc_cmp(COMPS_Doc *c1, COMPS_Doc *c2) {
         comps_set_add(set, it->data);
     }
     categories = comps_doc_categories(c2);
-    for (it = categories->first; it != NULL; it = it->next) {
+    for (it = categories?categories->first:NULL; it != NULL; it = it->next) {
         tmpcat = comps_set_data_at(set, it->data);
         if (!tmpcat || !comps_doccategory_cmp(tmpcat, it->data)) {
             printf("cat differ\n");

@@ -294,7 +294,7 @@ PyMethodDef PyCOMPSDict_methods[] = {
      "alias for libcomps.Dict[key]"},
      {"has_key", (PyCFunction)PyCOMPSDict_has_key, METH_O,
      "alias for key in dict"},
-     {"iteritems", (PyCFunction)PyCOMPSDict_getiteritems, METH_NOARGS,
+     {PYCOMPS_DICT_ITERITEMS, (PyCFunction)PyCOMPSDict_getiteritems, METH_NOARGS,
      "return iterator returning (key, value) tuple"},
      {"itervalues", (PyCFunction)PyCOMPSDict_getitervalues, METH_NOARGS,
      "return iterator returning (key, value) tuple"},
