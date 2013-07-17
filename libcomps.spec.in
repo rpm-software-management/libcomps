@@ -9,7 +9,7 @@
 Name:           libcomps
 Version:        @VERSION@
 Release:        1%{?dist}
-Summary:        Alternative for yum.comps writen in C
+Summary:        Alternative for yum.comps written in C
 
 Group:          Development/Libraries
 License:        GPLv2+
@@ -21,16 +21,25 @@ BuildRequires:  check-devel
 BuildRequires:  expat-devel
 BuildRequires:  cmake >= 2.7
 
-%description -n libcomps
+%description
 Alternative for yum.comps written in C
 
-%package -n libcomps-doc
-Summary:        libcomps bindings for python2
+
+%package doc
+Summary:        libcomps documentation files
 Group:          Development/Libraries
 BuildRequires:  doxygen
 
-%description -n libcomps-doc
+%description doc
 libcomps documentation package
+
+%package devel
+Summary:        libcomps development files
+Group:          Development/Libraries
+Requires:  %{name}%{?_isa} = %{version}-%{release}
+
+%description devel
+Libcomps development files
 
 
 %if %{with_python}
@@ -56,7 +65,7 @@ libcomps bindings for python3
 %endif
 
 
-%prep -n libcomps
+%prep
 %setup -qn %{name}-%{commit}
 %if %{with_python3}
     rm -rf py3
@@ -65,7 +74,7 @@ libcomps bindings for python3
     mv ../py3 ./
 %endif
 
-%build -n libcomps
+%build
 # order matters - py3 needs to be build first; why?
 %if %{with_python}
     %cmake -DPYTHON_DESIRED:STRING=2 libcomps/
@@ -84,6 +93,7 @@ libcomps bindings for python3
     make %{?_smp_mflags} docs
 %endif
 
+
 %check
 make test
 
@@ -97,10 +107,17 @@ make install DESTDIR=%{buildroot}
 popd
 %endif
 
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %files
 %doc README.md COPYING
-%{_libdir}/*
+%{_libdir}/libcomps.so.*
+%exclude %{_libdir}/python*
+
+%files devel
+%{_libdir}/libcomps.so
 %exclude %{_libdir}/python*
 %{_includedir}/*
 
