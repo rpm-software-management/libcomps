@@ -140,4 +140,4 @@ popd
 
 
 %changelog
-
+@CHANGELOG@
