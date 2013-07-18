@@ -19,4 +19,9 @@
 #  Boston, MA 02111-1307 USA
 #
 
-cmake -P build_prep.cmake
+if [ $# == "1" ]; then
+    TOP_COMMIT=$1
+else
+    TOP_COMMIT="HEAD"
+fi
+cmake -DTOP_COMMIT:str=$TOP_COMMIT -P build_prep.cmake
