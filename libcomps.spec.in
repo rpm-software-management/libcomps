@@ -27,6 +27,7 @@ Alternative for yum.comps written in C
 %package doc
 Summary:        Documentation files for libcomps library
 Group:          Development/Libraries
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 BuildRequires:  doxygen
 
 %description doc
@@ -115,7 +116,7 @@ popd
 %postun -p /sbin/ldconfig
 
 %files
-%doc README.md COPYING
+#%doc README.md COPYING
 %{_libdir}/libcomps.so.*
 %exclude %{_libdir}/python*
 
@@ -124,8 +125,8 @@ popd
 %exclude %{_libdir}/python*
 %{_includedir}/*
 
-%files -n libcomps-doc
-%doc docs/libcomps-doc/html
+%files doc
+%doc docs/libcomps-doc/html README.md COPYING
 
 %if %{with_python}
 %files -n python-libcomps

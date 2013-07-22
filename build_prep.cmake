@@ -52,7 +52,7 @@ MACRO(MAKE_TAG_LOGENTRY tag_log_entry tag last_tag)
     string(REGEX REPLACE "^[la-z]+(-)?" "" mtl_tag_fmt ${TAG})
     string(REPLACE "\n" "" mtl_tag_out ${tag_out})
 
-    set(tag_log_entry "* ${DATE} ${AUTHOR} - ${mtl_tag_fmt}\n${FMT_FINAL}")
+    set(tag_log_entry "* ${DATE} ${AUTHOR} ${mtl_tag_fmt}\n${FMT_FINAL}")
 ENDMACRO(MAKE_TAG_LOGENTRY)
 
 MACRO(MAKE_LOGENTRY log_entry commit)
