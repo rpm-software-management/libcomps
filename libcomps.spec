@@ -1,19 +1,19 @@
 %global with_python 1
 %global with_python3 1
 
-%global commit @GITREVLONG@
+%global commit 63f4affd2cfde6f251ccbb3bae9c35401288ea1d
 %global name libcomps
 
 
 Name:           libcomps
-Version:        @VERSION@
+Version:        0.1.2
 Release:        1%{?dist}
-Summary:        Comps XML file manipulation library
+Summary:        Comps.xml manipulation library
 
 Group:          Development/Libraries
 License:        GPLv2+
 URL:            https://github.com/midnightercz/libcomps/
-Source0:        https://github.com/midnightercz/libcomps/@SOURCE_URL_PATH@
+Source0:        https://github.com/midnightercz/libcomps/archive/63f4affd2cfde6f251ccbb3bae9c35401288ea1d/libcomps-63f4affd2cfde6f251ccbb3bae9c35401288ea1d.tar.gz
 BuildRequires:  libxml2-devel
 BuildRequires:  check-devel
 BuildRequires:  expat-devel
@@ -21,7 +21,7 @@ BuildRequires:  cmake >= 2.7
 
 %description
 Libcomps is library for structure-like manipulation with content of
-comps XML files.
+comps.xml files.
 
 %package doc
 Summary:        Documentation files for libcomps library
@@ -141,4 +141,35 @@ rm -rf $buildroot
 
 
 %changelog
-@CHANGELOG@
+* Tue Jul 30 2013 Jindrich Luza <jluza@redhat.com> 0.1.2.git63f4aff
+- spec fixed
+
+* Thu Jul 18 2013 Jindrich Luza <jluza@redhat.com> 0.1.2
+- automatic changelog system
+- fixed issue #14
+- libcomps.Dict is now behave more like python dict. Implemented iter(libcomps.Dict)
+- libcomps.iteritems() and libcomps.itervalues()
+- added <packagereq requires=...> support
+- remaked error reporting system.
+-     libcomps.Comps.fromxml_f and libcomps.Comps.fromxml_str now return
+-     -1, 0 or 1. 0 means parse procedure completed without any problem,
+-     1 means there's some errors or warnings but not fatal. -1 indicates
+-     fatal error problem (some results maybe given, but probably incomplete
+-     and invalid)
+- errors catched during parsing can be obtained by calling
+-     libcomps.Comps.get_last_parse_errors
+- all log is given by
+-     libcomps.Comps.get_last_parse_log
+- improved integrated tests
+- documentation is now isolated make target ('make docs')
+- prop system complete
+- fixed issue 1
+- fixed issue 3
+- new prop system in progress....
+- separated doc package
+- some minor fixes in CMakeFiles
+
+* Tue Jun 25 2013 Jindrich Luza <jluza@redhat.com> 0.1.1-1
+- Automatic commit of package [libcomps] release [0.1.1-1].
+
+
