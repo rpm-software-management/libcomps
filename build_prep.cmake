@@ -85,15 +85,12 @@ execute_process(COMMAND "git" rev-parse --tags
 string(REGEX REPLACE "\n$" "" tags ${tags})
 string(REPLACE "\n" ";" tags ${tags})
 
-execute_process(COMMAND "git" "rev-parse" ${TOP_COMMIT}
+execute_process(COMMAND "git" "rev-parse" "--verify" "${TOP_COMMIT}^{commit}"
                     OUTPUT_VARIABLE top_commit)
 string(REPLACE "\n" "" top_commit ${top_commit})
-message("top:${top_commit}")
-message("tags:${tags}")
 
 LIST_CONTAINS(contains ${top_commit} ${tags})
 if (NOT contains)
-    message("not contains")
     set(tags "${tags};${top_commit}")
 endif(NOT contains)
 
@@ -102,18 +99,39 @@ string(REPLACE "\n" "" last_tag ${last})
 
 foreach(tag ${tags})
     string(REPLACE "\n" "" tag_out ${tag})
-    MAKE_TAG_LOGENTRY(tag_log_entry ${tag_out} ${last_tag})
-    execute_process(COMMAND "git" "rev-list" ${tag_out}
+    execute_process(COMMAND "git" rev-parse --verify "${tag_out}^{commit}"
+                        OUTPUT_VARIABLE tag_commit)
+    string(REPLACE "\n" "" tag_commit ${tag_commit})
+
+    MAKE_TAG_LOGENTRY(tag_log_entry ${tag_commit} ${last_tag})
+    execute_process(COMMAND "git" "rev-list" "--all" ${tag_commit}
                         OUTPUT_VARIABLE commits)
+
+    string(REGEX REPLACE "\n$" "" commits ${commits})
     string(REPLACE "\n" ";" commits ${commits})
-    foreach(commit ${commits})
+    list(FIND commits ${tag_commit} index)
+    list(LENGTH commits commits_len)
+
+    math(EXPR clen "${commits_len}-1")
+
+    foreach(i RANGE ${index} ${clen})
+        list(GET commits ${i} commit)
         LIST_CONTAINS(contains1 ${commit} ${tags})
         LIST_CONTAINS(contains2 ${commit} ${changelog_commits})
-        if (NOT contains1 AND contains2)
+
+        #message("index:${i}")
+        #message("commit:${commit}")
+        #message("tag:${tag_out}")
+        #message("contains1:${contains1}")
+        #message("contains2:${contains2}")
+        if (contains1 AND NOT ${commit} STREQUAL ${tag_out})
+            break()
+        endif(contains1 AND NOT ${commit} STREQUAL ${tag_out})
+        if (contains2)
             MAKE_LOGENTRY(log_entry ${commit})
             set(tag_log_entry ${tag_log_entry}${log_entry})
-        endif(NOT contains1 AND contains2)
-    endforeach(commit ${commits})
+        endif(contains2)
+    endforeach(i RANGE ${index} ${commits_len})
 
     set(CHANGELOG "${tag_log_entry}\n${CHANGELOG}")
     set(last_tag ${tag_out})
