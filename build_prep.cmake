@@ -23,15 +23,15 @@ ENDMACRO(FORMAT_LOG_ENTRY)
 
 MACRO(MAKE_TAG_LOGENTRY tag_log_entry tag last_tag)
     exec_program("git" ARGS log ${tag} -n 1 --format="format:%ci%n"
-                        OUTPUT_VARIABLE date)
+                       OUTPUT_VARIABLE date)
     exec_program("date" ARGS -d"${date}" "\"+%a %b %d %Y\""
                         OUTPUT_VARIABLE DATE)
     exec_program("git" ARGS log ${tag} -n 1 --date=short
                             --format="format: %cn <%ce>%n"
-                        OUTPUT_VARIABLE AUTHOR)
+                       OUTPUT_VARIABLE AUTHOR)
     exec_program("git" ARGS log ${tag} -n 1 --date=short
                             --format="format:%B%n"
-                        OUTPUT_VARIABLE LOG)
+                       OUTPUT_VARIABLE LOG)
     FORMAT_LOG_ENTRY(FMT_FINAL ${LOG})
 
     string(REPLACE "\n" "" mtl_tag_stripped ${tag})
@@ -40,18 +40,14 @@ MACRO(MAKE_TAG_LOGENTRY tag_log_entry tag last_tag)
                         OUTPUT_VARIABLE describe_out ERROR_VARIABLE describe_err)
 
     if (NOT ${describe_err} STREQUAL "")
-        #message("notag ${describe_err} ${describe_out}")
         unset(describe_out)
         execute_process(COMMAND "git" describe --tags --exact-match ${mtl_lasttag_stripped}
                             OUTPUT_VARIABLE describe_out)
         execute_process(COMMAND "git" rev-parse --short ${mtl_tag_stripped}
                             OUTPUT_VARIABLE suffix)
-        set(describe_out "${describe_out}-${suffix}")
+        set(describe_out "${describe_out}.git${suffix}")
     endif(NOT ${describe_err} STREQUAL "")
     string(REPLACE "\n" "" TAG ${describe_out})
-
-    unset(describe_err)
-    unset(describe_out)
 
     string(REGEX REPLACE "^[la-z]+(-)?" "" mtl_tag_fmt ${TAG})
     string(REPLACE "\n" "" mtl_tag_out ${tag_out})
@@ -85,16 +81,19 @@ execute_process(COMMAND "git" rev-parse --tags
 string(REGEX REPLACE "\n$" "" tags ${tags})
 string(REPLACE "\n" ";" tags ${tags})
 
-execute_process(COMMAND "git" "rev-parse" ${TOP_COMMIT}
+execute_process(COMMAND "git" "rev-parse" "--verify" "${TOP_COMMIT}^{commit}"
                     OUTPUT_VARIABLE top_commit)
 string(REPLACE "\n" "" top_commit ${top_commit})
-message("top:${top_commit}")
-message("tags:${tags}")
 
 LIST_CONTAINS(contains ${top_commit} ${tags})
 if (NOT contains)
-    message("not contains")
     set(tags "${tags};${top_commit}")
+    set(SOURCE_URL_PATH "archive/${top_commit}/libcomps-${top_commit}.tar.gz")
+else (NOT contains)
+    execute_process(COMMAND "git" describe --tags --exact-match ${top_commit}
+                        OUTPUT_VARIABLE describe_out ERROR_VARIABLE describe_err)
+    string(REPLACE "\n" "" top_tag ${describe_out})
+    set(SOURCE_URL_PATH "${top_tag}.tag.gz")
 endif(NOT contains)
 
 list(GET tags 0 last)
@@ -102,18 +101,39 @@ string(REPLACE "\n" "" last_tag ${last})
 
 foreach(tag ${tags})
     string(REPLACE "\n" "" tag_out ${tag})
-    MAKE_TAG_LOGENTRY(tag_log_entry ${tag_out} ${last_tag})
-    execute_process(COMMAND "git" "rev-list" ${tag_out}
+    execute_process(COMMAND "git" rev-parse --verify "${tag_out}^{commit}"
+                        OUTPUT_VARIABLE tag_commit)
+    string(REPLACE "\n" "" tag_commit ${tag_commit})
+
+    MAKE_TAG_LOGENTRY(tag_log_entry ${tag_commit} ${last_tag})
+    execute_process(COMMAND "git" "rev-list" "--all" ${tag_commit}
                         OUTPUT_VARIABLE commits)
+
+    string(REGEX REPLACE "\n$" "" commits ${commits})
     string(REPLACE "\n" ";" commits ${commits})
-    foreach(commit ${commits})
+    list(FIND commits ${tag_commit} index)
+    list(LENGTH commits commits_len)
+
+    math(EXPR clen "${commits_len}-1")
+
+    foreach(i RANGE ${index} ${clen})
+        list(GET commits ${i} commit)
         LIST_CONTAINS(contains1 ${commit} ${tags})
         LIST_CONTAINS(contains2 ${commit} ${changelog_commits})
-        if (NOT contains1 AND contains2)
+
+        #message("index:${i}")
+        #message("commit:${commit}")
+        #message("tag:${tag_out}")
+        #message("contains1:${contains1}")
+        #message("contains2:${contains2}")
+        if (contains1 AND NOT ${commit} STREQUAL ${tag_out})
+            break()
+        endif(contains1 AND NOT ${commit} STREQUAL ${tag_out})
+        if (contains2)
             MAKE_LOGENTRY(log_entry ${commit})
             set(tag_log_entry ${tag_log_entry}${log_entry})
-        endif(NOT contains1 AND contains2)
-    endforeach(commit ${commits})
+        endif(contains2)
+    endforeach(i RANGE ${index} ${commits_len})
 
     set(CHANGELOG "${tag_log_entry}\n${CHANGELOG}")
     set(last_tag ${tag_out})

@@ -55,6 +55,7 @@ add_custom_target(test_comps_run ALL COMMAND ./test_comps
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS test_comps
                    COMMENT "Running comps test")
+
 add_custom_target(test_parse_run ALL COMMAND ./test_parse
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS test_parse

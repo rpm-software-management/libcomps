@@ -2,7 +2,7 @@
 %global with_python3 1
 
 %global commit @GITREVLONG@
-%global shortcommit @GITREV@
+#%global shortcommit @GITREV@
 %global name libcomps
 
 
@@ -14,8 +14,7 @@ Summary:        Alternative for yum.comps written in C
 Group:          Development/Libraries
 License:        GPLv2+
 URL:            https://github.com/midnightercz/libcomps/
-Source0:        https://github.com/midnightercz/libcomps/archive/%{commit}/libcomps-%{commit}.tar.gz
-
+Source0:        https://github.com/midnightercz/libcomps/@SOURCE_URL_PATH@
 BuildRequires:  libxml2-devel
 BuildRequires:  check-devel
 BuildRequires:  expat-devel
@@ -26,42 +25,44 @@ Alternative for yum.comps written in C
 
 
 %package doc
-Summary:        libcomps documentation files
+Summary:        Documentation files for libcomps library
 Group:          Development/Libraries
 BuildRequires:  doxygen
 
 %description doc
-libcomps documentation package
+Documentation files for libcomps library
 
 %package devel
-Summary:        libcomps development files
+Summary:        Development files for libcomps library
 Group:          Development/Libraries
-Requires:  %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
-Libcomps development files
+Development files for libcomps library
 
 
 %if %{with_python}
 %package -n python-libcomps
-Summary:        libcomps bindings for python2
+Summary:        Python2 bindings for libcomps library
 Group:          Development/Libraries
 BuildRequires:  python-devel
 Requires:       python2
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python-libcomps
-libcomps bindings for python2
+Python2 bindings for libcomps library
 %endif
 
 %if %{with_python3}
 %package -n python3-libcomps
-Summary:        libcomps bindings for python3
+Summary:        Python3 bindings for libcomps library
 Group:          Development/Libraries
 BuildRequires:  python3-devel
 Requires:       python3
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-libcomps
-libcomps bindings for python3
+Python3 bindings for libcomps library
 %endif
 
 
@@ -94,9 +95,11 @@ libcomps bindings for python3
 %endif
 
 
-%check
-make test
-
+%check devel
+    make ctest
+%if %{with_python}
+    make pytest
+%endif
 
 %install
 rm -rf $buildroot

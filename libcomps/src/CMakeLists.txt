@@ -7,7 +7,7 @@ set (libcomps_HEADERS comps.h comps_list.h comps_hslist.h comps_dict.h
      comps_doc_types.h)
 
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/libcomps_config.h.in"
-                "${PROJECT_SOURCE_DIR}/libcomps_config.h")
+                "${PROJECT_SOURCE_DIR}/src/libcomps/libcomps_config.h")
 
 include_directories(${LIBXML2_INCLUDE_DIR})
 file(GLOB files "${PROJECT_SOURCE_DIR}/src/*.h")
@@ -28,6 +28,7 @@ IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
     SET (LIB_SUFFIX "64")
 ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
 set (LIB_INST_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
+
 
 install (FILES ${libcomps_HEADERS} DESTINATION include/libcomps)
 install (TARGETS libcomps LIBRARY DESTINATION ${LIB_INST_DIR})
