@@ -21,7 +21,7 @@ BuildRequires:  cmake >= 2.7
 
 %description
 Libcomps is library for structure-like manipulation with content of
-comps XML files.
+comps XML files. Supports read/write xml file, structure(s) modification.
 
 %package doc
 Summary:        Documentation files for libcomps library
