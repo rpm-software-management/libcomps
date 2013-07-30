@@ -1,19 +1,19 @@
 %global with_python 1
 %global with_python3 1
 
-%global commit 63f4affd2cfde6f251ccbb3bae9c35401288ea1d
+%global commit 3af5bea29a169726a61a2d9ef1377669adae6ee3
 %global name libcomps
 
 
 Name:           libcomps
 Version:        0.1.2
 Release:        1%{?dist}
-Summary:        Comps.xml manipulation library
+Summary:        Comps XML file manipulation library
 
 Group:          Development/Libraries
 License:        GPLv2+
 URL:            https://github.com/midnightercz/libcomps/
-Source0:        https://github.com/midnightercz/libcomps/archive/63f4affd2cfde6f251ccbb3bae9c35401288ea1d/libcomps-63f4affd2cfde6f251ccbb3bae9c35401288ea1d.tar.gz
+Source0:        https://github.com/midnightercz/libcomps/archive/3af5bea29a169726a61a2d9ef1377669adae6ee3/libcomps-3af5bea29a169726a61a2d9ef1377669adae6ee3.tar.gz
 BuildRequires:  libxml2-devel
 BuildRequires:  check-devel
 BuildRequires:  expat-devel
@@ -21,7 +21,7 @@ BuildRequires:  cmake >= 2.7
 
 %description
 Libcomps is library for structure-like manipulation with content of
-comps.xml files.
+comps XML files.
 
 %package doc
 Summary:        Documentation files for libcomps library
@@ -141,7 +141,7 @@ rm -rf $buildroot
 
 
 %changelog
-* Tue Jul 30 2013 Jindrich Luza <jluza@redhat.com> 0.1.2.git63f4aff
+* Tue Jul 30 2013 Jindrich Luza <jluza@redhat.com> 0.1.2.git3af5bea
 - spec fixed
 
 * Thu Jul 18 2013 Jindrich Luza <jluza@redhat.com> 0.1.2

@@ -117,6 +117,10 @@ rm -rf $buildroot
 %postun -p /sbin/ldconfig
 
 %files
+<<<<<<< HEAD
+=======
+#%doc README.md COPYING
+>>>>>>> 75e5d29eebeaf727395e4657c5c13a285cf009e1
 %{_libdir}/libcomps.so.*
 %doc README.md COPYING
 
@@ -125,7 +129,11 @@ rm -rf $buildroot
 %{_includedir}/*
 
 %files doc
+<<<<<<< HEAD
 %doc docs/libcomps-doc/html
+=======
+%doc docs/libcomps-doc/html README.md COPYING
+>>>>>>> 75e5d29eebeaf727395e4657c5c13a285cf009e1
 
 %if %{with_python}
 %files -n python-libcomps
