@@ -1,6 +1,3 @@
-%global with_python 1
-%global with_python3 1
-
 %global commit @GITREVLONG@
 %global name libcomps
 
@@ -21,7 +18,7 @@ BuildRequires:  cmake >= 2.7
 
 %description
 Libcomps is library for structure-like manipulation with content of
-comps XML files. Supports read/write xml file, structure(s) modification.
+comps XML files. Supports read/write XML file, structure(s) modification.
 
 %package doc
 Summary:        Documentation files for libcomps library
@@ -40,8 +37,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description devel
 Development files for libcomps library
 
-
-%if %{with_python}
 %package -n python-libcomps
 Summary:        Python2 bindings for libcomps library
 Group:          Development/Libraries
@@ -51,9 +46,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python-libcomps
 Python2 bindings for libcomps library
-%endif
 
-%if %{with_python3}
 %package -n python3-libcomps
 Summary:        Python3 bindings for libcomps library
 Group:          Development/Libraries
@@ -63,51 +56,36 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-libcomps
 Python3 bindings for libcomps library
-%endif
 
 
 %prep
 %setup -qn %{name}-%{commit}
-%if %{with_python3}
-    rm -rf py3
-    mkdir ../py3
-    cp -a . ../py3/
-    mv ../py3 ./
-%endif
+
+rm -rf py3
+mkdir ../py3
+cp -a . ../py3/
+mv ../py3 ./
 
 %build
-# order matters - py3 needs to be build first; why?
-%if %{with_python}
-    %cmake -DPYTHON_DESIRED:STRING=2 libcomps/
-    make %{?_smp_mflags}
-    make %{?_smp_mflags} docs
-%endif
-%if %{with_python3}
-    pushd py3
-    %cmake -DPYTHON_DESIRED:STRING=3 libcomps/
-    make %{?_smp_mflags}
-    make %{?_smp_mflags} docs
-    popd
-%else
-    %cmake -DPYTHON_DESIRED:STRING=NO libcomps/
-    make %{?_smp_mflags}
-    make %{?_smp_mflags} docs
-%endif
+%cmake -DPYTHON_DESIRED:STRING=2 libcomps/
+make %{?_smp_mflags}
+make %{?_smp_mflags} docs
+
+pushd py3
+%cmake -DPYTHON_DESIRED:STRING=3 libcomps/
+make %{?_smp_mflags}
+make %{?_smp_mflags} docs
+popd
 
 
 %check devel
-    make ctest
-%if %{with_python}
-    make pytest
-%endif
+    make test
 
 %install
 make install DESTDIR=%{buildroot}
-%if %{with_python3}
 pushd py3
 make install DESTDIR=%{buildroot}
 popd
-%endif
 
 %clean
 rm -rf $buildroot
@@ -127,17 +105,13 @@ rm -rf $buildroot
 %files doc
 %doc docs/libcomps-doc/html
 
-%if %{with_python}
 %files -n python-libcomps
 %{_libdir}/python2*
 %exclude %{_libdir}/python2/libcomps/__pycache__
-%endif
 
-%if %{with_python3}
 %files -n python3-libcomps
 %{_libdir}/python3*
 %exclude %{_libdir}/python3/libcomps/__pycache__
-%endif
 
 
 %changelog
