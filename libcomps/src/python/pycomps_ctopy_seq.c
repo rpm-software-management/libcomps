@@ -158,7 +158,8 @@ PyObject *PyCOMPSCtoPySeq_get(PyObject *self, PyObject *key) {
     PyCOMPS_CtoPySeq *result;
     COMPS_ListItem *newit, *it;
     int i;
-    unsigned int n, uret, clen;
+    unsigned int n, uret;
+    Py_ssize_t clen;
     Py_ssize_t istart, istop, istep, ilen;
     PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
 
@@ -201,9 +202,8 @@ PyObject *PyCOMPSCtoPySeq_get(PyObject *self, PyObject *key) {
 
 int PyCOMPSCtoPySeq_set(PyObject *self, PyObject *key, PyObject *val) {
     COMPS_ListItem *it, *it2, *newit;
-    int i;
-    unsigned int n, c, uret, clen;
-    Py_ssize_t istart, istop, istep, ilen;
+    unsigned int n, uret;
+    Py_ssize_t istart, istop, istep, ilen, i, c, clen;
     PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
 
     if (PySlice_Check(key)) {

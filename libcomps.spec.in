@@ -1,10 +1,8 @@
 %global commit @GITREVLONG@
-%global name libcomps
-
 
 Name:           libcomps
 Version:        @VERSION@
-Release:        1%{?dist}
+Release:        @libcomps_RELEASE@%{?dist}
 Summary:        Comps XML file manipulation library
 
 Group:          Development/Libraries
@@ -14,7 +12,7 @@ Source0:        https://github.com/midnightercz/libcomps/@SOURCE_URL_PATH@
 BuildRequires:  libxml2-devel
 BuildRequires:  check-devel
 BuildRequires:  expat-devel
-BuildRequires:  cmake >= 2.7
+BuildRequires:  cmake
 
 %description
 Libcomps is library for structure-like manipulation with content of
@@ -24,6 +22,7 @@ comps XML files. Supports read/write XML file, structure(s) modification.
 Summary:        Documentation files for libcomps library
 Group:          Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+BuildArch:      noarch
 BuildRequires:  doxygen
 
 %description doc
@@ -41,7 +40,6 @@ Development files for libcomps library
 Summary:        Python2 bindings for libcomps library
 Group:          Development/Libraries
 BuildRequires:  python-devel
-Requires:       python2
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python-libcomps
@@ -51,7 +49,6 @@ Python2 bindings for libcomps library
 Summary:        Python3 bindings for libcomps library
 Group:          Development/Libraries
 BuildRequires:  python3-devel
-Requires:       python3
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-libcomps

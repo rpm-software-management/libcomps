@@ -76,7 +76,7 @@ inline PyObject* __pycomps_arg_to_unicode2(PyObject *o) {
     return tmp;
 }
 
-inline char __pycomps_PyUnicode_AsString(PyObject *val, char **ret) {
+inline signed char __pycomps_PyUnicode_AsString(PyObject *val, char **ret) {
     PyObject *o;
     char *tmp;
 
@@ -104,7 +104,7 @@ inline char __pycomps_PyUnicode_AsString(PyObject *val, char **ret) {
     return 0;
 }
 
-inline char __pycomps_stringable_to_char(PyObject *value, char ** ret) {
+inline signed char __pycomps_stringable_to_char(PyObject *value, char ** ret) {
     PyObject *tmpo;
     int retval;
 
@@ -122,7 +122,7 @@ inline PyObject *str_to_unicode(void* str) {
     return PyUnicode_FromString((const char*) str);
 }
 
-inline char __pycomps_arg_to_char(PyObject *value, char ** ret) {
+inline signed char __pycomps_arg_to_char(PyObject *value, char ** ret) {
     PyObject *tmpo;
     int retval;
 

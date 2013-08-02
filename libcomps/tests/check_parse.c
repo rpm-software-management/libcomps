@@ -88,8 +88,8 @@ START_TEST(test_comps_parse1)
         tmp_prop = comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "name");
         tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
 
-        COMPS_HSList *keys;
-        COMPS_HSListItem *hsit;
+        //COMPS_HSList *keys;
+        //COMPS_HSListItem *hsit;
 
         /*keys = comps_rtree_pairs(((COMPS_DocGroup*)it->data)->properties);
         for (hsit = keys->first; hsit != NULL; hsit = hsit->next) {
@@ -204,12 +204,12 @@ int check_errors(COMPS_Logger *log, COMPS_LoggerEntry ** known_errors,
 START_TEST(test_comps_parse2)
 {
     FILE *fp;
-    char *err_log;
+    //char *err_log;
     COMPS_Parsed *parsed;
-    COMPS_ListItem *it;
-    int ret, i;
+    //COMPS_ListItem *it;
+    int i;
 
-    COMPS_List * tmplist;
+    //COMPS_List * tmplist;
     COMPS_LoggerEntry* known_errors[8];
     known_errors[0] = comps_log_entry_create("description", 0,
                                              COMPS_ERR_NOCONTENT, 265, 18, 0);
@@ -247,14 +247,17 @@ END_TEST
 START_TEST(test_comps_parse3)
 {
     FILE *fp;
-    char *err_log, *tmp_ch;
+    //char *err_log,
+    char *tmp_ch;
     COMPS_Parsed *parsed;
     COMPS_ListItem *it;
-    int ret, i;
-    COMPS_List *pairlist, *tmplist;
+    //int ret,
+    int i;
+    //COMPS_List *pairlist;
+    COMPS_List *tmplist;
     COMPS_LoggerEntry* known_errors[3];
     COMPS_Prop *tmp_prop;
-    COMPS_HSListItem *hsit;
+    //COMPS_HSListItem *hsit;
 
     known_errors[0] = comps_log_entry_create("id", 0,
                                              COMPS_ERR_ELEM_REQUIRED, 188, 2, 0);
@@ -302,11 +305,12 @@ END_TEST
 START_TEST(test_comps_parse4)
 {
     FILE *fp;
-    char *err_log;
+    //char *err_log;
     COMPS_Parsed *parsed;
-    COMPS_ListItem *it;
-    int ret, i;
-    COMPS_List * tmplist;
+    //COMPS_ListItem *it;
+    //int ret,
+    int i;
+    //COMPS_List * tmplist;
     COMPS_LoggerEntry* known_errors[15];
 
     known_errors[0] = comps_log_entry_create("id", 0,
@@ -358,11 +362,12 @@ END_TEST
 START_TEST(test_comps_parse5)
 {
     FILE *fp;
-    char *err_log;
+    //char *err_log;
     COMPS_Parsed *parsed;
-    COMPS_ListItem *it;
-    int ret, i;
-    COMPS_List * tmplist;
+    //COMPS_ListItem *it;
+    //int ret
+    int i;
+    //COMPS_List * tmplist;
     COMPS_LoggerEntry* known_errors[2];
 
     known_errors[0] = comps_log_entry_create("some stray", 0,
@@ -388,11 +393,11 @@ END_TEST
 START_TEST(test_comps_fedora_parse)
 {
     COMPS_Parsed *parsed;
-    COMPS_HSList *list;
+    //COMPS_HSList *list;
     
     //COMPS_ListItem *it;
     FILE *fp;
-    char *tmp;
+    //char *tmp;
     //char *err_str;
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 0);

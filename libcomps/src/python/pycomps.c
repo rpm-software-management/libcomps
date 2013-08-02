@@ -206,7 +206,8 @@ void pycomps_ctopy_comps_init(PyObject *self) {
 PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
     FILE *f;
     COMPS_Parsed *parsed;
-    char *fname, parsed_ret;
+    char *fname;
+    signed char parsed_ret;
     PyCOMPS *self_comps = (PyCOMPS*)self;
 
     if (__pycomps_arg_to_char(other, &fname)) return NULL;
@@ -284,7 +285,8 @@ PyObject* PyCOMPS_get_last_log(PyObject *self, void *closure)
 }
 
 PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
-    char *tmps, parsed_ret;
+    char *tmps;
+    signed char parsed_ret;
     PyCOMPS *self_comps = (PyCOMPS*)self;
 
     if (__pycomps_arg_to_char(other, &tmps)) return NULL;

@@ -158,11 +158,13 @@ class BaseObjTestClass(object):
                 inspect.isgetsetdescriptor(x[1]) or\
                inspect.ismemberdescriptor(x[1])) and not x[0].startswith("__"):
                 data_desc.append(x)
+        print(data_desc)
         for attr in data_desc:
             z = getattr(obj, x[0])
             attr_types = self.obj_getset[attr[0]]
             for _type, vals in _iteritems(self.obj_types):
                 if _type not in attr_types:
+                    print (attr[0], vals[0])
                     with self.assertRaises(TypeError):
                         setattr(obj, attr[0], vals[0])
                 else:
@@ -684,7 +686,8 @@ class COMPSTest(unittest.TestCase):
         comps3 = libcomps.Comps()
         ret = comps3.fromxml_str(compsdoc)
         #print comps3.get_last_parse_log()
-        self.assertTrue(ret ==  -1, comps3.get_last_parse_errors())
+        self.assertTrue(ret ==  -1, "%d %s" %(ret,
+                                              comps3.get_last_parse_errors()))
         self.assertTrue(len(comps3.groups) == 3)
         self.assertTrue(len(comps3.categories) == 2)
         self.assertTrue(len(comps3.environments) == 0)

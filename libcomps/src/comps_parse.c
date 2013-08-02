@@ -107,7 +107,7 @@ void empty_xmlGenericErrorFunc(void * ctx, const char * msg, ...) {
     (void) msg;
 }
 
-char comps_parse_validate_dtd(char *filename, char *dtd_file) {
+int comps_parse_validate_dtd(char *filename, char *dtd_file) {
     xmlDocPtr fptr;
     xmlDtdPtr dtd_ptr;
     xmlValidCtxtPtr vctxt;
@@ -133,8 +133,10 @@ char comps_parse_validate_dtd(char *filename, char *dtd_file) {
         return -3;
     }
     ret = xmlValidateDtd(vctxt, fptr, dtd_ptr);
-    if (!ret)
+    if (!ret) {
         err = xmlGetLastError();
+        printf("%s\n", err->message);
+    }
     xmlFreeDoc(fptr);
     xmlFreeDtd(dtd_ptr);
     xmlFreeValidCtxt(vctxt);
@@ -144,7 +146,7 @@ char comps_parse_validate_dtd(char *filename, char *dtd_file) {
         return ret;
 }
 
-char comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
+signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
     void *buff;
     int bytes_read;
 
@@ -183,7 +185,7 @@ char comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
         return -1;
 }
 
-char comps_parse_str(COMPS_Parsed *parsed, char *str) {
+signed char comps_parse_str(COMPS_Parsed *parsed, char *str) {
     if (!XML_Parse(parsed->parser, str, strlen(str), 1)) {
         comps_log_error(parsed->log,
                         XML_ErrorString(XML_GetErrorCode(parsed->parser)),

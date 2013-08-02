@@ -144,8 +144,8 @@ PyObject *PyCOMPSSeq_get(PyObject *self, PyObject *key) {
     PyCOMPS_Sequence *result;
     COMPS_ListItem *newit, *it;
     int i;
-    unsigned int n, uret, clen;
-    Py_ssize_t istart, istop, istep, ilen;
+    unsigned int n, uret;
+    Py_ssize_t istart, istop, istep, ilen, clen;
 
     if (PySlice_Check(key)) {
         n = get_list(self)->len;
@@ -183,9 +183,9 @@ PyObject *PyCOMPSSeq_get(PyObject *self, PyObject *key) {
 
 int PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val) {
     COMPS_ListItem *it, *it2, *newit;
-    int i;
-    unsigned int n, c, uret, clen;
-    Py_ssize_t istart, istop, istep, ilen;
+
+    unsigned int n, uret;
+    Py_ssize_t istart, istop, istep, ilen, i, c, clen;
 
     if (PySlice_Check(key)) {
         n = get_list(self)->len;
@@ -362,17 +362,11 @@ PyObject* PyCOMPSSeq_str(PyObject *self) {
     else if (get_list(self)->first != NULL) {
         for (it = get_list(self)->first;
              it != NULL; it = it->next) {
-            if PyUnicode_Check(it->data) {
-                tmp = ret;
-                ret = PyUnicode_Concat(ret, (PyObject*)it->data);
-                Py_XDECREF(tmp);
-            } else {
-                tmp2 = Py_TYPE(((PyObject*)it->data))->tp_str((PyObject*)it->data);
-                tmp = ret;
-                ret = PyUnicode_Concat(ret, tmp2);
-                Py_XDECREF(tmp);
-                Py_XDECREF(tmp2);
-            }
+            tmp = ret;
+            tmp2 = ((PyCOMPS_Sequence*)self)->out_convert_func(it->data);
+            ret = PyUnicode_Concat(ret, tmp2);
+            Py_XDECREF(tmp);
+            Py_XDECREF(tmp2);
             if (it != get_list(self)->last) {
                 tmp2 = PyUnicode_FromString(", ");
                 tmp = ret;
