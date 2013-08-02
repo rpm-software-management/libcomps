@@ -45,9 +45,5 @@
 <!ELEMENT description (#PCDATA)>
 <!ATTLIST description xmlns CDATA #FIXED ''>
 
-<!ELEMENT optionlist (optionid)+>
+<!ELEMENT optionlist (groupid)+>
 <!ATTLIST optionlist xmlns CDATA #FIXED ''>
-
-<!ELEMENT optionid (#PCDATA)>
-<!ATTLIST optionid xmlns CDATA #FIXED ''>
-

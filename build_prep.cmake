@@ -88,7 +88,7 @@ string(REPLACE "\n" "" top_commit ${top_commit})
 LIST_CONTAINS(contains ${top_commit} ${tags})
 if (NOT contains)
     set(tags "${tags};${top_commit}")
-    set(SOURCE_URL_PATH "archive/${top_commit}/libcomps-${top_commit}.tar.gz")
+    set(SOURCE_URL_PATH "archive/%{commit}/libcomps-%{commit}.tar.gz")
 else (NOT contains)
     execute_process(COMMAND "git" describe --tags --exact-match ${top_commit}
                         OUTPUT_VARIABLE describe_out ERROR_VARIABLE describe_err)

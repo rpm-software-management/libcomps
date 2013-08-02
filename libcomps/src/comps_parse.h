@@ -64,16 +64,14 @@ void comps_parse_char_data_handler(void *userData,
 void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed);
 void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed);
 
-char comps_parse_file(COMPS_Parsed *parsed, FILE *f);
-char comps_parse_str(COMPS_Parsed *parsed, char *str);
+signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f);
+signed char comps_parse_str(COMPS_Parsed *parsed, char *str);
 
 unsigned comps_parse_init_parser(XML_Parser *p);//, COMPS_DTDRuleList * rules);
 void comps_parse_parsed_destroy(COMPS_Parsed *parsed);
 COMPS_PackageType comps_package_get_type(const XML_Char *s);
-//char comps_parse_validate_attrs(COMPS_DTDRule * elem_rule,
-//                                COMPS_DTDRuleList * rules, char **attrs);
 COMPS_ElemType comps_elem_get_type(const XML_Char *s);
 char * comps_elem_get_name(const COMPS_ElemType type);
-char comps_parse_validate_dtd(char *filename, char *dtd_file);
+int comps_parse_validate_dtd(char *filename, char *dtd_file);
 
 #endif
