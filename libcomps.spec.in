@@ -12,7 +12,11 @@ Source0:        https://github.com/midnightercz/libcomps/@SOURCE_URL_PATH@
 BuildRequires:  libxml2-devel
 BuildRequires:  check-devel
 BuildRequires:  expat-devel
-BuildRequires:  cmake >= 2.6
+%if 0%{?rhel} == 6
+    BuildRequires:  cmake28
+%else
+    BuildRequires:  cmake
+%endif
 
 %description
 Libcomps is library for structure-like manipulation with content of
