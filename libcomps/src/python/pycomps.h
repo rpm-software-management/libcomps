@@ -35,6 +35,7 @@
 #include "pycomps_ctopy.h"
 #include "pycomps_ctopy_seq.h"
 #include "pycomps_ctopy_seq_iter.h"
+#include "pycomps_gids.h"
 
 typedef struct {
     PyTypeObject * type;

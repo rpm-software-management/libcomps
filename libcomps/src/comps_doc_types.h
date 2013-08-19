@@ -184,6 +184,13 @@ typedef struct {
     void *reserved;
 } COMPS_DocEnv;
 
+
+typedef struct {
+    char *name;
+    char def;
+    void *reserved;
+} COMPS_DocGroupId;
+
 typedef enum {COMPS_PACKAGE_DEFAULT, COMPS_PACKAGE_OPTIONAL,
               COMPS_PACKAGE_CONDITIONAL, COMPS_PACKAGE_MANDATORY,
               COMPS_PACKAGE_UNKNOWN} COMPS_PackageType;

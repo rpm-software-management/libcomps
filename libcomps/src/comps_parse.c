@@ -346,7 +346,6 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             if (comps_dict_get(list_last_group->properties, "name") == NULL) {
-                printf("name is missing\n");
                 comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             }
@@ -518,7 +517,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 break;
             }
             list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
-            if (!list_last_env->group_list->first)
+            if (!list_last_env->option_list->first)
                 comps_log_error(parsed->log, "grouplist", COMPS_ERR_LIST_EMPTY,
                                 parser_line, parser_col, 0);
         break;
@@ -594,31 +593,38 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             }
             if (grandparent == COMPS_ELEM_CATEGORY) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
-                comps_list_append(list_last_cat->group_ids,
-                                  comps_list_item_create(parsed->tmp_buffer,
-                                                         NULL, &free));
+                if (parent == COMPS_ELEM_GROUPLIST &&
+                    list_last_cat->group_ids == NULL) {
+                    comps_log_warning(parsed->log, parsed->tmp_buffer,
+                                      COMPS_ERR_GROUPLIST_NOTSET,
+                                      parser_line, parser_col, 0);
+                } else if (parent == COMPS_ELEM_GROUPLIST &&
+                          list_last_cat->group_ids){
+                    comps_docgroupid_set_name(
+                            (COMPS_DocGroupId*)list_last_cat->group_ids->last->data,
+                            parsed->tmp_buffer, 0);
+                }
             } else if (grandparent == COMPS_ELEM_ENV) {
                 list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
-                if (list_last_env->option_list == NULL) {
-                    if (list_last_env->group_list == NULL) {
-                        comps_log_warning(parsed->log, parsed->tmp_buffer,
-                                          COMPS_ERR_GROUPLIST_NOTSET,
-                                          parser_line, parser_col, 0);
-                    } else {
-                        comps_list_append(list_last_env->group_list,
-                                      comps_list_item_create(parsed->tmp_buffer,
-                                                         NULL, &free));
-                    }
-                } else {
-                    if (list_last_env->option_list == NULL) {
-                        comps_log_warning(parsed->log, parsed->tmp_buffer,
-                                          COMPS_ERR_OPTIONLIST_NOTSET,
-                                          parser_line, parser_col, 0);
-                    } else {
-                        comps_list_append(list_last_env->option_list,
-                                      comps_list_item_create(parsed->tmp_buffer,
-                                                             NULL, &free));
-                    }
+                if (parent == COMPS_ELEM_GROUPLIST &&
+                    list_last_env->group_list != NULL) {
+                    comps_docgroupid_set_name(
+                     (COMPS_DocGroupId*)list_last_env->group_list->last->data,
+                            parsed->tmp_buffer, 0);
+
+                } else if (parent == COMPS_ELEM_OPTLIST &&
+                           list_last_env->option_list != NULL) {
+                    comps_docgroupid_set_name(
+                     (COMPS_DocGroupId*)list_last_env->group_list->last->data,
+                            parsed->tmp_buffer, 0);
+                } else if (parent == COMPS_ELEM_GROUPLIST) {
+                    comps_log_warning(parsed->log, parsed->tmp_buffer,
+                                      COMPS_ERR_GROUPLIST_NOTSET,
+                                      parser_line, parser_col, 0);
+                } else if (parent == COMPS_ELEM_OPTLIST) {
+                    comps_log_warning(parsed->log, parsed->tmp_buffer,
+                                      COMPS_ERR_OPTIONLIST_NOTSET,
+                                      parser_line, parser_col, 0);
                 }
             } else {
                 free(parsed->tmp_buffer);
@@ -698,6 +704,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
     static COMPS_DocEnv * env;
     COMPS_ListItem * it;
     COMPS_DocGroupPackage * package;
+    COMPS_DocGroupId *groupid;
+    char *tmp;
+
     /* prepare currently processed element. Create it, set text_buffer pointer
        to text data destination, if needed*/
     #define parent_o parsed->elem_stack->last->prev
@@ -888,14 +897,35 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_GROUPID:
             parsed->text_buffer_pt = &parsed->tmp_buffer;
-            if ((grandparent != COMPS_ELEM_CATEGORY
-                && grandparent != COMPS_ELEM_ENV) ||
-                (parent != COMPS_ELEM_GROUPLIST
-                && parent != COMPS_ELEM_OPTLIST)){
+            groupid = comps_docgroupid_create();
+            tmp = comps_dict_get(elem->attrs, "name");
+            comps_docgroupid_set_default(groupid, __comps_strcmp(tmp, "true"));
+
+            if (parent == COMPS_ELEM_GROUPLIST) {
+                if (grandparent == COMPS_ELEM_CATEGORY) {
+                    comps_doccategory_add_groupid(category, groupid);
+                } else if (grandparent == COMPS_ELEM_ENV) {
+                    comps_docenv_add_groupid(env, groupid);
+                } else {
+                    comps_log_error(parsed->log, comps_elem_get_name(elem->type),
+                                    COMPS_ERR_NOPARENT, parser_line, parser_col,
+                                    0);
+                    comps_docgroupid_destroy((void*)groupid);
+                }
+            } else if (parent == COMPS_ELEM_OPTLIST) {
+                if (grandparent == COMPS_ELEM_ENV) {
+                    comps_docenv_add_optionid(env, groupid);
+                } else {
+                    comps_log_error(parsed->log, comps_elem_get_name(elem->type),
+                                    COMPS_ERR_NOPARENT, parser_line, parser_col,
+                                    0);
+                    comps_docgroupid_destroy((void*)groupid);
+                }
+            } else {
                 comps_log_error(parsed->log, comps_elem_get_name(elem->type),
                                 COMPS_ERR_NOPARENT, parser_line, parser_col,
                                 0);
-                break;
+                comps_docgroupid_destroy((void*)groupid);
             }
         break;
         case COMPS_ELEM_MATCH:

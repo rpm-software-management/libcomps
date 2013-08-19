@@ -364,8 +364,8 @@ PyObject* PyCOMPSCat_get_groupids(PyCOMPS_Category *self, void *closure) {
     (void) closure;
     PyObject *ret;
     if (!self->group_ids_pobj) {
-        ret = PyCOMPSSeq_new(&PyCOMPS_IDsType, NULL, NULL);
-        PyCOMPSIDs_init((PyCOMPS_Sequence*)ret, NULL, NULL);
+        ret = PyCOMPSSeq_new(&PyCOMPS_GIDsType, NULL, NULL);
+        PyCOMPSGIDs_init((PyCOMPS_CtoPySeq*)ret, NULL, NULL);
         if (pycomps_cat_gget(self)->group_ids == NULL) {
             pycomps_cat_gget(self)->group_ids = comps_list_create();
             comps_list_init(pycomps_cat_gget(self)->group_ids);
@@ -393,7 +393,7 @@ int PyCOMPSCat_set_groupids(PyCOMPS_Category *self,
         PyErr_SetString(PyExc_TypeError, "Cannot delete attribute group_list");
         return -1;
     }
-    if (value->ob_type != &PyCOMPS_IDsType) {
+    if (value->ob_type != &PyCOMPS_GIDsType) {
         PyErr_SetString(PyExc_TypeError, "Not GroupIds instance");
         return -1;
     }

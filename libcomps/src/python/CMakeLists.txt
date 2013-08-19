@@ -6,13 +6,13 @@ endmacro(LIST_REPLACE)
 
 set (pycomps_SRC pycomps.c pycomps_sequence.c
      pycomps_envs.c pycomps_categories.c pycomps_groups.c
-     pycomps_ids.c pycomps_utils.c pycomps_dict.c
+     pycomps_gids.c pycomps_utils.c pycomps_dict.c
      pycomps_ctopy.c pycomps_ctopy_seq.c pycomps_lang.c
      pycomps_ctopy_seq_iter.c)
 
 set (pycomps_HEADERS pycomps_23macros.h pycomps_sequence.h
      pycomps_envs.h pycomps_categories.h pycomps_groups.h
-     pycomps_ids.h pycomps_utils.h pycomps_dict.h
+     pycomps_gids.h pycomps_utils.h pycomps_dict.h
      pycomps_ctopy.h pycomps_ctopy_seq.h pycomps_lang.h
      pycomps_ctopy_seq_iter.h)
 

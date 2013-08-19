@@ -23,6 +23,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define COMPS_DOCLIST_PREP(OBJ, LIST)\
+    if (OBJ->LIST == NULL) {\
+        OBJ->LIST = comps_list_create();\
+        comps_list_init(OBJ->LIST);\
+    }
+
 char __comps_strcmp(void *s1, void *s2);
 void* __comps_str_clone(void *str);
 

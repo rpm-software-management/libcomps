@@ -1388,22 +1388,15 @@ inline void comps_doccategory_set_displayorder(COMPS_DocCategory *category,
  * @param copy copy indicator
  */
 void comps_doccategory_add_groupid(COMPS_DocCategory *category,
-                                   char *id, char copy)
+                                   COMPS_DocGroupId *groupid)
 {
-    char *new;
     COMPS_ListItem *it;
     if (category == NULL) {
         return;
     }
-    if (category->group_ids == NULL) {
-        category->group_ids = comps_list_create();
-        comps_list_init(category->group_ids);
-    }
-    if (copy) {
-        if ((new = malloc(sizeof(char)*(strlen(id)+1))) == NULL) return;
-        memcpy(new, id, sizeof(char)*(strlen(id)+1));
-    } else new = id;
-    it = comps_list_item_create(new, NULL, &free);
+    COMPS_DOCLIST_PREP(category, group_ids)
+
+    it = comps_list_item_create(groupid, NULL, &comps_docgroupid_destroy);
     comps_list_append(category->group_ids, it);
 }
 
@@ -1475,7 +1468,12 @@ void comps_doccategory_xml(COMPS_DocCategory *cat, xmlTextWriterPtr writer,
         }
         for (it = cat->group_ids->first; it != NULL; it = it->next) {
             xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
-            xmlTextWriterWriteString(writer, (xmlChar*) it->data);
+            if (((COMPS_DocGroupId*)it->data)->def) {
+                xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                                    BAD_CAST "true");
+            }
+            xmlTextWriterWriteString(writer,
+                                    BAD_CAST ((COMPS_DocGroupId*)it->data)->name);
             xmlTextWriterEndElement(writer);
         }
         xmlTextWriterEndElement(writer);
@@ -1511,7 +1509,7 @@ COMPS_DocCategory* comps_doccategory_clone(COMPS_DocCategory *c) {
     comps_list_init(res->group_ids);
     if (c->group_ids) {
         for (it = c->group_ids->first; it != NULL; it = it->next) {
-            comps_doccategory_add_groupid(res, it->data, 1);
+            comps_doccategory_add_groupid(res, comps_docgroupid_clone(it->data));
         }
     }
     return res;
@@ -1537,7 +1535,7 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     COMPS_HSListItem *hsit;
     COMPS_Set *set;
     COMPS_HSList *pairs;
-
+    COMPS_DocGroupId *gid;
     res = comps_doccategory_create();
     comps_dict_destroy(res->properties);
 
@@ -1550,7 +1548,7 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     }
     comps_hslist_destroy(&pairs);
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &comps_docgroupid_cmp);
     it = c1->group_ids?c1->group_ids->first:NULL;
     for (; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
@@ -1562,7 +1560,7 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     res->group_ids = comps_list_create();
     comps_list_init(res->group_ids);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_doccategory_add_groupid(res, (char*)hsit->data, 1);
+        comps_doccategory_add_groupid(res, comps_docgroupid_clone(hsit->data));
     }
     comps_set_destroy(&set);
     comps_dict_destroy(res->name_by_lang);
@@ -1614,7 +1612,7 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
     comps_set_destroy(&set);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &comps_docgroupid_cmp);
 
     res->group_ids = comps_list_create();
     comps_list_init(res->group_ids);
@@ -1624,7 +1622,7 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
     }
     for (it = c2->group_ids->first; it != NULL; it = it->next) {
         if (comps_set_in(set, it->data)) {
-            comps_doccategory_add_groupid(res, (char*)it->data, 1);
+            comps_doccategory_add_groupid(res, comps_docgroupid_clone(it->data));
         }
     }
     comps_set_destroy(&set);
@@ -1763,22 +1761,15 @@ inline void comps_docenv_set_displayorder(COMPS_DocEnv *env, int display_order){
  * @param id new groupid
  * @param copy copy indicator
  */
-void comps_docenv_add_groupid(COMPS_DocEnv *env, char *id, char copy)
+void comps_docenv_add_groupid(COMPS_DocEnv *env,
+                              COMPS_DocGroupId *groupid)
 {
     COMPS_ListItem *it;
     if (env == NULL) {
         return;
     }
-    if (env->group_list == NULL) {
-        env->group_list = comps_list_create();
-        comps_list_init(env->group_list);
-    }
-    char *new;
-    if (copy && env != NULL) {
-        if ((new = malloc(sizeof(char)*(strlen(id)+1))) == NULL) return;
-        memcpy(new, id, sizeof(char)*(strlen(id)+1));
-    } else new = id;
-    it = comps_list_item_create(new, NULL, &free);
+    COMPS_DOCLIST_PREP(env, group_list)
+    it = comps_list_item_create(groupid, NULL, &comps_docgroupid_destroy);
     comps_list_append(env->group_list, it);
 }
 
@@ -1792,22 +1783,15 @@ void comps_docenv_add_groupid(COMPS_DocEnv *env, char *id, char copy)
  * @param id new optionid
  * @param copy copy indicator
  */
-void comps_docenv_add_optionid(COMPS_DocEnv *env, char *id, char copy)
+void comps_docenv_add_optionid(COMPS_DocEnv *env,
+                               COMPS_DocGroupId *optionid)
 {
     COMPS_ListItem *it;
     if (env == NULL) {
         return;
     }
-    if (env->option_list == NULL) {
-        env->option_list = comps_list_create();
-        comps_list_init(env->option_list);
-    }
-    char *new;
-    if (copy) {
-        if ((new = malloc(sizeof(char)*(strlen(id)+1))) == NULL) return;
-        memcpy(new, id, sizeof(char)*(strlen(id)+1));
-    } else new = id;
-    it = comps_list_item_create(new, NULL, &free);
+    COMPS_DOCLIST_PREP(env, option_list)
+    it = comps_list_item_create(optionid, NULL, &comps_docgroupid_destroy);
     comps_list_append(env->option_list, it);
 }
 
@@ -1867,7 +1851,12 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
         }
         for (it = env->group_list->first; it != NULL; it = it->next) {
             xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
-            xmlTextWriterWriteString(writer, (xmlChar*) it->data);
+            if (((COMPS_DocGroupId*)it->data)->def) {
+                xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                                    BAD_CAST "true");
+            }
+            xmlTextWriterWriteString(writer,
+                               BAD_CAST ((COMPS_DocGroupId*)it->data)->name);
             xmlTextWriterEndElement(writer);
         }
         xmlTextWriterEndElement(writer);
@@ -1883,7 +1872,12 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
         }
         for (it = env->option_list->first; it != NULL; it = it->next) {
             xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
-            xmlTextWriterWriteString(writer, (xmlChar*) it->data);
+            if (((COMPS_DocGroupId*)it->data)->def) {
+                xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                                    BAD_CAST "true");
+            }
+            xmlTextWriterWriteString(writer,
+                               BAD_CAST ((COMPS_DocGroupId*)it->data)->name);
             xmlTextWriterEndElement(writer);
         }
         xmlTextWriterEndElement(writer);
@@ -1917,12 +1911,12 @@ COMPS_DocEnv* comps_docenv_clone(COMPS_DocEnv *e) {
     comps_list_init(res->option_list);
     if (e->group_list) {
         for (it = e->group_list->first; it != NULL; it = it->next) {
-            comps_docenv_add_groupid(res, (char*) it->data, 1);
+            comps_docenv_add_groupid(res, comps_docgroupid_clone(it->data));
         }
     }
     if (e->option_list) {
         for (it = e->option_list->first; it != NULL; it = it->next) {
-            comps_docenv_add_optionid(res, (char*) it->data, 1);
+            comps_docenv_add_optionid(res, comps_docgroupid_clone(it->data));
         }
     }
     return res;
@@ -1959,7 +1953,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     comps_hslist_destroy(&pairs);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &comps_docgroupid_cmp);
     it = e1->group_list?e1->group_list->first:NULL;
     for (; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
@@ -1971,12 +1965,12 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     res->group_list = comps_list_create();
     comps_list_init(res->group_list);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_groupid(res, (char*)hsit->data, 1);
+        comps_docenv_add_groupid(res, comps_docgroupid_clone(hsit->data));
     }
     comps_set_destroy(&set);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &comps_docgroupid_cmp);
     if  (e1->option_list)
         for (it = e1->option_list->first; it != NULL; it = it->next)
             comps_set_add(set, it->data);
@@ -1986,7 +1980,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     res->option_list = comps_list_create();
     comps_list_init(res->option_list);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_optionid(res, (char*)hsit->data, 1);
+        comps_docenv_add_optionid(res, comps_docgroupid_clone(hsit->data));
     }
     comps_set_destroy(&set);
     comps_dict_destroy(res->name_by_lang);
@@ -2036,9 +2030,9 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     comps_set_destroy(&set);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &comps_docgroupid_cmp);
     set2 = comps_set_create();
-    comps_set_init(set2, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set2, NULL, NULL, NULL, &comps_docgroupid_cmp);
 
     for (it = e1->group_list->first; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
@@ -2050,15 +2044,15 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     res->group_list = comps_list_create();
     comps_list_init(res->group_list);
     for (hsit = set2->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_groupid(res, (char*)hsit->data, 1);
+        comps_docenv_add_groupid(res, comps_docgroupid_clone(hsit->data));
     }
     comps_set_destroy(&set);
     comps_set_destroy(&set2);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &comps_docgroupid_cmp);
     set2 = comps_set_create();
-    comps_set_init(set2, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set2, NULL, NULL, NULL, &comps_docgroupid_cmp);
 
     for (it = e1->option_list->first; it != NULL; it = it->next) {
         comps_set_add(set, it->data);
@@ -2070,7 +2064,7 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     res->option_list = comps_list_create();
     comps_list_init(res->option_list);
     for (hsit = set2->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_optionid(res, (char*)hsit->data, 1);
+        comps_docenv_add_optionid(res, comps_docgroupid_clone(hsit->data));
     }
     comps_set_destroy(&set);
     comps_set_destroy(&set2);
@@ -2230,9 +2224,8 @@ char comps_docpackage_cmp(void* pkg1, void *pkg2) {
         != ((COMPS_DocGroupPackage*)pkg2)->type) return 0;
     if (__comps_strcmp(((COMPS_DocGroupPackage*)pkg1)->name,
                ((COMPS_DocGroupPackage*)pkg2)->name) == 0) return 0;
-    if (__comps_strcmp(((COMPS_DocGroupPackage*)pkg1)->requires,
-               ((COMPS_DocGroupPackage*)pkg2)->requires) == 0) return 0;
-    return 1;
+    return __comps_strcmp(((COMPS_DocGroupPackage*)pkg1)->requires,
+               ((COMPS_DocGroupPackage*)pkg2)->requires);
 }
 const char* comps_docpackage_type_str(COMPS_PackageType type) {
     switch(type){
@@ -2245,4 +2238,50 @@ const char* comps_docpackage_type_str(COMPS_PackageType type) {
         default:
             return "default";
     }
+}
+
+COMPS_DocGroupId* comps_docgroupid_create() {
+    COMPS_DocGroupId * groupid;
+    if ((groupid = malloc(sizeof(COMPS_DocGroupId))) == NULL)
+        return NULL;
+    groupid->name = NULL;
+    groupid->def = 0;
+    return groupid;
+}
+
+COMPS_DocGroupId* comps_docgroupid_clone(COMPS_DocGroupId * groupid) {
+    COMPS_DocGroupId *new;
+    new = comps_docgroupid_create();
+    if (new == NULL)
+        return NULL;
+    new->name = NULL;
+    comps_docgroupid_set_name(new, groupid->name, 1);
+    new->def = groupid->def;
+    return new;
+}
+
+inline void comps_docgroupid_set_name(COMPS_DocGroupId *groupid, char *name,
+                               char copy) {
+    __comps_doc_char_setter((void**)&groupid->name, name, copy);
+}
+
+inline void comps_docgroupid_set_default(COMPS_DocGroupId *groupid, char def) {
+    if (groupid == NULL) {
+        groupid->def = (def != 0);
+    }
+}
+
+char comps_docgroupid_cmp(void* gid1, void *gid2) {
+    if (((COMPS_DocGroupId*)gid1)->def
+        != ((COMPS_DocGroupId*)gid2)->def) return 0;
+    return __comps_strcmp(((COMPS_DocGroupId*)gid1)->name,
+                          ((COMPS_DocGroupId*)gid2)->name);
+}
+
+void comps_docgroupid_destroy(void *groupid)
+{
+    if (groupid == NULL)
+        return;
+    free(((COMPS_DocGroupId*)groupid)->name);
+    free(groupid);
 }

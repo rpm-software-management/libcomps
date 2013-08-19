@@ -131,6 +131,7 @@ START_TEST(test_comps_doc_basic)
     COMPS_DocGroup *g;
     COMPS_DocCategory *c;
     COMPS_DocGroupPackage *p;
+    COMPS_DocGroupId *gid;
     COMPS_List *tmplist;
 
     doc = comps_doc_create("UTF-8");
@@ -157,7 +158,9 @@ START_TEST(test_comps_doc_basic)
         comps_doccategory_set_id(c, (char*)cats_ids[i], 1);
         comps_doccategory_set_name(c, (char*)cats_names[i], 1);
         for (int x=0; x<3; x++) {
-            comps_doccategory_add_groupid(c, (char*)cat_gids[i][x], 1);
+            gid = comps_docgroupid_create();
+            comps_docgroupid_set_name(gid, (char*)cat_gids[i][x], 1);
+            comps_doccategory_add_groupid(c, gid);
         }
         comps_doc_add_category(doc, c);
     }
@@ -237,7 +240,7 @@ START_TEST(test_comps_doc_setfeats)
     COMPS_DocEnv *e, *e1, *e2;
     COMPS_DocGroup *g, *g1, *g2;
     COMPS_DocGroupPackage *p;
-    //COMPS_List *tmplist;
+    COMPS_DocGroupId *gid;
 
     doc = comps_doc_create("UTF-8");
     comps_doc_init(doc);
@@ -262,10 +265,14 @@ START_TEST(test_comps_doc_setfeats)
         comps_docenv_set_id(e, (char*)envs_ids[i], 1);
         comps_docenv_set_name(e, (char*)envs_names[i], 1);
         for (int x=0; x<3; x++) {
-            comps_docenv_add_groupid(e, (char*)env_gids[i][x], 1);
+            gid = comps_docgroupid_create();
+            comps_docgroupid_set_name(gid, (char*)env_gids[i][x], 1);
+            comps_docenv_add_groupid(e, gid);
         }
         for (int x=0; x<4; x++) {
-            comps_docenv_add_optionid(e, (char*)env_opts[i][x], 1);
+            gid = comps_docgroupid_create();
+            comps_docgroupid_set_name(gid, (char*)env_opts[i][x], 1);
+            comps_docenv_add_optionid(e, gid);
         }
         comps_doc_add_env(doc, e);
     }
@@ -274,7 +281,9 @@ START_TEST(test_comps_doc_setfeats)
         comps_doccategory_set_id(c, (char*)cats_ids[i], 1);
         comps_doccategory_set_name(c, (char*)cats_names[i], 1);
         for (int x=0; x<3; x++) {
-            comps_doccategory_add_groupid(c, (char*)cat_gids[i][x], 1);
+            gid = comps_docgroupid_create();
+            comps_docgroupid_set_name(gid, (char*)cat_gids[i][x], 1);
+            comps_doccategory_add_groupid(c, gid);
         }
         comps_doc_add_category(doc, c);
     }
@@ -302,10 +311,14 @@ START_TEST(test_comps_doc_setfeats)
         comps_docenv_set_id(e, (char*)envs_ids2[i], 1);
         comps_docenv_set_name(e, (char*)envs_names2[i], 1);
         for (int x=0; x<3; x++) {
-            comps_docenv_add_groupid(e, (char*)env_gids2[i][x], 1);
+            gid = comps_docgroupid_create();
+            comps_docgroupid_set_name(gid, (char*)env_gids2[i][x], 1);
+            comps_docenv_add_groupid(e, gid);
         }
         for (int x=0; x<4; x++) {
-            comps_docenv_add_optionid(e, (char*)env_opts2[i][x], 1);
+            gid = comps_docgroupid_create();
+            comps_docgroupid_set_name(gid, (char*)env_opts2[i][x], 1);
+            comps_docenv_add_optionid(e, gid);
         }
         comps_doc_add_env(doc2, e);
     }
@@ -314,7 +327,9 @@ START_TEST(test_comps_doc_setfeats)
         comps_doccategory_set_id(c, (char*)cats_ids2[i], 1);
         comps_doccategory_set_name(c, (char*)cats_names2[i], 1);
         for (int x=0; x<3; x++) {
-            comps_doccategory_add_groupid(c, (char*)cat_gids2[i][x], 1);
+            gid = comps_docgroupid_create();
+            comps_docgroupid_set_name(gid, (char*)cat_gids2[i][x], 1);
+            comps_doccategory_add_groupid(c, gid);
         }
         comps_doc_add_category(doc2, c);
     }
@@ -348,6 +363,7 @@ START_TEST(test_comps_doc_setfeats)
     fail_if(c->group_ids->len != 4, "Union of (c1 v c2) should have 4 "
             "group ids, have %d", c->group_ids->len);
     comps_doccategory_destroy(c);
+
     c = comps_doccategory_intersect(c1, c2);
     fail_if(c->group_ids->len != 2, "Intersect of (c1 ^ c2) should have 2"
             "group ids, have %d", c->group_ids->len);
@@ -370,7 +386,7 @@ START_TEST(test_comps_doc_setfeats)
     fail_if(e->group_list->len != 4, "Union of (e1 v e2) should have 4 "
             "groud ids have %d", e->group_list->len);
     fail_if(e->option_list->len != 7, "Union of (e1 v e2) should have 7 "
-            "groud ids have %d", e->option_list->len);
+            "option ids have %d", e->option_list->len);
     comps_docenv_destroy(e);
     e = comps_docenv_intersect(e1, e2);
     fail_if(e->group_list->len != 2, "Intersect of (e1 ^ e2) should have 2"
@@ -404,6 +420,7 @@ START_TEST(test_comps_doc_setfeats)
             "should have 4 environments  have %d",
             comps_doc_environments(tmpdoc)->len);
     comps_doc_destroy(&tmpdoc);
+
     tmpdoc = comps_doc_intersect(doc, doc2);
     fail_if(comps_doc_groups(tmpdoc)->len != 2, "Intersect of (doc ^ doc2) "
             "should have 2 groups  have %d", comps_doc_groups(tmpdoc)->len);
@@ -443,6 +460,7 @@ START_TEST(test_comps_doc_xml)
     COMPS_DocGroup *g;
     COMPS_DocCategory *c;
     COMPS_DocGroupPackage *p;
+    COMPS_DocGroupId *gid;
     //COMPS_List *tmplist;
 
     doc = comps_doc_create("UTF-8");
@@ -469,7 +487,9 @@ START_TEST(test_comps_doc_xml)
         comps_doccategory_set_id(c, (char*)cats_ids[i], 1);
         comps_doccategory_set_name(c, (char*)cats_names[i], 1);
         for (int x=0; x<3; x++) {
-            comps_doccategory_add_groupid(c, (char*)cat_gids[i][x], 1);
+            gid = comps_docgroupid_create();
+            comps_docgroupid_set_name(gid, (char*)cat_gids[i][x], 1);
+            comps_doccategory_add_groupid(c, gid);
         }
         comps_doc_add_category(doc, c);
     }
@@ -490,6 +510,7 @@ START_TEST(test_comps_doc_union)
     COMPS_DocGroup *g1, *g2, *g3;
     COMPS_DocCategory *c1, *c2, *c3;
     COMPS_DocGroupPackage *p;
+    COMPS_DocGroupId *gid;
 
     g1 = comps_docgroup_create();
     comps_docgroup_set_id(g1, "g1", 1);
@@ -523,15 +544,23 @@ START_TEST(test_comps_doc_union)
     comps_doccategory_set_id(c1, "c1", 1);
     comps_doccategory_set_name(c1, "category 1", 1);
     comps_doccategory_set_desc(c1, "cat desc 1", 1);
-    comps_doccategory_add_groupid(c1, "g1", 1);
-    comps_doccategory_add_groupid(c1, "g2", 1);
+    gid = comps_docgroupid_create();
+    comps_docgroupid_set_name(gid, "g1", 1);
+    comps_doccategory_add_groupid(c1, gid);
+    gid = comps_docgroupid_create();
+    comps_docgroupid_set_name(gid, "g2", 1);
+    comps_doccategory_add_groupid(c1, gid);
 
     c2 = comps_doccategory_create();
     comps_doccategory_set_id(c2, "c1", 1);
     comps_doccategory_set_name(c2, "category 1", 1);
     comps_doccategory_set_desc(c2, "cat desc 1", 1);
-    comps_doccategory_add_groupid(c2, "g1", 1);
-    comps_doccategory_add_groupid(c2, "g2", 1);
+    gid = comps_docgroupid_create();
+    comps_docgroupid_set_name(gid, "g1", 1);
+    comps_doccategory_add_groupid(c2, gid);
+    gid = comps_docgroupid_create();
+    comps_docgroupid_set_name(gid, "g2", 1);
+    comps_doccategory_add_groupid(c2, gid);
 
     c3 = comps_doccategory_union(c1, c2);
     comps_doccategory_destroy(c1);

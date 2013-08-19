@@ -178,7 +178,7 @@ void comps_doccategory_add_lang_desc(COMPS_DocCategory *category, char *lang,
 void comps_doccategory_set_displayorder(COMPS_DocCategory *category,
                                         int display_order);
 void comps_doccategory_add_groupid(COMPS_DocCategory *category,
-                                   char *id, char copy);
+                                   COMPS_DocGroupId *groupid);
 void comps_doccategory_xml(COMPS_DocCategory *cat, xmlTextWriterPtr writer,
                            COMPS_Logger *log);
 COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
@@ -200,8 +200,10 @@ void comps_docenv_set_desc(COMPS_DocEnv * env, char *desc, char copy);
 void comps_docenv_add_lang_desc(COMPS_DocEnv *env, char *lang,
                                 char *desc, char copy);
 void comps_docenv_set_displayorder(COMPS_DocEnv *env, int display_order);
-void comps_docenv_add_optionid(COMPS_DocEnv *env, char *id, char copy);
-void comps_docenv_add_groupid(COMPS_DocEnv *env, char *id, char copy);
+void comps_docenv_add_optionid(COMPS_DocEnv *env,
+                               COMPS_DocGroupId *optionid);
+void comps_docenv_add_groupid(COMPS_DocEnv *env,
+                              COMPS_DocGroupId *groupid);
 void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
                       COMPS_Logger *log);
 COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
@@ -225,5 +227,12 @@ void comps_docpackage_xml(COMPS_DocGroupPackage *pkg, xmlTextWriterPtr writer,
                           COMPS_Logger *log);
 char comps_docpackage_cmp(void* pkg1, void *pkg2);
 const char* comps_docpackage_type_str(COMPS_PackageType type);
+
+COMPS_DocGroupId* comps_docgroupid_create();
+COMPS_DocGroupId* comps_docgroupid_clone(COMPS_DocGroupId * groupid);
+void comps_docgroupid_set_name(COMPS_DocGroupId *groupid, char *name, char copy);
+void comps_docgroupid_set_default(COMPS_DocGroupId *groupid, char def);
+char comps_docgroupid_cmp(void* gid1, void *gid2);
+void comps_docgroupid_destroy(void *groupid);
 
 #endif

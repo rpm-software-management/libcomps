@@ -663,7 +663,7 @@ PYINIT_FUNC(void) {
     Py_INCREF(&PyCOMPS_CatType);
     PyModule_AddObject(m, "Category", (PyObject*) &PyCOMPS_CatType);
     Py_INCREF(&PyCOMPS_IDsType);
-    PyModule_AddObject(m, "IdList", (PyObject*) &PyCOMPS_IDsType);
+    PyModule_AddObject(m, "IdList", (PyObject*) &PyCOMPS_GIDsType);
     Py_INCREF(&PyCOMPS_GroupType);
     PyModule_AddObject(m, "Group", (PyObject*) &PyCOMPS_GroupType);
     Py_INCREF(&PyCOMPS_GroupsType);
