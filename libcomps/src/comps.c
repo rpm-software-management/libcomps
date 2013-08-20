@@ -1637,7 +1637,7 @@ inline char comps_doccategory_cmp(COMPS_DocCategory *c1, COMPS_DocCategory *c2) 
     it2 = (c2->group_ids)?c2->group_ids->first: NULL;
 
     for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        if (!__comps_strcmp(it->data, it2->data)) {
+        if (!comps_docgroupid_cmp(it->data, it2->data)) {
             return 0;
         }
     }
@@ -2076,7 +2076,7 @@ inline char comps_docenv_cmp(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     COMPS_Set *set;
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_strcmp);
+    comps_set_init(set, NULL, NULL, NULL, &comps_docgroupid_cmp);
 
     it = (e1->group_list)?e1->group_list->first: NULL;
     for (; it!= NULL; it = it->next) {
@@ -2085,8 +2085,10 @@ inline char comps_docenv_cmp(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     it = (e2->group_list)?e2->group_list->first: NULL;
     for (; it!= NULL; it = it->next) {
         if (!comps_set_in(set, it->data)) {
-                comps_set_destroy(&set);
-                return 0;
+            comps_set_destroy(&set);
+            printf("%s\n", ((COMPS_DocGroupId*)it->data));
+            printf("gid differ\n");
+            return 0;
         }
     }
     comps_set_clear(set);

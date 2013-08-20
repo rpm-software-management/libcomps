@@ -25,7 +25,7 @@
 #include "libcomps/comps_list.h"
 #include "structmember.h"
 #include "pycomps_sequence.h"
-#include "pycomps_ids.h"
+#include "pycomps_gids.h"
 #include "pycomps_utils.h"
 #include "pycomps_23macros.h"
 #include "pycomps_dict.h"

@@ -405,10 +405,10 @@ static PyMethodDef PyCOMPS_methods[] = {
     "Load COMPS from xml string"},
     {"clear", (PyCFunction)PyCOMPS_clear, METH_NOARGS,
     "Clear COMPS"},
-    {"get_last_parse_errors", (PyCFunction)PyCOMPS_get_last_errors,
+    {"get_last_errors", (PyCFunction)PyCOMPS_get_last_errors,
      METH_NOARGS,"return list of messages from log of last parse action."
                  "Containg errors only"},
-    {"get_last_parse_log", (PyCFunction)PyCOMPS_get_last_log,
+    {"get_last_log", (PyCFunction)PyCOMPS_get_last_log,
      METH_NOARGS,"return list of messages from log of last parse action."},
     {NULL}  /* Sentinel */
 };
@@ -618,7 +618,10 @@ PYINIT_FUNC(void) {
     if (PyType_Ready(&PyCOMPS_CatsType) < 0 ) {
         MODINIT_RET_NONE;
     }
-    if (PyType_Ready(&PyCOMPS_IDsType) < 0 ) {
+    if (PyType_Ready(&PyCOMPS_GIDType) < 0 ) {
+        MODINIT_RET_NONE;
+    }
+    if (PyType_Ready(&PyCOMPS_GIDsType) < 0 ) {
         MODINIT_RET_NONE;
     }
     if (PyType_Ready(&PyCOMPS_EnvsType) < 0 ) {
@@ -662,12 +665,14 @@ PYINIT_FUNC(void) {
     PyModule_AddObject(m, "CategoryList", (PyObject*) &PyCOMPS_CatsType);
     Py_INCREF(&PyCOMPS_CatType);
     PyModule_AddObject(m, "Category", (PyObject*) &PyCOMPS_CatType);
-    Py_INCREF(&PyCOMPS_IDsType);
+    Py_INCREF(&PyCOMPS_GIDsType);
     PyModule_AddObject(m, "IdList", (PyObject*) &PyCOMPS_GIDsType);
     Py_INCREF(&PyCOMPS_GroupType);
     PyModule_AddObject(m, "Group", (PyObject*) &PyCOMPS_GroupType);
     Py_INCREF(&PyCOMPS_GroupsType);
     PyModule_AddObject(m, "GroupList", (PyObject*) &PyCOMPS_GroupsType);
+    Py_INCREF(&PyCOMPS_GIDType);
+    PyModule_AddObject(m, "GroupId", (PyObject*) &PyCOMPS_GIDType);
     Py_INCREF(&PyCOMPS_PacksType);
     PyModule_AddObject(m, "PackageList", (PyObject*) &PyCOMPS_PacksType);
     Py_INCREF(&PyCOMPS_PackType);

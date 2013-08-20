@@ -364,7 +364,7 @@ PyObject* PyCOMPSCat_get_groupids(PyCOMPS_Category *self, void *closure) {
     (void) closure;
     PyObject *ret;
     if (!self->group_ids_pobj) {
-        ret = PyCOMPSSeq_new(&PyCOMPS_GIDsType, NULL, NULL);
+        ret = PyCOMPSCtoPySeq_new(&PyCOMPS_GIDsType, NULL, NULL);
         PyCOMPSGIDs_init((PyCOMPS_CtoPySeq*)ret, NULL, NULL);
         if (pycomps_cat_gget(self)->group_ids == NULL) {
             pycomps_cat_gget(self)->group_ids = comps_list_create();
@@ -373,10 +373,10 @@ PyObject* PyCOMPSCat_get_groupids(PyCOMPS_Category *self, void *closure) {
                                     pycomps_cat_gget(self)->group_ids;
         }
         ctopy_citem_destroy(((PyCOMPS_Sequence*)ret)->citem);
-        ((PyCOMPS_Sequence*)ret)->citem =
+        ((PyCOMPS_CtoPySeq*)ret)->citem =
                         pycomps_cat_get_extra((PyObject*)self)->group_ids_citem;
         self->group_ids_pobj = ret;
-        ctopy_citem_incref(((PyCOMPS_Sequence*)ret)->citem);
+        ctopy_citem_incref(((PyCOMPS_CtoPySeq*)ret)->citem);
         Py_INCREF(ret);
     } else {
         ret = self->group_ids_pobj;

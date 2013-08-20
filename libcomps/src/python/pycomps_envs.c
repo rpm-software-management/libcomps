@@ -395,19 +395,19 @@ PyObject* PyCOMPSEnv_get_groupids(PyCOMPS_Env *self, void *closure) {
     (void) closure;
     PyObject *ret;
     if (!self->group_list_pobj) {
-        ret = PyCOMPSSeq_new(&PyCOMPS_IDsType, NULL, NULL);
-        PyCOMPSIDs_init((PyCOMPS_Sequence*)ret, NULL, NULL);
+        ret = PyCOMPSCtoPySeq_new(&PyCOMPS_GIDsType, NULL, NULL);
+        PyCOMPSGIDs_init((PyCOMPS_CtoPySeq*)ret, NULL, NULL);
         if (pycomps_env_gget(self)->group_list == NULL) {
             pycomps_env_gget(self)->group_list = comps_list_create();
             comps_list_init(pycomps_env_gget(self)->group_list);
             pycomps_env_get_extra((PyObject*)self)->group_list_citem->data =
                                    pycomps_env_gget(self)->group_list;
         }
-        ctopy_citem_destroy(((PyCOMPS_Sequence*)ret)->citem);
-        ((PyCOMPS_Sequence*)ret)->citem =
+        ctopy_citem_destroy(((PyCOMPS_CtoPySeq*)ret)->citem);
+        ((PyCOMPS_CtoPySeq*)ret)->citem =
                        pycomps_env_get_extra((PyObject*)self)->group_list_citem;
         self->group_list_pobj = ret;
-        ctopy_citem_incref(((PyCOMPS_Sequence*)ret)->citem);
+        ctopy_citem_incref(((PyCOMPS_CtoPySeq*)ret)->citem);
         Py_INCREF(ret);
     } else {
         ret = self->group_list_pobj;
@@ -423,7 +423,7 @@ int PyCOMPSEnv_set_groupids(PyCOMPS_Env *self,
         PyErr_SetString(PyExc_TypeError, "Cannot delete attribute option_ids");
         return -1;
     }
-    if (value->ob_type != &PyCOMPS_IDsType) {
+    if (value->ob_type != &PyCOMPS_GIDsType) {
         PyErr_SetString(PyExc_TypeError, "Not GroupIds instance");
         return -1;
     }
@@ -445,19 +445,19 @@ PyObject* PyCOMPSEnv_get_optionids(PyCOMPS_Env *self, void *closure) {
     (void) closure;
     PyObject *ret;
     if (!self->option_list_pobj) {
-        ret = PyCOMPSSeq_new(&PyCOMPS_IDsType, NULL, NULL);
-        PyCOMPSIDs_init((PyCOMPS_Sequence*)ret, NULL, NULL);
+        ret = PyCOMPSCtoPySeq_new(&PyCOMPS_GIDsType, NULL, NULL);
+        PyCOMPSGIDs_init((PyCOMPS_CtoPySeq*)ret, NULL, NULL);
         if (pycomps_env_gget(self)->option_list == NULL) {
             pycomps_env_gget(self)->option_list= comps_list_create();
             comps_list_init(pycomps_env_gget(self)->option_list);
             pycomps_env_get_extra((PyObject*)self)->option_list_citem->data =
                                    pycomps_env_gget(self)->option_list;
         }
-        ctopy_citem_destroy(((PyCOMPS_Sequence*)ret)->citem);
-        ((PyCOMPS_Sequence*)ret)->citem =
+        ctopy_citem_destroy(((PyCOMPS_CtoPySeq*)ret)->citem);
+        ((PyCOMPS_CtoPySeq*)ret)->citem =
                        pycomps_env_get_extra((PyObject*)self)->option_list_citem;
         self->option_list_pobj = ret;
-        ctopy_citem_incref(((PyCOMPS_Sequence*)ret)->citem);
+        ctopy_citem_incref(((PyCOMPS_CtoPySeq*)ret)->citem);
         Py_INCREF(ret);
     } else {
         ret = self->option_list_pobj;
@@ -473,8 +473,8 @@ int PyCOMPSEnv_set_optionids(PyCOMPS_Env *self,
         PyErr_SetString(PyExc_TypeError, "Cannot delete attribute option_ids");
         return -1;
     }
-    if (value->ob_type != &PyCOMPS_IDsType) {
-        PyErr_Format(PyExc_TypeError, "Not %s instance", PyCOMPS_IDsType.tp_name);
+    if (value->ob_type != &PyCOMPS_GIDsType) {
+        PyErr_Format(PyExc_TypeError, "Not %s instance", PyCOMPS_GIDsType.tp_name);
         return -1;
     }
     ctopy_citem_decref(pycomps_env_get_extra((PyObject*)self)->option_list_citem);

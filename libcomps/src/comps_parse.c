@@ -518,7 +518,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             }
             list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
             if (!list_last_env->option_list->first)
-                comps_log_error(parsed->log, "grouplist", COMPS_ERR_LIST_EMPTY,
+                comps_log_error(parsed->log, "optionlist", COMPS_ERR_LIST_EMPTY,
                                 parser_line, parser_col, 0);
         break;
         case COMPS_ELEM_PACKAGEREQ:
@@ -615,7 +615,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 } else if (parent == COMPS_ELEM_OPTLIST &&
                            list_last_env->option_list != NULL) {
                     comps_docgroupid_set_name(
-                     (COMPS_DocGroupId*)list_last_env->group_list->last->data,
+                     (COMPS_DocGroupId*)list_last_env->option_list->last->data,
                             parsed->tmp_buffer, 0);
                 } else if (parent == COMPS_ELEM_GROUPLIST) {
                     comps_log_warning(parsed->log, parsed->tmp_buffer,
