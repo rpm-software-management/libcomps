@@ -675,7 +675,7 @@ class COMPSTest(unittest.TestCase):
 
         comps2 = libcomps.Comps()
         ret = comps2.fromxml_f(fname)
-        self.assertTrue(ret == 0, comps2.get_last_parse_errors())
+        self.assertTrue(ret == 0, comps2.get_last_errors())
 
         compsdoc = comps2.xml_str()
         compsdoc = compsdoc[0:-5] # make some error
@@ -687,7 +687,7 @@ class COMPSTest(unittest.TestCase):
         ret = comps3.fromxml_str(compsdoc)
         #print comps3.get_last_parse_log()
         self.assertTrue(ret ==  -1, "%d %s" %(ret,
-                                              comps3.get_last_parse_errors()))
+                                              comps3.get_last_errors()))
         self.assertTrue(len(comps3.groups) == 3)
         self.assertTrue(len(comps3.categories) == 2)
         self.assertTrue(len(comps3.environments) == 0)

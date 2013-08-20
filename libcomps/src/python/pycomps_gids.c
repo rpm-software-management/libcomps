@@ -187,7 +187,9 @@ int PyCOMPSGID_print(PyObject *self, FILE *f, int flags) {
 PyObject* pycomps_gid_from_str(PyObject *other) {
     PyObject *pygid = PyCOMPSGID_new(&PyCOMPS_GIDType, NULL, NULL);
     PyCOMPSGID_init((PyCOMPS_GID*)pygid, NULL, NULL);
-    __pycomps_PyUnicode_AsString(other, &pycomps_gid_get(pygid)->name);
+    __pycomps_stringable_to_char(other, &pycomps_gid_get(pygid)->name);
+    if (!pycomps_gid_get(pygid)->name)
+        return NULL;
     return pygid;
 }
 
@@ -301,9 +303,9 @@ PyObject* PyCOMPSGIDs_append(PyObject * self, PyObject *item) {
     void *key;
     PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
     if (PyUnicode_Check(item) || PyBytes_Check(item)) {
-        PyObject *item2 = PyCOMPSGID_new(&PyCOMPS_GIDType, NULL, NULL);
-        PyCOMPSGID_init((PyCOMPS_GID*)item2, NULL, NULL);
-        __pycomps_PyUnicode_AsString(item, &pycomps_gid_get(item2)->name);
+        PyObject *item2 = pycomps_gid_from_str(item);
+        if (!item2)
+            return NULL;
         it = comps_list_item_create(((PyCOMPS_CtoPy_PItem*)item2)->citem->data,
                                      NULL,
                                      &pycomps_gid_decref);
