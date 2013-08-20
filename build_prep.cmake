@@ -89,11 +89,13 @@ LIST_CONTAINS(contains ${top_commit} ${tags})
 if (NOT contains)
     set(tags "${tags};${top_commit}")
     set(SOURCE_URL_PATH "archive/%{commit}/libcomps-%{commit}.tar.gz")
+    set(archive_name "libcomps-${GITREVLONG}.tar.gz")
 else (NOT contains)
     execute_process(COMMAND "git" describe --tags --exact-match ${top_commit}
                         OUTPUT_VARIABLE describe_out ERROR_VARIABLE describe_err)
     string(REPLACE "\n" "" top_tag ${describe_out})
-    set(SOURCE_URL_PATH "${top_tag}.tag.gz")
+    set(SOURCE_URL_PATH "${top_tag}.tar.gz")
+    set(archive_name "${top_tag}.tar.gz")
 endif(NOT contains)
 
 list(GET tags 0 last)
@@ -151,7 +153,7 @@ exec_program("git" ARGS rev-parse HEAD OUTPUT_VARIABLE GITREVLONG)
 
 set(GITARG archive ${GITREV} "--format=tar.gz" "--prefix=libcomps-${GITREVLONG}/")
 set(GITCMD "git")
-execute_process(COMMAND ${GITCMD} ${GITARG} OUTPUT_FILE "libcomps-${GITREVLONG}.tar.gz")
+execute_process(COMMAND ${GITCMD} ${GITARG} OUTPUT_FILE ${archive_name})
 
 configure_file(libcomps.spec.in libcomps.spec)
 configure_file(libcomps.pc.in libcomps.pc @ONLY)

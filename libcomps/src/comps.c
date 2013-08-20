@@ -1535,7 +1535,6 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     COMPS_HSListItem *hsit;
     COMPS_Set *set;
     COMPS_HSList *pairs;
-    COMPS_DocGroupId *gid;
     res = comps_doccategory_create();
     comps_dict_destroy(res->properties);
 
@@ -2086,8 +2085,6 @@ inline char comps_docenv_cmp(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     for (; it!= NULL; it = it->next) {
         if (!comps_set_in(set, it->data)) {
             comps_set_destroy(&set);
-            printf("%s\n", ((COMPS_DocGroupId*)it->data));
-            printf("gid differ\n");
             return 0;
         }
     }
