@@ -174,6 +174,7 @@ class BaseObjTestClass(object):
             with self.assertRaises(TypeError):
                 self.assertTrue(delattr(obj, x[0]), x[0])
 
+    #@unittest.skip("")
     def test_dictmembers(self):
         obj = self.obj_constructor(**self.obj_data[0])
         for member in self.obj_dict_members:
@@ -187,6 +188,7 @@ class BaseObjTestClass(object):
             for x,y in _zipped:
                 self.assertTrue(_dict[x] == y)
 
+    #@unittest.skip("")
     def test_listmembers(self):
         obj = self.obj_constructor(**self.obj_data[0])
         for member, v in _iteritems(self.obj_list_members):
@@ -230,6 +232,7 @@ class BaseObjTestClass(object):
         return obj1
 
 
+    #@unittest.skip("")
     def test_union1(self):
         obj1 = self.__union_prep1()
         obj2 = self.obj_constructor(**self.obj_data[1])
@@ -247,6 +250,7 @@ class BaseObjTestClass(object):
             _d = {k:v for k,v in _iteritems(_dict)}
             self.assertTrue(_d == _d1)
 
+    #@unittest.skip("")
     def test_union2(self):
         obj1 = self.__union_prep1()
         obj2 = self.obj_constructor(**self.obj_data[1])
@@ -264,6 +268,7 @@ class BaseObjTestClass(object):
             _d = {k:v for k,v in _iteritems(_dict)}
             self.assertTrue(_d == _d1)
 
+    #@unittest.skip("")
     def test_union3(self):
         obj1 = self.__union_prep1()
         obj2 = self.__union_prep2()
@@ -824,10 +829,27 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(cids3_set == cids_set)
         self.assertTrue(eids3_set == eids_set)
 
+    @unittest.skip("")
+    def test_gz(self):
+        comps = libcomps.Comps()
+        comps.fromxml_f("comps-rawhide.xml.gz")
+
+    #@unittest.skip("")
+    def test_a_inoptid(self):
+        c = libcomps.Comps()
+        c.fromxml_f("comps-rawhide.xml")
+        groups = c.groups
+        envs = [e for e in c.environments if "gnome" in e.id]
+        env = envs[0]
+        for grp in groups:
+            id_ = grp.id
+            print(id_ in env.option_ids)
+
+
 if __name__ == "__main__":
     unittest.main(testRunner = MyRunner)
     #unittest.main()
-    #suite = unittest.TestLoader().loadTestsFromTestCase(CategoryTest)
+    #suite = unittest.TestLoader().loadTestsFromTestCase(Category_Test)
     #ret = MyRunner(verbosity=2).run(suite)
     
     #unittest.TextTestRunner(verbosity=2).run(suite)

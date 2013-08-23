@@ -317,14 +317,26 @@ PyObject* comps_env_str(void * env) {
          ((COMPS_DocEnv*)env)->group_list->first:NULL;
     for (; it != NULL && it != ((COMPS_DocEnv*)env)->group_list->last;
          it = it->next){
-        tmp2 =PyUnicode_FromFormat("'%s', ", (char*)it->data);
+        if (((COMPS_DocGroupId*)it->data)->def) {
+            tmp2 =PyUnicode_FromFormat("['%s' default=true], ",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        } else {
+            tmp2 =PyUnicode_FromFormat("'%s', ",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        }
         tmp = PyUnicode_Concat(ret,tmp2);
         Py_DECREF(ret);
         Py_DECREF(tmp2);
         ret = tmp;
     }
     if (it) {
-        tmp2 =PyUnicode_FromFormat("'%s', ", (char*)it->data);
+        if (((COMPS_DocGroupId*)it->data)->def) {
+            tmp2 =PyUnicode_FromFormat("['%s' default=true]",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        } else {
+            tmp2 =PyUnicode_FromFormat("'%s'",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        }
     } else {
         tmp2 = PyUnicode_FromString("]");
     }
@@ -342,14 +354,26 @@ PyObject* comps_env_str(void * env) {
          ((COMPS_DocEnv*)env)->option_list->first:NULL;
     for (; it != NULL && it != ((COMPS_DocEnv*)env)->option_list->last;
          it = it->next){
-        tmp2 =PyUnicode_FromFormat("'%s', ", (char*)it->data);
+        if (((COMPS_DocGroupId*)it->data)->def) {
+            tmp2 =PyUnicode_FromFormat("['%s' default=true], ",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        } else {
+            tmp2 =PyUnicode_FromFormat("'%s', ",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        }
         tmp = PyUnicode_Concat(ret,tmp2);
         Py_DECREF(ret);
         Py_DECREF(tmp2);
         ret = tmp;
     }
     if (it) {
-        tmp2 =PyUnicode_FromFormat("'%s', ", (char*)it->data);
+        if (((COMPS_DocGroupId*)it->data)->def) {
+            tmp2 =PyUnicode_FromFormat("['%s' default=true]",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        } else {
+            tmp2 =PyUnicode_FromFormat("'%s'",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        }
     } else {
         tmp2 = PyUnicode_FromString("]");
     }

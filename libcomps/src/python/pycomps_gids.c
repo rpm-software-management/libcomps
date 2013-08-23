@@ -158,17 +158,21 @@ PyGetSetDef gid_getset[] = {
     {NULL}  /* Sentinel */
 };
 
-PyObject* PyCOMPSGID_str(PyObject *self) {
+PyObject* comps_gid_str(void *gid) {
     PyObject * ret;
     char *name;
     const char *def;
     char * empty = "";
-    name = (pycomps_gid_get(self)->name)?
-          pycomps_gid_get(self)->name:empty;
-    def = (pycomps_gid_get(self)->def)?"true":"false";
+    name = (((COMPS_DocGroupId*)gid)->name)?
+          ((COMPS_DocGroupId*)gid)->name:empty;
+    def = ((COMPS_DocGroupId*)gid)->def?"true":"false";
     ret = PyUnicode_FromFormat("<COMPS_GroupID: name='%s', default=%s>",
                                name, def);
     return ret;
+}
+
+PyObject* PyCOMPSGID_str(PyObject *self) {
+    return comps_gid_str(pycomps_gid_get(self));
 }
 
 inline void comps_gid_print(FILE *f, void *gid) {
@@ -184,12 +188,26 @@ int PyCOMPSGID_print(PyObject *self, FILE *f, int flags) {
     return 0;
 }
 
+COMPS_DocGroupId* comps_gid_from_str(PyObject *other) {
+    COMPS_DocGroupId *gid;
+    gid = comps_docgroupid_create();
+    gid->reserved = ctopy_citem_create(gid, &pycomps_gid_destroy);
+    __pycomps_stringable_to_char(other, &gid->name);
+    if (!gid->name) {
+        pycomps_gid_decref(gid);
+        return NULL;
+    }
+    return gid;
+}
+
 PyObject* pycomps_gid_from_str(PyObject *other) {
     PyObject *pygid = PyCOMPSGID_new(&PyCOMPS_GIDType, NULL, NULL);
     PyCOMPSGID_init((PyCOMPS_GID*)pygid, NULL, NULL);
     __pycomps_stringable_to_char(other, &pycomps_gid_get(pygid)->name);
-    if (!pycomps_gid_get(pygid)->name)
+    if (!pycomps_gid_get(pygid)->name) {
+        PyCOMPSGID_dealloc((PyCOMPS_GID*)pygid);
         return NULL;
+    }
     return pygid;
 }
 
@@ -247,7 +265,8 @@ PyCOMPS_CtoPySeqItemMan PyCOMPSGID_ItemMan = {
     .data_incref = pycomps_gid_incref,
     .data_cmp = pycomps_gid_cmp,
     .data_decref = pycomps_gid_decref,
-    .fprint_f = comps_gid_print
+    .fprint_f = comps_gid_print,
+    .str_f = comps_gid_str
 };
 
 PyTypeObject PyCOMPS_GIDType = {
@@ -303,16 +322,15 @@ PyObject* PyCOMPSGIDs_append(PyObject * self, PyObject *item) {
     void *key;
     PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
     if (PyUnicode_Check(item) || PyBytes_Check(item)) {
-        PyObject *item2 = pycomps_gid_from_str(item);
-        if (!item2)
+        COMPS_DocGroupId* gid = comps_gid_from_str(item);
+        if (!gid)
             return NULL;
-        it = comps_list_item_create(((PyCOMPS_CtoPy_PItem*)item2)->citem->data,
-                                     NULL,
-                                     &pycomps_gid_decref);
-        key = ctopy_make_key(it->data);
-        comps_brtree_set(self_seq->ctopy_map, key, item2);
-        Py_INCREF(item2);
-        ctopy_key_destroy(key);
+        it = comps_list_item_create(gid, NULL, &pycomps_gid_decref);
+
+        //key = ctopy_make_key(it->data);
+        //comps_brtree_set(self_seq->ctopy_map, key, item2);
+        //Py_INCREF(item2);
+        //ctopy_key_destroy(key);
         if (!comps_list_append(ctopy_get_list(self), it)) {
             PyErr_SetString(PyExc_TypeError, "Cannot append\n");
             return NULL;

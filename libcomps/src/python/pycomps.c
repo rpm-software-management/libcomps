@@ -143,6 +143,14 @@ void pycomps_ctopy_comps_init(PyObject *self) {
         comps_cat_get_extra(it->data)->desc_by_lang_citem = ctopy_citem_create(
                                    ((COMPS_DocCategory*)it->data)->desc_by_lang,
                                    &comps_dict_destroy_v);
+        it2 =(((COMPS_DocCategory*)it->data)->group_ids)?
+                ((COMPS_DocCategory*)it->data)->group_ids->first:NULL;
+        for (; it2 != NULL; it2 = it2->next) {
+            ((COMPS_DocGroupId*)it2->data)->reserved = ctopy_citem_create(
+                                                           it2->data,
+                                                           &pycomps_gid_destroy);
+            it2->data_destructor = &pycomps_gid_decref;
+        }
         it->data_destructor = &pycomps_cat_decref;
     }
     it =(comps_doc_groups(self_comps->comps))?
@@ -190,6 +198,22 @@ void pycomps_ctopy_comps_init(PyObject *self) {
                                    ((COMPS_DocEnv*)it->data)->desc_by_lang,
                                    &comps_dict_destroy_v);
         it->data_destructor = &pycomps_env_decref;
+        it2 =(((COMPS_DocEnv*)it->data)->group_list)?
+                ((COMPS_DocEnv*)it->data)->group_list->first:NULL;
+        for (; it2 != NULL; it2 = it2->next) {
+            ((COMPS_DocGroupId*)it2->data)->reserved = ctopy_citem_create(
+                                                           it2->data,
+                                                           &pycomps_gid_destroy);
+            it2->data_destructor = &pycomps_gid_decref;
+        }
+        it2 =(((COMPS_DocEnv*)it->data)->option_list)?
+                ((COMPS_DocEnv*)it->data)->option_list->first:NULL;
+        for (; it2 != NULL; it2 = it2->next) {
+            ((COMPS_DocGroupId*)it2->data)->reserved = ctopy_citem_create(
+                                                           it2->data,
+                                                           &pycomps_gid_destroy);
+            it2->data_destructor = &pycomps_gid_decref;
+        }
     }
 
     self_comps->cats_citem = ctopy_citem_create(

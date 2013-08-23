@@ -39,6 +39,7 @@ void pycomps_gid_decref(void * gid);
 void pycomps_gid_incref(void * gid);
 void pycomps_gid_destroy(void * gid);
 void comps_gid_print(FILE *f, void *p);
+PyObject* comps_gid_str(void *gid);
 
 COMPS_DocGroupId* pycomps_gid_get(PyObject *pygid);
 PyObject* PyCOMPSGID_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
