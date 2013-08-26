@@ -244,25 +244,32 @@ PyObject* comps_cat_str(void * cat) {
     it = (((COMPS_DocCategory*)cat)->group_ids)?
          ((COMPS_DocCategory*)cat)->group_ids->first:NULL;
     for (; it != ((COMPS_DocCategory*)cat)->group_ids->last; it = it->next){
-        tmp2 = PyUnicode_FromFormat("'%s', ", (char*)it->data);
-        tmp = PyUnicode_Concat(ret, tmp2);
+        if (((COMPS_DocGroupId*)it->data)->def) {
+            tmp2 =PyUnicode_FromFormat("['%s' default=true], ",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        } else {
+            tmp2 =PyUnicode_FromFormat("'%s', ",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        }
         Py_XDECREF(tmp2);
         Py_XDECREF(ret);
         ret = tmp;
     }
     if (it) {
-        tmp2 = PyUnicode_FromFormat("'%s']", (char*)it->data);
-        tmp = PyUnicode_Concat(ret, tmp2);
-        Py_XDECREF(tmp2);
-        Py_XDECREF(ret);
-        ret = tmp;
+        if (((COMPS_DocGroupId*)it->data)->def) {
+            tmp2 = PyUnicode_FromFormat("['%s' default=true]",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        } else {
+            tmp2 = PyUnicode_FromFormat("'%s'",
+                                       ((COMPS_DocGroupId*)it->data)->name);
+        }
     } else {
         tmp2 = PyUnicode_FromString("]");
-        tmp = PyUnicode_Concat(ret, tmp2);
-        Py_XDECREF(ret);
-        Py_XDECREF(tmp2);
-        ret = tmp;
     }
+    tmp = PyUnicode_Concat(ret,tmp2);
+    Py_DECREF(tmp2);
+    Py_DECREF(ret);
+    ret = tmp;
 
     tmp2 = PyUnicode_FromString(">");
     tmp = PyUnicode_Concat(ret, tmp2);
@@ -325,10 +332,23 @@ void comps_cat_print(FILE *f, void *c) {
     if (((COMPS_DocCategory*)c)->group_ids) {
         for (it = (((COMPS_DocCategory*)c)->group_ids)->first; it != NULL &&
              it != ((COMPS_DocCategory*)c)->group_ids->last; it = it->next){
-            fprintf(f, "'%s', ", (char*)it->data);
+            if (((COMPS_DocGroupId*)it->data)->def) {
+                fprintf(f, "['%s' default=true], ",
+                           ((COMPS_DocGroupId*)it->data)->name);
+            } else {
+                fprintf(f, "'%s', ",
+                        ((COMPS_DocGroupId*)it->data)->name);
+            }
         }
-        if (it)
-            fprintf(f, "'%s'", (char*)it->data);
+        if (it) {
+            if (((COMPS_DocGroupId*)it->data)->def) {
+                fprintf(f, "['%s' default=true]",
+                           ((COMPS_DocGroupId*)it->data)->name);
+            } else {
+                fprintf(f, "'%s'",
+                        ((COMPS_DocGroupId*)it->data)->name);
+            }
+        }
     }
     fprintf(f, "]>");
 }

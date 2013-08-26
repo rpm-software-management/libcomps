@@ -72,12 +72,14 @@ PyObject* PyCOMPSGID_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
 char pycomps_p2c_bool_convert(PyObject* pobj, void *cobj) {
     if (!PyBool_Check(pobj)) {
+        cobj = NULL;
         return 0;
     } else {
-        if (pobj == Py_True)
+        if (pobj == Py_True) {
             *(char*)cobj = 1;
-        else
+        } else {
             *(char*)cobj = 0;
+        }
         return 1;
     }
 }
@@ -94,20 +96,24 @@ int PyCOMPSGID_init(PyCOMPS_GID *self, PyObject *args, PyObject *kwds)
     char *name = NULL;
     char def;
 
-    char* keywords[] = {"default"};
-
-    if (args!=NULL && kwds && PyArg_ParseTupleAndKeywords(args, kwds,
-                                    "s|O&", keywords, &name,
-                                            &pycomps_p2c_bool_convert,&def)) {
-        comps_docgroupid_set_name(pycomps_gid_get((PyObject*)self), name, 1);
-        comps_docgroupid_set_default(pycomps_gid_get((PyObject*)self), def);
-        return 0;
+    char* keywords[] = {"name", "default", NULL};
+    if (args) {
+        if (PyArg_ParseTupleAndKeywords(args, kwds,
+                                        "s|O&", keywords, &name,
+                                        &pycomps_p2c_bool_convert, &def
+                                           )) {
+            comps_docgroupid_set_name(pycomps_gid_get((PyObject*)self), name, 1);
+            comps_docgroupid_set_default(pycomps_gid_get((PyObject*)self), def);
+            return 0;
+        } else {
+            return -1;
+        }
     } else {
         pycomps_gid_get((PyObject*)self)->name = NULL;
         pycomps_gid_get((PyObject*)self)->def = 0;
         return 0;
     }
-    return 1;
+    return -1;
 }
 
 PyObject* PyCOMPSGID_strget_(PyCOMPS_GID *self, void *closure) {
@@ -163,6 +169,7 @@ PyObject* comps_gid_str(void *gid) {
     char *name;
     const char *def;
     char * empty = "";
+    printf("gid str def:%d\n", ((COMPS_DocGroupId*)gid)->def);
     name = (((COMPS_DocGroupId*)gid)->name)?
           ((COMPS_DocGroupId*)gid)->name:empty;
     def = ((COMPS_DocGroupId*)gid)->def?"true":"false";

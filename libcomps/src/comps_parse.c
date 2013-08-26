@@ -898,7 +898,7 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         case COMPS_ELEM_GROUPID:
             parsed->text_buffer_pt = &parsed->tmp_buffer;
             groupid = comps_docgroupid_create();
-            tmp = comps_dict_get(elem->attrs, "name");
+            tmp = comps_dict_get(elem->attrs, "default");
             comps_docgroupid_set_default(groupid, __comps_strcmp(tmp, "true"));
 
             if (parent == COMPS_ELEM_GROUPLIST) {

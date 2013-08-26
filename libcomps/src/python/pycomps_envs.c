@@ -331,10 +331,10 @@ PyObject* comps_env_str(void * env) {
     }
     if (it) {
         if (((COMPS_DocGroupId*)it->data)->def) {
-            tmp2 =PyUnicode_FromFormat("['%s' default=true]",
+            tmp2 = PyUnicode_FromFormat("['%s' default=true]",
                                        ((COMPS_DocGroupId*)it->data)->name);
         } else {
-            tmp2 =PyUnicode_FromFormat("'%s'",
+            tmp2 = PyUnicode_FromFormat("'%s'",
                                        ((COMPS_DocGroupId*)it->data)->name);
         }
     } else {

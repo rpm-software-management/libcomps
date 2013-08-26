@@ -2265,7 +2265,7 @@ inline void comps_docgroupid_set_name(COMPS_DocGroupId *groupid, char *name,
 }
 
 inline void comps_docgroupid_set_default(COMPS_DocGroupId *groupid, char def) {
-    if (groupid == NULL) {
+    if (groupid != NULL) {
         groupid->def = (def != 0);
     }
 }

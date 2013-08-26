@@ -248,13 +248,18 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
     parsed_ret = comps_parse_file(parsed, f);
     pycomps_clear(self);
     pycomps_doc_destroy((void*)self_comps->comps);
-    self_comps->comps = parsed->comps_doc;
+    if (parsed->comps_doc) {
+        self_comps->comps = parsed->comps_doc;
+        self_comps->enc = PyBytes_FromString(parsed->comps_doc->encoding);
+    } else {
+        self_comps->comps = comps_doc_create("UTF-8");
+        self_comps->enc = PyBytes_FromString("UTF-8");
+    }
     comps_log_destroy(self_comps->comps->log);
     self_comps->comps->log = parsed->log;
     parsed->log = NULL;
 
     pycomps_ctopy_comps_init(self);
-    self_comps->enc = PyBytes_FromString(parsed->comps_doc->encoding);
 
     free(fname);
     parsed->comps_doc = NULL;
