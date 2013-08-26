@@ -19,18 +19,23 @@
 # USA
 
 import _libpycomps as libcomps
+
+import sys
 import unittest
 import tempfile
 import os
 import traceback
 import inspect
 
+if sys.version_info[0] == 3:
+    from functools import reduce
 if hasattr(dict, "iteritems"):
     def _iteritems(_dict):
         return _dict.iteritems()
 else:
     def _iteritems(_dict):
         return _dict.items()
+
 
 class MyResult(unittest.TestResult):
     WHITEBOLD = {"1":(1,),  "2":(0,)}
@@ -676,7 +681,6 @@ class COMPSTest(unittest.TestCase):
         (h, fname) = tempfile.mkstemp()
         ret = self.comps.xml_f(fname)
         self.assertTrue(not ret)
-        #f = open(fname, "r")
 
         comps2 = libcomps.Comps()
         ret = comps2.fromxml_f(fname)
@@ -698,6 +702,7 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(len(comps3.environments) == 0)
         x = self.comps.xml_str()
         y = comps2.xml_str()
+
         self.assertTrue(x == y)
         os.remove(fname)
 
@@ -756,7 +761,6 @@ class COMPSTest(unittest.TestCase):
         c2 = libcomps.Comps()
         c2.fromxml_f('main_comps.xml')
         c = c1 + c2
-        return
 
         c1 = libcomps.Comps()
         c1.fromxml_f('main_comps.xml')
@@ -829,22 +833,47 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(cids3_set == cids_set)
         self.assertTrue(eids3_set == eids_set)
 
-    @unittest.skip("")
+    #@unittest.skip("")
     def test_gz(self):
         comps = libcomps.Comps()
-        comps.fromxml_f("comps-rawhide.xml.gz")
+        ret = comps.fromxml_f("sample_comps2.xml.gz")
+        self.assertTrue(ret == -1)
 
     #@unittest.skip("")
     def test_a_inoptid(self):
         c = libcomps.Comps()
-        c.fromxml_f("comps-rawhide.xml")
+        ret = c.fromxml_f("sample_comps2.xml")
+        self.assertTrue(ret != -1)
         groups = c.groups
+
         envs = [e for e in c.environments if "gnome" in e.id]
         env = envs[0]
-        for grp in groups:
-            id_ = grp.id
-            print(id_ in env.option_ids)
+        #for grp in groups:
+        #    id_ = grp.id
+        ret = reduce(lambda x,y : y and (x or env.option_ids), groups, False)
+        self.assertTrue(ret)
 
+    def test_default(self):
+        e = libcomps.Environment("e1", "enviroment1", "env desc")
+        e.group_ids.append("groupid1")
+        e.group_ids.append("groupid2")
+        gid = libcomps.GroupId("groupid3", default=True)
+        e.group_ids.append(gid)
+
+        gid = libcomps.GroupId("groupid4")
+        e.group_ids.append(gid)
+
+        gid = libcomps.GroupId("groupid4", default=False)
+        e.group_ids.append(gid)
+
+        with self.assertRaises(TypeError):
+            gid = libcomps.GroupId()
+
+        self.assertFalse(e.group_ids[0].default)
+        self.assertFalse(e.group_ids[1].default)
+        self.assertTrue(e.group_ids[2].default)
+        self.assertFalse(e.group_ids[3].default)
+        self.assertFalse(e.group_ids[4].default)
 
 if __name__ == "__main__":
     unittest.main(testRunner = MyRunner)
