@@ -13,6 +13,8 @@ FILE(COPY ${pycomps_SRCDIR}/__init__.py DESTINATION ./libcomps/)
 FILE(COPY ${pycomps_SRCDIR}/tests/__test.py DESTINATION ./libcomps/)
 FILE(COPY ${pycomps_SRCDIR}/tests/fedora_comps.xml DESTINATION ./libcomps/)
 FILE(COPY ${pycomps_SRCDIR}/tests/sample_comps.xml DESTINATION ./libcomps/)
+FILE(COPY ${pycomps_SRCDIR}/tests/sample_comps2.xml DESTINATION ./libcomps/)
+FILE(COPY ${pycomps_SRCDIR}/tests/sample_comps2.xml.gz DESTINATION ./libcomps/)
 FILE(COPY ${pycomps_SRCDIR}/tests/main_comps.xml DESTINATION ./libcomps/)
 FILE(COPY ${pycomps_SRCDIR}/tests/main_comps2.xml DESTINATION ./libcomps/)
 
