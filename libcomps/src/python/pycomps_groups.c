@@ -173,12 +173,6 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
     static char *kwlist[] = {"id", "name", "desc", "display_order", "default",
                               "uservisible", "langonly", NULL};
 
-    name = NULL;
-    id = NULL;
-    desc = NULL;
-    def = 0;
-    uservis = 0;
-    lang = NULL;
     if (!args && !kwds) {
         return 0;
     } else if (PyArg_ParseTupleAndKeywords(args, kwds, "|sssiiis", kwlist,
@@ -907,7 +901,7 @@ PyObject* PyCOMPSPack_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 int PyCOMPSPack_init(PyCOMPS_Package *self, PyObject *args, PyObject *kwds)
 {
     char *name = NULL;
-    long type = COMPS_PACKAGE_UNKNOWN;
+    int type = COMPS_PACKAGE_UNKNOWN;
 
    (void) kwds;
 

@@ -94,7 +94,7 @@ PyObject* pycomps_c2p_bool_convert(void *cobj) {
 int PyCOMPSGID_init(PyCOMPS_GID *self, PyObject *args, PyObject *kwds)
 {
     char *name = NULL;
-    char def;
+    char def = 0;
 
     char* keywords[] = {"name", "default", NULL};
     if (args) {

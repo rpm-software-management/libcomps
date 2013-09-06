@@ -1,2 +1,2 @@
-echo $(pwd)
+#!/bin/sh
 @PYTHON_EXECUTABLE@ __test.py

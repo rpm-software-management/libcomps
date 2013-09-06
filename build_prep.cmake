@@ -73,7 +73,11 @@ SET(changelog_commits 946584c5a01d83bf9ec4c26d3f9d73e37bfb5456;
                       e401de99222bac95e61b10836b230367a92f5e4f;
                       f243b574c801244447b873c8e77b82b3318c09d4;
                       5500d1275ce9288a763c957a23525aae25f283fb;
-                      997834ec69b72ded9acbd785502c5f3bbf888be8)
+                      997835ec69b72ded9acbd785502c5f3bbf888be8;
+                      8108808bbcdfacbb2732536ddcc05cd44318dd9c;
+                      08008e492804c488a4a97712785ed99880343d69
+)
+
 set(CHANGELOG "")
 
 execute_process(COMMAND "git" rev-parse --tags

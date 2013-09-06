@@ -60,6 +60,7 @@ START_TEST(test_comps_parse1)
     int ret;
 
     COMPS_List * tmplist;
+    fprintf(stderr, "## Running test_parse1\n\n");
 
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
@@ -209,7 +210,7 @@ START_TEST(test_comps_parse2)
     //COMPS_ListItem *it;
     int i;
 
-    //COMPS_List * tmplist;
+    fprintf(stderr, "## Running test_parse2\n\n");
     COMPS_LoggerEntry* known_errors[8];
     known_errors[0] = comps_log_entry_create("description", 0,
                                              COMPS_ERR_NOCONTENT, 265, 18, 0);
@@ -257,7 +258,7 @@ START_TEST(test_comps_parse3)
     COMPS_List *tmplist;
     COMPS_LoggerEntry* known_errors[3];
     COMPS_Prop *tmp_prop;
-    //COMPS_HSListItem *hsit;
+    fprintf(stderr, "## Running test_parse3\n\n");
 
     known_errors[0] = comps_log_entry_create("id", 0,
                                              COMPS_ERR_ELEM_REQUIRED, 188, 2, 0);
@@ -312,6 +313,7 @@ START_TEST(test_comps_parse4)
     int i;
     //COMPS_List * tmplist;
     COMPS_LoggerEntry* known_errors[15];
+    fprintf(stderr, "## Running test_parse4\n\n");
 
     known_errors[0] = comps_log_entry_create("id", 0,
                                              COMPS_ERR_NOPARENT, 4, 2, 0);
@@ -367,7 +369,7 @@ START_TEST(test_comps_parse5)
     //COMPS_ListItem *it;
     //int ret
     int i;
-    //COMPS_List * tmplist;
+    fprintf(stderr, "## Running test_parse5\n\n");
     COMPS_LoggerEntry* known_errors[2];
 
     known_errors[0] = comps_log_entry_create("some stray", 0,
@@ -398,7 +400,7 @@ START_TEST(test_comps_fedora_parse)
     //COMPS_ListItem *it;
     FILE *fp;
     //char *tmp;
-    //char *err_str;
+    fprintf(stderr, "## Running test_parse fedora\n");
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 0);
     fp = fopen("fedora_comps.xml", "r");

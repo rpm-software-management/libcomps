@@ -25,47 +25,47 @@
 __COMPS_LoggerMsg COMPS_LogMessages[] = {
       [COMPS_ERR_NO_ERR] = {.format ="",
                             .usedm=0,.used1=0,.used2=0,.used3=0},
-      [COMPS_ERR_ELEM_UNKNOWN] = {.format="WARNING: Unknown elemenet '%s' at line:%d\n",
+      [COMPS_ERR_ELEM_UNKNOWN] = {.format="WARNING: Unknown elemenet '%s' at line:%s\n",
                                   .usedm=1,.used1=2,.used2=0,.used3=0},
-      [COMPS_ERR_ELEM_ALREADYSET] = {.format="WARNING: Element <%s> at line:%d "
-                                     "col:%d has been already found\n",
+      [COMPS_ERR_ELEM_ALREADYSET] = {.format="WARNING: Element <%s> at line:%s "
+                                     "col:%s has been already found\n",
                                   .usedm=1,.used1=2,.used2=3,.used3=0},
-      [COMPS_ERR_PARSER] = {.format="ERROR: Parser error at line:%d col:%d\n    %s\n",
+      [COMPS_ERR_PARSER] = {.format="ERROR: Parser error at line:%s col:%s\n    %s\n",
                             .usedm=3,.used1=1,.used2=2,.used3=0},
       [COMPS_ERR_DEFAULT_PARAM] = {.format="WARNING: Wrong default param value '%s' "
-                                   "at line:%d col:%d\n",
+                                   "at line:%s col:%s\n",
                                    .usedm=1,.used1=2,.used2=3,.used3=0},
       [COMPS_ERR_USERVISIBLE_PARAM] = {.format="WARNING: Wrong uservisible param value"
-                                        "'%s' at line:%d col:%d\n",
+                                        "'%s' at line:%s col:%s\n",
                                         .usedm=1,.used1=2,.used2=3,.used3=0},
       [COMPS_ERR_PACKAGE_UNKNOWN] = {.format="WARNING: Unkonwn package type '%s' "
-                                     "at line:%d col:%d\n",
+                                     "at line:%s col:%s\n",
                                      .usedm=1,.used1=2,.used2=3,.used3=0},
       [COMPS_ERR_DEFAULT_MISSING] = {.format="WARNING: <default> subelement required"
-                                     " at line:%d col:%d\n",
+                                     " at line:%s col:%s\n",
                                         .usedm=0,.used1=1,.used2=2,.used3=0},
       [COMPS_ERR_USERVISIBLE_MISSING] = {.format="WARNING: <uservisible> subelement"
-                                         "required at line:%d col%d\n",
+                                         "required at line:%s col%s\n",
                                          .usedm=0,.used1=1,.used2=2,.used3=0},
       [COMPS_ERR_NAME_MISSING] = {.format="ERROR: '<name>' subelement required at "
-                                  "line:%d col:%d\n",
+                                  "line:%s col:%s\n",
                                   .usedm=0,.used1=1,.used2=2,.used3=0},
       [COMPS_ERR_ID_MISSING] = {.format="WARNING: '<id>' subelement required at "
-                                "line:%d col:%d\n",
+                                "line:%s col:%s\n",
                                 .usedm=0,.used1=1,.used2=2,.used3=0},
       [COMPS_ERR_DESC_MISSING] = {.format="WARNING: '<description>' subelement required"
-                                  " at line:%d col:%d\n",
+                                  " at line:%s col:%s\n",
                                   .usedm=0,.used1=1,.used2=2,.used3=0},
       [COMPS_ERR_GROUPLIST_NOTSET] = {.format="WARNING: '<grouplist>' subelement"
-                                  " not parsed and groupid found at line:%d col:%d\n",
+                                  " not parsed and groupid found at line:%s col:%s\n",
                                   .usedm=0,.used1=1,.used2=2,.used3=0},
       [COMPS_ERR_OPTIONLIST_NOTSET] = {.format="WARNING: '<optionlist>' subelement"
-                                  " not parsed and groupid found at line:%d col:%d\n",
+                                  " not parsed and groupid found at line:%s col:%s\n",
                                   .usedm=0,.used1=1,.used2=2,.used3=0},
       [COMPS_ERR_GROUPIDS_EMPTY] = {.format="ERROR: Missing <groupid> elements\n",
                                      .usedm=0,.used1=0,.used2=0,.used3=0},
       [COMPS_ERR_NOPARENT] = {.format="ERROR: <%s> found with no suitable parent"
-                                      " at line:%d col:%d\n",
+                                      " at line:%s col:%s\n",
                                      .usedm=1,.used1=2,.used2=3,.used3=0},
       [COMPS_ERR_MALLOC] = {.format="Malloc failed. Cannot continue\n",
                             .usedm=0,.used1=0,.used2=0,.used3=0},
@@ -75,16 +75,16 @@ __COMPS_LoggerMsg COMPS_LogMessages[] = {
                             .usedm=1,.used1=0,.used2=0,.used3=0},
       [COMPS_ERR_XMLGEN] = {.format="Can't generate xml\n",
                             .usedm=0,.used1=0,.used2=0,.used3=0},
-      [COMPS_ERR_ELEM_REQUIRED] = {.format="Element %s is required at line:%d "
-                                    "column :%d but missing\n", .usedm=1,
+      [COMPS_ERR_ELEM_REQUIRED] = {.format="Element %s is required at line:%s "
+                                    "column :%s but missing\n", .usedm=1,
                                     .used1=2, .used2=3, .used3=0},
-      [COMPS_ERR_LIST_EMPTY] = {.format="%s is empty at line:%d column :%d\n",
+      [COMPS_ERR_LIST_EMPTY] = {.format="%s is empty at line:%s column :%s\n",
                                 .usedm=1, .used1=2, .used2=3, .used3=0},
       [COMPS_ERR_TEXT_BETWEEN] = {.format="'%s' found between elements at line:"
-                                  "%d column :%d\n",
+                                  "%s column :%s\n",
                                 .usedm=1, .used1=2, .used2=3, .used3=0},
-      [COMPS_ERR_NOCONTENT] = {.format="<%s> content missing at line:%d "
-                               "column:%d\n", .usedm=1, .used1=2, .used2=3,
+      [COMPS_ERR_NOCONTENT] = {.format="<%s> content missing at line:%s "
+                               "column:%s\n", .usedm=1, .used1=2, .used2=3,
                                .used3=0}
 };
 
@@ -176,44 +176,89 @@ inline void comps_log_entry_destroy_v(void *entry) {
  * @return string representation of log entry
  */
 char * comps_log_entry_str(COMPS_LoggerEntry *entry) {
-    unsigned int len;
+    unsigned int len, total_used;
     char * ret;
-    union {
+    /*union {
         char *s;
         int i;
-    } pitem[4];
+    } pitem[4];*/
+    char * pstr[4];
+    for (int x = 0; x<4; x++) {
+        pstr[x] = NULL;
+    }
 
+    total_used = 0;
     len = strlen(COMPS_LogMessages[entry->code].format);
     if (COMPS_LogMessages[entry->code].usedm != 0) {
-        if (entry->log_message)
+        total_used++;
+        if (entry->log_message) {
             len += strlen(entry->log_message) -2;
-        else
+            pstr[COMPS_LogMessages[entry->code].usedm-1] = malloc(
+                            sizeof(char) * (strlen(entry->log_message) + 1));
+            sprintf(pstr[COMPS_LogMessages[entry->code].usedm-1],
+                    "%s", entry->log_message);
+        } else {
+            pstr[COMPS_LogMessages[entry->code].usedm - 1] = malloc(
+                                                                sizeof(char));
+            pstr[COMPS_LogMessages[entry->code].usedm - 1][0] = 0;
+            //sprintf(pstr[COMPS_LogMessages[entry->code].usedm - 1], "");
             len += -2; // empty message
+        }
     }
     if (COMPS_LogMessages[entry->code].used1 != 0) {
-        if (entry->opt_code1)
+        total_used++;
+        if (entry->opt_code1) {
             len += (int)ceil(log10(entry->opt_code1));
-        else
+            pstr[COMPS_LogMessages[entry->code].used1 - 1] = malloc(
+                    sizeof(char) * ((int)ceil(log10(entry->opt_code1)) + 1));
+            sprintf(pstr[COMPS_LogMessages[entry->code].used1 - 1],
+                    "%d", entry->opt_code1);
+        } else {
             len++;
+            pstr[COMPS_LogMessages[entry->code].used1 - 1] = malloc(
+                                                            sizeof(char) * 2);
+            sprintf(pstr[COMPS_LogMessages[entry->code].used1 - 1],
+                    "%d", entry->opt_code1);
+        }
         len -= 2;
     }
     if (COMPS_LogMessages[entry->code].used2 != 0) {
+        total_used++;
         if (entry->opt_code2) {
             len += (int)ceil(log10(entry->opt_code2));
-        } else
+            pstr[COMPS_LogMessages[entry->code].used2 - 1] = malloc(
+                    sizeof(char) * ((int)ceil(log10(entry->opt_code2)) + 1));
+            sprintf(pstr[COMPS_LogMessages[entry->code].used2 - 1],
+                    "%d", entry->opt_code2);
+        } else {
             len++;
+            pstr[COMPS_LogMessages[entry->code].used2 - 1] = malloc(
+                                                            sizeof(char) * 2);
+            sprintf(pstr[COMPS_LogMessages[entry->code].used2 - 1],
+                    "%d", entry->opt_code2);
+        }
         len -= 2;
     }
     if (COMPS_LogMessages[entry->code].used3 != 0) {
-        if (entry->opt_code3)
+        total_used++;
+        if (entry->opt_code3) {
             len += (int)ceil(log10(entry->opt_code3));
-        else
+            pstr[COMPS_LogMessages[entry->code].used3 - 1] = malloc(
+                    sizeof(char) * ((int)ceil(log10(entry->opt_code3)) + 1));
+            sprintf(pstr[COMPS_LogMessages[entry->code].used3 - 1],
+                    "%d", entry->opt_code3);
+        } else {
             len++;
+            pstr[COMPS_LogMessages[entry->code].used3 - 1] = malloc(
+                                                            sizeof(char) * 2);
+            sprintf(pstr[COMPS_LogMessages[entry->code].used3 - 1],
+                    "%d", entry->opt_code3);
+        }
         len -= 2;
     }
     ret = malloc(sizeof(char)*(len+1));
     if (ret == NULL) return NULL;
-    if (COMPS_LogMessages[entry->code].usedm)
+    /*if (COMPS_LogMessages[entry->code].usedm)
         pitem[COMPS_LogMessages[entry->code].usedm-1].s = entry->log_message?
                                                           entry->log_message:
                                                           "";
@@ -222,9 +267,24 @@ char * comps_log_entry_str(COMPS_LoggerEntry *entry) {
     if (COMPS_LogMessages[entry->code].used2)
         pitem[COMPS_LogMessages[entry->code].used2-1].i = entry->opt_code2;
     if (COMPS_LogMessages[entry->code].used3)
-        pitem[COMPS_LogMessages[entry->code].used3-1].i = entry->opt_code3;
-    sprintf(ret, COMPS_LogMessages[entry->code].format,
-            pitem[0], pitem[1], pitem[2], pitem[3]);
+        pitem[COMPS_LogMessages[entry->code].used3-1].i = entry->opt_code3;*/
+    if (total_used == 0) {
+        sprintf(ret, COMPS_LogMessages[entry->code].format);
+    } else if (total_used == 1) {
+        sprintf(ret, COMPS_LogMessages[entry->code].format, pstr[0]);
+    } else if (total_used == 2) {
+        sprintf(ret, COMPS_LogMessages[entry->code].format, pstr[0], pstr[1]);
+    } else if (total_used == 3) {
+        //printf("%d %s %s %s\n", entry->code, pstr[0], pstr[1], pstr[2]);
+        sprintf(ret, COMPS_LogMessages[entry->code].format, pstr[0], pstr[1],
+                     pstr[2]);
+    } else if (total_used == 4) {
+        sprintf(ret, COMPS_LogMessages[entry->code].format, pstr[0], pstr[1],
+                     pstr[2], pstr[3]);
+    }
+    for (int x = 0; x < 4; x++) {
+        free(pstr[x]);
+    }
     return ret;
 }
 
