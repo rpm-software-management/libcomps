@@ -51,12 +51,12 @@ foreach(file ${TEST_FILES})
 endforeach()
 
 #add_custom_target(test ALL)
-add_custom_target(test_comps_run ALL COMMAND ./test_comps
+add_custom_target(test_comps_run COMMAND ./test_comps
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS test_comps
                    COMMENT "Running comps test")
 
-add_custom_target(test_parse_run ALL COMMAND ./test_parse
+add_custom_target(test_parse_run COMMAND ./test_parse
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS test_parse
                    COMMENT "Running comps_parse test")

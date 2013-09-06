@@ -28,7 +28,7 @@ target_link_libraries(pycomps ${EXPAT_LIBRARIES})
 target_link_libraries(pycomps ${LIBXML2_LIBRARIES})
 target_link_libraries(pycomps ${PYTHON_LIBRARIES})
 
-add_custom_target(pytest_run ALL COMMAND ./run_tests.sh
+add_custom_target(pytest_run COMMAND ./run_tests.sh
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
                    DEPENDS pycomps
                    COMMENT "Running python binding tests")
