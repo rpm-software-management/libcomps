@@ -17,29 +17,23 @@
  * USA
  */
 
+#ifndef COMPS_DOCGROUPID_H
+#define COMPS_DOCGROUPID_H
+
 #include "comps_utils.h"
 
-void* __comps_str_clone(void *str) {
-    char *ret;
-    if (str == NULL)
-        return NULL;
-    ret = malloc(sizeof(char) * (strlen((char*)str)+1));
-    if (ret==NULL) return NULL;
-    memcpy(ret, str, sizeof(char) * (strlen((char*)str)+1));
-    return ret;
-}
+typedef struct {
+    COMPS_Object_HEAD
+    COMPS_Str *name;
+    char def;
+} COMPS_DocGroupId;
 
-inline char __comps_strcmp(void *s1, void *s2) {
-    if (s1 == NULL && s2 == NULL) return 1;
-    else if ((s1 == NULL && s2 != NULL) || (s1 != NULL && s2 == NULL)) return 0;
-    return (strcmp((const char*)s1, (const char*)s2) == 0);
-}
+HEAD_COMPS_CREATE_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
+HEAD_COMPS_COPY_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
+HEAD_COMPS_DESTROY_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
 
-inline void __comps_xml_prop(char *key; COMPS_Object *val) {
-    char *str;
-    xmlTextWriterStartElement(writer, "key");
-    str = unfo_object_tostr(val);
-    xmlTextWriterWriteString(writer, str);
-    free(str);
-    xmlTextWriterEndElement(writer);
-}
+char __comps_docgroupid_cmp_set(void *gid1, void *gid2);
+
+extern COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo;
+
+#endif

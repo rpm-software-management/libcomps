@@ -1,7 +1,13 @@
-set (libcomps_SOURCES comps.c comps_list.c comps_hslist.c comps_dict.c
+set (libcomps_SOURCES comps_doc.c comps_docgroup.c comps_doccategory.c
+                      comps_docenv.c comps_docpackage.c comps_docgroupid.c
+     comps_obj.c comps_mm.c comps_list.c comps_hslist.c comps_dict.c
+     comps_objdict.c
      comps_elem.c comps_radix.c comps_mradix.c comps_bradix.c comps_set.c
      comps_parse.c comps_logger.c comps_utils.c comps_getset.c)
-set (libcomps_HEADERS comps.h comps_list.h comps_hslist.h comps_dict.h
+set (libcomps_HEADERS comps_doc.h comps_docgroup.h comps_doccategory.h
+                      comps_docenv.h comps_docpackage.h comps_docgroupid.h
+     comps_obj.h comps_mm.h comps_list.h comps_hslist.h comps_dict.h
+     comps_objdict.h
      comps_elem.h comps_radix.h comps_mradix.h comps_bradix.h comps_set.h
      comps_parse.h comps_logger.h comps_utils.h comps_types.h comps_getset.h
      comps_doc_types.h)

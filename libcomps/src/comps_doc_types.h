@@ -24,6 +24,7 @@
 #include "comps_list.h"
 #include "comps_set.h"
 #include "comps_logger.h"
+#include "comps_obj.h"
 
 /**
  * COMPS Document
@@ -52,20 +53,10 @@
  * @see comps2xml_str
  */
 typedef struct {
-    /** List of document groups @see COMPS_DocGroup*/
-    COMPS_Dict *lobjects;
-    COMPS_Dict *dobjects;
-    COMPS_Dict *mdobjects;
-
-    //COMPS_List *groups;
-    /** List of document categories @see COMPS_DocCategory*/
-    //COMPS_List *categories;
-    /** List of document environemnts @see COMPS_DocEnv*/
-    //COMPS_List *envs;
-    /** Logger for logging xml convert process @see COMPS_Logger*/
-    void *reserved;
+    COMPS_Object_HEAD
+    COMPS_ObjDict *objects;
     COMPS_Logger *log;
-    const char *encoding;
+    COMPS_Str *encoding;
     } COMPS_Doc;
 
 
@@ -87,19 +78,11 @@ typedef struct {
  * @see comps_doccategory_intersect
  */
 typedef struct {
-    COMPS_Dict *properties;
-    /** category id */
-    //char *id;
-    /** category name*/
-    //char *name;
-    COMPS_Dict *name_by_lang;
-    /** category description */
-    //char *desc;
-    COMPS_Dict *desc_by_lang;
-    /** category display order */
-    //unsigned display_order;
-    /** category groups ids*/
-    COMPS_List *group_ids;
+    COMPS_Object_HEAD
+    COMPS_ObjDict *properties;
+    COMPS_ObjDict *name_by_lang;
+    COMPS_ObjDict *desc_by_lang;
+    COMPS_ObjList *group_ids;
 
     void *reserved;
 } COMPS_DocCategory;
@@ -125,25 +108,11 @@ typedef struct {
  * @see comps_docgroup_intersect
  */
 typedef struct {
-    COMPS_Dict *properties;
-    /** group id*/
-    //char *id;
-    /** group name*/
-    //char *name;
-    COMPS_Dict *name_by_lang;
-    /** group description*/
-    //char *desc;
-    COMPS_Dict *desc_by_lang;
-    /** group default*/
-    //unsigned def;
-    /** group lang only*/
-    //char *lang_only;
-    /**group user visible*/
-    //unsigned uservisible;
-    /** group display order*/
-    //unsigned display_order;
-    /** group list of packages. @see COMPS_DocGroupPackage*/
-    COMPS_List *packages;
+    COMPS_Object_HEAD
+    COMPS_ObjDict *properties;
+    COMPS_ObjDict *name_by_lang;
+    COMPS_ObjDict *desc_by_lang;
+    COMPS_ObjList *packages;
     void *reserved;
 } COMPS_DocGroup;
 
@@ -166,26 +135,18 @@ typedef struct {
  * @see comps_docenv_intersect
  */
 typedef struct {
+    COMPS_Object_HEAD
     COMPS_Dict *properties;
-    /** environment id*/
-    //char *id;
-    /** environment name*/
-    //char *name;
     COMPS_Dict *name_by_lang;
-    /** environment description*/
-    //char *desc;
     COMPS_Dict *desc_by_lang;
-    /** environment display order*/
-    //unsigned display_order;
-    /** environment grouid list*/
     COMPS_List *group_list;
-    /** environment optionid list*/
     COMPS_List *option_list;
     void *reserved;
 } COMPS_DocEnv;
 
 
 typedef struct {
+    COMPS_Object_HEAD
     char *name;
     char def;
     void *reserved;
@@ -207,12 +168,13 @@ typedef enum {COMPS_PACKAGE_DEFAULT, COMPS_PACKAGE_OPTIONAL,
  * @see comps_docpackage_set_type
  */
 typedef struct {
-    COMPS_Dict *properties;
-    /** package type @see COMPS_PackageType */
+    COMPS_Object_HEAD
+    //COMPS_Dict *properties;
     COMPS_PackageType type;
-    /** name of package */
-    char *name;
-    char *requires;
+    UNFO_Str *name;
+    UNFO_Str *requires;
+    //char *name;
+    //char *requires;
     void *reserved;
 } COMPS_DocGroupPackage;
 
