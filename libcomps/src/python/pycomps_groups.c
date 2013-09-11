@@ -1007,9 +1007,8 @@ PyObject* PyCOMPSPack_cmp(PyObject *self, PyObject *other, int op) {
         PyErr_SetString(PyExc_TypeError, "Not COMPS_Pack instance");
         return NULL;
     }
-    if (op != Py_EQ && op != Py_NE) {
-        return Py_NotImplemented;
-    }
+    CMP_OP_EQ_NE_CHECK(op)
+
     if (comps_docpackage_cmp(pycomps_pkg_get(self), pycomps_pkg_get(other))) {
         if (op == Py_EQ){
             Py_RETURN_TRUE;

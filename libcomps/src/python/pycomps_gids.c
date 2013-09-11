@@ -239,11 +239,8 @@ PyObject* PyCOMPSGID_cmp(PyObject *self, PyObject *other, int op) {
                                     Py_TYPE(other)->tp_name);
         return NULL;
     }
-    if (op != Py_EQ && op != Py_NE) {
-        if (created)
-            Py_DECREF(tmpgid);
-        return Py_NotImplemented;
-    }
+    CMP_OP_EQ_NE_CHECK(op)
+
     ret = comps_docgroupid_cmp(pycomps_gid_get(self), pycomps_gid_get(tmpgid));
     if (created) {
         Py_DECREF(tmpgid);

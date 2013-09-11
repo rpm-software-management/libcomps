@@ -857,7 +857,8 @@ class COMPSTest(unittest.TestCase):
         gid1 = libcomps.GroupId("gid1")
         gid2 = libcomps.GroupId("gid2", default=False)
         gid3 = libcomps.GroupId("gid3", default=True)
-        self.assertTrue(gid1 != 1)
+        with self.assertRaises(TypeError):
+            self.assertTrue(gid1 != 1)
         self.assertTrue(gid1 != None)
         self.assertTrue(gid1 == gid1)
         self.assertTrue(gid1 != "gid2")
@@ -885,6 +886,23 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(e.group_ids[2].default)
         self.assertFalse(e.group_ids[3].default)
         self.assertFalse(e.group_ids[4].default)
+
+    def test21(self):
+        c1 = libcomps.Comps()
+        c1.fromxml_f("f21-rawhide-comps.xml")
+        c2 = libcomps.Comps()
+        c2.fromxml_f("sample_comps.xml")
+        c = c1 + c2
+        c.xml_f("f21_united.xml")
+        group = libcomps.Group()
+        gid = libcomps.GroupId("gid1")
+        from pykickstart.parser import Group
+        #comps = libcomps.Comps()
+        #comps.fromxml_f('/tmp/dnf.cache/default/fedora/repodata/16e49bf17cb730f0ec316dfb0c813241a955f545b0dac7c51dbb582ea6da14c9-comps-f20.xml')
+        gid = c1.environments[0].group_ids[0]
+        g = Group(gid)
+        with self.assertRaises(NotImplementedError):
+            g in [Group('2'), Group(gid)]
 
 if __name__ == "__main__":
     unittest.main(testRunner = MyRunner)

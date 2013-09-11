@@ -155,7 +155,7 @@ PyObject* PyCOMPSDict_cmp(PyObject *self, PyObject *other, int op) {
     }
     if (op != Py_EQ && op != Py_NE) {
         PyErr_Format(PyExc_TypeError, "Unsuported operator");
-        return Py_NotImplemented;
+        return Py_INCREF(Py_NotImplemented), Py_NotImplemented;
     }
     pairlist = comps_dict_pairs(get_dict(self));
     pairlist2 = comps_dict_pairs(get_dict(other));

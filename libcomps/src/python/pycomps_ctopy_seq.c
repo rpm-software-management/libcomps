@@ -438,7 +438,7 @@ PyObject* PyCOMPSCtoPySeq_cmp(PyObject *self, PyObject *other, int op) {
     }
     if (op != Py_EQ && op != Py_NE) {
         PyErr_Format(PyExc_TypeError, "Unsuported operator");
-        return Py_NotImplemented;
+        return Py_INCREF(Py_NotImplemented), Py_NotImplemented; 
     }
     if (other == Py_None && self == Py_None) {
         return Py_NotImplemented;
