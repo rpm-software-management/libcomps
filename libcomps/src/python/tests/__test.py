@@ -853,6 +853,17 @@ class COMPSTest(unittest.TestCase):
         ret = reduce(lambda x,y : y and (x or env.option_ids), groups, False)
         self.assertTrue(ret)
 
+    def test_gid(self):
+        gid1 = libcomps.GroupId("gid1")
+        gid2 = libcomps.GroupId("gid2", default=False)
+        gid3 = libcomps.GroupId("gid3", default=True)
+        self.assertTrue(gid1 != 1)
+        self.assertTrue(gid1 != None)
+        self.assertTrue(gid1 == gid1)
+        self.assertTrue(gid1 != "gid2")
+        self.assertTrue(gid1 != gid2)
+        self.assertTrue(gid1 != gid3)
+
     def test_default(self):
         e = libcomps.Environment("e1", "enviroment1", "env desc")
         e.group_ids.append("groupid1")

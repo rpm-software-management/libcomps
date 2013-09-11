@@ -227,8 +227,16 @@ PyObject* PyCOMPSGID_cmp(PyObject *self, PyObject *other, int op) {
         tmpgid = pycomps_gid_from_str(other);
     } else if (other && other->ob_type == &PyCOMPS_GIDType) {
         tmpgid = other;
+    } else if (other == Py_None){
+        if (op == Py_EQ){
+            Py_RETURN_FALSE;
+        } else {
+            Py_RETURN_TRUE;
+        }
     } else {
-        PyErr_SetString(PyExc_TypeError, "Not COMPS_GroupID instance");
+        PyErr_Format(PyExc_TypeError, "Cannot compare %s with %s",
+                                    Py_TYPE(self)->tp_name,
+                                    Py_TYPE(other)->tp_name);
         return NULL;
     }
     if (op != Py_EQ && op != Py_NE) {
@@ -255,8 +263,9 @@ PyObject* PyCOMPSGID_cmp(PyObject *self, PyObject *other, int op) {
     }
 }
 
-char pycomps_gid_cmp(void *p1, void *p2) {
-    return comps_docgroupid_cmp((COMPS_DocGroupId*)p1, (COMPS_DocGroupId*)p2);
+char pycomps_gid_cmp(void *gid1, void *gid2) {
+    return comps_docgroupid_cmp((COMPS_DocGroupId*)gid1,
+                                (COMPS_DocGroupId*)gid2);
 }
 
 PyMemberDef PyCOMPSGID_members[] = {
