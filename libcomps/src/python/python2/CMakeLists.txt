@@ -17,6 +17,7 @@ FILE(COPY ${pycomps_SRCDIR}/tests/sample_comps2.xml DESTINATION ./libcomps/)
 FILE(COPY ${pycomps_SRCDIR}/tests/sample_comps2.xml.gz DESTINATION ./libcomps/)
 FILE(COPY ${pycomps_SRCDIR}/tests/main_comps.xml DESTINATION ./libcomps/)
 FILE(COPY ${pycomps_SRCDIR}/tests/main_comps2.xml DESTINATION ./libcomps/)
+FILE(COPY ${pycomps_SRCDIR}/tests/f21-rawhide-comps.xml DESTINATION ./libcomps/)
 
 add_library(pycomps SHARED ${pycomps_SRC})
 set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
