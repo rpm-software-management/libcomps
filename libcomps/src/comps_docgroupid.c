@@ -49,9 +49,9 @@ void comps_docgroupid_set_default(COMPS_DocGroupId *gid, int def) {
 }
 
 char __comps_docgroupid_cmp_set(void *gid1, void *gid2) {
-    if (!comps_object_cmp(((COMPS_DocGroupId*)gid1)->name,
+    if (!COMPS_OBJECT_CMP(((COMPS_DocGroupId*)gid1)->name,
                           ((COMPS_DocGroupId*)gid2)->name)) return 0;
-    if (((COMPS_DocGroupId*)gid1)->type != ((COMPS_DocGroupId*)gid2)->type)
+    if (((COMPS_DocGroupId*)gid1)->def != ((COMPS_DocGroupId*)gid2)->def)
         return 0;
     return 1;
 }
@@ -60,7 +60,7 @@ signed char comps_docgroupid_cmp_u(COMPS_Object *gid1, COMPS_Object *gid2) {
     #define _gid1 ((COMPS_DocGroupId*)gid1)
     #define _gid2 ((COMPS_DocGroupId*)gid2)
 
-    if (!comps_object_cmp(_gid1->name, _gid2->name)) return 0;
+    if (!COMPS_OBJECT_CMP(_gid1->name, _gid2->name)) return 0;
     if (_gid1->def != _gid2->def) return 0;
     return 1;
 
@@ -68,11 +68,11 @@ signed char comps_docgroupid_cmp_u(COMPS_Object *gid1, COMPS_Object *gid2) {
     #undef _gid2
 }
 
-extern COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo = {
+COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo = {
     .obj_size = sizeof(COMPS_DocGroupId),
     .constructor = &comps_docgroupid_create_u,
     .destructor = &comps_docgroupid_destroy_u,
-    .deep_copy = &comps_docgroupid_copy_u,
+    .copy = &comps_docgroupid_copy_u,
     .obj_cmp = &comps_docgroupid_cmp_u
 };
 

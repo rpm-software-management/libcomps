@@ -134,7 +134,7 @@ COMPS_ObjectInfo COMPS_Num_ObjInfo = {
     .obj_size = sizeof(COMPS_Num),
     .constructor = &comps_num_create_u,
     .destructor = &comps_num_destroy_u,
-    .deep_copy = &comps_num_copy_u,
+    .copy = &comps_num_copy_u,
     .to_str = &comps_num_tostr
 };
 
@@ -142,7 +142,7 @@ COMPS_ObjectInfo COMPS_Str_ObjInfo = {
     .obj_size = sizeof(COMPS_Str),
     .constructor = &comps_str_create_u,
     .destructor = &comps_str_destroy_u,
-    .deep_copy = &comps_str_copy_u,
+    .copy = &comps_str_copy_u,
     .to_str = &comps_str_tostr
 };
 

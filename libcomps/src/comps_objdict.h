@@ -41,12 +41,13 @@ void comps_objdict_destroy_v(void *rt);
 //void comps_mdict_destroy_v(void *rt);
 
 void comps_objdict_set(COMPS_ObjDict *rt, char *key, COMPS_Object *data);
-void comps_objdict_set_n(COMPS_ObjDict *rt, char *key, unsigned int len, COMPS_Object *data);
+void comps_objdict_set_n(COMPS_ObjDict *rt, char *key, unsigned int len,
+                         COMPS_Object *data);
 //void comps_mdict_set(COMPS_MDict *rt, char *key, void *data);
 //void comps_mdict_set_n(COMPS_MDict *rt, char *key, unsigned int len,
 //                            void *data);
 
-void* comps_objdict_get(COMPS_ObjDict *rt, const char *key);
+COMPS_Object* comps_objdict_get(COMPS_ObjDict *rt, const char *key);
 //COMPS_HSList * comps_mdict_get(COMPS_MDict *rt, const char *key);
 //COMPS_HSList ** comps_mdict_getp(COMPS_MDict *rt, const char * key);
 

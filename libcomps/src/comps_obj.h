@@ -4,6 +4,15 @@
 
 #include "comps_mm.h"
 
+#define COMPS_OBJECT_CMP(obj1,obj2)\
+    comps_object_cmp((COMPS_Object*)obj1, (COMPS_Object*)obj2)
+
+#define COMPS_OBJECT_DESTROY(obj1)\
+    comps_object_destroy((COMPS_Object*)obj1)
+
+#define COMPS_OBJECT_COPY(obj)\
+    comps_object_copy(((COMPS_Object*)obj))
+
 #define COMPS_Object_HEAD COMPS_RefC *refc;\
                          COMPS_ObjectInfo *obj_info;
 

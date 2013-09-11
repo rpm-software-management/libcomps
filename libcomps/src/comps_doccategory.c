@@ -34,22 +34,22 @@ COMPS_CREATE_u(doccategory, COMPS_DocCategory)  /*comps_utils.h macro*/
 
 void comps_doccategory_copy(COMPS_DocCategory *category_dst,
                             COMPS_DocCategory *category_src) {
-    category_dst->properties = (COMPS_ObjDict*)comps_object_copy(
-                                       (COMPS_Object*)category_src->properties);
-    category_dst->name_by_lang = (COMPS_ObjDict*)comps_object_copy(
-                                    (COMPS_Object*)category_src->name_by_lang);
-    category_dst->desc_by_lang = (COMPS_ObjDict*)comps_object_copy(
-                                    (COMPS_Object*)category_src->desc_by_lang);
-    category_dst->group_ids = (COMPS_ObjList*)comps_object_copy(
-                                    (COMPS_Object*)category_src->group_ids);
+    category_dst->properties = (COMPS_ObjDict*)
+                                COMPS_OBJECT_COPY(category_src->properties);
+    category_dst->name_by_lang = (COMPS_ObjDict*)
+                                COMPS_OBJECT_COPY(category_src->name_by_lang);
+    category_dst->desc_by_lang = (COMPS_ObjDict*)
+                                COMPS_OBJECT_COPY(category_src->desc_by_lang);
+    category_dst->group_ids = (COMPS_ObjList*)
+                                COMPS_OBJECT_COPY(category_src->group_ids);
 }
 COMPS_COPY_u(doccategory, COMPS_DocCategory)    /*comps_utils.h macro*/
 
 void comps_doccategory_destroy(COMPS_DocCategory *category) {
-    comps_object_destroy((COMPS_Object*)category->properties);
-    comps_object_destroy((COMPS_Object*)category->name_by_lang);
-    comps_object_destroy((COMPS_Object*)category->desc_by_lang);
-    comps_object_destroy((COMPS_Object*)category->group_ids);
+    COMPS_OBJECT_DESTROY(category->properties);
+    COMPS_OBJECT_DESTROY(category->name_by_lang);
+    COMPS_OBJECT_DESTROY(category->desc_by_lang);
+    COMPS_OBJECT_DESTROY(category->group_ids);
 }
 COMPS_DESTROY_u(doccategory, COMPS_DocCategory) /*comps_utils.h macro*/
 

@@ -19,57 +19,44 @@
 
 #include "comps_objdict.h"
 
-inline COMPS_ObjDict* comps_objdict_create(void* (*data_constructor)(void*),
-                                     void* (*data_cloner)(void*),
-                                     void (*data_destructor)(void*)) {
-    return (COMPS_ObjRTree*) comps_rtree_create(data_constructor,
-                                             data_cloner, data_destructor);
-}
-
-inline void comps_objdict_destroy(COMPS_ObjDict *rt) {
-    comps_rtree_destroy((COMPS_ObjRTree*)rt);
-}
-inline void comps_objdict_destroy_v(void *rt) {
-    comps_rtree_destroy((COMPS_ObjRTree*)rt);
-}
-inline void comps_objdict_set(COMPS_ObjDict *rt, char *key, void *data) {
-    comps_rtree_set((COMPS_ObjRTree*) rt, key, data);
+inline void comps_objdict_set(COMPS_ObjDict *rt, char *key, COMPS_Object *data){
+    comps_objrtree_set((COMPS_ObjRTree*) rt, key, data);
 }
 inline void comps_objdict_set_n(COMPS_ObjDict *rt, char *key, unsigned int len,
-                            void *data) {
-    comps_rtree_set_n((COMPS_ObjRTree*) rt, key, len, data);
+                                COMPS_Object *data) {
+    comps_objrtree_set_n((COMPS_ObjRTree*) rt, key, len, data);
 }
 
-inline void* comps_objdict_get(COMPS_ObjDict *rt, const char *key) {
-    return comps_rtree_get((COMPS_ObjRTree*) rt, key);
+inline COMPS_Object* comps_objdict_get(COMPS_ObjDict *rt, const char *key) {
+    return comps_objrtree_get((COMPS_ObjRTree*) rt, key);
 }
 inline void comps_objdict_unset(COMPS_ObjDict * rt, const char * key) {
-    comps_rtree_unset((COMPS_ObjRTree*) rt, key);
+    comps_objrtree_unset((COMPS_ObjRTree*) rt, key);
 }
 inline void comps_objdict_clear(COMPS_ObjDict * rt) {
-    comps_rtree_clear((COMPS_ObjRTree*) rt);
+    comps_objrtree_clear((COMPS_ObjRTree*) rt);
 }
 inline COMPS_HSList * comps_objdict_values(COMPS_ObjDict * rt) {
-    return comps_rtree_values((COMPS_ObjRTree*)rt);
+    return comps_objrtree_values((COMPS_ObjRTree*)rt);
 }
 inline void comps_objdict_values_walk(COMPS_ObjRTree * rt, void* udata,
                               void (*walk_f)(void*, void*)) {
-    comps_rtree_values_walk((COMPS_ObjRTree*)rt, udata, walk_f);
+    comps_objrtree_values_walk((COMPS_ObjRTree*)rt, udata, walk_f);
 }
 inline COMPS_ObjDict * comps_objdict_clone(COMPS_ObjDict * rt) {
-    return (COMPS_ObjRTree*) comps_rtree_clone((COMPS_ObjRTree*)rt);
+    return (COMPS_ObjRTree*) comps_objrtree_clone((COMPS_ObjRTree*)rt);
 }
 inline void * comps_objdict_clone_v(void * rt) {
-    return (COMPS_ObjRTree*) comps_rtree_clone((COMPS_ObjRTree*)rt);
+    return (void*) comps_objrtree_clone((COMPS_ObjRTree*)rt);
 }
 inline COMPS_HSList* comps_objdict_keys(COMPS_ObjDict * rt) {
-    return comps_rtree_keys((COMPS_ObjRTree*)rt);
+    return comps_objrtree_keys((COMPS_ObjRTree*)rt);
 }
 inline COMPS_HSList* comps_objdict_pairs(COMPS_ObjDict *rt) {
-    return comps_rtree_pairs((COMPS_ObjRTree*)rt);
+    return comps_objrtree_pairs((COMPS_ObjRTree*)rt);
 }
 inline COMPS_ObjDict* comps_objdict_union(COMPS_ObjDict *d1, COMPS_ObjDict *d2) {
-    return comps_rtree_union((COMPS_ObjRTree*)d1, (COMPS_ObjRTree*)d2);
+    return comps_objrtree_union((COMPS_ObjRTree*)d1, (COMPS_ObjRTree*)d2);
 }
 
 /*
