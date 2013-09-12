@@ -22,8 +22,11 @@
 
 #include <stdlib.h>
 #include <string.h>
+
 #include "comps_hslist.h"
 #include "comps_obj.h"
+#include "comps_utils.h"
+#include "comps_objlist.h"
 
 typedef struct {
     char *key;
@@ -66,15 +69,16 @@ void comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *data);
 void comps_objrtree_set_n(COMPS_ObjRTree *rt, char *key, unsigned int len,
                           COMPS_Object *data);
 
-void* comps_objrtree_get(COMPS_ObjRTree *rt, const char *key);
+COMPS_Object* comps_objrtree_get(COMPS_ObjRTree * rt, const char * key);
 void comps_objrtree_unset(COMPS_ObjRTree *rt, const char *key);
 void comps_objrtree_clear(COMPS_ObjRTree *rt);
 
-void comps_objrtree_values_walk(COMPS_ObjRTree *rt, void* udata,
-                                               void (*walk_f)(void*, void*));
-COMPS_HSList* comps_objrtree_values(COMPS_ObjRTree *rt);
+char comps_objrtree_paircmp(void *obj1, void *obj2);
+void comps_objrtree_values_walk(COMPS_ObjRTree * rt, void* udata,
+                                void (*walk_f)(void*, COMPS_Object*));
+COMPS_ObjList * comps_objrtree_values(COMPS_ObjRTree * rt);
 COMPS_HSList* comps_objrtree_keys(COMPS_ObjRTree *rt);
-COMPS_HSList* comps_objrtree_pairs(COMPS_ObjRTree *rt);
+COMPS_HSList* comps_objrtree_pairs(COMPS_ObjRTree * rt);
 COMPS_ObjRTree* comps_objrtree_clone(COMPS_ObjRTree *rt);
 COMPS_ObjRTree* comps_objrtree_union(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2);
 void comps_objrtree_unite(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2);

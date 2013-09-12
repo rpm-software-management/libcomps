@@ -118,6 +118,6 @@ COMPS_ObjectInfo COMPS_ObjDict_ObjInfo = {
     .obj_size = sizeof(COMPS_ObjRTree),
     .constructor = &comps_objrtree_create_u,
     .destructor = &comps_objrtree_destroy_u,
-    .deep_copy = &comps_objrtree_copy_u,
+    .copy = &comps_objrtree_copy_u,
     .obj_cmp = &comps_objrtree_cmp_u
 };

@@ -40,6 +40,8 @@
     }\
     return ret;\
 }
+#define HEAD_COMPS_DOC_GETOBJLIST(OBJNAME) COMPS_ObjList* CONCAT(comps_doc_, OBJNAME)\
+                                                           (COMPS_Doc *doc);
 
 #define COMPS_DOC_GETOBJDICT(OBJNAME) COMPS_ObjDict* CONCAT(comps_doc_, OBJNAME)\
                                                            (COMPS_Doc *doc){\
@@ -51,6 +53,45 @@
     }\
     return ret;\
 }
+#define HEAD_COMPS_DOC_GETOBJDICT(OBJNAME) COMPS_ObjDict* CONCAT(comps_doc_, OBJNAME)\
+                                                           (COMPS_Doc *doc);
+
+#define COMPS_DOC_ADDOBJLIST(OBJS, OBJNAME, OBJTYPE) void CONCAT(comps_doc_add_,\
+                                                           OBJNAME)\
+                                                           (COMPS_Doc *doc,\
+                                                            OBJTYPE *obj){\
+    COMPS_ObjList *ret;\
+    ret = (COMPS_ObjList*)comps_objdict_get(doc->objects, #OBJS);\
+    if (!ret) {\
+        ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);\
+        comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)ret);\
+    }\
+    comps_objlist_append(ret, (COMPS_Object*)obj);\
+}
+#define HEAD_COMPS_DOC_ADDOBJLIST(OBJNAME, OBJTYPE) void CONCAT(comps_doc_add_,\
+                                                           OBJNAME)\
+                                                           (COMPS_Doc *doc,\
+                                                            OBJTYPE *obj);
+
+#define COMPS_DOC_ADDOBJDICT(OBJS, OBJNAME) void CONCAT(comps_doc_add_,\
+                                                           OBJNAME)\
+                                                           (COMPS_Doc *doc,\
+                                                            char *key,\
+                                                            COMPS_Str *obj){\
+    COMPS_ObjDict *ret;\
+    ret = (COMPS_ObjDict*)comps_objdict_get(doc->objects, #OBJS);\
+    if (!ret) {\
+        ret = (COMPS_ObjDict*)comps_object_create(&COMPS_ObjDict_ObjInfo, NULL);\
+        comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)ret);\
+    }\
+    comps_objdict_set(ret, key, (COMPS_Object*)obj);\
+}
+#define HEAD_COMPS_DOC_ADDOBJDICT(OBJNAME) void CONCAT(comps_doc_add_,\
+                                                           OBJNAME)\
+                                                           (COMPS_Doc *doc,\
+                                                            char *key,\
+                                                            COMPS_Str *obj);
+
 
 typedef struct {
     COMPS_Object_HEAD
@@ -67,6 +108,21 @@ void comps_doc_create(COMPS_Doc* doc, COMPS_Object **args);
 void comps_doc_copy(COMPS_Doc *doc_dst, COMPS_Doc *doc_src);
 void comps_doc_destroy(COMPS_Doc *doc);
 signed char comps_doc_cmp_u(COMPS_Object *obj1, COMPS_Object *obj2);
+
+HEAD_COMPS_DOC_GETOBJLIST(groups) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_GETOBJLIST(categories) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_GETOBJLIST(environments) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_GETOBJDICT(langpacks) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_GETOBJDICT(blacklist) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_GETOBJDICT(whiteout) /*comps_doc.h macro*/
+
+HEAD_COMPS_DOC_ADDOBJLIST(group, COMPS_DocGroup) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_ADDOBJLIST(category, COMPS_DocCategory) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_ADDOBJLIST(environment, COMPS_DocEnv) /*comps_doc.h macro*/
+
+HEAD_COMPS_DOC_ADDOBJDICT(langpack) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_ADDOBJDICT(blacklist) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_ADDOBJDICT(whiteout) /*comps_doc.h macro*/
 
 void comps_doc_xml_f(COMPS_Doc* doc,  char *filename, char *enc, COMPS_Logger *log);
 char* comps_doc_xml_str(COMPS_Doc* doc, char *enc, COMPS_Logger *log);

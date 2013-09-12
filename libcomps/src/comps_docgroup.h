@@ -50,11 +50,14 @@ HEAD_COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, display_order) /*comps_utils.h 
 HEAD_COMPS_STRPROP_SETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
 
 signed char comps_docgroup_cmp_u(COMPS_Object *group1, COMPS_Object *group2);
+char __comps_docgroup_idcmp(void *g1, void *g2);
 
 void comps_docgroup_add_package(COMPS_DocGroup *group,
                                 COMPS_DocGroupPackage *package);
 
 COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2);
+COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,
+                                         COMPS_DocGroup *g2);
 
 void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                         COMPS_Logger *log);

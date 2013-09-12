@@ -28,11 +28,14 @@ HEAD_COMPS_STRPROP_SETTER(env, COMPS_DocEnv, name) /*comps_utils.h macro*/
 HEAD_COMPS_STRPROP_SETTER(env, COMPS_DocEnv, desc) /*comps_utils.h macro*/
 HEAD_COMPS_NUMPROP_SETTER(env, COMPS_DocEnv, display_order) /*comps_utils.h macro*/
 
+char __comps_docenv_idcmp(void *e1, void *e2);
+
 void comps_docenv_add_groupid(COMPS_DocEnv *env,
                             COMPS_DocGroupId *gid);
 void comps_docenv_add_optionid(COMPS_DocEnv *env,
                             COMPS_DocGroupId *gid);
 COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
+COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
 
 void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
                         COMPS_Logger *log);

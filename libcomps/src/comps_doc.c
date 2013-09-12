@@ -58,11 +58,17 @@ inline void comps_doc_clear(COMPS_Doc *doc) {
 }
 
 COMPS_DOC_GETOBJLIST(groups)        /*comps_doc.h macro*/
+COMPS_DOC_ADDOBJLIST(groups, group, COMPS_DocGroup) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJLIST(categories)    /*comps_doc.h macro*/
+COMPS_DOC_ADDOBJLIST(categories, category, COMPS_DocCategory) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJLIST(environments)  /*comps_doc.h macro*/
+COMPS_DOC_ADDOBJLIST(environments, environment, COMPS_DocEnv) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJDICT(langpacks)     /*comps_doc.h macro*/
+COMPS_DOC_ADDOBJDICT(langpacks, langpack) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJDICT(blacklist)     /*comps_doc.h macro*/
+COMPS_DOC_ADDOBJDICT(blacklist,  blacklist) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJDICT(whiteout)      /*comps_doc.h macro*/
+COMPS_DOC_ADDOBJDICT(whiteout,  whiteout) /*comps_doc.h macro*/
 
 void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
     xmlDocPtr xmldoc;
@@ -131,6 +137,191 @@ char* comps2xml_str(COMPS_Doc *doc) {
     xmlCleanupParser();
     xmlMemoryDump();
     return ret;
+}
+
+COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
+    COMPS_ObjListIt *it;
+    COMPS_Set *set;
+    COMPS_Doc *res;
+    COMPS_DocGroup *tmpgroup;
+    COMPS_DocCategory *tmpcat;
+    COMPS_DocEnv *tmpenv;
+    COMPS_HSListItem *hsit;
+    COMPS_ObjList *groups = comps_doc_groups(c1);
+    COMPS_ObjList *categories = comps_doc_categories(c1);
+    COMPS_ObjList *envs = comps_doc_environments(c1);
+    COMPS_ObjList* (*getter[])(COMPS_Doc*) = {&comps_doc_groups,
+                                              &comps_doc_categories,
+                                              &comps_doc_environments};
+    void (*adder[])(COMPS_Doc*, COMPS_Object*) = {
+            (void (*)(COMPS_Doc*, COMPS_Object*))&comps_doc_add_group,
+            (void (*)(COMPS_Doc*, COMPS_Object*))&comps_doc_add_category,
+            (void (*)(COMPS_Doc*, COMPS_Object*))&comps_doc_add_environment};
+    COMPS_Object* (*_union[])(COMPS_Object*, COMPS_Object*) = {
+                                                 &comps_docgroup_union,
+                                                 &comps_doccategory_union,
+                                                 &comps_docenv_union};
+
+    void *tmpdata;
+    res = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
+             (COMPS_Object*[]){comps_object_copy((COMPS_Object*)c1->encoding)});
+
+    set = comps_set_create();
+    comps_set_init(set, NULL, NULL, NULL, &__comps_docgroup_idcmp);
+
+    for (it = groups ? groups->first : NULL; it != NULL; it = it->next) {
+        comps_set_add(set, comps_object_copy(it->comps_obj));
+    }
+    groups = comps_doc_groups(c2);
+    for (it = groups ? groups->first : NULL; it != NULL; it = it->next) {
+        if (comps_set_in(set, it->comps_obj)) {
+            tmpgroup = comps_docgroup_union(
+                                (COMPS_DocGroup*)it->comps_obj,
+                                (COMPS_DocGroup*)comps_set_data_at(set,
+                                                                   it->comps_obj));
+            tmpdata = comps_set_data_at(set, it->comps_obj);
+            comps_set_remove(set, it->comps_obj);
+            comps_object_destroy((COMPS_Object*)tmpdata);
+            comps_set_add(set, tmpgroup);
+        } else {
+            comps_set_add(set, comps_object_copy(it->comps_obj));
+        }
+    }
+    for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
+        comps_doc_add_group(res, hsit->data);
+    }
+    comps_set_clear(set);
+
+    comps_set_init(set, NULL, NULL, NULL, &__comps_doccategory_idcmp);
+    for (it = categories ? categories->first : NULL; it != NULL; it = it->next) {
+        comps_set_add(set, comps_object_copy(it->comps_obj));
+    }
+    categories = comps_doc_categories(c2);
+    for (it = categories ? categories->first : NULL; it != NULL; it = it->next) {
+        if (comps_set_in(set, it->comps_obj)) {
+            tmpcat = comps_doccategory_union(
+                                (COMPS_DocCategory*)it->comps_obj,
+                                (COMPS_DocCategory*)comps_set_data_at(set,
+                                                                it->comps_obj));
+            tmpdata = comps_set_data_at(set, it->comps_obj);
+            comps_set_remove(set, it->comps_obj);
+            comps_object_destroy((COMPS_Object*)tmpdata);
+            comps_set_add(set, tmpcat);
+        } else {
+            comps_set_add(set, comps_object_copy(it->comps_obj));
+        }
+    }
+    for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
+        comps_doc_add_category(res, hsit->data);
+    }
+    comps_set_clear(set);
+
+    comps_set_init(set, NULL, NULL, NULL, &__comps_docenv_idcmp);
+    if (envs) {
+        for (it = envs->first; it != NULL; it = it->next) {
+            comps_set_add(set, comps_object_copy(it->comps_obj));
+        }
+    }
+    envs = comps_doc_environments(c2);
+    if (envs) {
+        for (it = envs->first; it != NULL; it = it->next) {
+            if (comps_set_in(set, it->comps_obj)) {
+                tmpenv = comps_docenv_union(
+                                    (COMPS_DocEnv*)it->comps_obj,
+                                    (COMPS_DocEnv*)comps_set_data_at(set,
+                                                                  it->comps_obj));
+                tmpdata = comps_set_data_at(set, it->comps_obj);
+                comps_set_remove(set, it->comps_obj);
+                comps_object_destroy((COMPS_Object*)tmpdata);
+                comps_set_add(set, tmpenv);
+            } else {
+                comps_set_add(set, comps_object_copy(it->comps_obj));
+            }
+        }
+    }
+    for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
+        comps_doc_add_environment(res, hsit->data);
+    }
+    comps_set_destroy(&set);
+    return res;
+}
+
+/**
+ * Make intersection of two existing COMPS_Doc objects. Result intersection is
+ * completly new COMPS_Doc object (deep copy of those two).
+ * Intersection is made by objects ids. Objects of intersection is created
+ * by intersecting specific objects.
+ * @see comps_docgroup_intersect
+ * @see comps_doccategory_intersect
+ * @see comps_docenv_intersect
+ * @param c1 COMPS_Doc object
+ * @param c2 COMPS_Doc object
+ * @return new COMPS_Doc object
+ */
+COMPS_Doc* comps_doc_intersect(COMPS_Doc *c1, COMPS_Doc *c2) {
+    COMPS_ObjListIt *it;
+    COMPS_Set *set;
+    COMPS_Doc *res;
+    COMPS_DocGroup *tmpgroup;
+    COMPS_DocCategory *tmpcat;
+    COMPS_DocEnv *tmpenv;
+    COMPS_ObjList *groups = comps_doc_groups(c1);
+    COMPS_ObjList *categories = comps_doc_categories(c1);
+    COMPS_ObjList *envs = comps_doc_environments(c1);
+
+    res = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
+                            (COMPS_Object*[])
+                            {comps_object_copy((COMPS_Object*)c1->encoding)});
+
+    set = comps_set_create();
+    comps_set_init(set, NULL, NULL, NULL, &__comps_docgroup_idcmp);
+
+    for (it = groups->first; it != NULL; it = it->next) {
+        comps_set_add(set, it->comps_obj);
+    }
+    groups = comps_doc_groups(c2);
+    for (it = groups->first; it != NULL; it = it->next) {
+        if (comps_set_in(set, it->comps_obj)) {
+            tmpgroup = comps_docgroup_intersect(
+                                (COMPS_DocGroup*)it->comps_obj,
+                                (COMPS_DocGroup*)comps_set_data_at(set,
+                                                                   it->comps_obj));
+            comps_doc_add_group(res, tmpgroup);
+        }
+    }
+    comps_set_clear(set);
+
+    comps_set_init(set, NULL, NULL, NULL, &__comps_doccategory_idcmp);
+    for (it = categories->first; it != NULL; it = it->next) {
+        comps_set_add(set, it->comps_obj);
+    }
+    categories = comps_doc_categories(c2);
+    for (it = categories->first; it != NULL; it = it->next) {
+        if (comps_set_in(set, it->comps_obj)) {
+            tmpcat = comps_doccategory_intersect(
+                                (COMPS_DocCategory*)it->comps_obj,
+                                (COMPS_DocCategory*)comps_set_data_at(set,
+                                                                    it->comps_obj));
+            comps_doc_add_category(res, tmpcat);
+        }
+    }
+    comps_set_clear(set);
+
+    comps_set_init(set, NULL, NULL, NULL, &__comps_docenv_idcmp);
+    for (it = envs->first; it != NULL; it = it->next) {
+        comps_set_add(set, it->comps_obj);
+    }
+    envs = comps_doc_environments(c2);
+    for (it = envs->first; it != NULL; it = it->next) {
+        if (comps_set_in(set, it->comps_obj)) {
+            tmpenv = comps_docenv_intersect(
+                                (COMPS_DocEnv*)it->comps_obj,
+                                (COMPS_DocEnv*)comps_set_data_at(set,it->comps_obj));
+            comps_doc_add_environment(res, tmpenv);
+        }
+    }
+    comps_set_destroy(&set);
+    return res;
 }
 
 void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {

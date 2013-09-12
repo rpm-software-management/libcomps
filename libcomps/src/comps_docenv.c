@@ -109,6 +109,14 @@ signed char comps_docenv_cmp_u(COMPS_Object *env1, COMPS_Object *env2) {
     #undef _env2
 }
 
+char __comps_docenv_idcmp(void *e1, void *e2) {
+    return comps_object_cmp(
+                            comps_objdict_get(((COMPS_DocEnv*)e1)->properties,
+                                                  "id"),
+                            comps_objdict_get(((COMPS_DocEnv*)e2)->properties,
+                                                  "id"));
+}
+
 COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     COMPS_DocEnv *res;
     COMPS_ObjListIt *it;
@@ -117,7 +125,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     COMPS_HSList *pairs;
 
     res = (COMPS_DocEnv*)comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
-    comps_objdict_destroy(res->properties);
+    COMPS_OBJECT_DESTROY(res->properties);
     res->properties = comps_objdict_clone(e2->properties);
     pairs = comps_objdict_pairs(e1->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
@@ -164,6 +172,77 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     return res;
 }
 
+COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
+    COMPS_DocEnv *res;
+    COMPS_ObjListIt *it;
+    COMPS_HSListItem *hsit;
+    COMPS_Set *set, *set2;
+    COMPS_HSList *pairs1, *pairs2;
+
+    res = (COMPS_DocEnv*)comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
+    set = comps_set_create();
+    comps_set_init(set, NULL, NULL, NULL, &comps_objrtree_paircmp);
+
+    pairs1 = comps_objdict_pairs(e1->properties);
+    for (hsit = pairs1->first; hsit != NULL; hsit = hsit->next) {
+        comps_set_add(set, hsit->data);
+    }
+    pairs2 = comps_objdict_pairs(e2->properties);
+    for (hsit = pairs2->first; hsit != NULL; hsit = hsit->next) {
+        if (comps_set_in(set, hsit->data)) {
+            comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
+                  comps_object_copy(((COMPS_RTreePair*)hsit->data)->data));
+        }
+    }
+    comps_hslist_destroy(&pairs1);
+    comps_hslist_destroy(&pairs2);
+    comps_set_destroy(&set);
+
+    set = comps_set_create();
+    comps_set_init(set, NULL, NULL, NULL, &__comps_docgroupid_cmp_set);
+    set2 = comps_set_create();
+    comps_set_init(set2, NULL, NULL, NULL, &__comps_docgroupid_cmp_set);
+
+    for (it = e1->group_list->first; it != NULL; it = it->next) {
+        comps_set_add(set, it->comps_obj);
+    }
+    for (it = e2->group_list->first; it != NULL; it = it->next) {
+        if (comps_set_in(set, it->comps_obj))
+            comps_set_add(set2, it->comps_obj);
+    }
+    res->group_list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
+                                                          NULL);
+    //comps_list_init(res->group_list);
+    for (hsit = set2->data->first; hsit!= NULL; hsit = hsit->next) {
+        comps_docenv_add_groupid(res,
+                              (COMPS_DocGroupId*)comps_object_copy(hsit->data));
+    }
+    comps_set_destroy(&set);
+    comps_set_destroy(&set2);
+
+    set = comps_set_create();
+    comps_set_init(set, NULL, NULL, NULL, &__comps_docgroupid_cmp_set);
+    set2 = comps_set_create();
+    comps_set_init(set2, NULL, NULL, NULL, &__comps_docgroupid_cmp_set);
+
+    for (it = e1->option_list->first; it != NULL; it = it->next) {
+        comps_set_add(set, it->comps_obj);
+    }
+    for (it = e2->option_list->first; it != NULL; it = it->next) {
+        if (comps_set_in(set, it->comps_obj))
+            comps_set_add(set2, it->comps_obj);
+    }
+    res->option_list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
+                                                          NULL);
+    for (hsit = set2->data->first; hsit!= NULL; hsit = hsit->next) {
+        comps_docenv_add_optionid(res,
+                              (COMPS_DocGroupId*)comps_object_copy(hsit->data));
+    }
+    comps_set_destroy(&set);
+    comps_set_destroy(&set2);
+    return res;
+}
+
 void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
                         COMPS_Logger *log) {
     COMPS_ObjListIt *it;
@@ -184,7 +263,7 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
         if (!type[i]) {
             obj = comps_objdict_get(env->properties, props[i]);
             if (obj) {
-                __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj);
+                __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj, writer);
             }
         } else {
             pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)

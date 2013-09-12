@@ -59,6 +59,8 @@ COMPS_Object* comps_object_incref(COMPS_Object *obj);
 
 COMPS_Num* comps_num(int n);
 COMPS_Str* comps_str(const char *s);
+COMPS_Str* comps_str_x(char *s);
+void comps_str_set(COMPS_Str *str, char *s);
 
 extern COMPS_ObjectInfo COMPS_Num_ObjInfo;
 extern COMPS_ObjectInfo COMPS_Str_ObjInfo;

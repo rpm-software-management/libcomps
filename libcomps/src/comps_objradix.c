@@ -33,7 +33,7 @@ inline void comps_objrtree_data_destroy_v(void * rtd) {
 
 inline COMPS_ObjRTreeData * __comps_objrtree_data_create(char *key,
                                                    unsigned int keylen,
-                                                   UNFO_Object *data){
+                                                   COMPS_Object *data){
     COMPS_ObjRTreeData * rtd;
     if ((rtd = malloc(sizeof(*rtd))) == NULL)
         return NULL;
@@ -52,27 +52,28 @@ inline COMPS_ObjRTreeData * __comps_objrtree_data_create(char *key,
     return rtd;
 }
 
-COMPS_ObjRTreeData * comps_objrtree_data_create(char * key,UNFO_Object * data) {
+COMPS_ObjRTreeData * comps_objrtree_data_create(char *key, COMPS_Object *data) {
     COMPS_ObjRTreeData * rtd;
     rtd = __comps_objrtree_data_create(key, strlen(key), data);
     return rtd;
 }
 
-COMPS_ObjRTreeData * comps_objrtree_data_create_n(char * key, unsigned keylen,
-                                                  void * data) {
+COMPS_ObjRTreeData * comps_objrtree_data_create_n(char *key, unsigned keylen,
+                                                  COMPS_Object *data) {
     COMPS_ObjRTreeData * rtd;
     rtd = __comps_objrtree_data_create(key, keylen, data);
     return rtd;
 }
 
 void comps_objrtree_create(COMPS_ObjRTree *rtree, COMPS_Object **args) {
-    ret->subnodes = comps_hslist_create();
-    comps_hslist_init(ret->subnodes, NULL, NULL, &comps_objrtree_data_destroy_v);
-    if (ret->subnodes == NULL) {
-        free(ret);
-        return NULL;
+    (void)args;
+    rtree->subnodes = comps_hslist_create();
+    comps_hslist_init(rtree->subnodes, NULL, NULL, &comps_objrtree_data_destroy_v);
+    if (rtree->subnodes == NULL) {
+        COMPS_OBJECT_DESTROY(rtree);
+        return;
     }
-    objrtree->len = 0;
+    rtree->len = 0;
 }
 COMPS_CREATE_u(objrtree, COMPS_ObjRTree)
 
@@ -100,7 +101,8 @@ COMPS_ObjList * comps_objrtree_values(COMPS_ObjRTree * rt) {
                                     ((COMPS_ObjRTreeData*)it->data)->subnodes, 0);
             }
             if (((COMPS_ObjRTreeData*)it->data)->data != NULL) {
-                comps_objrtree_append(ret,((COMPS_ObjRTreeData*)it->data)->data);
+                comps_objlist_append(ret,
+                                    ((COMPS_ObjRTreeData*)it->data)->data);
             }
         }
         free(firstit);
@@ -115,19 +117,19 @@ COMPS_ObjRTree * comps_objrtree_clone(COMPS_ObjRTree *rt) {
     COMPS_ObjRTree *ret;
     COMPS_HSListItem *it, *it2;
     COMPS_ObjRTreeData *rtdata;
-    UNFO_Object *new_data;
+    COMPS_Object *new_data;
 
     if (!rt) return NULL;
 
     to_clone = comps_hslist_create();
     comps_hslist_init(to_clone, NULL, NULL, NULL);
-    ret = unfo_object_create(&UNFO_ObjRTree_ObjInfo, NULL);
+    ret = (COMPS_ObjRTree*)comps_object_create(&COMPS_ObjRTree_ObjInfo, NULL);
 
     for (it = rt->subnodes->first; it != NULL; it = it->next) {
         rtdata = comps_objrtree_data_create(
                                     ((COMPS_ObjRTreeData*)it->data)->key, NULL);
         if (((COMPS_ObjRTreeData*)it->data)->data != NULL)
-            new_data = unfo_object_copy(((COMPS_ObjRTreeData*)it->data)->data);
+            new_data = comps_object_copy(((COMPS_ObjRTreeData*)it->data)->data);
         else
             new_data = NULL;
         comps_hslist_destroy(&rtdata->subnodes);
@@ -148,7 +150,7 @@ COMPS_ObjRTree * comps_objrtree_clone(COMPS_ObjRTree *rt) {
             rtdata = comps_objrtree_data_create(
                                       ((COMPS_ObjRTreeData*)it->data)->key, NULL);
             if (((COMPS_ObjRTreeData*)it->data)->data != NULL)
-                new_data = unfo_object_copy(((COMPS_ObjRTreeData*)it->data)->data);
+                new_data = comps_object_copy(((COMPS_ObjRTreeData*)it->data)->data);
             else
                 new_data = NULL;
             comps_hslist_destroy(&rtdata->subnodes);
@@ -167,18 +169,19 @@ void comps_objrtree_copy(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2){
     COMPS_HSList *to_clone, *tmplist, *new_subnodes;
     COMPS_HSListItem *it, *it2;
     COMPS_ObjRTreeData *rtdata;
-    UNFO_Object *new_data;
+    COMPS_Object *new_data;
 
-    if (!rt) return NULL;
+    if (!rt1) return;
+    if (!rt2) return;
 
     to_clone = comps_hslist_create();
     comps_hslist_init(to_clone, NULL, NULL, NULL);
 
-    for (it = rt->subnodes->first; it != NULL; it = it->next) {
+    for (it = rt1->subnodes->first; it != NULL; it = it->next) {
         rtdata = comps_objrtree_data_create(
                                     ((COMPS_ObjRTreeData*)it->data)->key, NULL);
         if (((COMPS_ObjRTreeData*)it->data)->data != NULL)
-            new_data = unfo_object_copy(((COMPS_ObjRTreeData*)it->data)->data);
+            new_data = comps_object_copy(((COMPS_ObjRTreeData*)it->data)->data);
         else
             new_data = NULL;
         comps_hslist_destroy(&rtdata->subnodes);
@@ -199,7 +202,7 @@ void comps_objrtree_copy(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2){
             rtdata = comps_objrtree_data_create(
                                       ((COMPS_ObjRTreeData*)it->data)->key, NULL);
             if (((COMPS_ObjRTreeData*)it->data)->data != NULL)
-                new_data = unfo_object_copy(((COMPS_ObjRTreeData*)it->data)->data);
+                new_data = comps_object_copy(((COMPS_ObjRTreeData*)it->data)->data);
             else
                 new_data = NULL;
             comps_hslist_destroy(&rtdata->subnodes);
@@ -240,18 +243,24 @@ void comps_objrtree_values_walk(COMPS_ObjRTree * rt, void* udata,
     comps_hslist_destroy(&tmplist);
 }
 
-char comps_objrtree_objcmp(void *obj1, void *obj2) {
-    return (char) comps_object_cmp((COMPS_Object*)obj1, (COMPS_Object*)obj2);
+char comps_objrtree_paircmp(void *obj1, void *obj2) {
+    if (strcmp(((COMPS_ObjRTreePair*)obj1)->key,
+               ((COMPS_ObjRTreePair*)obj2)->key) != 0)
+        return 0;
+    return comps_object_cmp(((COMPS_ObjRTreePair*)obj1)->data,
+                            ((COMPS_ObjRTreePair*)obj1)->data);
 }
+
 
 signed char comps_objrtree_cmp(COMPS_ObjRTree *ort1, COMPS_ObjRTree *ort2) {
     COMPS_HSList *values1, *values2;
     signed char ret;
-    values1 = comps_objtree_values(ort1);
-    values2 = comps_objtree_values(ort2);
-    ret = comps_hslist_values_equal(values1, values2, &comps_objrtree_objcmp);
-    comps_hlist_destroy(values1);
-    comps_hlist_destroy(values2);
+    values1 = comps_objrtree_pairs(ort1);
+    values2 = comps_objrtree_pairs(ort2);
+    
+    ret = comps_hslist_values_equal(values1, values2, &comps_objrtree_paircmp);
+    comps_hslist_destroy(&values1);
+    comps_hslist_destroy(&values2);
     return ret;
 }
 COMPS_CMP_u(objrtree, COMPS_ObjRTree)
@@ -272,7 +281,7 @@ void comps_objrtree_set(COMPS_ObjRTree * rt, char * key, COMPS_Object * data) {
 
     if (rt->subnodes == NULL)
         return;
-    data = comps_object_copy(data);
+    ndata = comps_object_copy(data);
 
     subnodes = rt->subnodes;
     while (offset != len)
@@ -298,7 +307,7 @@ void comps_objrtree_set(COMPS_ObjRTree * rt, char * key, COMPS_Object * data) {
                 if (key[offset+x] != rtdata->key[x]) break;
             }
             if (ended == 3) { //keys equals; data replacement
-                unfo_object_destroy(rtdata->data);
+                comps_object_destroy(rtdata->data);
                 rtdata->data = ndata;
                 return;
             } else if (ended == 2) { //global key ends first; make global leaf
@@ -348,7 +357,7 @@ void comps_objrtree_set(COMPS_ObjRTree * rt, char * key, COMPS_Object * data) {
 }
 
 void comps_objrtree_set_n(COMPS_ObjRTree * rt, char * key,
-                       unsigned int len, void * data)
+                       unsigned int len, COMPS_Object * data)
 {
     static COMPS_HSListItem *it;
     COMPS_HSList *subnodes;
@@ -357,12 +366,12 @@ void comps_objrtree_set_n(COMPS_ObjRTree * rt, char * key,
 
     unsigned int klen, offset=0;
     unsigned x, found = 0;
-    UNFO_Object *ndata;
+    COMPS_Object *ndata;
     char ended, tmpch;
 
     if (rt->subnodes == NULL)
         return;
-    ndata = unfo_object_copy(data);
+    ndata = comps_object_copy(data);
 
     subnodes = rt->subnodes;
     while (offset != len)
@@ -388,7 +397,7 @@ void comps_objrtree_set_n(COMPS_ObjRTree * rt, char * key,
                 if (key[offset+x] != rtdata->key[x]) break;
             }
             if (ended == 3) { //keys equals; data replacement
-                unfo_object_destroy(rtdata->data);
+                comps_object_destroy(rtdata->data);
                 return;
             } else if (ended == 2) { //global key ends first; make global leaf
                 comps_hslist_remove(subnodes, it);
@@ -429,7 +438,7 @@ void comps_objrtree_set_n(COMPS_ObjRTree * rt, char * key,
     }
 }
 
-UNFO_Object* comps_objrtree_get(COMPS_ObjRTree * rt, const char * key) {
+COMPS_Object* comps_objrtree_get(COMPS_ObjRTree * rt, const char * key) {
     COMPS_HSList * subnodes;
     COMPS_HSListItem * it = NULL;
     COMPS_ObjRTreeData * rtdata;
@@ -464,7 +473,7 @@ UNFO_Object* comps_objrtree_get(COMPS_ObjRTree * rt, const char * key) {
         subnodes = ((COMPS_ObjRTreeData*)it->data)->subnodes;
     }
     if (it != NULL)
-        return unfo_object_copy(((COMPS_ObjRTreeData*)it->data)->data);
+        return comps_object_copy(((COMPS_ObjRTreeData*)it->data)->data);
     else return NULL;
 }
 
@@ -514,9 +523,9 @@ void comps_objrtree_unset(COMPS_ObjRTree * rt, const char * key) {
                 comps_objrtree_data_destroy(rtdata);
                 free(it);
             }
-            else if (rtdata->data_destructor != NULL) {
+            else {
                 //printf("removing data only\n");
-                unfo_object_destroy(rtdata->data);
+                comps_object_destroy(rtdata->data);
                 rtdata->is_leaf = 0;
                 rtdata->data = NULL;
             }
@@ -567,12 +576,12 @@ void comps_objrtree_clear(COMPS_ObjRTree * rt) {
     oldit = rt->subnodes->first;
     it = (oldit)?oldit->next:NULL;
     for (;it != NULL; it=it->next) {
-        unfo_object_destroy(oldit->data);
+        comps_object_destroy(oldit->data);
         free(oldit);
         oldit = it;
     }
     if (oldit) {
-        unfo_object_destroy(oldit->data);
+        comps_object_destroy(oldit->data);
         free(oldit);
     }
 }
@@ -712,9 +721,9 @@ void comps_objrtree_unite(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2) {
             }
             /* current node has data */
             if (((COMPS_ObjRTreeData*)it->data)->data != NULL) {
-                    comps_objrtree_set(rt1,
-                                    pair->key,
-                        rt2->data_cloner(((COMPS_ObjRTreeData*)it->data)->data));
+                    comps_objrtree_set(rt1, pair->key,
+                                       comps_object_copy(
+                                      (((COMPS_ObjRTreeData*)it->data)->data)));
             }
             if (((COMPS_ObjRTreeData*)it->data)->subnodes->first) {
                 comps_hslist_append(tmplist, pair, 0);
@@ -759,6 +768,6 @@ COMPS_ObjectInfo COMPS_ObjRTree_ObjInfo = {
     .obj_size = sizeof(COMPS_ObjRTree),
     .constructor = &comps_objrtree_create_u,
     .destructor = &comps_objrtree_destroy_u,
-    .deep_copy = &comps_objrtree_copy_u,
-    .obj_cmp = &comps_objrtree_cmp
+    .copy = &comps_objrtree_copy_u,
+    .obj_cmp = &comps_objrtree_cmp_u
 };

@@ -89,6 +89,14 @@ signed char comps_doccategory_cmp_u(COMPS_Object *cat1, COMPS_Object *cat2) {
     #undef _cat2
 }
 
+char __comps_doccategory_idcmp(void *c1, void *c2) {
+    return comps_object_cmp(
+                        comps_objdict_get(((COMPS_DocCategory*)c1)->properties,
+                                              "id"),
+                        comps_objdict_get(((COMPS_DocCategory*)c2)->properties,
+                                              "id"));
+}
+
 COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
                                            COMPS_DocCategory *c2) {
     COMPS_DocCategory *res;
@@ -98,7 +106,7 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     COMPS_HSList *pairs;
     res = (COMPS_DocCategory*)comps_object_create(&COMPS_DocCategory_ObjInfo,
                                                   NULL);
-    comps_objdict_destroy(res->properties);
+    COMPS_OBJECT_DESTROY(res->properties);
 
 
     res->properties = comps_objdict_clone(c2->properties);
@@ -124,10 +132,58 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
         comps_doccategory_add_groupid(res, hsit->data);
     }
     comps_set_destroy(&set);
-    comps_objdict_destroy(res->name_by_lang);
-    comps_objdict_destroy(res->desc_by_lang);
+    COMPS_OBJECT_DESTROY(res->name_by_lang);
+    COMPS_OBJECT_DESTROY(res->desc_by_lang);
     res->name_by_lang = comps_objdict_union(c1->name_by_lang, c2->name_by_lang);
     res->desc_by_lang = comps_objdict_union(c1->desc_by_lang, c2->desc_by_lang);
+    return res;
+}
+
+COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
+                                         COMPS_DocCategory *c2) {
+    COMPS_DocCategory *res;
+    COMPS_ObjListIt *it;
+    COMPS_HSListItem *hsit;
+    COMPS_Set *set;
+
+    COMPS_HSList *pairs1, *pairs2;
+
+    res = (COMPS_DocCategory*)comps_object_create(&COMPS_DocCategory_ObjInfo, NULL);
+    set = comps_set_create();
+    comps_set_init(set, NULL, NULL, NULL, &comps_objrtree_paircmp);
+
+    pairs1 = comps_objdict_pairs(c1->properties);
+    for (hsit = pairs1->first; hsit != NULL; hsit = hsit->next) {
+        comps_set_add(set, hsit->data);
+    }
+    pairs2 = comps_objdict_pairs(c2->properties);
+    for (hsit = pairs2->first; hsit != NULL; hsit = hsit->next) {
+        if (comps_set_in(set, hsit->data)) {
+            comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
+                  comps_object_copy(((COMPS_RTreePair*)hsit->data)->data));
+        }
+    }
+    comps_hslist_destroy(&pairs1);
+    comps_hslist_destroy(&pairs2);
+    comps_set_clear(set);
+
+    //set = comps_set_create();
+    comps_set_init(set, NULL, NULL, NULL, &__comps_docgroupid_cmp_set);
+
+    res->group_ids = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
+                                                         NULL);
+    //comps_list_init(res->group_ids);
+
+    for (it = c1->group_ids->first; it != NULL; it = it->next) {
+        comps_set_add(set, it->comps_obj);
+    }
+    for (it = c2->group_ids->first; it != NULL; it = it->next) {
+        if (comps_set_in(set, it->comps_obj)) {
+            comps_doccategory_add_groupid(res,
+                        (COMPS_DocGroupId*)comps_object_copy(it->comps_obj));
+        }
+    }
+    comps_set_destroy(&set);
     return res;
 }
 
@@ -149,7 +205,7 @@ void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
         if (!type[i]) {
             obj = comps_objdict_get(category->properties, props[i]);
             if (obj) {
-                __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj);
+                __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj, writer);
             }
         } else {
             pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)

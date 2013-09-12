@@ -35,11 +35,12 @@ inline char __comps_strcmp(void *s1, void *s2) {
     return (strcmp((const char*)s1, (const char*)s2) == 0);
 }
 
-inline void __comps_xml_prop(char *key; COMPS_Object *val) {
+inline void __comps_xml_prop(char *key, COMPS_Object *val,
+                             xmlTextWriterPtr writer) {
     char *str;
-    xmlTextWriterStartElement(writer, "key");
-    str = unfo_object_tostr(val);
-    xmlTextWriterWriteString(writer, str);
+    xmlTextWriterStartElement(writer, BAD_CAST key);
+    str = comps_object_tostr(val);
+    xmlTextWriterWriteString(writer, BAD_CAST str);
     free(str);
     xmlTextWriterEndElement(writer);
 }

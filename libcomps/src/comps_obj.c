@@ -129,6 +129,16 @@ COMPS_Str* comps_str(const char *s) {
     strcpy(ret->val, s);
     return ret;
 }
+COMPS_Str* comps_str_x(char *s) {
+    COMPS_Str *ret = (COMPS_Str*)comps_object_create(&COMPS_Str_ObjInfo, NULL);
+    ret->val = s;
+    return ret;
+}
+void comps_str_set(COMPS_Str *str, char *s) {
+    free(str->val);
+    str->val = malloc(sizeof(char) * ((strlen(s)+1)));
+    strcpy(str->val, s);
+}
 
 COMPS_ObjectInfo COMPS_Num_ObjInfo = {
     .obj_size = sizeof(COMPS_Num),

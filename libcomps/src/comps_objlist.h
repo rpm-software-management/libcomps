@@ -25,6 +25,7 @@
 #define COMPS_OBJLIST_H
 
 #include "comps_obj.h"
+#include "comps_utils.h"
 
 #include <string.h>
 #include <stdlib.h>

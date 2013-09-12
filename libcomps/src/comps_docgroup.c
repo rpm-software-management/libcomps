@@ -93,6 +93,13 @@ signed char comps_docgroup_cmp_u(COMPS_Object *group1, COMPS_Object *group2) {
     #undef _group2
 }
 
+char __comps_docgroup_idcmp(void *g1, void *g2) {
+    return comps_object_cmp(comps_objdict_get(((COMPS_DocGroup*)g1)->properties,
+                                              "id"),
+                            comps_objdict_get(((COMPS_DocGroup*)g2)->properties,
+                                              "id"));
+}
+
 COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     COMPS_DocGroup *res;
     COMPS_ObjListIt *it;
@@ -102,7 +109,7 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     COMPS_HSList *pairs;
 
     res = (COMPS_DocGroup*)comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
-    comps_objdict_destroy(res->properties);
+    COMPS_OBJECT_DESTROY(res->properties);
 
     res->properties = comps_objdict_clone(g2->properties);
     pairs = comps_objdict_pairs(g1->properties);
@@ -137,6 +144,55 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     return res;
 }
 
+COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,
+                                         COMPS_DocGroup *g2) {
+    COMPS_DocGroup *res;
+    COMPS_ObjListIt *it;
+    COMPS_HSListItem *hsit;
+    COMPS_Set *set;
+    COMPS_DocGroupPackage *newpkg;
+    COMPS_HSList *pairs1, *pairs2;
+
+    res = (COMPS_DocGroup*)comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
+    set = comps_set_create();
+    //comps_objrtree_paircmp(void *obj1, void *obj2) {
+    comps_set_init(set, NULL, NULL, NULL, &comps_objrtree_paircmp);
+
+    pairs1 = comps_objdict_pairs(g1->properties);
+    for (hsit = pairs1->first; hsit != NULL; hsit = hsit->next) {
+        comps_set_add(set, hsit->data);
+    }
+    pairs2 = comps_objdict_pairs(g2->properties);
+    for (hsit = pairs2->first; hsit != NULL; hsit = hsit->next) {
+        if (comps_set_in(set, hsit->data)) {
+            comps_objdict_set(res->properties,
+                              ((COMPS_RTreePair*)hsit->data)->key,
+                  comps_object_copy(((COMPS_RTreePair*)hsit->data)->data));
+        }
+    }
+    comps_hslist_destroy(&pairs1);
+    comps_hslist_destroy(&pairs2);
+    comps_set_clear(set);
+    res->packages = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
+                                                        NULL);
+
+    //set = comps_set_create();
+    comps_set_init(set, NULL, NULL, NULL, &comps_docpackage_cmp_set);
+
+    for (it = g1->packages->first; it != NULL; it = it->next) {
+        comps_set_add(set, it->comps_obj);
+    }
+    for (it = g2->packages->first; it != NULL; it = it->next) {
+        if (comps_set_in(set, it->comps_obj)) {
+            newpkg = (COMPS_DocGroupPackage*)
+                     comps_object_copy(it->comps_obj);
+            comps_docgroup_add_package(res, newpkg);
+        }
+    }
+    comps_set_destroy(&set);
+    return res;
+}
+
 void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                         COMPS_Logger *log) {
     COMPS_ObjListIt *it;
@@ -159,7 +215,7 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
         if (!type[i]) {
             obj = comps_objdict_get(group->properties, props[i]);
             if (obj) {
-                __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj);
+                __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj, writer);
             }
         } else {
             pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)

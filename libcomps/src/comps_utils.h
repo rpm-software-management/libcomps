@@ -23,8 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "comps_obj.h"
 #include "comps_logger.h"
+#include "comps_obj.h"
 
 #include <libxml/encoding.h>
 #include <libxml/xmlwriter.h>
@@ -106,8 +106,14 @@ void CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _set_), PROPNAME)(OBJTYPE *OBJNAM
 }
 #define HEAD_COMPS_DESTROY_u(NAME, TYPE) void CONCAT(CONCAT(comps_, NAME), _destroy_u)\
                                                             (COMPS_Object* obj);
+#define COMPS_CMP_u(NAME, TYPE) signed char CONCAT(CONCAT(comps_,NAME),_cmp_u)\
+                                                            (COMPS_Object* obj_dst,\
+                                                             COMPS_Object* obj_src){\
+    return CONCAT(CONCAT(comps_, NAME),_cmp) ((TYPE*)obj_dst, (TYPE*)obj_src);\
+}
+#define HEAD_COMPS_CMP_u(NAME, TYPE) void CONCAT(CONCAT(comps_,NAME),_cmp_u)\
 
 char __comps_strcmp(void *s1, void *s2);
 void* __comps_str_clone(void *str);
-void __comps_xml_prop(char *key, COMPS_Object *val);
+void __comps_xml_prop(char *key, COMPS_Object *val, xmlTextWriterPtr writer);
 #endif
