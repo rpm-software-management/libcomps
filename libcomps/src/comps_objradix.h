@@ -56,10 +56,11 @@ COMPS_ObjRTreeData* comps_objrtree_data_create_n(char *key,
                                                  unsigned int len,
                                                  COMPS_Object *data);
 
-COMPS_ObjRTree* comps_objrtree_create(void* (*data_constructor)(void*),
-                                 void* (*data_cloner)(void*),
-                                 void (*data_destructor)(void*));
-void comps_objrtree_destroy(COMPS_ObjRTree *rt);
+
+void comps_objrtree_copy_u(COMPS_Object *rt1, COMPS_Object *rt2);
+signed char comps_objrtree_cmp_u(COMPS_Object *ort1, COMPS_Object *ort2);
+void comps_objrtree_create_u(COMPS_Object *rtree, COMPS_Object **args);
+void comps_objrtree_destroy_u(COMPS_Object * rt);
 
 void comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *data);
 void comps_objrtree_set_n(COMPS_ObjRTree *rt, char *key, unsigned int len,
