@@ -864,6 +864,8 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(gid1 != "gid2")
         self.assertTrue(gid1 != gid2)
         self.assertTrue(gid1 != gid3)
+        with self.assertRaises(NotImplementedError):
+            gid1 < gid2
 
     def test_default(self):
         e = libcomps.Environment("e1", "enviroment1", "env desc")
@@ -894,15 +896,6 @@ class COMPSTest(unittest.TestCase):
         c2.fromxml_f("sample_comps.xml")
         c = c1 + c2
         c.xml_f("f21_united.xml")
-        group = libcomps.Group()
-        gid = libcomps.GroupId("gid1")
-        from pykickstart.parser import Group
-        #comps = libcomps.Comps()
-        #comps.fromxml_f('/tmp/dnf.cache/default/fedora/repodata/16e49bf17cb730f0ec316dfb0c813241a955f545b0dac7c51dbb582ea6da14c9-comps-f20.xml')
-        gid = c1.environments[0].group_ids[0]
-        g = Group(gid)
-        with self.assertRaises(NotImplementedError):
-            g in [Group('2'), Group(gid)]
 
 if __name__ == "__main__":
     unittest.main(testRunner = MyRunner)
