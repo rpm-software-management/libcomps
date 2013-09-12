@@ -53,8 +53,8 @@
 
 #define CMP_OP_EQ_NE_CHECK(OP)                                  \
     if ((OP) != Py_EQ && (OP) != Py_NE) {                       \
-        PyErr_Format(PyExc_TypeError, "Unsuported operator");   \
-        return Py_INCREF(Py_NotImplemented), Py_NotImplemented; \
+        PyErr_Format(PyExc_NotImplementedError, "Unsuported operator");   \
+        return NULL; \
     }
 
 #define CMP_NONE_CHECK(OP, SELF, OTHER)                         \
