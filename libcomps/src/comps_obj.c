@@ -30,9 +30,14 @@ void comps_object_destroy_v(void *comps_obj) {
 }
 
 COMPS_Object* comps_object_copy(COMPS_Object *comps_obj) {
-    COMPS_Object *ret = comps_object_create(comps_obj->obj_info, NULL);
-    comps_obj->obj_info->copy(ret, comps_obj);
-    return ret;
+    if (!comps_obj) return NULL;
+    COMPS_Object *obj;
+    obj = malloc(comps_obj->obj_info->obj_size);
+    obj->refc = comps_refc_create((void*)obj,
+                             (void (*)(void*)) comps_obj->obj_info->destructor);
+    obj->obj_info = comps_obj->obj_info;
+    comps_obj->obj_info->copy(obj, comps_obj);
+    return obj;
 }
 
 COMPS_Object* comps_object_copy_deep(COMPS_Object *comps_obj) {
@@ -41,10 +46,14 @@ COMPS_Object* comps_object_copy_deep(COMPS_Object *comps_obj) {
 }
 
 signed char comps_object_cmp(COMPS_Object *obj1, COMPS_Object *obj2) {
+    if (!obj1 && !obj2)
+        return 1;
+    else if (!obj1 || !obj2)
+        return 0;
     if (obj1->obj_info->obj_cmp) {
         return obj1->obj_info->obj_cmp(obj1, obj2);
     } else {
-        return -1;
+        return 0;
     }
 }
 
@@ -93,6 +102,10 @@ char* comps_num_tostr(COMPS_Object *num) {
     return ret;
 }
 
+signed char comps_num_cmp_u(COMPS_Object *num1, COMPS_Object *num2) {
+    return ((COMPS_Num*)num1)->val == ((COMPS_Num*)num2)->val;
+}
+
 void comps_str_create_u(COMPS_Object* str, COMPS_Object **args){
     if (args && args[0]->obj_info == &COMPS_Str_ObjInfo) {
         ((COMPS_Str*)str)->val = malloc(sizeof(char) * (strlen(((COMPS_Str*)args[0])->val)+1));
@@ -101,8 +114,13 @@ void comps_str_create_u(COMPS_Object* str, COMPS_Object **args){
 }
 
 void comps_str_copy_u(COMPS_Object *str_dst, COMPS_Object *str_src) {
-    ((COMPS_Str*)str_dst)->val = malloc(sizeof(char) * strlen(((COMPS_Str*)str_src)->val));
-    strcpy(((COMPS_Str*)str_dst)->val, ((COMPS_Str*)str_dst)->val);
+    if (((COMPS_Str*)str_src)->val) {
+        ((COMPS_Str*)str_dst)->val =
+                      malloc(sizeof(char) *
+                             (strlen(((COMPS_Str*)str_src)->val) + 1));
+        strcpy(((COMPS_Str*)str_dst)->val, ((COMPS_Str*)str_src)->val);
+    } else
+        ((COMPS_Str*)str_dst)->val = NULL;
 }
 
 void comps_str_destroy_u(COMPS_Object *str){
@@ -116,6 +134,15 @@ char* comps_str_tostr(COMPS_Object *str) {
     return ret;
 }
 
+signed char comps_str_cmp_u(COMPS_Object *str1, COMPS_Object *str2) {
+    if (!((COMPS_Str*)str1)->val && !((COMPS_Str*)str2)->val) {
+        return 1;
+    } else if (!((COMPS_Str*)str1)->val || !((COMPS_Str*)str2)->val) {
+        return 0;
+    } else return strcmp(((COMPS_Str*)str1)->val,
+                         ((COMPS_Str*)str2)->val) == 0;
+}
+
 
 COMPS_Num* comps_num(int n) {
     COMPS_Num *ret = (COMPS_Num*)comps_object_create(&COMPS_Num_ObjInfo, NULL);
@@ -125,8 +152,11 @@ COMPS_Num* comps_num(int n) {
 
 COMPS_Str* comps_str(const char *s) {
     COMPS_Str *ret = (COMPS_Str*)comps_object_create(&COMPS_Str_ObjInfo, NULL);
-    ret->val = malloc(sizeof(char) * ((strlen(s)+1)));
-    strcpy(ret->val, s);
+    if (s) {
+        ret->val = malloc(sizeof(char) * ((strlen(s)+1)));
+        strcpy(ret->val, s);
+    } else 
+        ret->val = NULL;
     return ret;
 }
 COMPS_Str* comps_str_x(char *s) {
@@ -145,7 +175,8 @@ COMPS_ObjectInfo COMPS_Num_ObjInfo = {
     .constructor = &comps_num_create_u,
     .destructor = &comps_num_destroy_u,
     .copy = &comps_num_copy_u,
-    .to_str = &comps_num_tostr
+    .to_str = &comps_num_tostr,
+    .obj_cmp = &comps_num_cmp_u
 };
 
 COMPS_ObjectInfo COMPS_Str_ObjInfo = {
@@ -153,6 +184,7 @@ COMPS_ObjectInfo COMPS_Str_ObjInfo = {
     .constructor = &comps_str_create_u,
     .destructor = &comps_str_destroy_u,
     .copy = &comps_str_copy_u,
-    .to_str = &comps_str_tostr
+    .to_str = &comps_str_tostr,
+    .obj_cmp = &comps_str_cmp_u
 };
 

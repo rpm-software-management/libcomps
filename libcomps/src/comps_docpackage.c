@@ -23,6 +23,7 @@ void comps_docpackage_create(COMPS_DocGroupPackage* package, COMPS_Object **args
     (void)args;
     package->name = NULL;
     package->requires = NULL;
+    package->type = COMPS_PACKAGE_UNKNOWN;
 }
 COMPS_CREATE_u(docpackage, COMPS_DocGroupPackage)
 
@@ -67,6 +68,7 @@ signed char comps_docpackage_cmp_u(COMPS_Object *pkg1, COMPS_Object *pkg2) {
     if (!comps_object_cmp((COMPS_Object*)_pkg1->requires,
                           (COMPS_Object*)_pkg2->requires)) return 0;
     if (_pkg1->type != _pkg2->type) return 0;
+    
     return 1;
 
     #undef _pkg1

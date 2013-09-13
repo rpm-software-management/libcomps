@@ -9,7 +9,7 @@ COMPS_ObjListIt* comps_objlist_it_create(COMPS_Object *obj) {
     objit = malloc(sizeof(COMPS_ObjListIt));
     if (!objit) return NULL;
 
-    objit->comps_obj = comps_object_copy(obj);
+    objit->comps_obj = comps_object_incref(obj);
     objit->next = NULL;
     return objit;
 }
@@ -25,7 +25,7 @@ COMPS_ObjListIt* comps_objlist_it_create_x(COMPS_Object *obj) {
 }
 
 void comps_objlist_it_destroy(COMPS_ObjListIt *objit) {
-    objit = malloc(sizeof(COMPS_ObjListIt));
+    //objit = malloc(sizeof(COMPS_ObjListIt));
     comps_object_destroy(objit->comps_obj);
     free(objit);
 }
@@ -41,6 +41,10 @@ COMPS_CREATE_u(objlist, COMPS_ObjList)
 void comps_objlist_copy(COMPS_ObjList *objlist_dst,
                         COMPS_ObjList *objlist_src) {
     COMPS_ObjListIt *it;
+
+    objlist_dst->first = NULL;
+    objlist_dst->last = NULL;
+    objlist_dst->len = 0;
 
     for (it = objlist_src->first; it != NULL; it = it->next) {
         comps_objlist_append(objlist_dst, comps_object_copy(it->comps_obj));
@@ -120,7 +124,8 @@ COMPS_ObjListIt* comps_objlist_get_it(COMPS_ObjList *objlist,
 
 int comps_objlist_walk(COMPS_ObjListIt **walker, COMPS_Object **result) {
     if (!walker || !*walker) return 0;
-    result = &(*walker)->comps_obj;
+    if (result)
+        *result = (*walker)->comps_obj;
     *walker = (*walker)->next;
     return 1;
 }

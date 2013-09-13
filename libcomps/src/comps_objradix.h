@@ -36,6 +36,7 @@ typedef struct {
 } COMPS_ObjRTreeData;
 
 typedef struct {
+    COMPS_Object_HEAD
     COMPS_HSList *subnodes;
     unsigned int len;
 } COMPS_ObjRTree;
@@ -65,6 +66,8 @@ signed char comps_objrtree_cmp_u(COMPS_Object *ort1, COMPS_Object *ort2);
 void comps_objrtree_create_u(COMPS_Object *rtree, COMPS_Object **args);
 void comps_objrtree_destroy_u(COMPS_Object * rt);
 
+void __comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *data);
+void comps_objrtree_set_x(COMPS_ObjRTree *rt, char *key, COMPS_Object *data);
 void comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *data);
 void comps_objrtree_set_n(COMPS_ObjRTree *rt, char *key, unsigned int len,
                           COMPS_Object *data);

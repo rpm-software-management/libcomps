@@ -41,6 +41,7 @@ void comps_objdict_destroy_v(void *rt);
 //void comps_mdict_destroy_v(void *rt);
 
 void comps_objdict_set(COMPS_ObjDict *rt, char *key, COMPS_Object *data);
+void comps_objdict_set_x(COMPS_ObjDict *rt, char *key, COMPS_Object *data);
 void comps_objdict_set_n(COMPS_ObjDict *rt, char *key, unsigned int len,
                          COMPS_Object *data);
 //void comps_mdict_set(COMPS_MDict *rt, char *key, void *data);
@@ -57,10 +58,10 @@ void comps_objdict_unset(COMPS_ObjDict * rt, const char * key);
 void comps_objdict_clear(COMPS_ObjDict * rt);
 //void comps_mdict_clear(COMPS_MDict * rt);
 
-COMPS_HSList * comps_objdict_values(COMPS_ObjDict * rt);
+COMPS_ObjList * comps_objdict_values(COMPS_ObjDict * rt);
 
-void comps_objdict_values_walk(COMPS_ObjDict *rt, void *udata,
-                              void (*walk_f)(void*, void*));
+void comps_objdict_values_walk(COMPS_ObjRTree * rt, void* udata,
+                              void (*walk_f)(void*, COMPS_Object*));
 //void comps_mdict_values_walk(COMPS_MDict *rt, void *udata,
 //                              void (*walk_f)(void*, void*));
 

@@ -58,6 +58,11 @@ COMPS_STRPROP_SETTER(category, COMPS_DocCategory, name) /*comps_utils.h macro*/
 COMPS_STRPROP_SETTER(category, COMPS_DocCategory, desc) /*comps_utils.h macro*/
 COMPS_NUMPROP_SETTER(category, COMPS_DocCategory, display_order) /*comps_utils.h macro*/
 
+COMPS_PROP_GETTER(category, COMPS_DocCategory, id) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(category, COMPS_DocCategory, name) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(category, COMPS_DocCategory, desc) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(category, COMPS_DocCategory, display_order) /*comps_utils.h macro*/
+
 void comps_doccategory_add_groupid(COMPS_DocCategory *category,
                                 COMPS_DocGroupId *gid) {
 
@@ -69,7 +74,7 @@ void comps_doccategory_add_groupid(COMPS_DocCategory *category,
         category->group_ids = (COMPS_ObjList*) comps_object_create(
                                                  &COMPS_ObjList_ObjInfo, NULL);
     }
-    comps_objlist_append(category->group_ids, (COMPS_Object*)gid);
+    comps_objlist_append_x(category->group_ids, (COMPS_Object*)gid);
 }
 
 signed char comps_doccategory_cmp_u(COMPS_Object *cat1, COMPS_Object *cat2) {
@@ -113,7 +118,7 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     pairs = comps_objdict_pairs(c1->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
         comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
-                   comps_object_copy(((COMPS_RTreePair*)hsit->data)->data));
+                          ((COMPS_RTreePair*)hsit->data)->data);
     }
     comps_hslist_destroy(&pairs);
     set = comps_set_create();
@@ -126,10 +131,10 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     for (; it != NULL; it = it->next) {
         comps_set_add(set, it->comps_obj);
     }
-    res->group_ids = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
-                                                        NULL);
+    //res->group_ids = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
+    //                                                    NULL);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_doccategory_add_groupid(res, hsit->data);
+        comps_doccategory_add_groupid(res, comps_object_copy(hsit->data));
     }
     comps_set_destroy(&set);
     COMPS_OBJECT_DESTROY(res->name_by_lang);
@@ -155,12 +160,13 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
     pairs1 = comps_objdict_pairs(c1->properties);
     for (hsit = pairs1->first; hsit != NULL; hsit = hsit->next) {
         comps_set_add(set, hsit->data);
+        
     }
     pairs2 = comps_objdict_pairs(c2->properties);
     for (hsit = pairs2->first; hsit != NULL; hsit = hsit->next) {
         if (comps_set_in(set, hsit->data)) {
             comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
-                  comps_object_copy(((COMPS_RTreePair*)hsit->data)->data));
+                  ((COMPS_RTreePair*)hsit->data)->data);
         }
     }
     comps_hslist_destroy(&pairs1);
@@ -170,8 +176,8 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
     //set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_docgroupid_cmp_set);
 
-    res->group_ids = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
-                                                         NULL);
+    //res->group_ids = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
+    //                                                     NULL);
     //comps_list_init(res->group_ids);
 
     for (it = c1->group_ids->first; it != NULL; it = it->next) {

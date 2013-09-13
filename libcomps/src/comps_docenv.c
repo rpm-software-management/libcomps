@@ -130,7 +130,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     pairs = comps_objdict_pairs(e1->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
         comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
-                comps_object_copy(((COMPS_RTreePair*)hsit->data)->data));
+                         ((COMPS_RTreePair*)hsit->data)->data);
     }
     comps_hslist_destroy(&pairs);
 
@@ -144,8 +144,8 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     for (; it != NULL; it = it->next) {
         comps_set_add(set, it->comps_obj);
     }
-    res->group_list = (COMPS_ObjList*)comps_object_create(
-                                                  &COMPS_ObjList_ObjInfo, NULL);
+    //res->group_list = (COMPS_ObjList*)comps_object_create(
+    //                                              &COMPS_ObjList_ObjInfo, NULL);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
         comps_docenv_add_groupid(res, hsit->data);
     }
@@ -159,8 +159,8 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     if (e2->option_list)
         for (it = e2->option_list->first; it != NULL; it = it->next)
             comps_set_add(set, it->comps_obj);
-    res->group_list = (COMPS_ObjList*)comps_object_create(
-                                                  &COMPS_ObjList_ObjInfo, NULL);
+    //res->group_list = (COMPS_ObjList*)comps_object_create(
+    //                                              &COMPS_ObjList_ObjInfo, NULL);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
         comps_docenv_add_optionid(res, hsit->data);
     }
@@ -191,7 +191,7 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     for (hsit = pairs2->first; hsit != NULL; hsit = hsit->next) {
         if (comps_set_in(set, hsit->data)) {
             comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
-                  comps_object_copy(((COMPS_RTreePair*)hsit->data)->data));
+                              ((COMPS_RTreePair*)hsit->data)->data);
         }
     }
     comps_hslist_destroy(&pairs1);
@@ -210,8 +210,8 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
         if (comps_set_in(set, it->comps_obj))
             comps_set_add(set2, it->comps_obj);
     }
-    res->group_list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
-                                                          NULL);
+    //res->group_list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
+    //                                                      NULL);
     //comps_list_init(res->group_list);
     for (hsit = set2->data->first; hsit!= NULL; hsit = hsit->next) {
         comps_docenv_add_groupid(res,
@@ -232,11 +232,10 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
         if (comps_set_in(set, it->comps_obj))
             comps_set_add(set2, it->comps_obj);
     }
-    res->option_list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
-                                                          NULL);
+    //res->option_list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
+    //                                                      NULL);
     for (hsit = set2->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_optionid(res,
-                              (COMPS_DocGroupId*)comps_object_copy(hsit->data));
+        comps_docenv_add_optionid(res,(COMPS_DocGroupId*)hsit->data);
     }
     comps_set_destroy(&set);
     comps_set_destroy(&set2);

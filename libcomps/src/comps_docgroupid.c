@@ -34,26 +34,18 @@ void comps_docgroupid_copy(COMPS_DocGroupId *gid_dst,
 COMPS_COPY_u(docgroupid, COMPS_DocGroupId)    /*comps_utils.h macro*/
 
 void comps_docgroupid_destroy(COMPS_DocGroupId *gid) {
-    free(gid->name);
+    COMPS_OBJECT_DESTROY(gid->name);
 }
 COMPS_DESTROY_u(docgroupid, COMPS_DocGroupId) /*comps_utils.h macro*/
 
 
 void comps_docgroupid_set_name(COMPS_DocGroupId *gid, char *name) {
     if (gid->name)
-        comps_object_destroy((COMPS_Object*)gid->name);
+        COMPS_OBJECT_DESTROY(gid->name);
     gid->name = comps_str(name);
 }
 void comps_docgroupid_set_default(COMPS_DocGroupId *gid, int def) {
     gid->def = (def != 0);
-}
-
-char __comps_docgroupid_cmp_set(void *gid1, void *gid2) {
-    if (!COMPS_OBJECT_CMP(((COMPS_DocGroupId*)gid1)->name,
-                          ((COMPS_DocGroupId*)gid2)->name)) return 0;
-    if (((COMPS_DocGroupId*)gid1)->def != ((COMPS_DocGroupId*)gid2)->def)
-        return 0;
-    return 1;
 }
 
 signed char comps_docgroupid_cmp_u(COMPS_Object *gid1, COMPS_Object *gid2) {
@@ -66,6 +58,11 @@ signed char comps_docgroupid_cmp_u(COMPS_Object *gid1, COMPS_Object *gid2) {
 
     #undef _gid1
     #undef _gid2
+}
+
+char __comps_docgroupid_cmp_set(void *gid1, void *gid2) {
+    return comps_docgroupid_cmp_u((COMPS_Object*)gid1,
+                                  (COMPS_Object*)gid2);
 }
 
 COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo = {

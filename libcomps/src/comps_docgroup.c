@@ -33,7 +33,7 @@ void comps_docgroup_create(COMPS_DocGroup* group, COMPS_Object **args) {
 COMPS_CREATE_u(docgroup, COMPS_DocGroup)
 
 void comps_docgroup_copy(COMPS_DocGroup *group_dst,
-                                           COMPS_DocGroup *group_src) {
+                         COMPS_DocGroup *group_src) {
     group_dst->properties = (COMPS_ObjDict*)comps_object_copy(
                                        (COMPS_Object*)group_src->properties);
     group_dst->name_by_lang = (COMPS_ObjDict*)comps_object_copy(
@@ -46,10 +46,11 @@ void comps_docgroup_copy(COMPS_DocGroup *group_dst,
 COMPS_COPY_u(docgroup, COMPS_DocGroup)    /*comps_utils.h macro*/
 
 void comps_docgroup_destroy(COMPS_DocGroup *group) {
-    comps_object_destroy((COMPS_Object*)group->properties);
-    comps_object_destroy((COMPS_Object*)group->name_by_lang);
-    comps_object_destroy((COMPS_Object*)group->desc_by_lang);
-    comps_object_destroy((COMPS_Object*)group->packages);
+    
+    COMPS_OBJECT_DESTROY(group->properties);
+    COMPS_OBJECT_DESTROY(group->name_by_lang);
+    COMPS_OBJECT_DESTROY(group->desc_by_lang);
+    COMPS_OBJECT_DESTROY(group->packages);
 }
 COMPS_DESTROY_u(docgroup, COMPS_DocGroup) /*comps_utils.h macro*/
 
@@ -60,6 +61,14 @@ COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, def) /*comps_utils.h macro*/
 COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, uservisible) /*comps_utils.h macro*/
 COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, display_order) /*comps_utils.h macro*/
 COMPS_STRPROP_SETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
+
+COMPS_PROP_GETTER(group, COMPS_DocGroup, id) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(group, COMPS_DocGroup, name) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(group, COMPS_DocGroup, desc) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(group, COMPS_DocGroup, def) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(group, COMPS_DocGroup, uservisible) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(group, COMPS_DocGroup, display_order) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
 
 void comps_docgroup_add_package(COMPS_DocGroup *group,
                                 COMPS_DocGroupPackage *package) {
@@ -72,7 +81,37 @@ void comps_docgroup_add_package(COMPS_DocGroup *group,
         group->packages = (COMPS_ObjList*) comps_object_create(
                                                 &COMPS_ObjList_ObjInfo, NULL);
     }
-    comps_objlist_append(group->packages, (COMPS_Object*)package);
+    comps_objlist_append_x(group->packages, (COMPS_Object*)package);
+}
+
+COMPS_ObjList* comps_docgroup_get_packages(COMPS_DocGroup *group, char *name,
+                                       COMPS_PackageType type) {
+    COMPS_ObjListIt *it;
+    COMPS_ObjList *ret;
+    unsigned int matched, matched_max;
+    matched_max = 0;
+    #define package ((COMPS_DocGroupPackage*)it->comps_obj)
+    COMPS_Str *objname = comps_str(name);
+    if (!group) return NULL;
+
+    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+
+    if (name != NULL) matched_max++;
+    if (type != COMPS_PACKAGE_UNKNOWN) matched_max++;
+
+    for (it = (group->packages)?group->packages->first:NULL;
+         it != NULL; it = it->next) {
+        matched = 0;
+        if ((name != NULL) && COMPS_OBJECT_CMP(package->name, objname))
+            matched++;
+        if ((type != COMPS_PACKAGE_UNKNOWN) && package->type  == type)
+            matched++;
+        if (matched == matched_max) {
+            comps_objlist_append(ret, (COMPS_Object*)package);
+        }
+    }
+    COMPS_OBJECT_DESTROY(objname);
+    return ret;
 }
 
 
@@ -115,7 +154,7 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     pairs = comps_objdict_pairs(g1->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
         comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
-                       comps_object_copy(((COMPS_RTreePair*)hsit->data)->data));
+                          ((COMPS_RTreePair*)hsit->data)->data);
     }
     comps_hslist_destroy(&pairs);
 
@@ -129,7 +168,7 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     for (; it != NULL; it = it->next) {
         comps_set_add(set, (void*)it->comps_obj);
     }
-    res->packages = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    //res->packages = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
     //comps_list_init(res->packages);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
         newpkg = (COMPS_DocGroupPackage*)comps_object_copy(
@@ -167,14 +206,14 @@ COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,
         if (comps_set_in(set, hsit->data)) {
             comps_objdict_set(res->properties,
                               ((COMPS_RTreePair*)hsit->data)->key,
-                  comps_object_copy(((COMPS_RTreePair*)hsit->data)->data));
+                              ((COMPS_RTreePair*)hsit->data)->data);
         }
     }
     comps_hslist_destroy(&pairs1);
     comps_hslist_destroy(&pairs2);
     comps_set_clear(set);
-    res->packages = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
-                                                        NULL);
+    //res->packages = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
+    //                                                    NULL);
 
     //set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &comps_docpackage_cmp_set);

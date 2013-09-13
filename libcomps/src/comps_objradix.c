@@ -171,13 +171,18 @@ void comps_objrtree_copy(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2){
     COMPS_ObjRTreeData *rtdata;
     COMPS_Object *new_data;
 
-    if (!rt1) return;
-    if (!rt2) return;
+    rt1->subnodes = comps_hslist_create();
+    comps_hslist_init(rt1->subnodes, NULL, NULL, &comps_objrtree_data_destroy_v);
+    if (rt1->subnodes == NULL) {
+        COMPS_OBJECT_DESTROY(rt1);
+        return;
+    }
+    rt1->len = 0;
 
     to_clone = comps_hslist_create();
     comps_hslist_init(to_clone, NULL, NULL, NULL);
 
-    for (it = rt1->subnodes->first; it != NULL; it = it->next) {
+    for (it = rt2->subnodes->first; it != NULL; it = it->next) {
         rtdata = comps_objrtree_data_create(
                                     ((COMPS_ObjRTreeData*)it->data)->key, NULL);
         if (((COMPS_ObjRTreeData*)it->data)->data != NULL)
@@ -187,7 +192,7 @@ void comps_objrtree_copy(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2){
         comps_hslist_destroy(&rtdata->subnodes);
         rtdata->subnodes = ((COMPS_ObjRTreeData*)it->data)->subnodes;
         rtdata->data = new_data;
-        comps_hslist_append(rt2->subnodes, rtdata, 0);
+        comps_hslist_append(rt1->subnodes, rtdata, 0);
         comps_hslist_append(to_clone, rtdata, 0);
     }
 
@@ -265,7 +270,16 @@ signed char comps_objrtree_cmp(COMPS_ObjRTree *ort1, COMPS_ObjRTree *ort2) {
 }
 COMPS_CMP_u(objrtree, COMPS_ObjRTree)
 
-void comps_objrtree_set(COMPS_ObjRTree * rt, char * key, COMPS_Object * data) {
+void comps_objrtree_set_x(COMPS_ObjRTree *rt, char *key, COMPS_Object *data) {
+    __comps_objrtree_set(rt, key, data);
+}
+void comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *data) {
+    COMPS_Object *ndata = ndata = comps_object_copy(data);
+    __comps_objrtree_set(rt, key, ndata);
+}
+
+
+void __comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *ndata) {
 
     static COMPS_HSListItem *it;
     COMPS_HSList *subnodes;
@@ -274,14 +288,12 @@ void comps_objrtree_set(COMPS_ObjRTree * rt, char * key, COMPS_Object * data) {
 
     unsigned int len, offset=0;
     unsigned x, found = 0;
-    void *ndata;
     char ended, tmpch;
 
     len = strlen(key);
 
     if (rt->subnodes == NULL)
         return;
-    ndata = comps_object_copy(data);
 
     subnodes = rt->subnodes;
     while (offset != len)

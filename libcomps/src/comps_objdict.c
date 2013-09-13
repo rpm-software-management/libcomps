@@ -19,6 +19,9 @@
 
 #include "comps_objdict.h"
 
+inline void comps_objdict_set_x(COMPS_ObjDict *rt, char *key, COMPS_Object *data){
+    comps_objrtree_set_x((COMPS_ObjRTree*) rt, key, data);
+}
 inline void comps_objdict_set(COMPS_ObjDict *rt, char *key, COMPS_Object *data){
     comps_objrtree_set((COMPS_ObjRTree*) rt, key, data);
 }
@@ -36,11 +39,11 @@ inline void comps_objdict_unset(COMPS_ObjDict * rt, const char * key) {
 inline void comps_objdict_clear(COMPS_ObjDict * rt) {
     comps_objrtree_clear((COMPS_ObjRTree*) rt);
 }
-inline COMPS_HSList * comps_objdict_values(COMPS_ObjDict * rt) {
+inline COMPS_ObjList * comps_objdict_values(COMPS_ObjDict * rt) {
     return comps_objrtree_values((COMPS_ObjRTree*)rt);
 }
 inline void comps_objdict_values_walk(COMPS_ObjRTree * rt, void* udata,
-                              void (*walk_f)(void*, void*)) {
+                              void (*walk_f)(void*, COMPS_Object*)) {
     comps_objrtree_values_walk((COMPS_ObjRTree*)rt, udata, walk_f);
 }
 inline COMPS_ObjDict * comps_objdict_clone(COMPS_ObjDict * rt) {

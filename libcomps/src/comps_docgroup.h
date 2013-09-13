@@ -49,11 +49,21 @@ HEAD_COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, uservisible) /*comps_utils.h ma
 HEAD_COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, display_order) /*comps_utils.h macro*/
 HEAD_COMPS_STRPROP_SETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
 
+HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, id) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, name) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, desc) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, def) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, uservisible) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, display_order) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
+
 signed char comps_docgroup_cmp_u(COMPS_Object *group1, COMPS_Object *group2);
 char __comps_docgroup_idcmp(void *g1, void *g2);
 
 void comps_docgroup_add_package(COMPS_DocGroup *group,
                                 COMPS_DocGroupPackage *package);
+COMPS_ObjList* comps_docgroup_get_packages(COMPS_DocGroup *group, char *name,
+                                       COMPS_PackageType type);
 
 COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2);
 COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,

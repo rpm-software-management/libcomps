@@ -61,7 +61,7 @@ inline void CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _set_), PROPNAME)(OBJTYPE 
     if (PROPNAME) {\
         COMPS_Object *str;\
         str = (COMPS_Object*)comps_str(PROPNAME);\
-        comps_objdict_set(OBJNAME->properties, #PROPNAME, str);\
+        comps_objdict_set_x(OBJNAME->properties, #PROPNAME, str);\
     }\
 }
 
@@ -75,12 +75,22 @@ inline void CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _set_), PROPNAME)(OBJTYPE 
                                                                         int PROPNAME){\
         COMPS_Object *num;\
         num = (COMPS_Object*)comps_num(PROPNAME);\
-        comps_objdict_set(OBJNAME->properties, #PROPNAME, num);\
+        comps_objdict_set_x(OBJNAME->properties, #PROPNAME, num);\
 }
-
 #define HEAD_COMPS_NUMPROP_SETTER(OBJNAME, OBJTYPE, PROPNAME)\
 void CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _set_), PROPNAME)(OBJTYPE *OBJNAME,\
                                                                         int PROPNAME);
+
+
+#define COMPS_PROP_GETTER(OBJNAME, OBJTYPE, PROPNAME)\
+inline COMPS_Object* CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _get_), PROPNAME)\
+                                                         (OBJTYPE *OBJNAME){\
+    return comps_objdict_get(OBJNAME->properties, #PROPNAME);\
+}
+#define HEAD_COMPS_PROP_GETTER(OBJNAME, OBJTYPE, PROPNAME)\
+COMPS_Object* CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _get_), PROPNAME)\
+                                                            (OBJTYPE *OBJNAME);
+
 
 #define COMPS_CREATE_u(NAME, TYPE) void CONCAT(CONCAT(comps_, NAME), _create_u)\
                                                         (COMPS_Object *uobj,\
