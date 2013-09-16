@@ -73,7 +73,7 @@ void comps_docenv_add_groupid(COMPS_DocEnv *env,
         env->group_list = (COMPS_ObjList*) comps_object_create(
                                             &COMPS_ObjList_ObjInfo, NULL);
     }
-    comps_objlist_append(env->group_list, (COMPS_Object*)gid);
+    comps_objlist_append_x(env->group_list, (COMPS_Object*)gid);
 }
 
 void comps_docenv_add_optionid(COMPS_DocEnv *env,
@@ -87,7 +87,7 @@ void comps_docenv_add_optionid(COMPS_DocEnv *env,
         env->option_list = (COMPS_ObjList*) comps_object_create(
                                             &COMPS_ObjList_ObjInfo, NULL);
     }
-    comps_objlist_append(env->option_list, (COMPS_Object*)gid);
+    comps_objlist_append_x(env->option_list, (COMPS_Object*)gid);
 }
 
 signed char comps_docenv_cmp_u(COMPS_Object *env1, COMPS_Object *env2) {
@@ -147,7 +147,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     //res->group_list = (COMPS_ObjList*)comps_object_create(
     //                                              &COMPS_ObjList_ObjInfo, NULL);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_groupid(res, hsit->data);
+        comps_docenv_add_groupid(res, comps_object_copy(hsit->data));
     }
     comps_set_destroy(&set);
 
@@ -162,7 +162,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     //res->group_list = (COMPS_ObjList*)comps_object_create(
     //                                              &COMPS_ObjList_ObjInfo, NULL);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_optionid(res, hsit->data);
+        comps_docenv_add_optionid(res, comps_object_copy(hsit->data));
     }
     comps_set_destroy(&set);
     comps_object_destroy((COMPS_Object*)res->name_by_lang);
@@ -235,7 +235,8 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     //res->option_list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
     //                                                      NULL);
     for (hsit = set2->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_optionid(res,(COMPS_DocGroupId*)hsit->data);
+        comps_docenv_add_optionid(res,
+                              (COMPS_DocGroupId*)comps_object_copy(hsit->data));
     }
     comps_set_destroy(&set);
     comps_set_destroy(&set2);

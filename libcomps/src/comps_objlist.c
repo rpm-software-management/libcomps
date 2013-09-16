@@ -47,7 +47,7 @@ void comps_objlist_copy(COMPS_ObjList *objlist_dst,
     objlist_dst->len = 0;
 
     for (it = objlist_src->first; it != NULL; it = it->next) {
-        comps_objlist_append(objlist_dst, comps_object_copy(it->comps_obj));
+        comps_objlist_append_x(objlist_dst, comps_object_copy(it->comps_obj));
     }
 }
 COMPS_COPY_u(objlist, COMPS_ObjList)
@@ -87,7 +87,7 @@ COMPS_Object* comps_objlist_get(COMPS_ObjList *objlist, unsigned int atpos) {
     if (pos != atpos)
         return NULL;
 
-    return (it)?comps_object_copy(it->comps_obj):NULL;
+    return (it)?comps_object_incref(it->comps_obj):NULL;
 }
 
 COMPS_Object* comps_objlist_get_x(COMPS_ObjList *objlist, unsigned int atpos) {

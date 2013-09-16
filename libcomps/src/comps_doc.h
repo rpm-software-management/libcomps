@@ -64,7 +64,6 @@
     COMPS_ObjList *ret;\
     ret = (COMPS_ObjList*)comps_objdict_get(doc->objects, #OBJS);\
     if (!ret) {\
-        printf("add_%s not exitst\n", #OBJS);\
         ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);\
         comps_objdict_set_x(doc->objects, #OBJS, (COMPS_Object*)ret);\
     }\
@@ -84,9 +83,9 @@
     ret = (COMPS_ObjDict*)comps_objdict_get(doc->objects, #OBJS);\
     if (!ret) {\
         ret = (COMPS_ObjDict*)comps_object_create(&COMPS_ObjDict_ObjInfo, NULL);\
-        comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)ret);\
+        comps_objdict_set_x(doc->objects, #OBJS, (COMPS_Object*)ret);\
     }\
-    comps_objdict_set(ret, key, (COMPS_Object*)obj);\
+    comps_objdict_set_x(ret, key, (COMPS_Object*)obj);\
 }
 #define HEAD_COMPS_DOC_ADDOBJDICT(OBJNAME) void CONCAT(comps_doc_add_,\
                                                            OBJNAME)\
@@ -132,6 +131,8 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
 void comps_doc_xml_f(COMPS_Doc* doc,  char *filename, char *enc, COMPS_Logger *log);
 char* comps_doc_xml_str(COMPS_Doc* doc, char *enc, COMPS_Logger *log);
 void comps_doc_xml(COMPS_Doc *obj, xmlTextWriterPtr writer);
+
+void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect);
 
 extern COMPS_ObjectInfo COMPS_Doc_ObjInfo;
 

@@ -129,8 +129,13 @@ void comps_str_destroy_u(COMPS_Object *str){
 
 char* comps_str_tostr(COMPS_Object *str) {
     char *ret;
-    ret = malloc(sizeof(char)*(strlen(((COMPS_Str*)str)->val)+1));
-    strcpy(ret, ((COMPS_Str*)str)->val);
+    if (((COMPS_Str*)str)->val) {
+        ret = malloc(sizeof(char)*(strlen(((COMPS_Str*)str)->val)+1));
+        strcpy(ret, ((COMPS_Str*)str)->val);
+    } else {
+        ret = malloc(sizeof(char));
+        ret[0] = 0;
+    }
     return ret;
 }
 

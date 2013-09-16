@@ -20,7 +20,7 @@
 #include <check.h>
 #include <stdio.h>
 
-#include "../src/comps.h"
+#include "../src/comps_doc.h"
 #include "check_utils.h"
 
 void * int_constructor(void *x){

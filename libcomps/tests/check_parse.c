@@ -20,7 +20,7 @@
 #include <check.h>
 #include <stdio.h>
 
-#include "../src/comps.h"
+#include "../src/comps_doc.h"
 #include "../src/comps_parse.h"
 
 void print_all_str(COMPS_RTree *rt) {
@@ -46,27 +46,40 @@ START_TEST(test_comps_parse1)
     FILE *fp;
     char *err_log;
     COMPS_Parsed *parsed;
-    COMPS_ListItem *it;
-    char *tmp_ch;
-    COMPS_Prop *tmp_prop;
 
-    const char* groups_ids[] = {"additional-devel", "backup-client", "backup-server"};
-    const char* groups_names[] = {"Additional Development", "Backup Client", "Backup Server"};
+    const char *groups_ids[] = {"additional-devel", "backup-client", "backup-server"};
+    const char *groups_names[] = {"Additional Development", "Backup Client",
+                                  "Backup Server"};
+    const char *groups_descs[] = {"Additional development headers and libraries"
+                                " for developing applications",
+                                "Client tools for connecting to a backup server"
+                                " and doing backups.",
+                                "Software to centralize your infrastructure's"
+                                " backups."};
+
     const int group_packages[][3] = {{40, 62, 0}, {0,1,1}, {0,2,2}};
 
     const char* cats_ids[] = {"cat 1", "cat 2"};
     const char* cats_names[] = {"category 1", "category 2"};
     const int cats_gids[] = {1, 2};
-    int ret;
 
-    COMPS_List * tmplist;
+    const char* envs_ids[] = {"env 1"};
+    const char* envs_names[] = {"environment 1"};
+    const char* env_gids[][3] = {{"a", "b", "c"}};
+    const char* env_opids[][2] = {{" option 1 ", " option 2 "}};
+
+    int ret;
+    COMPS_Object *tmpobj, *tmpobj2;
+    char *tmpstr;
+
+    COMPS_ObjList * tmplist;
     fprintf(stderr, "## Running test_parse1\n\n");
 
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
     fp = fopen("sample-comps.xml", "r");
     comps_parse_file(parsed, fp);
-    fail_unless(comps_parse_validate_dtd("sample-comps.xml", "comps.dtd"));
+    //fail_unless(comps_parse_validate_dtd("sample-comps.xml", "comps.dtd"));
 
     if (parsed->log->logger_data->len != 0) {
         err_log = comps_log_str(parsed->log);
@@ -84,73 +97,62 @@ START_TEST(test_comps_parse1)
             comps_doc_environments(parsed->comps_doc)->len);
 
     for (int i=0; i<3; i++) {
-        it = comps_list_at(comps_doc_groups(parsed->comps_doc), i);
-        fail_if(it == NULL, "Group not found");
-        tmp_prop = comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "name");
-        tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
+        tmpobj2 = comps_objlist_get(comps_doc_groups(parsed->comps_doc), i);
+        fail_if(tmpobj == NULL, "Group not found");
+        tmpobj = comps_docgroup_get_id((COMPS_DocGroup*)tmpobj2);
+        tmpstr = comps_object_tostr(tmpobj);
+        fail_if(strcmp(tmpstr, groups_ids[i]) != 0,
+                       "%d.group should have id:%s not %s",
+                        i, groups_ids[i], tmpstr);
+        free(tmpstr);
 
-        //COMPS_HSList *keys;
-        //COMPS_HSListItem *hsit;
+        tmpobj = comps_docgroup_get_name((COMPS_DocGroup*)tmpobj2);
+        tmpstr = comps_object_tostr(tmpobj);
+        fail_if(strcmp(tmpstr, groups_names[i]) != 0,
+                       "%d.group should have name:%s not %s",
+                        i, groups_names[i], tmpstr);
+        free(tmpstr);
 
-        /*keys = comps_rtree_pairs(((COMPS_DocGroup*)it->data)->properties);
-        for (hsit = keys->first; hsit != NULL; hsit = hsit->next) {
-            printf("prop:%s", ((COMPS_RTreePair*)hsit->data)->key);
-            if (((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop_type
-                == COMPS_PROP_STR)
-                printf(" %s\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.str);
-            else {
-                printf(" %d\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.num);
-            }
-        }
-        comps_hslist_destroy(&keys);*/
+        tmpobj = comps_docgroup_get_desc((COMPS_DocGroup*)tmpobj2);
+        tmpstr = comps_object_tostr(tmpobj);
+        fail_if(strcmp(tmpstr, groups_descs[i]) != 0,
+                       "%d.group should have desc:%s not %s",
+                        i, groups_descs[i], tmpstr);
+        free(tmpstr);
 
-        //printf("group name:%s\n", tmp_ch);
-
-        tmp_prop = comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "id");
-        tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
-        fail_if(tmp_ch == NULL, "id null");
-        //printf("group id:%s\n", tmp_ch);
-        fail_if(strcmp(tmp_ch, groups_ids[i])!=0,
-                "Wrong #%d group id(%s). Should be %s", i,
-                tmp_ch, groups_ids[i]);
-
-        tmp_prop = comps_dict_get(((COMPS_DocGroup*)it->data)->properties, "name");
-        tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
-        fail_if(tmp_ch == NULL, "name null");
-        fail_if(strcmp(tmp_ch, groups_names[i])!=0,
-                "Wrong group #%d name(%s). Should be %s", i,
-                tmp_ch, groups_names[i]);
-        tmplist = comps_docgroup_get_packages((COMPS_DocGroup*)it->data, NULL,
+        tmplist = comps_docgroup_get_packages((COMPS_DocGroup*)tmpobj2, NULL,
                                              COMPS_PACKAGE_DEFAULT);
         fail_if(group_packages[i][0] != tmplist->len, "Group #%d should have"
                 " %d default packages, Have %d", i, group_packages[i][0],
                 tmplist->len);
-        comps_list_destroy(&tmplist);
-        tmplist = comps_docgroup_get_packages((COMPS_DocGroup*)it->data, NULL,
+        COMPS_OBJECT_DESTROY(tmplist);
+        tmplist = comps_docgroup_get_packages((COMPS_DocGroup*)tmpobj2, NULL,
                                              COMPS_PACKAGE_OPTIONAL);
         fail_if(group_packages[i][1] != tmplist->len, "Group #%d should have"
                 " %d optional packages, Have %d", i, group_packages[i][1],
                 tmplist->len);
-        comps_list_destroy(&tmplist);
+        COMPS_OBJECT_DESTROY(tmplist);
+        COMPS_OBJECT_DESTROY(tmpobj2);
     }
-
     for (int i=0; i<2; i++) {
-        it = comps_list_at(comps_doc_categories(parsed->comps_doc), i);
-        tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "id");
-        tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
-        fail_if(strcmp(tmp_ch, cats_ids[i])!=0,
-                "Wrong #%d category id(%s). Should be %s", i,
-                tmp_ch, cats_ids[i]);
-        tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "name");
-        tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
-        fail_if(strcmp(tmp_ch, cats_names[i])!=0,
-                "Wrong category #%d name(%s). Should be %s", i,
-                tmp_ch, cats_names[i]);
-        fail_if(((COMPS_DocCategory*)it->data)->group_ids->len != cats_gids[i],
+        tmpobj2 = comps_objlist_get(comps_doc_categories(parsed->comps_doc), i);
+        tmpobj = comps_doccategory_get_id((COMPS_DocCategory*)tmpobj2);
+        tmpstr = comps_object_tostr(tmpobj);
+        fail_if(strcmp(tmpstr, cats_ids[i]) != 0,
+                       "%s. category should have id:%s not %s",
+                        i, cats_ids[i], tmpstr);
+        free(tmpstr);
+        tmpobj = comps_doccategory_get_name((COMPS_DocCategory*)tmpobj2);
+        tmpstr = comps_object_tostr(tmpobj);
+        fail_if(strcmp(tmpstr, cats_names[i]) != 0,
+                       "%s. category should have name:%s not %s",
+                        i, cats_names[i], tmpstr);
+        free(tmpstr);
+        fail_if(((COMPS_DocCategory*)tmpobj2)->group_ids->len != cats_gids[i],
                 "Category #%d should have %d groupids, have %d", i,
-                cats_gids[i], ((COMPS_DocCategory*)it->data)->group_ids->len);
+                cats_gids[i], ((COMPS_DocCategory*)tmpobj2)->group_ids->len);
+        COMPS_OBJECT_DESTROY(tmpobj2);
     }
-
     fp = fopen("sample-bad-elem.xml", "r");
 
     comps_parse_file(parsed, fp);
@@ -226,8 +228,8 @@ START_TEST(test_comps_parse2)
                                              COMPS_ERR_NOCONTENT, 440, 18, 0);
     known_errors[6] = comps_log_entry_create("packagelist", 0,
                                              COMPS_ERR_LIST_EMPTY, 445, 4, 0);
-    known_errors[7] = comps_log_entry_create("optionlist", 0,
-                                             COMPS_ERR_ELEM_REQUIRED, 1201, 2, 0);
+    //known_errors[7] = comps_log_entry_create("optionlist", 0,
+    //                                         COMPS_ERR_ELEM_REQUIRED, 1201, 2, 0);
 
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
@@ -237,9 +239,9 @@ START_TEST(test_comps_parse2)
     fail_if(parsed->log->logger_data->len == 0);
     i = check_errors(parsed->log, known_errors, 8);
 
-    fail_if(i != 8);
+    fail_if(i != 7);
     comps_parse_parsed_destroy(parsed);
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 7; i++) {
         comps_log_entry_destroy(known_errors[i]);
     }
 }
@@ -251,13 +253,13 @@ START_TEST(test_comps_parse3)
     //char *err_log,
     char *tmp_ch;
     COMPS_Parsed *parsed;
-    COMPS_ListItem *it;
-    //int ret,
+    COMPS_ObjListIt *it;
     int i;
-    //COMPS_List *pairlist;
-    COMPS_List *tmplist;
+    COMPS_ObjList *tmplist;
     COMPS_LoggerEntry* known_errors[3];
-    COMPS_Prop *tmp_prop;
+    char *str;
+    COMPS_Object *tmpobj;
+
     fprintf(stderr, "## Running test_parse3\n\n");
 
     known_errors[0] = comps_log_entry_create("id", 0,
@@ -287,18 +289,12 @@ START_TEST(test_comps_parse3)
                           ((COMPS_RTreePair*)hsit->data)->data);
     }*/
 
-    tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "id");
-    tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
-    fail_if(tmp_ch != NULL,
-            "first group should have NULL id");
-    tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "name");
-    tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
-    fail_if(tmp_ch != NULL,
-            "first group should have NULL id");
-    tmp_prop = comps_dict_get(((COMPS_DocCategory*)it->data)->properties, "desc");
-    tmp_ch = (tmp_prop)?tmp_prop->prop.str:NULL;
-    fail_if(tmp_ch != NULL,
-            "first group should have NULL id");
+    tmpobj = comps_docgroup_get_id((COMPS_DocGroup*)it->comps_obj);
+    fail_if(tmpobj, "%d. category should have NULL id\n");
+    tmpobj = comps_docgroup_get_name((COMPS_DocGroup*)it->comps_obj);
+    fail_if(tmpobj, "%d. category should have NULL name\n");
+    tmpobj = comps_docgroup_get_desc((COMPS_DocGroup*)it->comps_obj);
+    fail_if(tmpobj, "%d. category should have NULL description\n");
     comps_parse_parsed_destroy(parsed);
 }
 END_TEST
@@ -435,6 +431,7 @@ Suite* basic_suite (void)
     tcase_add_test (tc_core, test_comps_parse4);
     tcase_add_test (tc_core, test_comps_parse5);
     tcase_add_test (tc_core, test_comps_fedora_parse);
+    tcase_set_timeout(tc_core, 15);
     suite_add_tcase (s, tc_core);
 
     return s;

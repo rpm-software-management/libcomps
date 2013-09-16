@@ -211,7 +211,7 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
             comps_object_destroy((COMPS_Object*)tmpdata);
             comps_set_add(set, tmpcat);
         } else {
-            comps_set_add(set, it->comps_obj);
+            comps_set_add(set, comps_object_copy(it->comps_obj));
         }
     }
     for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
@@ -238,7 +238,7 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
                 comps_object_destroy((COMPS_Object*)tmpdata);
                 comps_set_add(set, tmpenv);
             } else {
-                comps_set_add(set, it->comps_obj);
+                comps_set_add(set, comps_object_copy(it->comps_obj));
             }
         }
     }
