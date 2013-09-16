@@ -936,7 +936,7 @@ int PyCOMPSPack_strset_(PyCOMPS_Package *self, PyObject *value, void *closure) {
 PyObject* PyCOMPSPack_get_type(PyCOMPS_Package *self, void *closure) {
     (void) closure;
     int type = pycomps_pkg_get((PyObject*)self)->type;
-    if (type > 0 && type <= COMPS_PACKAGE_UNKNOWN)
+    if (type >= 0)
         return Py_BuildValue("i", type);
     Py_RETURN_NONE;
 }

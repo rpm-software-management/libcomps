@@ -266,7 +266,7 @@ void comps_parse_def_handler(void *userData, const XML_Char *s, int len) {
 COMPS_PackageType comps_package_get_type(const XML_Char *s)
 {
     COMPS_ElemType type;
-    if (!s) type = COMPS_PACKAGE_UNKNOWN;
+    if (!s) type = COMPS_PACKAGE_DEFAULT;
     else if (strcmp(s, "default") == 0) type = COMPS_PACKAGE_DEFAULT;
     else if (strcmp(s, "optional") == 0) type = COMPS_PACKAGE_OPTIONAL;
     else if (strcmp(s, "mandatory") == 0) type = COMPS_PACKAGE_MANDATORY;
