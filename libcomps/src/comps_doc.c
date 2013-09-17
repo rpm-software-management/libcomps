@@ -60,17 +60,24 @@ inline void comps_doc_clear(COMPS_Doc *doc) {
 }
 
 COMPS_DOC_GETOBJLIST(groups)        /*comps_doc.h macro*/
+COMPS_DOC_SETOBJLIST(groups) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJLIST(groups, group, COMPS_DocGroup) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJLIST(categories)    /*comps_doc.h macro*/
+COMPS_DOC_SETOBJLIST(categories) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJLIST(categories, category, COMPS_DocCategory) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJLIST(environments)  /*comps_doc.h macro*/
+COMPS_DOC_SETOBJLIST(environments) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJLIST(environments, environment, COMPS_DocEnv) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJDICT(langpacks)     /*comps_doc.h macro*/
+COMPS_DOC_SETOBJDICT(langpacks) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJDICT(langpacks, langpack) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJDICT(blacklist)     /*comps_doc.h macro*/
+COMPS_DOC_SETOBJDICT(blacklist) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJDICT(blacklist,  blacklist) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJDICT(whiteout)      /*comps_doc.h macro*/
+COMPS_DOC_SETOBJDICT(whiteout) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJDICT(whiteout,  whiteout) /*comps_doc.h macro*/
+
 
 void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
     xmlDocPtr xmldoc;

@@ -44,6 +44,15 @@
 #define HEAD_COMPS_DOC_GETOBJLIST(OBJS) COMPS_ObjList* CONCAT(comps_doc_, OBJS)\
                                                            (COMPS_Doc *doc);
 
+#define COMPS_DOC_SETOBJLIST(OBJS) void CONCAT(comps_doc_set_, OBJS)\
+                                                       (COMPS_Doc *doc,\
+                                                        COMPS_ObjList *list){\
+    comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)list);\
+}
+#define HEAD_COMPS_DOC_SETOBJLIST(OBJS) void CONCAT(comps_doc_set_, OBJS)\
+                                                   (COMPS_Doc *doc,\
+                                                    COMPS_ObjList *list);
+
 #define COMPS_DOC_GETOBJDICT(OBJNAME) COMPS_ObjDict* CONCAT(comps_doc_, OBJNAME)\
                                                            (COMPS_Doc *doc){\
     COMPS_ObjDict *ret;\
@@ -56,6 +65,15 @@
 }
 #define HEAD_COMPS_DOC_GETOBJDICT(OBJNAME) COMPS_ObjDict* CONCAT(comps_doc_, OBJNAME)\
                                                            (COMPS_Doc *doc);
+
+#define COMPS_DOC_SETOBJDICT(OBJS) void CONCAT(comps_doc_set_, OBJS)\
+                                                       (COMPS_Doc *doc,\
+                                                        COMPS_ObjDict *dict){\
+    comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)dict);\
+}
+#define HEAD_COMPS_DOC_SETOBJDICT(OBJS) void CONCAT(comps_doc_set_, OBJS)\
+                                                   (COMPS_Doc *doc,\
+                                                    COMPS_ObjDict *dict);
 
 #define COMPS_DOC_ADDOBJLIST(OBJS, OBJNAME, OBJTYPE) void CONCAT(comps_doc_add_,\
                                                            OBJNAME)\
@@ -117,6 +135,13 @@ HEAD_COMPS_DOC_GETOBJDICT(langpacks) /*comps_doc.h macro*/
 HEAD_COMPS_DOC_GETOBJDICT(blacklist) /*comps_doc.h macro*/
 HEAD_COMPS_DOC_GETOBJDICT(whiteout) /*comps_doc.h macro*/
 
+HEAD_COMPS_DOC_SETOBJLIST(groups) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_SETOBJLIST(categories) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_SETOBJLIST(environments) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_SETOBJDICT(langpacks) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_SETOBJDICT(blacklist) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_SETOBJDICT(whiteout) /*comps_doc.h macro*/
+
 HEAD_COMPS_DOC_ADDOBJLIST(group, COMPS_DocGroup) /*comps_doc.h macro*/
 HEAD_COMPS_DOC_ADDOBJLIST(category, COMPS_DocCategory) /*comps_doc.h macro*/
 HEAD_COMPS_DOC_ADDOBJLIST(environment, COMPS_DocEnv) /*comps_doc.h macro*/
@@ -133,6 +158,9 @@ char* comps_doc_xml_str(COMPS_Doc* doc, char *enc, COMPS_Logger *log);
 void comps_doc_xml(COMPS_Doc *obj, xmlTextWriterPtr writer);
 
 void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect);
+char* comps2xml_str(COMPS_Doc *doc);
+
+COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2);
 
 extern COMPS_ObjectInfo COMPS_Doc_ObjInfo;
 

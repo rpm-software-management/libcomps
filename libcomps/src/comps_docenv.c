@@ -57,6 +57,11 @@ void comps_docenv_destroy(COMPS_DocEnv *env) {
 }
 COMPS_DESTROY_u(docenv, COMPS_DocEnv) /*comps_utils.h macro*/
 
+COMPS_PROP_GETTER(env, COMPS_DocEnv, id) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(env, COMPS_DocEnv, name) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(env, COMPS_DocEnv, desc) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(env, COMPS_DocEnv, display_order) /*comps_utils.h macro*/
+
 COMPS_STRPROP_SETTER(env, COMPS_DocEnv, id) /*comps_utils.h macro*/
 COMPS_STRPROP_SETTER(env, COMPS_DocEnv, name) /*comps_utils.h macro*/
 COMPS_STRPROP_SETTER(env, COMPS_DocEnv, desc) /*comps_utils.h macro*/
@@ -147,7 +152,8 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     //res->group_list = (COMPS_ObjList*)comps_object_create(
     //                                              &COMPS_ObjList_ObjInfo, NULL);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_groupid(res, comps_object_copy(hsit->data));
+        comps_docenv_add_groupid(res,
+                             (COMPS_DocGroupId*)comps_object_copy(hsit->data));
     }
     comps_set_destroy(&set);
 
@@ -162,7 +168,8 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     //res->group_list = (COMPS_ObjList*)comps_object_create(
     //                                              &COMPS_ObjList_ObjInfo, NULL);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_optionid(res, comps_object_copy(hsit->data));
+        comps_docenv_add_optionid(res,
+                             (COMPS_DocGroupId*)comps_object_copy(hsit->data));
     }
     comps_set_destroy(&set);
     comps_object_destroy((COMPS_Object*)res->name_by_lang);

@@ -63,6 +63,8 @@ int comps_objlist_walk_r(COMPS_ObjListIt *walker_start,
 int comps_objlist_append_x(COMPS_ObjList *objlist, COMPS_Object *obj);
 int comps_objlist_append(COMPS_ObjList *objlist, COMPS_Object *obj);
 COMPS_Object* comps_objlist_get(COMPS_ObjList *objlist, unsigned int atpos);
+int comps_objlist_set(COMPS_ObjList *objlist, unsigned int atpos,
+                      COMPS_Object *obj);
 COMPS_Object* comps_objlist_get_x(COMPS_ObjList *objlist, unsigned int atpos);
 int comps_objlist_insert_at(COMPS_ObjList *objlist,
                            unsigned int pos,

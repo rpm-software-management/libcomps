@@ -382,7 +382,7 @@ signed char comps_objlist_cmp(COMPS_Object *list1, COMPS_Object *list2) {
     if (!list1 || !list2) return -1;
     it =  ((COMPS_ObjList*)list1)->first;
     it2 =  ((COMPS_ObjList*)list2)->first;
-    
+
     for (; it != NULL && it2 != NULL; it = it->next, it2 = it2->next) {
         if (!comps_object_cmp(it->comps_obj, it2->comps_obj))
             return 0;
@@ -391,6 +391,22 @@ signed char comps_objlist_cmp(COMPS_Object *list1, COMPS_Object *list2) {
         return 1;
     else
         return 0;
+}
+
+int comps_objlist_set(COMPS_ObjList *objlist, unsigned int atpos,
+                      COMPS_Object *obj) {
+    COMPS_ObjListIt *it;
+    unsigned int i = 0;
+
+    if (!objlist) return -1;
+    it =  ((COMPS_ObjList*)objlist)->first;
+
+    for (; it != NULL && i != atpos; it = it->next, i++);
+    if (!it)
+        return -1;
+    COMPS_OBJECT_DESTROY(it->comps_obj);
+    it->comps_obj = comps_object_incref(obj);
+    return 0;
 }
 
 COMPS_ObjectInfo COMPS_ObjList_ObjInfo = {

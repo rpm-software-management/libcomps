@@ -21,7 +21,7 @@
 #define PYCOMPS_GROUPS_H
 
 #include <Python.h>
-#include "libcomps/comps.h"
+#include "libcomps/comps_doc.h"
 #include "libcomps/comps_list.h"
 #include "structmember.h"
 #include "pycomps_sequence.h"

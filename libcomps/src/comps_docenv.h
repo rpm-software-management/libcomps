@@ -9,6 +9,12 @@
 #include "comps_objdict.h"
 #include "comps_objlist.h"
 #include "comps_docgroupid.h"
+#define COMPS_DOCOBJ_GETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
+COMPS_ObjList* CONCAT(CONCAT(CONCAT(comps_, OBJ), _), OBJS) (OBJTYPE *obj){\
+    return obj->MEMBER;\
+}
+#define HEAD_COMPS_DOCOBJ_GETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
+COMPS_ObjList* CONCAT(CONCAT(CONCAT(comps_, OBJ), _), OBJS) (OBJTYPE *obj);
 
 typedef struct {
     COMPS_Object_HEAD
@@ -23,10 +29,18 @@ HEAD_COMPS_CREATE_u(docenv, COMPS_DocEnv)  /*comps_utils.h macro*/
 HEAD_COMPS_COPY_u(docenv, COMPS_DocEnv)  /*comps_utils.h macro*/
 HEAD_COMPS_DESTROY_u(docenv, COMPS_DocEnv)  /*comps_utils.h macro*/
 
+HEAD_COMPS_PROP_GETTER(env, COMPS_DocEnv, id) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER(env, COMPS_DocEnv, name) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER(env, COMPS_DocEnv, desc) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER(env, COMPS_DocEnv, display_order) /*comps_utils.h macro*/
+
 HEAD_COMPS_STRPROP_SETTER(env, COMPS_DocEnv, id) /*comps_utils.h macro*/
 HEAD_COMPS_STRPROP_SETTER(env, COMPS_DocEnv, name) /*comps_utils.h macro*/
 HEAD_COMPS_STRPROP_SETTER(env, COMPS_DocEnv, desc) /*comps_utils.h macro*/
 HEAD_COMPS_NUMPROP_SETTER(env, COMPS_DocEnv, display_order) /*comps_utils.h macro*/
+
+HEAD_COMPS_DOCOBJ_GETOBJLIST(docenv, COMPS_DocEnv, group_list, group_list)
+HEAD_COMPS_DOCOBJ_GETOBJLIST(docenv, COMPS_DocEnv, option_list, option_list)
 
 char __comps_docenv_idcmp(void *e1, void *e2);
 

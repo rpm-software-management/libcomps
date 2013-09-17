@@ -134,7 +134,8 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     //res->group_ids = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
     //                                                    NULL);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_doccategory_add_groupid(res, comps_object_copy(hsit->data));
+        comps_doccategory_add_groupid(res,
+                            (COMPS_DocGroupId*)comps_object_copy(hsit->data));
     }
     comps_set_destroy(&set);
     COMPS_OBJECT_DESTROY(res->name_by_lang);

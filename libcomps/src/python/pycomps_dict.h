@@ -20,7 +20,7 @@
 #ifndef PYCOMPS_DICT_H
 #define PYCOMPS_DICT_H
 
-#include "libcomps/comps.h"
+#include "libcomps/comps_doc.h"
 #include "libcomps/comps_dict.h"
 
 #include "pycomps_utils.h"
