@@ -59,10 +59,10 @@ typedef struct {
 } PyCOMPS_Env_ListGetSetClosure;
 
 
-COMPS_List* comps_envs_union(COMPS_List *envs1, COMPS_List *envs2);
+COMPS_ObjList* comps_envs_union(COMPS_ObjList *envs1, COMPS_ObjList *envs2);
 
 PyObject* PyCOMPSEnv_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
-int PyCOMPSEnvs_init(PyCOMPS_CtoPySeq *self, PyObject *args, PyObject *kwds);
+int PyCOMPSEnvs_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds);
 
 int PyCOMPSEnv_init(PyCOMPS_Env *self, PyObject *args, PyObject *kwds);
 PyObject* PyCOMPSEnv_get_id(PyCOMPS_Env *self, void *closure);

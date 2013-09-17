@@ -67,6 +67,12 @@ COMPS_STRPROP_SETTER(env, COMPS_DocEnv, name) /*comps_utils.h macro*/
 COMPS_STRPROP_SETTER(env, COMPS_DocEnv, desc) /*comps_utils.h macro*/
 COMPS_NUMPROP_SETTER(env, COMPS_DocEnv, display_order) /*comps_utils.h macro*/
 
+COMPS_DOCOBJ_GETOBJLIST(docenv, COMPS_DocEnv, group_list, group_list)
+COMPS_DOCOBJ_GETOBJLIST(docenv, COMPS_DocEnv, option_list, option_list)
+
+COMPS_DOCOBJ_SETOBJLIST(docenv, COMPS_DocEnv, group_list, group_list)
+COMPS_DOCOBJ_SETOBJLIST(docenv, COMPS_DocEnv, option_list, option_list)
+
 void comps_docenv_add_groupid(COMPS_DocEnv *env,
                             COMPS_DocGroupId *gid) {
 

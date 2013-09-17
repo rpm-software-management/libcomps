@@ -16,6 +16,16 @@ COMPS_ObjList* CONCAT(CONCAT(CONCAT(comps_, OBJ), _), OBJS) (OBJTYPE *obj){\
 #define HEAD_COMPS_DOCOBJ_GETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
 COMPS_ObjList* CONCAT(CONCAT(CONCAT(comps_, OBJ), _), OBJS) (OBJTYPE *obj);
 
+#define COMPS_DOCOBJ_SETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
+void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
+                                                   COMPS_ObjList *list){\
+    COMPS_OBJECT_DESTROY(obj->MEMBER);\
+    obj->MEMBER = (COMPS_ObjList*)comps_object_incref((COMPS_Object*)list);\
+}
+#define HEAD_COMPS_DOCOBJ_SETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
+void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
+                                                   COMPS_ObjList *list);
+
 typedef struct {
     COMPS_Object_HEAD
     COMPS_ObjDict *properties;
@@ -41,6 +51,9 @@ HEAD_COMPS_NUMPROP_SETTER(env, COMPS_DocEnv, display_order) /*comps_utils.h macr
 
 HEAD_COMPS_DOCOBJ_GETOBJLIST(docenv, COMPS_DocEnv, group_list, group_list)
 HEAD_COMPS_DOCOBJ_GETOBJLIST(docenv, COMPS_DocEnv, option_list, option_list)
+
+HEAD_COMPS_DOCOBJ_SETOBJLIST(docenv, COMPS_DocEnv, group_list, group_list)
+HEAD_COMPS_DOCOBJ_SETOBJLIST(docenv, COMPS_DocEnv, option_list, option_list)
 
 char __comps_docenv_idcmp(void *e1, void *e2);
 
