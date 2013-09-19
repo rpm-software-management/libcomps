@@ -63,6 +63,9 @@ COMPS_PROP_GETTER(category, COMPS_DocCategory, name) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(category, COMPS_DocCategory, desc) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(category, COMPS_DocCategory, display_order) /*comps_utils.h macro*/
 
+COMPS_DOCOBJ_GETOBJLIST(doccategory, COMPS_DocCategory, group_ids, group_ids)
+COMPS_DOCOBJ_SETOBJLIST(doccategory, COMPS_DocCategory, group_ids, group_ids)
+
 void comps_doccategory_add_groupid(COMPS_DocCategory *category,
                                 COMPS_DocGroupId *gid) {
 

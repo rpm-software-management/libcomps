@@ -409,10 +409,45 @@ int comps_objlist_set(COMPS_ObjList *objlist, unsigned int atpos,
     return 0;
 }
 
+char* comps_objlist_tostr_u(COMPS_Object* list) {
+    char *items[((COMPS_ObjList*)list)->len];
+    char *tmps, *ret;
+    unsigned int i=0, total_strlen = 0;
+    const int sep_len = strlen(", ");
+
+    COMPS_ObjListIt *it = ((COMPS_ObjList*)list)->first;
+    for (; it != ((COMPS_ObjList*)list)->last; it = it->next, i++) {
+        tmps = comps_object_tostr(it->comps_obj);
+        items[i] = tmps;
+        total_strlen += sep_len + strlen(tmps);
+    }
+    if (it) {
+        tmps = comps_object_tostr(it->comps_obj);
+        items[i] = tmps;
+        total_strlen += strlen(tmps);
+    }
+
+    tmps = malloc(sizeof(char) * (total_strlen+3));
+    strcpy(tmps, "[");
+    for (i = 0; i < ((COMPS_ObjList*)list)->len-1; i++) {
+        strcat(tmps, items[i]);
+        strcat(tmps, ", ");
+        free(items[i]);
+    }
+    if (((COMPS_ObjList*)list)->len) {
+        strcat(tmps, items[i]);
+        free(items[i]);
+    }
+    strcat(tmps, "]");
+    return tmps;
+}
+
+
 COMPS_ObjectInfo COMPS_ObjList_ObjInfo = {
     .obj_size = sizeof(COMPS_ObjList),
     .constructor = &comps_objlist_create_u,
     .destructor = &comps_objlist_destroy_u,
     .copy = &comps_objlist_copy_u,
-    .obj_cmp = &comps_objlist_cmp
+    .obj_cmp = &comps_objlist_cmp,
+    .to_str = &comps_objlist_tostr_u
 };

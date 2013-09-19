@@ -9,22 +9,6 @@
 #include "comps_objdict.h"
 #include "comps_objlist.h"
 #include "comps_docgroupid.h"
-#define COMPS_DOCOBJ_GETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
-COMPS_ObjList* CONCAT(CONCAT(CONCAT(comps_, OBJ), _), OBJS) (OBJTYPE *obj){\
-    return obj->MEMBER;\
-}
-#define HEAD_COMPS_DOCOBJ_GETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
-COMPS_ObjList* CONCAT(CONCAT(CONCAT(comps_, OBJ), _), OBJS) (OBJTYPE *obj);
-
-#define COMPS_DOCOBJ_SETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
-void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
-                                                   COMPS_ObjList *list){\
-    COMPS_OBJECT_DESTROY(obj->MEMBER);\
-    obj->MEMBER = (COMPS_ObjList*)comps_object_incref((COMPS_Object*)list);\
-}
-#define HEAD_COMPS_DOCOBJ_SETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
-void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
-                                                   COMPS_ObjList *list);
 
 typedef struct {
     COMPS_Object_HEAD

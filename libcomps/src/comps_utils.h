@@ -123,6 +123,24 @@ COMPS_Object* CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _get_), PROPNAME)\
 }
 #define HEAD_COMPS_CMP_u(NAME, TYPE) void CONCAT(CONCAT(comps_,NAME),_cmp_u)\
 
+
+#define COMPS_DOCOBJ_GETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
+COMPS_ObjList* CONCAT(CONCAT(CONCAT(comps_, OBJ), _), OBJS) (OBJTYPE *obj){\
+    return obj->MEMBER;\
+}
+#define HEAD_COMPS_DOCOBJ_GETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
+COMPS_ObjList* CONCAT(CONCAT(CONCAT(comps_, OBJ), _), OBJS) (OBJTYPE *obj);
+
+#define COMPS_DOCOBJ_SETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
+void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
+                                                   COMPS_ObjList *list){\
+    COMPS_OBJECT_DESTROY(obj->MEMBER);\
+    obj->MEMBER = (COMPS_ObjList*)comps_object_incref((COMPS_Object*)list);\
+}
+#define HEAD_COMPS_DOCOBJ_SETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
+void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
+                                                   COMPS_ObjList *list);
+
 char __comps_strcmp(void *s1, void *s2);
 void* __comps_str_clone(void *str);
 void __comps_xml_prop(char *key, COMPS_Object *val, xmlTextWriterPtr writer);

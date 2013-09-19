@@ -19,151 +19,59 @@
 
 #include "pycomps_groups.h"
 
-inline COMPS_DocGroup* pycomps_group_oget(PyObject *pygroup) {
-    return (COMPS_DocGroup*)((PyCOMPS_Group*)pygroup)->citem->data;
-}
-inline COMPS_DocGroup* pycomps_group_gget(PyCOMPS_Group *pygroup) {
-    return (COMPS_DocGroup*)pygroup->citem->data;
-}
-
-inline COMPS_DocGroup** pycomps_group_getp(PyObject *pygroup) {
-    return (COMPS_DocGroup**)&((PyCOMPS_Group*)pygroup)->citem->data;
-}
-inline COMPS_DocGroupExtra* pycomps_group_get_extra(PyObject *pygroup) {
-    return (COMPS_DocGroupExtra*)
-           ((COMPS_DocGroup*)((PyCOMPS_Group*)pygroup)->citem->data)
-           ->reserved;
-}
-inline COMPS_DocGroupExtra* comps_group_get_extra(void* group) {
-    return (COMPS_DocGroupExtra*)((COMPS_DocGroup*)group)->reserved;
-}
-inline void pycomps_group_incref(PyObject * pygroup) {
-    comps_group_incref(pycomps_group_oget(pygroup));
-}
-
-void comps_group_incref(void * group) {
-
-    ctopy_citem_incref(comps_group_get_extra(group)->name_by_lang_citem);
-    ctopy_citem_incref(comps_group_get_extra(group)->desc_by_lang_citem);
-    ctopy_citem_incref(comps_group_get_extra(group)->packages_citem);
-    ctopy_citem_incref(comps_group_get_extra(group)->citem);
-}
-
-void pycomps_group_decref(void * group) {
-    ctopy_citem_decref(comps_group_get_extra(group)->name_by_lang_citem);
-    ctopy_citem_decref(comps_group_get_extra(group)->desc_by_lang_citem);
-    ctopy_citem_decref(comps_group_get_extra(group)->packages_citem);
-    ctopy_citem_decref(comps_group_get_extra(group)->citem);
-}
-
-COMPS_DocGroupExtra * comps_docgroup_extra_create() {
-    COMPS_DocGroupExtra *ret;
-    ret = malloc(sizeof(*ret));
-    return ret;
-}
-
 PyObject* PyCOMPSGroup_convert(void *g) {
-    PyObject *ret;
-    ret = PyCOMPSGroup_new(&PyCOMPS_GroupType, NULL, NULL);
-    PyCOMPSGroup_init((PyCOMPS_Group*)ret, NULL, NULL);
-    pycomps_group_decref(pycomps_group_oget(ret));
-
-    ((PyCOMPS_Group*)ret)->citem = comps_group_get_extra(g)->citem;
-    pycomps_group_get_extra(ret)->packages_citem =
-                                     comps_group_get_extra(g)->packages_citem;
-    pycomps_group_get_extra(ret)->name_by_lang_citem =
-                                     comps_group_get_extra(g)->name_by_lang_citem;
-    pycomps_group_get_extra(ret)->desc_by_lang_citem =
-                                     comps_group_get_extra(g)->desc_by_lang_citem;
-
-    pycomps_group_incref(ret);
-    return ret;
+   (void)g;
 }
 
 PyObject* PyCOMPSGroup_union(PyObject *self, PyObject *other) {
     COMPS_DocGroup *g;
     PyObject *res;
-    COMPS_ListItem *it;
 
     if (other->ob_type != &PyCOMPS_GroupType) {
         PyErr_SetString(PyExc_TypeError, "Not Group instance");
         return NULL;
     }
-    g = comps_docgroup_union(pycomps_group_oget(self),
-                             pycomps_group_oget(other));
-    for (it = g->packages->first; it != NULL; it = it->next) {
-        ((COMPS_DocGroupPackage*)it->data)->reserved = ctopy_citem_create(
-                                                        it->data,
-                                                        &pycomps_pkg_destroy);
-        it->data_destructor = &pycomps_pkg_decref;
-    }
+    g = comps_docgroup_union(((PyCOMPS_Group*)self)->group,
+                             ((PyCOMPS_Group*)other)->group);
     res = PyCOMPSGroup_new(&PyCOMPS_GroupType, NULL, NULL);
     PyCOMPSGroup_init((PyCOMPS_Group*)res, NULL, NULL);
-    g->reserved = pycomps_group_get_extra(res);
-    comps_docgroup_destroy(pycomps_group_oget(res));
-    ((PyCOMPS_Group*)res)->citem->data = g;
-    pycomps_group_get_extra(res)->packages_citem->data = g->packages;
-    pycomps_group_get_extra(res)->name_by_lang_citem->data = g->name_by_lang;
-    pycomps_group_get_extra(res)->desc_by_lang_citem->data = g->desc_by_lang;
+    COMPS_OBJECT_DESTROY(((PyCOMPS_Group*)res)->group);
+    ((PyCOMPS_Group*)res)->group = g;
     return res;
 }
 
 void PyCOMPSGroup_dealloc(PyObject *self)
 {
-    PyCOMPS_Group *self_group = (PyCOMPS_Group*)self;
-
-    pycomps_group_decref(pycomps_group_oget(self));
-    if (self_group->packages_pobj)
-        Py_XDECREF(self_group->packages_pobj);
-    if (self_group->name_by_lang_pobj)
-        Py_XDECREF(self_group->name_by_lang_pobj);
-    if (self_group->desc_by_lang_pobj)
-        Py_XDECREF(self_group->desc_by_lang_pobj);
+    #define _group_ ((PyCOMPS_Group*)self)
+    Py_XDECREF(_group_->p_packages);
+    Py_XDECREF(_group_->p_name_by_lang);
+    Py_XDECREF(_group_->p_desc_by_lang);
+    COMPS_OBJECT_DESTROY(_group_->group);
     Py_TYPE(self)->tp_free((PyObject*)self);
-}
-
-void pycomps_group_destroy(void * group) {
-    comps_dict_destroy(((COMPS_DocGroup*)group)->properties);
-    free(((COMPS_DocGroup*)group)->reserved);
-    free(group);
+    #undef _group_
 }
 
 PyObject* PyCOMPSGroup_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyCOMPS_Group *self;
-    COMPS_DocGroup *g;
+    (void) args;
+    (void) kwds;
 
-    (void)args;
-    (void)kwds;
     self = (PyCOMPS_Group*) type->tp_alloc(type, 0);
     if (self != NULL) {
-
-        g = comps_docgroup_create();
-        g->reserved = (void*)comps_docgroup_extra_create();
-        ((COMPS_DocGroupExtra*)(g->reserved))->citem =\
-                                  ctopy_citem_create(g, &pycomps_group_destroy);
-        self->citem = ((COMPS_DocGroupExtra*)g->reserved)->citem;
-
-        ((COMPS_DocGroupExtra*)(g->reserved))->packages_citem =
-                                    ctopy_citem_create(g->packages,
-                                                       &comps_list_destroy_v);
-        self->packages_pobj = NULL;
-
-        ((COMPS_DocGroupExtra*)(g->reserved))->name_by_lang_citem =
-                                    ctopy_citem_create(g->name_by_lang,
-                                                       &comps_dict_destroy_v);
-        self->name_by_lang_pobj = NULL;
-
-        ((COMPS_DocGroupExtra*)(g->reserved))->desc_by_lang_citem =
-                                    ctopy_citem_create(g->desc_by_lang,
-                                                       &comps_dict_destroy_v);
-        self->desc_by_lang_pobj = NULL;
+        self->group = (COMPS_DocGroup*)comps_object_create(
+                                                    &COMPS_DocGroup_ObjInfo,
+                                                    NULL);
+        self->p_packages = NULL;
+        self->p_name_by_lang = NULL;
+        self->p_desc_by_lang = NULL;
     }
     return (PyObject*) self;
 }
 
 int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
 {
+    #define _group_ ((PyCOMPS_Group*)self)->group
     char *name = NULL;
     char *id = NULL;
     char *desc = NULL;
@@ -180,189 +88,105 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
                                           &def, &uservis, &lang)) {
         //printf("%s %s %s %i %i %i %s\n",
         //       id, name, desc, def, uservis, disp_order, lang);
-        comps_docgroup_set_id(pycomps_group_gget(self), id, 1);
-        comps_docgroup_set_name(pycomps_group_gget(self), name, 1);
-        comps_docgroup_set_desc(pycomps_group_gget(self), desc, 1);
-        comps_docgroup_set_default(pycomps_group_gget(self), def);
-        comps_docgroup_set_uservisible(pycomps_group_gget(self), uservis);
-        comps_docgroup_set_displayorder(pycomps_group_gget(self), disp_order);
-        comps_docgroup_set_langonly(pycomps_group_gget(self), lang, 1);
+        comps_docgroup_set_id(_group_, id, 1);
+        comps_docgroup_set_name(_group_, name, 1);
+        comps_docgroup_set_desc(_group_, desc, 1);
+        comps_docgroup_set_def(_group_, def);
+        comps_docgroup_set_uservisible(_group_, uservis);
+        comps_docgroup_set_display_order(_group_, disp_order);
+        comps_docgroup_set_langonly(_group_, lang, 1);
         return 0;
     } else {
         return -1;
     }
-}
-
-PyObject* comps_group_str(void * group) {
-    PyObject *ret, *tmp, *tmp2, *emptytmp;
-    const char *id, *name, *desc, *lang;
-    char *empty;
-    COMPS_ListItem *it;
-    unsigned def, uservis;
-    int disp_ord;
-    COMPS_Prop* tmp_prop;
-
-    emptytmp = Py_TYPE(Py_None)->tp_str(Py_None);
-    if (PyUnicode_Check(emptytmp)) {
-        __pycomps_PyUnicode_AsString(emptytmp, &empty);
-    } else {
-        empty = PyBytes_AsString(emptytmp);
-    }
-
-    tmp_prop = __comps_docgroup_get_prop(group, "id");
-    id = (tmp_prop)?tmp_prop->prop.str: empty;
-    tmp_prop = __comps_docgroup_get_prop(group, "name");
-    name = (tmp_prop)?tmp_prop->prop.str: empty;
-    tmp_prop = __comps_docgroup_get_prop(group, "desc");
-    desc = (tmp_prop)?tmp_prop->prop.str: empty;
-    tmp_prop = __comps_docgroup_get_prop(group, "lang_only");
-    lang = (tmp_prop)?tmp_prop->prop.str: empty;
-    tmp_prop = __comps_docgroup_get_prop(group, "def");
-    def = (tmp_prop)?tmp_prop->prop.num: 0;
-    tmp_prop = __comps_docgroup_get_prop(group, "display_order");
-    disp_ord = (tmp_prop)?tmp_prop->prop.num: 0;
-    tmp_prop = __comps_docgroup_get_prop(group, "uservisible");
-    uservis = (tmp_prop)?tmp_prop->prop.num: 0;
-
-    ret = PyUnicode_FromFormat("<COMPS_Group: id='%s', name='%s', description='%s',"
-                              "default='%d', uservisible='%d', lang_only='%s', "
-                              "display_order=%d, name_by_lang=",
-                              /*, description_by_lang=%U, %U>",*/
-                              id, name, desc, def, uservis, lang, disp_ord);
-    if (PyUnicode_Check(emptytmp)) {
-        free(empty);
-    }
-    Py_XDECREF(emptytmp);
-
-    tmp2 = comps_lang_str(((COMPS_DocGroup*)group)->name_by_lang);
-    tmp = PyUnicode_Concat(ret, tmp2);
-    Py_XDECREF(tmp2);
-    Py_XDECREF(ret);
-    ret = tmp;
-
-    tmp2 = PyUnicode_FromString(", desc_by_lang=");
-    tmp = PyUnicode_Concat(ret, tmp2);
-    Py_XDECREF(tmp2);
-    Py_XDECREF(ret);
-    ret = tmp;
-
-    tmp2 = comps_lang_str(((COMPS_DocGroup*)group)->desc_by_lang);
-    tmp = PyUnicode_Concat(ret, tmp2);
-    Py_XDECREF(tmp2);
-    Py_XDECREF(ret);
-    ret = tmp;
-
-    tmp2 = PyUnicode_FromString(", packages=[");
-    tmp = PyUnicode_Concat(ret, tmp2);
-    Py_DECREF(ret);
-    Py_DECREF(tmp2);
-    ret = tmp;
-    it = (((COMPS_DocGroup*)group)->packages)?
-         ((COMPS_DocGroup*)group)->packages->first:NULL;
-    for (; it != NULL && it != ((COMPS_DocGroup*)group)->packages->last;
-         it = it->next){
-        tmp2 =PyUnicode_FromFormat("<COMPS_Package name='%s' type=%s>",
-                               ((COMPS_DocGroupPackage*)it->data)->name,
-          comps_docpackage_type_str(((COMPS_DocGroupPackage*)it->data)->type));
-        tmp = PyUnicode_Concat(ret,tmp2);
-        Py_DECREF(ret);
-        Py_DECREF(tmp2);
-        ret = tmp;
-    }
-    if (it) {
-        tmp2 = PyUnicode_FromFormat("<COMPS_Package name='%s' type=%s>]",
-                               ((COMPS_DocGroupPackage*)it->data)->name,
-          comps_docpackage_type_str(((COMPS_DocGroupPackage*)it->data)->type));
-    } else {
-        tmp2 = PyUnicode_FromString("]");
-    }
-    tmp = PyUnicode_Concat(ret,tmp2);
-    Py_DECREF(tmp2);
-    Py_DECREF(ret);
-    ret = tmp;
-
-    tmp2 = PyUnicode_FromString(">");
-    tmp = PyUnicode_Concat(ret, tmp2);
-    Py_DECREF(tmp2);
-    Py_XDECREF(ret);
-    ret = tmp;
-    return ret;
+    #undef _group_
 }
 
 PyObject* PyCOMPSGroup_str(PyObject *self) {
-    return comps_group_str(pycomps_group_oget(self));
+    return PyUnicode_FromString(comps_object_tostr((COMPS_Object*)
+                                               ((PyCOMPS_Group*)self)->group));
 }
 
-void comps_group_print(FILE *f, void *g) {
-    COMPS_ListItem *it;
+int PyCOMPSGroup_print(PyObject *self, FILE *f, int flags) {
+    #define _group_ ((PyCOMPS_Group*)self)
+    COMPS_ObjListIt *it;
     COMPS_HSList *pairlist;
     COMPS_HSListItem *hsit;
-    const char *id, *name, *desc, *lang;
-    unsigned def, uservis;
-    int disp_ord;
-    COMPS_Prop* tmp_prop;
+    char *id, *name, *desc, *lang, *def, *uservis, *disp_ord;
+    COMPS_Object* tmp_prop;
 
-    tmp_prop = __comps_docgroup_get_prop(g, "id");
-    id = (tmp_prop)?tmp_prop->prop.str: NULL;
-    tmp_prop = __comps_docgroup_get_prop(g, "name");
-    name = (tmp_prop)?tmp_prop->prop.str: NULL;
-    tmp_prop = __comps_docgroup_get_prop(g, "desc");
-    desc = (tmp_prop)?tmp_prop->prop.str: NULL;
-    tmp_prop = __comps_docgroup_get_prop(g, "lang_only");
-    lang = (tmp_prop)?tmp_prop->prop.str: NULL;
-    tmp_prop = __comps_docgroup_get_prop(g, "def");
-    def = (tmp_prop)?tmp_prop->prop.num: 0;
-    tmp_prop = __comps_docgroup_get_prop(g, "display_order");
-    disp_ord = (tmp_prop)?tmp_prop->prop.num: 0;
-    tmp_prop = __comps_docgroup_get_prop(g, "uservisible");
-    uservis = (tmp_prop)?tmp_prop->prop.num: 0;
+    (void)flags;
+
+    tmp_prop = comps_docgroup_get_id(_group_->group);
+    id = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    tmp_prop = comps_docgroup_get_name(_group_->group);
+    name = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    tmp_prop = comps_docgroup_get_desc(_group_->group);
+    desc = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    tmp_prop = comps_docgroup_get_display_order(_group_->group);
+    disp_ord = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    tmp_prop = comps_docgroup_get_langonly(_group_->group);
+    lang = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    tmp_prop = comps_docgroup_get_def(_group_->group);
+    def = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    tmp_prop = comps_docgroup_get_uservisible(_group_->group);
+    uservis = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+
 
     fprintf(f, "<COMPS_Group: id='%s', name='%s', description='%s',  "
-            "default='%d', uservisible='%d', lang_only='%s', display_order=%d ",
+            "default='%s', uservisible='%s', lang_only='%s', display_order=%s ",
             id, name, desc, def, uservis, lang, disp_ord);
+    free(id);
+    free(name);
+    free(desc);
+    free(lang);
+    free(def);
+    free(uservis);
+    free(disp_ord);
+
     fprintf(f, "name_by_lang={");
-    pairlist = comps_rtree_pairs(((COMPS_DocGroup*)g)->name_by_lang);
+    pairlist = comps_objrtree_pairs(_group_->group->name_by_lang);
     for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
-        printf("'%s': '%s', ", ((COMPS_RTreePair*)hsit->data)->key,
-                               (char*)((COMPS_RTreePair*)hsit->data)->data);
+        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key,
+                               (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
     }
     if (hsit)
-        printf("'%s': '%s'}", ((COMPS_RTreePair*)hsit->data)->key,
-                               (char*)((COMPS_RTreePair*)hsit->data)->data);
+        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key,
+                               (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
     else
         printf("}");
     comps_hslist_destroy(&pairlist);
 
     fprintf(f, ", desc_by_lang={");
-    pairlist = comps_rtree_pairs(((COMPS_DocGroup*)g)->desc_by_lang);
+    pairlist = comps_objrtree_pairs(_group_->group->desc_by_lang);
     for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
-        printf("'%s': '%s', ", ((COMPS_RTreePair*)hsit->data)->key,
+        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key,
                                (char*)((COMPS_RTreePair*)hsit->data)->data);
     }
     if (hsit)
-        printf("'%s': '%s'}", ((COMPS_RTreePair*)hsit->data)->key,
+        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key,
                                (char*)((COMPS_RTreePair*)hsit->data)->data);
     else
         printf("}");
     comps_hslist_destroy(&pairlist);
 
     fprintf(f, ", packages=[");
-    if (((COMPS_DocGroup*)g)->packages) {
-        for (it = (((COMPS_DocGroup*)g)->packages)->first;
-             it != ((COMPS_DocGroup*)g)->packages->last; it = it->next){
-            comps_pkg_print(f, it->data);
-            fprintf(f,", ");
+    if (_group_->group->packages) {
+        for (it = _group_->group->packages->first;
+             it != _group_->group->packages->last; it = it->next){
+            id = comps_object_tostr(it->comps_obj);
+            fprintf(f,"%s, ", id);
+            free(id);
         }
-        if (it)
-            comps_pkg_print(f, it->data);
+        if (it) {
+            id = comps_object_tostr(it->comps_obj);
+            fprintf(f,"%s", id);
+            free(id);
+        }
     }
     fprintf(f, "]>");
-}
-
-int PyCOMPSGroup_print(PyObject *self, FILE *f, int flags) {
-    (void) flags;
-    comps_group_print(f, pycomps_group_oget(self));
     return 0;
+    #undef _group_
 }
 
 PyObject* PyCOMPSGroup_cmp(PyObject *self, PyObject *other, int op) {
@@ -379,8 +203,8 @@ PyObject* PyCOMPSGroup_cmp(PyObject *self, PyObject *other, int op) {
     }
     CMP_NONE_CHECK(op, self, other)
 
-    ret = comps_docgroup_cmp(pycomps_group_oget(self),
-                             pycomps_group_oget(other));
+    ret = COMPS_OBJECT_CMP(((PyCOMPS_Group*)self)->group,
+                           ((PyCOMPS_Group*)other)->group);
     if (op == Py_EQ) {
         if (!ret) Py_RETURN_FALSE;
     } else {
@@ -389,153 +213,56 @@ PyObject* PyCOMPSGroup_cmp(PyObject *self, PyObject *other, int op) {
     Py_RETURN_TRUE;
 }
 
-PyObject* PyCOMPSGroup_get_packages(PyCOMPS_Group *self, void *closure) {
-    (void) closure;
-    PyObject *ret;
-    if (!self->packages_pobj) {
-        ret = PyCOMPSCtoPySeq_new(&PyCOMPS_PacksType, NULL, NULL);
-        PyCOMPSPacks_init((PyCOMPS_CtoPySeq*)ret, NULL, NULL);
-        if (pycomps_group_gget(self)->packages == NULL) {
-            pycomps_group_gget(self)->packages = comps_list_create();
-            comps_list_init(pycomps_group_gget(self)->packages);
-            pycomps_group_get_extra((PyObject*)self)->packages_citem->data =
-                                   pycomps_group_gget(self)->packages;
-        }
-        ctopy_citem_destroy(((PyCOMPS_CtoPySeq*)ret)->citem);
-        ((PyCOMPS_CtoPySeq*)ret)->citem = pycomps_group_get_extra(
-                                               (PyObject*)self)->packages_citem;
-        self->packages_pobj = ret;
-        ctopy_citem_incref(((PyCOMPS_CtoPySeq*)ret)->citem);
-        Py_INCREF(ret);
-    } else {
-        ret = self->packages_pobj;
-        Py_INCREF(ret);
-    }
-    return  ret;
-}
-
-int PyCOMPSGroup_set_packages(PyCOMPS_Group *self,
-                                  PyObject *value, void *closure) {
-    (void) closure;
-
-    if (value->ob_type != &PyCOMPS_PacksType) {
-        PyErr_SetString(PyExc_TypeError, "Not COMPS_Packages instance");
-        return -1;
-    }
-    ctopy_citem_decref(pycomps_group_get_extra((PyObject*)self)->packages_citem);
-    if (self->packages_pobj) {
-        Py_XDECREF(self->packages_pobj);
-    }
-    pycomps_group_get_extra((PyObject*)self)->packages_citem =
-                                              ((PyCOMPS_CtoPySeq*)value)->citem;
-    ctopy_citem_incref(((PyCOMPS_CtoPySeq*)value)->citem);
-    pycomps_group_oget((PyObject*)self)->packages = ctopy_get_list(value);
-    self->packages_pobj = value;
-    Py_INCREF(value);
-    return 0;
-}
-
 inline PyObject* PyCOMPSGroup_get_name_by_lang(PyCOMPS_Group *self, void *closure) {
     (void) closure;
-    return pycomps_lang_get_dict(
+    (void) self;
+/*    return pycomps_lang_get_dict(
                    pycomps_group_get_extra((PyObject*)self)->name_by_lang_citem,
                    &self->name_by_lang_pobj);
+*/
 }
 
 inline int PyCOMPSGroup_set_name_by_lang(PyCOMPS_Group *self,
                                   PyObject *value, void *closure) {
     (void) closure;
-    return pycomps_lang_set_dict(
+    (void) self;
+    (void) value;
+/*    return pycomps_lang_set_dict(
                   &pycomps_group_get_extra((PyObject*)self)->name_by_lang_citem,
                   &self->name_by_lang_pobj,
                   value,
                   (void**)&pycomps_group_oget((PyObject*)self)->name_by_lang);
+*/
 }
 
 inline PyObject* PyCOMPSGroup_get_desc_by_lang(PyCOMPS_Group *self, void *closure) {
     (void) closure;
-    return pycomps_lang_get_dict(
+    (void) self;
+/*    return pycomps_lang_get_dict(
                    pycomps_group_get_extra((PyObject*)self)->desc_by_lang_citem,
                    &self->desc_by_lang_pobj);
+*/
 }
 
 inline int PyCOMPSGroup_set_desc_by_lang(PyCOMPS_Group *self,
                                   PyObject *value, void *closure) {
     (void) closure;
-    return pycomps_lang_set_dict(
+    (void) self;
+    (void) value;
+/*    return pycomps_lang_set_dict(
                   &pycomps_group_get_extra((PyObject*)self)->desc_by_lang_citem,
                   &self->desc_by_lang_pobj,
                   value,
                   (void**)&pycomps_group_oget((PyObject*)self)->desc_by_lang);
+*/
 }
 
-int pycomps_group_strattr_setter(PyObject *self, PyObject *val, void *closure) {
-    char *tmp;
-    COMPS_Prop *tmp_prop;
-    if (__pycomps_stringable_to_char(val, &tmp) < 0) {
-        return -1;
-    }
-    tmp_prop = comps_dict_get(pycomps_group_oget(self)->properties, (char*)closure);
-    if (!tmp_prop) {
-        if (tmp) {
-            tmp_prop = comps_doc_prop_str_create(tmp, 0);
-            comps_dict_set(pycomps_group_oget(self)->properties,
-                           (char*)closure, tmp_prop);
-        }
-    } else {
-        if (tmp)
-            __comps_doc_char_setter((void**)&tmp_prop->prop.str, tmp, 0);
-        else {
-            comps_dict_unset(pycomps_group_oget(self)->properties, (char*)closure);
-        }
-    }
-    return 0;
-}
-
-PyObject* pycomps_group_strattr_getter(PyObject *self, void *closure) {
-
-    COMPS_Prop *tmp_prop;
-    tmp_prop = comps_dict_get(pycomps_group_oget(self)->properties, (char*)closure);
-    if (tmp_prop)
-        return PyUnicode_FromString(tmp_prop->prop.str);
-    else
-        Py_RETURN_NONE;
-}
-
-int pycomps_group_numattr_setter(PyObject *self, PyObject *val, void *closure) {
-    long tmp;
-    COMPS_Prop *tmp_prop;
-    if (!PyINT_CHECK(val)) {
-        PyErr_SetString(PyExc_TypeError, "Not int object");
-        return -1;
-    }
-    tmp = PyINT_ASLONG(val);
-    tmp_prop = comps_dict_get(pycomps_group_oget(self)->properties, (char*)closure);
-    if (!tmp_prop) {
-            tmp_prop = comps_doc_prop_num_create(tmp);
-            comps_dict_set(pycomps_group_oget(self)->properties,
-                           (char*)closure, tmp_prop);
-    } else {
-        tmp_prop->prop.num = tmp;
-    }
-    return 0;
-}
-
-PyObject* pycomps_group_numattr_getter(PyObject *self, void *closure) {
-
-    COMPS_Prop *tmp_prop;
-    tmp_prop = comps_dict_get(pycomps_group_oget(self)->properties, (char*)closure);
-    if (tmp_prop)
-        return PyLong_FromLong(tmp_prop->prop.num);
-    else
-        Py_RETURN_NONE;
-}
 
 int pycomps_group_boolattr_setter(PyObject *self, PyObject *val, void *closure) {
     long tmp;
-    COMPS_Prop *tmp_prop;
+    COMPS_Object *tmp_prop;
     if (!val) {
-        PyErr_Format(PyExc_TypeError, "Cant' delete %s", (char*)closure);
+        PyErr_Format(PyExc_TypeError, "Can't delete %s", (char*)closure);
         return -1;
     }
     if (val && !PyBool_Check(val)) {
@@ -543,24 +270,21 @@ int pycomps_group_boolattr_setter(PyObject *self, PyObject *val, void *closure) 
         return -1;
     }
     tmp = (val == Py_True)?1:0;
-    tmp_prop = comps_dict_get(pycomps_group_oget(self)->properties, (char*)closure);
-    if (!tmp_prop) {
-            tmp_prop = comps_doc_prop_num_create(tmp);
-            comps_dict_set(pycomps_group_oget(self)->properties,
-                           (char*)closure, tmp_prop);
-    } else {
-        tmp_prop->prop.num = tmp;
-    }
+    tmp_prop = (COMPS_Object*) comps_num(tmp);
+    comps_objdict_set_x(((PyCOMPS_Group*)self)->group->properties,
+                   (char*)closure, tmp_prop);
     return 0;
 }
 
 PyObject* pycomps_group_boolattr_getter(PyObject *self, void *closure) {
 
-    COMPS_Prop *tmp_prop;
-    tmp_prop = comps_dict_get(pycomps_group_oget(self)->properties, (char*)closure);
-    if (tmp_prop)
-        return PyBool_FromLong(tmp_prop->prop.num);
-    else
+    COMPS_Object *tmp_prop;
+    tmp_prop = comps_objdict_get(((PyCOMPS_Group*)self)->group->properties,
+                                 (char*)closure);
+    if (tmp_prop) {
+        Py_XDECREF(tmp_prop);
+        return PyBool_FromLong(((COMPS_Num*)tmp_prop)->val);
+    } else
         Py_RETURN_NONE;
 }
 
@@ -571,32 +295,69 @@ PyMethodDef PyCOMPSGroup_methods[] = {
     {NULL}  /* Sentinel */
 };
 
+__COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_IdClosure = {
+    .get_f = &comps_docgroup_get_id,
+    .set_f = &comps_docgroup_set_id,
+    .c_offset = offsetof(PyCOMPS_Group, group)
+};
+
+__COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_NameClosure = {
+    .get_f = &comps_docgroup_get_name,
+    .set_f = &comps_docgroup_set_name,
+    .c_offset = offsetof(PyCOMPS_Group, group)
+};
+
+__COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_DescClosure = {
+    .get_f = &comps_docgroup_get_desc,
+    .set_f = &comps_docgroup_set_desc,
+    .c_offset = offsetof(PyCOMPS_Group, group)
+};
+
+__COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_LangClosure = {
+    .get_f = &comps_docgroup_get_langonly,
+    .set_f = &comps_docgroup_set_langonly,
+    .c_offset = offsetof(PyCOMPS_Group, group)
+};
+
+__COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_DispOrdClosure = {
+    .get_f = &comps_docgroup_get_display_order,
+    .set_f = &comps_docgroup_set_display_order,
+    .c_offset = offsetof(PyCOMPS_Group, group)
+};
+
+__COMPS_LIST_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_Packages = {
+    .get_f = &comps_docgroup_packages,
+    .set_f = &comps_docgroup_set_packages,
+    .p_offset = offsetof(PyCOMPS_Group, p_packages),
+    .c_offset = offsetof(PyCOMPS_Group, group)
+};
+
 PyGetSetDef PyCOMPSGroup_getset[] = {
     {"id",
-     (getter)pycomps_group_strattr_getter, (setter)pycomps_group_strattr_setter,
-     "Group id", "id"},
+     (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
+     "Group id", (void*)&DocGroup_IdClosure},
     {"name",
-     (getter)pycomps_group_strattr_getter, (setter)pycomps_group_strattr_setter,
-     "Group name", "name"},
+     (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
+     "Group name", (void*)&DocGroup_NameClosure},
     {"desc",
-     (getter)pycomps_group_strattr_getter, (setter)pycomps_group_strattr_setter,
-     "Group description", "desc"},
+     (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
+     "Group description", (void*)&DocGroup_DescClosure},
     {"lang_only",
-     (getter)pycomps_group_strattr_getter, (setter)pycomps_group_strattr_setter,
-     "Group langonly", "lang_only"},
+     (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
+     "Group langonly", (void*)&DocGroup_LangClosure},
     {"display_order",
-     (getter)pycomps_group_numattr_getter, (setter)pycomps_group_numattr_setter,
-     "Group display order attribute", "display_order"},
+     (getter)__PyCOMPS_get_numattr, (setter)__PyCOMPS_set_numattr,
+     "Group display order attribute", (void*)&DocGroup_DispOrdClosure},
     {"uservisible",
-     (getter)pycomps_group_boolattr_getter, (setter)pycomps_group_boolattr_setter,
+     (getter)pycomps_group_boolattr_setter, (setter)pycomps_group_boolattr_setter,
      "Group uservisible attribute", "uservisible"},
     {"default",
-     (getter)pycomps_group_boolattr_getter, (setter)pycomps_group_boolattr_setter,
+     (getter)pycomps_group_boolattr_setter, (setter)pycomps_group_boolattr_setter,
      "Group default attribute", "def"},
     {"packages",
-    (getter)PyCOMPSGroup_get_packages, (setter)PyCOMPSGroup_set_packages,
+    (getter)__PyCOMPS_get_ids, (setter)__PyCOMPS_set_ids,
      "Group packages",
-     NULL},
+     (void*)&DocGroup_Packages},
     {"name_by_lang",
     (getter)PyCOMPSGroup_get_name_by_lang, (setter)PyCOMPSGroup_set_name_by_lang,
      "Group name locales", NULL},
@@ -608,16 +369,6 @@ PyGetSetDef PyCOMPSGroup_getset[] = {
 
 PyNumberMethods PyCOMPSGroup_Nums = {
     .nb_add = PyCOMPSGroup_union
-};
-
-PyCOMPS_CtoPySeqItemMan PyCOMPSGroup_ItemMan = {
-    .item_type = &PyCOMPS_GroupType,
-    .ctopy_convert = PyCOMPSGroup_convert,
-    .data_decref = pycomps_group_decref,
-    .data_incref = comps_group_incref,
-    .data_cmp = comps_docgroup_cmp_v,
-    .fprint_f = comps_group_print,
-    .str_f = comps_group_str
 };
 
 PyTypeObject PyCOMPS_GroupType = {
@@ -661,81 +412,69 @@ PyTypeObject PyCOMPS_GroupType = {
     PyCOMPSGroup_new,                 /* tp_new */};
 
 
-int PyCOMPSGroups_init(PyCOMPS_CtoPySeq *self, PyObject *args, PyObject *kwds)
+int PyCOMPSGroups_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
 {
     (void) args;
     (void) kwds;
-    self->item_man = &PyCOMPSGroup_ItemMan;
+    (void) self;
     return 0;
 }
 
-COMPS_List* comps_groups_union(COMPS_List *groups1, COMPS_List *groups2) {
+COMPS_ObjList* comps_groups_union(COMPS_ObjList *groups1,
+                                  COMPS_ObjList *groups2) {
     COMPS_HSListItem *hsit;
     COMPS_Set *set;
-    COMPS_List *res;
-    COMPS_DocGroup *tmpgroup, *tmpgroup2, *unigroup;
-    COMPS_ListItem *it, *newit;
+    COMPS_ObjList *ret;
+    COMPS_DocGroup *tmpgroup;
+    COMPS_ObjListIt *it;
+    void *tmpdata;
 
-    res = comps_list_create();
-    comps_list_init(res);
+    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_docgroup_idcmp);
 
-    it = groups1?groups1->first:NULL;
-    for (; it != NULL; it = it->next) {
-        comps_group_incref(it->data);
-        comps_set_add(set, it->data);
+    for (it = groups1 ? groups1->first : NULL; it != NULL; it = it->next) {
+        comps_set_add(set, comps_object_copy(it->comps_obj));
     }
-    it = groups2?groups2->first:NULL;
-    for (; it != NULL; it = it->next) {
-        tmpgroup = it->data;
-        if (comps_set_in(set, tmpgroup)) {
-            tmpgroup2 = (COMPS_DocGroup*)comps_set_data_at(set, tmpgroup);
-            unigroup = comps_docgroup_union(tmpgroup, tmpgroup2);
-            unigroup->reserved = comps_docgroup_extra_create();
-            ((COMPS_DocGroupExtra*)(unigroup->reserved))->citem =
-                             ctopy_citem_create(unigroup, &pycomps_group_destroy);
-            ((COMPS_DocGroupExtra*)(unigroup->reserved))->packages_citem =
-                                        ctopy_citem_create(unigroup->packages,
-                                                           &comps_list_destroy_v);
-            ((COMPS_DocGroupExtra*)(unigroup->reserved))->name_by_lang_citem =
-                                        ctopy_citem_create(unigroup->name_by_lang,
-                                                           &comps_dict_destroy_v);
-            ((COMPS_DocGroupExtra*)(unigroup->reserved))->desc_by_lang_citem =
-                                        ctopy_citem_create(unigroup->desc_by_lang,
-                                                           &comps_dict_destroy_v);
-            pycomps_group_decref(tmpgroup2);
-            comps_set_remove(set, tmpgroup2);
-            comps_set_add(set, unigroup);
-        } else {
-            comps_group_incref((void*)tmpgroup);
+    for (it = groups2 ? groups2->first : NULL; it != NULL; it = it->next) {
+        if (comps_set_in(set, it->comps_obj)) {
+            tmpgroup = comps_docgroup_union(
+                                (COMPS_DocGroup*)it->comps_obj,
+                                (COMPS_DocGroup*)comps_set_data_at(set,
+                                                                   it->comps_obj));
+            tmpdata = comps_set_data_at(set, it->comps_obj);
+            comps_set_remove(set, it->comps_obj);
+            comps_object_destroy((COMPS_Object*)tmpdata);
             comps_set_add(set, tmpgroup);
+        } else {
+            comps_set_add(set, comps_object_copy(it->comps_obj));
         }
     }
     for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
-        newit = comps_list_item_create(hsit->data, NULL, &pycomps_group_decref);
-        comps_list_append(res, newit);
+        comps_objlist_append_x(ret, (COMPS_Object*)hsit->data);
     }
     comps_set_destroy(&set);
-    return res;
+
+    return ret;
 }
 
 PyObject* PyCOMPSGroups_union(PyObject *self, PyObject *other) {
-    PyCOMPS_CtoPySeq *res;
-    COMPS_List *res_list;
+    PyCOMPS_Sequence *res;
+    COMPS_ObjList *res_list;
 
     if (other == NULL || Py_TYPE(other) != &PyCOMPS_GroupsType) {
         PyErr_SetString(PyExc_TypeError, "Not GroupList instance");
         return NULL;
     }
 
-    res = (PyCOMPS_CtoPySeq*)Py_TYPE(self)->tp_new(Py_TYPE(self), NULL, NULL);
+    res = (PyCOMPS_Sequence*) Py_TYPE(self)->tp_new(Py_TYPE(self), NULL, NULL);
     PyCOMPSGroups_init(res, NULL, NULL);
 
-    res_list = comps_groups_union(ctopy_get_list(self), ctopy_get_list(other));
-    comps_list_destroy((COMPS_List**)&res->citem->data);
-    res->citem->data = res_list;
+    res_list = comps_groups_union(((PyCOMPS_Sequence*)self)->list,
+                                ((PyCOMPS_Sequence*)other)->list);
+    COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)res)->list);
+    res->list = res_list;
     return (PyObject*)res;
 }
 
@@ -757,7 +496,7 @@ PyTypeObject PyCOMPS_GroupsType = {
     "libcomps.GroupList",   /*tp_name*/
     sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     sizeof(PyCOMPS_Group),   /*tp_itemsize*/
-    (destructor)PyCOMPSCtoPySeq_dealloc, /*tp_dealloc*/
+    (destructor)PyCOMPSSeq_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -768,35 +507,35 @@ PyTypeObject PyCOMPS_GroupsType = {
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
-    PyCOMPSCtoPySeq_str,           /*tp_str*/
+    PyCOMPSSeq_str,           /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_TYPE_SUBCLASS,        /*tp_flags*/
-    "Comps Category list",           /* tp_doc */
+    "Comps Group list",           /* tp_doc */
     0,                    /* tp_traverse */
     0,                     /* tp_clear */
-    &PyCOMPSCtoPySeq_cmp,       /* tp_richcompare */
+    &PyCOMPSSeq_cmp,       /* tp_richcompare */
     0,                     /* tp_weaklistoffset */
     0,                     /* tp_iter */
     0,                     /* tp_iternext */
     PyCOMPSGroups_methods,        /* tp_methods */
     PyCOMPSGroups_members,        /* tp_members */
     0,                         /* tp_getset */
-    &PyCOMPS_CtoPySeqType,           /* tp_base */
+    &PyCOMPS_SeqType,           /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
     (initproc)PyCOMPSGroups_init,      /* tp_init */
     0,                               /* tp_alloc */
-    PyCOMPSCtoPySeq_new,                 /* tp_new */};
+    PyCOMPSSeq_new,                 /* tp_new */};
 
-int PyCOMPSPacks_init(PyCOMPS_CtoPySeq *self, PyObject *args, PyObject *kwds)
+int PyCOMPSPacks_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
 {
-   (void) args;
-   (void) kwds;
-    self->item_man = &PyCOMPSPack_ItemMan;
+    (void) args;
+    (void) kwds;
+    (void) self;
     return 0;
 }
 
@@ -810,9 +549,9 @@ PyMethodDef PyCOMPSPacks_methods[] = {
 PyTypeObject PyCOMPS_PacksType = {
     PY_OBJ_HEAD_INIT
     "libcomps.PackageList",   /*tp_name*/
-    sizeof(PyCOMPS_CtoPySeq), /*tp_basicsize*/
+    sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     0,                        /*tp_itemsize*/
-    (destructor)PyCOMPSCtoPySeq_dealloc, /*tp_dealloc*/
+    (destructor)PyCOMPSSeq_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -823,7 +562,7 @@ PyTypeObject PyCOMPS_PacksType = {
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
-    PyCOMPSCtoPySeq_str,           /*tp_str*/
+    PyCOMPSSeq_str,           /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
@@ -831,69 +570,44 @@ PyTypeObject PyCOMPS_PacksType = {
     "Comps Group Package list",           /* tp_doc */
     0,                    /* tp_traverse */
     0,                     /* tp_clear */
-    &PyCOMPSCtoPySeq_cmp,       /* tp_richcompare */
+    &PyCOMPSSeq_cmp,       /* tp_richcompare */
     0,                     /* tp_weaklistoffset */
     0,                     /* tp_iter */
     0,                     /* tp_iternext */
     PyCOMPSPacks_methods,        /* tp_methods */
     PyCOMPSPacks_members,        /* tp_members */
     0,                         /* tp_getset */
-    &PyCOMPS_CtoPySeqType,           /* tp_base */
+    &PyCOMPS_SeqType,           /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
     (initproc)PyCOMPSPacks_init,      /* tp_init */
     0,                               /* tp_alloc */
-    PyCOMPSCtoPySeq_new,                 /* tp_new */};
-
-inline COMPS_DocGroupPackage* pycomps_pkg_get(PyObject *pypkg) {
-    return (COMPS_DocGroupPackage*)((PyCOMPS_Package*)pypkg)->citem->data;
-}
-
-inline void pycomps_pkg_destroy(void * pkg) {
-    comps_docpackage_destroy(pkg);
-}
-
-inline void pycomps_pkg_incref(void * pkg) {
-    ctopy_citem_incref(
-                (PyCOMPS_CtoPy_CItem*)((COMPS_DocGroupPackage*)pkg)->reserved);
-}
-
-inline void pycomps_pkg_decref(void * pkg) {
-    ctopy_citem_destroy(((COMPS_DocGroupPackage*)pkg)->reserved);
-}
+    PyCOMPSSeq_new,                 /* tp_new */};
 
 PyObject* PyCOMPSPack_convert(void *p) {
-    PyObject *ret;
-    ret = PyCOMPSPack_new(&PyCOMPS_PackType, NULL, NULL);
-    PyCOMPSPack_init((PyCOMPS_Package*)ret, NULL, NULL);
-    ctopy_citem_decref(((PyCOMPS_Package*)ret)->citem);
-    ((PyCOMPS_Package*)ret)->citem = ((COMPS_DocGroupPackage*)p)->reserved;
-    ctopy_citem_incref(((PyCOMPS_Package*)ret)->citem);
-    return ret;
+    (void)p;
 }
 
 void PyCOMPSPack_dealloc(PyCOMPS_Package *self)
 {
-    ctopy_citem_decref(self->citem);
+    COMPS_OBJECT_DESTROY(self->package);
     Py_TYPE(self)->tp_free((PyObject*)self);
-    self = NULL;
 }
 
 PyObject* PyCOMPSPack_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyCOMPS_Package *self;
-    COMPS_DocGroupPackage *p;
 
    (void) args;
    (void) kwds;
 
     self = (PyCOMPS_Package*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        p = comps_docpackage_create();
-        p->reserved = ctopy_citem_create(p, &pycomps_pkg_destroy);
-        self->citem = p->reserved;
+        self->package = (COMPS_DocGroupPackage*)
+                        comps_object_create(&COMPS_DocGroupPackage_ObjInfo,
+                                            NULL);
     }
     return (PyObject*) self;
 }
@@ -906,131 +620,93 @@ int PyCOMPSPack_init(PyCOMPS_Package *self, PyObject *args, PyObject *kwds)
    (void) kwds;
 
     if (args!=NULL && PyArg_ParseTuple(args, "|si", &name, &type)) {
-        comps_docpackage_set_name(pycomps_pkg_get((PyObject*)self), name, 1);
-        comps_docpackage_set_type(pycomps_pkg_get((PyObject*)self), type);
+        comps_docpackage_set_name(((PyCOMPS_Package*)self)->package, name, 1);
+        comps_docpackage_set_type(((PyCOMPS_Package*)self)->package, type);
         return 0;
     } else {
-        pycomps_pkg_get((PyObject*)self)->name = NULL;
-        pycomps_pkg_get((PyObject*)self)->type = COMPS_PACKAGE_UNKNOWN;
+        ((PyCOMPS_Package*)self)->package->name = NULL;
+        ((PyCOMPS_Package*)self)->package->type = COMPS_PACKAGE_UNKNOWN;
         return 0;
     }
     return 1;
 }
 
 PyObject* PyCOMPSPack_strget_(PyCOMPS_Package *self, void *closure) {
-    char *tmp = GET_FROM(pycomps_pkg_get((PyObject*)self),
-                                         (size_t)closure);
+    char *tmp = GET_FROM(self->package, (size_t)closure);
     return PyUnicode_FromString(tmp);
 }
-int PyCOMPSPack_strset_(PyCOMPS_Package *self, PyObject *value, void *closure) {
-    char *tmp;
-    (void) closure;
-    if (__pycomps_arg_to_char(value, &tmp)) {
-        return -1;
-    }
-    __comps_doc_char_setter((void**)&GET_FROM(pycomps_pkg_get((PyObject*)self),
-                                    (size_t)closure), tmp, 0);
-    return 0;
-}
 
-PyObject* PyCOMPSPack_get_type(PyCOMPS_Package *self, void *closure) {
-    (void) closure;
-    int type = pycomps_pkg_get((PyObject*)self)->type;
-    if (type > 0 && type <= COMPS_PACKAGE_UNKNOWN)
-        return Py_BuildValue("i", type);
-    Py_RETURN_NONE;
-}
+__COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) DocGroupPkg_NameClosure = {
+    .get_f = &comps_docpackage_get_name,
+    .set_f = &comps_docpackage_set_name,
+    .c_offset = offsetof(PyCOMPS_Package, package)
+};
 
-int PyCOMPSPack_set_type(PyCOMPS_Package *self, PyObject *value, void *closure){
-   (void) closure;
-    if (!PyLong_Check(value)) {
-        PyErr_SetString(PyExc_TypeError, "Not a integer");
-        return -1;
-    }
-    if (PyLong_AsLong(value)>3 || PyLong_AsLong(value)<0) {
-        PyErr_SetString(PyExc_ValueError, "Out of range");
-        return -1;
-    }
-    pycomps_pkg_get((PyObject*)self)->type = PyLong_AsLong(value);
-    return 0;
-}
+__COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) DocGroupPkg_TypeClosure = {
+    .get_f = &comps_docpackage_get_type,
+    .set_f = &comps_docpackage_set_type_i,
+    .c_offset = offsetof(PyCOMPS_Package, package)
+};
 
 PyGetSetDef pack_getset[] = {
     {"name",
-     (getter)PyCOMPSPack_strget_, (setter)PyCOMPSPack_strset_,
+     (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
      "Package name",
      (void*)offsetof(COMPS_DocGroupPackage, name)},
     {"requires",
-     (getter)PyCOMPSPack_strget_, (setter)PyCOMPSPack_strset_,
+     (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
      "Package requires",
      (void*)offsetof(COMPS_DocGroupPackage, requires)},
     {"type",
-     (getter)PyCOMPSPack_get_type, (setter)PyCOMPSPack_set_type,
+     (getter)__PyCOMPS_get_numattr, (setter)__PyCOMPS_set_numattr,
      "Package type",
      NULL},
     {NULL}  /* Sentinel */
 };
 
 PyObject* PyCOMPSPack_str(PyObject *self) {
-    PyObject * ret;
-    char *name;
-    const char *type;
-    char * empty = "";
-    name = (pycomps_pkg_get(self)->name)?
-          pycomps_pkg_get(self)->name:empty;
-    type = comps_docpackage_type_str(pycomps_pkg_get(self)->type);
-    ret = PyUnicode_FromFormat("<COMPS_Package: name='%s', type=%s>",
-                               name, type);
-    return ret;
-}
-
-inline void comps_pkg_print(FILE *f, void *p) {
-    const char *type;
-    type = comps_docpackage_type_str(((COMPS_DocGroupPackage*)p)->type);
-    if (((COMPS_DocGroupPackage*)p)->requires)
-        fprintf(f, "<COPMS_Package name='%s' type='%s' requires='%s'>",
-                ((COMPS_DocGroupPackage*)p)->name, type,
-                ((COMPS_DocGroupPackage*)p)->requires);
-    else
-        fprintf(f, "<COPMS_Package name='%s' type='%s'>",
-                ((COMPS_DocGroupPackage*)p)->name, type);
+    return PyUnicode_FromString(comps_object_tostr((COMPS_Object*)
+                                           ((PyCOMPS_Package*)self)->package));
 }
 
 int PyCOMPSPack_print(PyObject *self, FILE *f, int flags) {
     (void) flags;
-    comps_pkg_print(f, (void*)pycomps_pkg_get(self));
+    char *name, *requires;
+    const char *type;
+    type = comps_docpackage_type_str(((PyCOMPS_Package*)self)->package->type);
+    name = comps_object_tostr((COMPS_Object*)
+                              ((PyCOMPS_Package*)self)->package->name);
+    if (((PyCOMPS_Package*)self)->package->requires) {
+        requires = comps_object_tostr((COMPS_Object*)
+                                  ((PyCOMPS_Package*)self)->package->requires);
+        fprintf(f, "<COPMS_Package name='%s' type='%s' requires='%s'>",
+                name, type, requires);
+        free(requires);
+    } else
+        fprintf(f, "<COPMS_Package name='%s' type='%s'>", name, type);
+    free(name);
     return 0;
 }
 
 PyObject* PyCOMPSPack_cmp(PyObject *self, PyObject *other, int op) {
-    if (other == NULL || other->ob_type != &PyCOMPS_PackType) {
-        PyErr_SetString(PyExc_TypeError, "Not COMPS_Pack instance");
+    char ret;
+    CMP_OP_EQ_NE_CHECK(op)
+
+    if (other == NULL || ( Py_TYPE(other) != &PyCOMPS_PackType
+                           && other != Py_None)) {
+        PyErr_Format(PyExc_TypeError, "Not %s instance",
+                        Py_TYPE(self)->tp_name);
         return NULL;
     }
-    if (op != Py_EQ && op != Py_NE) {
-        return Py_NotImplemented;
-    }
-    if (comps_docpackage_cmp(pycomps_pkg_get(self), pycomps_pkg_get(other))) {
-        if (op == Py_EQ){
-            Py_RETURN_TRUE;
-        } else {
-            Py_RETURN_FALSE;
-        }
+    CMP_NONE_CHECK(op, self, other)
+    ret = COMPS_OBJECT_CMP((COMPS_Object*)((PyCOMPS_Package*)self)->package,
+                           (COMPS_Object*)((PyCOMPS_Package*)other)->package);
+    if (op == Py_EQ) {
+        if (!ret) Py_RETURN_FALSE;
     } else {
-        if (op == Py_EQ){
-            Py_RETURN_FALSE;
-        } else {
-            Py_RETURN_TRUE;
-        }
+        if (ret) Py_RETURN_FALSE;
     }
-}
-
-char pycomps_pack_cmp(void *p1, void *p2) {
-    if (__pycomps_strcmp(((COMPS_DocGroupPackage*)p1)->name,
-                         ((COMPS_DocGroupPackage*)p2)->name)) return 0;
-    if (((COMPS_DocGroupPackage*)p1)->type!=((COMPS_DocGroupPackage*)p2)->type)
-        return 0;
-    return 1;
+    Py_RETURN_TRUE;
 }
 
 PyMemberDef PyCOMPSPack_members[] = {
@@ -1038,15 +714,6 @@ PyMemberDef PyCOMPSPack_members[] = {
 
 PyMethodDef PyCOMPSPack_methods[] = {
     {NULL}  /* Sentinel */
-};
-
-PyCOMPS_CtoPySeqItemMan PyCOMPSPack_ItemMan = {
-    .item_type = &PyCOMPS_PackType,
-    .ctopy_convert = PyCOMPSPack_convert,
-    .data_incref = pycomps_pkg_incref,
-    .data_cmp = pycomps_pack_cmp,
-    .data_decref = pycomps_pkg_decref,
-    .fprint_f = comps_pkg_print
 };
 
 PyTypeObject PyCOMPS_PackType = {

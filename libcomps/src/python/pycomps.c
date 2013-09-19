@@ -200,7 +200,7 @@ PyObject* PyCOMPS_get_(PyCOMPS *self, void *closure) {
     PyObject *ret;
 
     if (!(PyObject*)GET_FROM(self, get_closure(closure)->pobj_offset)) {
-        ret = PyCOMPSCtoPySeq_new(get_closure(closure)->type, NULL, NULL);
+        ret = PyCOMPSSeq_new(get_closure(closure)->type, NULL, NULL);
         Py_TYPE(ret)->tp_init(ret, NULL, NULL);
         //TODO
         SET_TO(self, get_closure(closure)->pobj_offset, ret)
@@ -458,9 +458,6 @@ PYINIT_FUNC(void) {
         MODINIT_RET_NONE;
     }
     if (PyType_Ready(&PyCOMPS_DictIterType) < 0 ) {
-        MODINIT_RET_NONE;
-    }
-    if (PyType_Ready(&PyCOMPS_CtoPySeqIterType) < 0 ) {
         MODINIT_RET_NONE;
     }
     #if PY_MAJOR_VERSION >= 3

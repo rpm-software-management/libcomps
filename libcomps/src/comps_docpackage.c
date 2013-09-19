@@ -42,20 +42,33 @@ void comps_docpackage_destroy(COMPS_DocGroupPackage *pkg) {
 }
 COMPS_DESTROY_u(docpackage, COMPS_DocGroupPackage) /*comps_utils.h macro*/
 
-
-void comps_docpackage_set_name(COMPS_DocGroupPackage *pkg, char *name) {
+void comps_docpackage_set_name(COMPS_DocGroupPackage *pkg, char *name, char copy) {
+    (void)copy;
     if (pkg->name)
         comps_object_destroy((COMPS_Object*)pkg->name);
     pkg->name = comps_str(name);
 }
-void comps_docpackage_set_requires(COMPS_DocGroupPackage *pkg, char *requires) {
+COMPS_Object* comps_docpackage_get_name(COMPS_DocGroupPackage *pkg) {
+    return comps_object_incref((COMPS_Object*)pkg->name);
+}
+void comps_docpackage_set_requires(COMPS_DocGroupPackage *pkg, char *requires, char copy) {
+    (void)copy;
     if (pkg->requires)
         comps_object_destroy((COMPS_Object*)pkg->requires);
     pkg->requires = comps_str(requires);
 }
+COMPS_Object* comps_docpackage_get_requires(COMPS_DocGroupPackage *pkg) {
+    return comps_object_incref((COMPS_Object*)pkg->requires);
+}
+void comps_docpackage_set_type_i(COMPS_DocGroupPackage *pkg, int type) {
+    pkg->type = type;
+}
 void comps_docpackage_set_type(COMPS_DocGroupPackage *pkg,
                                    COMPS_PackageType type) {
     pkg->type = type;
+}
+COMPS_Object* comps_docpackage_get_type(COMPS_DocGroupPackage *pkg) {
+    return (COMPS_Object*)comps_num(pkg->type);
 }
 
 
@@ -74,6 +87,20 @@ signed char comps_docpackage_cmp_u(COMPS_Object *pkg1, COMPS_Object *pkg2) {
     #undef _pkg1
     #undef _pkg2
 }
+
+const char* comps_docpackage_type_str(COMPS_PackageType type) {
+    switch(type){
+        case COMPS_PACKAGE_OPTIONAL:
+            return "optional";
+        case COMPS_PACKAGE_MANDATORY:
+            return "mandatory";
+        case COMPS_PACKAGE_CONDITIONAL:
+            return "conditional";
+        default:
+            return "default";
+    }
+}
+
 inline char comps_docpackage_cmp_set(void *pkg1, void *pkg2) {
     return comps_docpackage_cmp_u((COMPS_Object*) pkg1, (COMPS_Object*)pkg2);
 }

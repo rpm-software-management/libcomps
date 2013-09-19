@@ -21,35 +21,30 @@
 #define PYCOMPS_GIDS_H
 
 #include <Python.h>
+#include "structmember.h"
+
 #include "libcomps/comps_doc.h"
 #include "libcomps/comps_list.h"
-#include "structmember.h"
+#include "libcomps/comps_docgroupid.h"
+
+#include "pycomps_types.h"
 #include "pycomps_utils.h"
 #include "pycomps_23macros.h"
-#include "pycomps_ctopy_seq.h"
-#include "pycomps_ctopy.h"
+#include "pycomps_sequence.h"
 
 typedef struct {
     PyObject_HEAD
-    PyCOMPS_CtoPy_PItem_HEAD
+    COMPS_DocGroupId *gid;
 } PyCOMPS_GID;
 
-
-void pycomps_gid_decref(void * gid);
-void pycomps_gid_incref(void * gid);
-void pycomps_gid_destroy(void * gid);
-void comps_gid_print(FILE *f, void *p);
-PyObject* comps_gid_str(void *gid);
+__H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroupId) /*pycomps_utils.h macro*/
 
 COMPS_DocGroupId* pycomps_gid_get(PyObject *pygid);
 PyObject* PyCOMPSGID_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int PyCOMPSGID_init(PyCOMPS_GID *self, PyObject *args, PyObject *kwds);
 PyObject* PyCOMPSGID_convert(void *gid);
 
-int PyCOMPSGIDs_init(PyCOMPS_CtoPySeq *self, PyObject *args, PyObject *kwds);
+int PyCOMPSGIDs_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds);
 
-extern PyCOMPS_CtoPySeqItemMan PyCOMPSGID_ItemMan;
-extern PyTypeObject PyCOMPS_GIDsType;
-extern PyTypeObject PyCOMPS_GIDType;
 
 #endif

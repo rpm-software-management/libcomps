@@ -39,10 +39,18 @@ void comps_docgroupid_destroy(COMPS_DocGroupId *gid) {
 COMPS_DESTROY_u(docgroupid, COMPS_DocGroupId) /*comps_utils.h macro*/
 
 
-void comps_docgroupid_set_name(COMPS_DocGroupId *gid, char *name) {
+COMPS_Object* comps_docgroupid_get_name(COMPS_DocGroupId *gid) {
+    return comps_object_incref((COMPS_Object*)gid->name);
+}
+void comps_docgroupid_set_name(COMPS_DocGroupId *gid, char *name, char copy) {
+    (void)copy;
     if (gid->name)
         COMPS_OBJECT_DESTROY(gid->name);
     gid->name = comps_str(name);
+}
+
+COMPS_Object* comps_docgroupid_get_default(COMPS_DocGroupId *gid) {
+    return (COMPS_Object*)comps_num(gid->def);
 }
 void comps_docgroupid_set_default(COMPS_DocGroupId *gid, int def) {
     gid->def = (def != 0);
@@ -64,12 +72,22 @@ char __comps_docgroupid_cmp_set(void *gid1, void *gid2) {
     return comps_docgroupid_cmp_u((COMPS_Object*)gid1,
                                   (COMPS_Object*)gid2);
 }
+char* comps_docgroupid_str_u(COMPS_Object* docgroupid) {
+    const int len = strlen("<COMPS_DocGroupId name='' default=''>");
+    char *name = comps_object_tostr((COMPS_Object*)((COMPS_DocGroupId*)docgroupid)->name);
+    char *def = ((COMPS_DocGroupId*)docgroupid)->def?"True":"False";
+    char *ret = malloc(sizeof(char)*(len+strlen(name)+strlen(def)+1));
+    sprintf(ret, "<COMPS_DocGroupId name='%s' default='%s'>", name, def);
+    free(name);
+    return ret;
+}
 
 COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo = {
     .obj_size = sizeof(COMPS_DocGroupId),
     .constructor = &comps_docgroupid_create_u,
     .destructor = &comps_docgroupid_destroy_u,
     .copy = &comps_docgroupid_copy_u,
-    .obj_cmp = &comps_docgroupid_cmp_u
+    .obj_cmp = &comps_docgroupid_cmp_u,
+    .to_str = &comps_docgroupid_str_u
 };
 

@@ -19,74 +19,8 @@
 
 #include "pycomps_categories.h"
 
-inline COMPS_DocCategory* pycomps_cat_gget(PyCOMPS_Category *pycat) {
-    return (COMPS_DocCategory*)pycat->citem->data;
-}
-inline COMPS_DocCategory* pycomps_cat_oget(PyObject *pycat) {
-    return (COMPS_DocCategory*)((PyCOMPS_Category*)pycat)->citem->data;
-}
-inline COMPS_DocCategoryExtra* pycomps_cat_get_extra(PyObject *pycat) {
-    return (COMPS_DocCategoryExtra*)
-           ((COMPS_DocCategory*)((PyCOMPS_Category*)pycat)->citem->data)
-           ->reserved;
-}
-inline COMPS_DocCategoryExtra* comps_cat_get_extra(void *doccat) {
-    return (COMPS_DocCategoryExtra*)((COMPS_DocCategory*)(doccat))->reserved;
-}
-inline COMPS_DocCategory** pycomps_cat_getp(PyObject *pycat) {
-    return (COMPS_DocCategory**)&((PyCOMPS_Category*)pycat)->citem->data;
-}
-
-inline void pycomps_cat_incref(PyObject * pycat) {
-    comps_cat_incref(pycomps_cat_oget(pycat));
-}
-
-inline void comps_cat_incref(void * cat) {
-    ctopy_citem_incref(comps_cat_get_extra(cat)->name_by_lang_citem);
-    ctopy_citem_incref(comps_cat_get_extra(cat)->desc_by_lang_citem);
-    ctopy_citem_incref(comps_cat_get_extra(cat)->group_ids_citem);
-    ctopy_citem_incref(comps_cat_get_extra(cat)->citem);
-}
-
-inline void pycomps_cat_decref(void * cat) {
-    ctopy_citem_decref(comps_cat_get_extra(cat)->name_by_lang_citem);
-    ctopy_citem_decref(comps_cat_get_extra(cat)->desc_by_lang_citem);
-    ctopy_citem_decref(comps_cat_get_extra(cat)->group_ids_citem);
-    ctopy_citem_decref(comps_cat_get_extra(cat)->citem);
-}
-
-COMPS_DocCategoryExtra * comps_doccategory_extra_create() {
-    COMPS_DocCategoryExtra *ret;
-    ret = malloc(sizeof(*ret));
-    return ret;
-}
-
-void comps_doccategory_extra_destroy(void *cdce)
-{
-    ctopy_citem_destroy(((COMPS_DocCategoryExtra*)cdce)->citem);
-    ctopy_citem_destroy(((COMPS_DocCategoryExtra*)cdce)->group_ids_citem);
-    ctopy_citem_destroy(((COMPS_DocCategoryExtra*)cdce)->name_by_lang_citem);
-    ctopy_citem_destroy(((COMPS_DocCategoryExtra*)cdce)->desc_by_lang_citem);
-    free(cdce);
-}
-
 PyObject* PyCOMPSCat_convert(void *c) {
-    PyObject *ret;
-    ret = PyCOMPSCat_new(&PyCOMPS_CatType, NULL, NULL);
-    PyCOMPSCat_init((PyCOMPS_Category*)ret, NULL, NULL);
-
-    pycomps_cat_decref(pycomps_cat_oget(ret));
-
-    ((PyCOMPS_Category*)ret)->citem = comps_cat_get_extra(c)->citem;
-    pycomps_cat_get_extra(ret)->group_ids_citem =
-                                        comps_cat_get_extra(c)->group_ids_citem;
-    pycomps_cat_get_extra(ret)->name_by_lang_citem =
-                                     comps_cat_get_extra(c)->name_by_lang_citem;
-    pycomps_cat_get_extra(ret)->desc_by_lang_citem =
-                                     comps_cat_get_extra(c)->desc_by_lang_citem;
-
-    pycomps_cat_incref(ret);
-    return ret;
+    (void)c;
 }
 
 PyObject* PyCOMPSCat_union(PyObject *self, PyObject *other) {
@@ -97,73 +31,47 @@ PyObject* PyCOMPSCat_union(PyObject *self, PyObject *other) {
         PyErr_SetString(PyExc_TypeError, "Not Category instance");
         return NULL;
     }
-    c = comps_doccategory_union(pycomps_cat_oget(self),
-                                pycomps_cat_oget(other));
+    c = comps_doccategory_union(((PyCOMPS_Category*)self)->cat,
+                                ((PyCOMPS_Category*)other)->cat);
     res = PyCOMPSCat_new(&PyCOMPS_CatType, NULL, NULL);
     PyCOMPSCat_init((PyCOMPS_Category*)res, NULL, NULL);
-    c->reserved = pycomps_cat_get_extra(res);
-    comps_doccategory_destroy(pycomps_cat_oget(res));
-    ((PyCOMPS_Category*)res)->citem->data = c;
-    pycomps_cat_get_extra(res)->group_ids_citem->data = c->group_ids;
-    pycomps_cat_get_extra(res)->name_by_lang_citem->data = c->name_by_lang;
-    pycomps_cat_get_extra(res)->desc_by_lang_citem->data = c->desc_by_lang;
+    COMPS_OBJECT_DESTROY(((PyCOMPS_Category*)res)->cat);
+    ((PyCOMPS_Category*)res)->cat = c;
     return res;
 }
 
 void PyCOMPSCat_dealloc(PyObject *self)
 {
-    pycomps_cat_decref(pycomps_cat_oget(self));
-    if (((PyCOMPS_Category*)self)->group_ids_pobj)
-        Py_XDECREF(((PyCOMPS_Category*)self)->group_ids_pobj);
-    if (((PyCOMPS_Category*)self)->name_by_lang_pobj)
-        Py_XDECREF(((PyCOMPS_Category*)self)->name_by_lang_pobj);
-    if (((PyCOMPS_Category*)self)->desc_by_lang_pobj)
-        Py_XDECREF(((PyCOMPS_Category*)self)->desc_by_lang_pobj);
+    #define _cat_ ((PyCOMPS_Category*)self)
+    Py_XDECREF(_cat_->p_group_ids);
+    Py_XDECREF(_cat_->p_name_by_lang);
+    Py_XDECREF(_cat_->p_desc_by_lang);
+    COMPS_OBJECT_DESTROY(_cat_->cat);
     Py_TYPE(self)->tp_free((PyObject*)self);
+    #undef _cat_
 }
-
-void pycomps_cat_destroy(void * cat) {
-    comps_dict_destroy(((COMPS_DocCategory*)cat)->properties);
-    free(((COMPS_DocCategory*)cat)->reserved);
-    free(cat);
-}
-
 
 PyObject* PyCOMPSCat_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyCOMPS_Category *self;
-    COMPS_DocCategory *cat;
     (void) args;
     (void) kwds;
 
     self = (PyCOMPS_Category*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        cat = comps_doccategory_create();
-        cat->reserved = (void*)comps_doccategory_extra_create();
-        ((COMPS_DocCategoryExtra*)(cat->reserved))->citem =\
-                                  ctopy_citem_create(cat, &pycomps_cat_destroy);
-        self->citem = ((COMPS_DocCategoryExtra*)cat->reserved)->citem;
-
-        ((COMPS_DocCategoryExtra*)(cat->reserved))->group_ids_citem =
-                                    ctopy_citem_create(cat->group_ids,
-                                                       &comps_list_destroy_v);
-        self->group_ids_pobj = NULL;
-
-        ((COMPS_DocCategoryExtra*)(cat->reserved))->name_by_lang_citem =
-                                    ctopy_citem_create(cat->name_by_lang,
-                                                       &comps_dict_destroy_v);
-        self->name_by_lang_pobj = NULL;
-
-        ((COMPS_DocCategoryExtra*)(cat->reserved))->desc_by_lang_citem =
-                                    ctopy_citem_create(cat->desc_by_lang,
-                                                       &comps_dict_destroy_v);
-        self->desc_by_lang_pobj = NULL;
+        self->cat = (COMPS_DocCategory*)comps_object_create(
+                                                    &COMPS_DocCategory_ObjInfo,
+                                                    NULL);
+        self->p_group_ids = NULL;
+        self->p_name_by_lang = NULL;
+        self->p_desc_by_lang = NULL;
     }
     return (PyObject*) self;
 }
 
 int PyCOMPSCat_init(PyCOMPS_Category *self, PyObject *args, PyObject *kwds)
 {
+    #define _cat_ ((PyCOMPS_Category*)self)->cat
     char *name, *id, *desc;
     unsigned disp_ord;
     static char *kwlist[] = {"id", "name", "desc", "display_order", NULL};
@@ -176,187 +84,98 @@ int PyCOMPSCat_init(PyCOMPS_Category *self, PyObject *args, PyObject *kwds)
     }
     else if (PyArg_ParseTupleAndKeywords(args, kwds, "|sssi", kwlist,
                                     &id, &name, &desc, &disp_ord)) {
-        comps_doccategory_set_id(pycomps_cat_gget(self), id, 1);
-        comps_doccategory_set_name(pycomps_cat_gget(self), name, 1);
-        comps_doccategory_set_desc(pycomps_cat_gget(self), desc, 1);
-        comps_doccategory_set_displayorder(pycomps_cat_gget(self), disp_ord);
+        comps_doccategory_set_id(_cat_, id, 1);
+        comps_doccategory_set_name(_cat_, name, 1);
+        comps_doccategory_set_desc(_cat_, desc, 1);
+        comps_doccategory_set_display_order(_cat_, disp_ord);
         return 0;
     }else {
         return -1;
     }
-}
-
-
-PyObject* comps_cat_str(void * cat) {
-    PyObject *ret, *tmp, *tmp2, *emptytmp;
-    const char *id, *name, *desc;
-    char *empty;
-    COMPS_ListItem *it;
-    COMPS_Prop *tmp_prop;
-    int disp_ord;
-
-    emptytmp = Py_TYPE(Py_None)->tp_str(Py_None);
-    if (PyUnicode_Check(emptytmp)) {
-        __pycomps_PyUnicode_AsString(emptytmp, &empty);
-    } else {
-        empty = PyBytes_AsString(emptytmp);
-    }
-
-    tmp_prop = __comps_doccat_get_prop(cat, "id");
-    id = (tmp_prop)?tmp_prop->prop.str:empty;
-    tmp_prop = __comps_doccat_get_prop(cat, "name");
-    name = (tmp_prop)?tmp_prop->prop.str:empty;
-    tmp_prop = __comps_doccat_get_prop(cat, "desc");
-    desc = (tmp_prop)?tmp_prop->prop.str:empty;
-    tmp_prop = __comps_doccat_get_prop(cat, "display_order");
-    disp_ord = (tmp_prop)?tmp_prop->prop.num:0;
-
-    ret = PyUnicode_FromFormat("<COMPS_Category: id='%s', name='%s', "
-                          "description='%s', display_order=%d, name_by_lang=",
-                              id, name, desc, disp_ord);
-    if (PyUnicode_Check(emptytmp)) {
-        free(empty);
-    }
-    Py_XDECREF(emptytmp);
-    tmp2 = comps_lang_str(((COMPS_DocGroup*)cat)->name_by_lang);
-    tmp = PyUnicode_Concat(ret, tmp2);
-    Py_XDECREF(tmp2);
-    Py_XDECREF(ret);
-    ret = tmp;
-
-    tmp2 =PyUnicode_FromString(", desc_by_lang=");
-    tmp = PyUnicode_Concat(ret, tmp2);
-    Py_XDECREF(ret);
-    Py_XDECREF(tmp2);
-    ret = tmp;
-
-    tmp2 = comps_lang_str(((COMPS_DocGroup*)cat)->desc_by_lang);
-    tmp = PyUnicode_Concat(ret, tmp2);
-    Py_XDECREF(tmp2);
-    Py_XDECREF(ret);
-    ret = tmp;
-
-    tmp2 = PyUnicode_FromString(", group_ids=[");
-    tmp = PyUnicode_Concat(ret, tmp2);
-    Py_XDECREF(ret);
-    Py_XDECREF(tmp2);
-    ret = tmp;
-    it = (((COMPS_DocCategory*)cat)->group_ids)?
-         ((COMPS_DocCategory*)cat)->group_ids->first:NULL;
-    for (; it != ((COMPS_DocCategory*)cat)->group_ids->last; it = it->next){
-        if (((COMPS_DocGroupId*)it->data)->def) {
-            tmp2 =PyUnicode_FromFormat("['%s' default=true], ",
-                                       ((COMPS_DocGroupId*)it->data)->name);
-        } else {
-            tmp2 =PyUnicode_FromFormat("'%s', ",
-                                       ((COMPS_DocGroupId*)it->data)->name);
-        }
-        Py_XDECREF(tmp2);
-        Py_XDECREF(ret);
-        ret = tmp;
-    }
-    if (it) {
-        if (((COMPS_DocGroupId*)it->data)->def) {
-            tmp2 = PyUnicode_FromFormat("['%s' default=true]",
-                                       ((COMPS_DocGroupId*)it->data)->name);
-        } else {
-            tmp2 = PyUnicode_FromFormat("'%s'",
-                                       ((COMPS_DocGroupId*)it->data)->name);
-        }
-    } else {
-        tmp2 = PyUnicode_FromString("]");
-    }
-    tmp = PyUnicode_Concat(ret,tmp2);
-    Py_DECREF(tmp2);
-    Py_DECREF(ret);
-    ret = tmp;
-
-    tmp2 = PyUnicode_FromString(">");
-    tmp = PyUnicode_Concat(ret, tmp2);
-    Py_XDECREF(ret);
-    Py_XDECREF(tmp2);
-    ret = tmp;
-    return ret;
+    #undef _cat_
 }
 
 PyObject* PyCOMPSCat_str(PyObject *self) {
-    return comps_cat_str(pycomps_cat_oget(self));
+    return PyUnicode_FromString(comps_object_tostr((COMPS_Object*)
+                                               ((PyCOMPS_Category*)self)->cat));
 }
 
-void comps_cat_print(FILE *f, void *c) {
-    COMPS_ListItem *it;
+int PyCOMPSCat_print(PyObject *self, FILE *f, int flags) {
+    #define _cat_ ((PyCOMPS_Category*)self)
+    COMPS_ObjListIt *it;
     COMPS_HSList *pairlist;
     COMPS_HSListItem *hsit;
-    char *id, *name, *desc;
-    int disp_ord;
-    COMPS_Prop *tmp_prop;
+    char *id, *name, *desc, *disp_ord;
+    COMPS_Object *tmp_prop;
 
-    tmp_prop = __comps_doccat_get_prop(c, "id");
-    id = (tmp_prop)?tmp_prop->prop.str:NULL;
-    tmp_prop = __comps_doccat_get_prop(c, "name");
-    name = (tmp_prop)?tmp_prop->prop.str:NULL;
-    tmp_prop = __comps_doccat_get_prop(c, "desc");
-    desc = (tmp_prop)?tmp_prop->prop.str:NULL;
-    tmp_prop = __comps_doccat_get_prop(c, "display_order");
-    disp_ord = (tmp_prop)?tmp_prop->prop.num:0;
+    (void)flags;
+
+    tmp_prop = comps_doccategory_get_id(_cat_->cat);
+    id = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    tmp_prop = comps_doccategory_get_name(_cat_->cat);
+    name = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    tmp_prop = comps_doccategory_get_desc(_cat_->cat);
+    desc = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    tmp_prop = comps_doccategory_get_display_order(_cat_->cat);
+    disp_ord = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
 
     fprintf(f, "<COMPS_Category: id='%s', name='%s', description='%s', "
-            " display_order=%d, ", id, name, desc, disp_ord);
+            " display_order=%s, ", id, name, desc, disp_ord);
     fprintf(f, "name_by_lang={");
-    pairlist = comps_rtree_pairs(((COMPS_DocCategory*)c)->name_by_lang);
+    pairlist = comps_objrtree_pairs(_cat_->cat->name_by_lang);
     for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
-        printf("'%s': '%s', ", ((COMPS_RTreePair*)hsit->data)->key,
-                               (char*)((COMPS_RTreePair*)hsit->data)->data);
+        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key,
+                               (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
     }
     if (hsit)
-        printf("'%s': '%s'}", ((COMPS_RTreePair*)hsit->data)->key,
-                               (char*)((COMPS_RTreePair*)hsit->data)->data);
+        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key,
+                               (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
     else
         printf("}");
     comps_hslist_destroy(&pairlist);
 
     fprintf(f, ", desc_by_lang={");
-    pairlist = comps_rtree_pairs(((COMPS_DocCategory*)c)->desc_by_lang);
+    pairlist = comps_objrtree_pairs(_cat_->cat->desc_by_lang);
     for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
-        printf("'%s': '%s', ", ((COMPS_RTreePair*)hsit->data)->key,
-                               (char*)((COMPS_RTreePair*)hsit->data)->data);
+        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key,
+                               (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
     }
     if (hsit)
-        printf("'%s': '%s'}", ((COMPS_RTreePair*)hsit->data)->key,
-                               (char*)((COMPS_RTreePair*)hsit->data)->data);
+        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key,
+                               (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
     else
         printf("}");
     comps_hslist_destroy(&pairlist);
 
     fprintf(f, ", group_ids=[");
-    if (((COMPS_DocCategory*)c)->group_ids) {
-        for (it = (((COMPS_DocCategory*)c)->group_ids)->first; it != NULL &&
-             it != ((COMPS_DocCategory*)c)->group_ids->last; it = it->next){
-            if (((COMPS_DocGroupId*)it->data)->def) {
-                fprintf(f, "['%s' default=true], ",
-                           ((COMPS_DocGroupId*)it->data)->name);
+    if (_cat_->cat->group_ids) {
+        for (it = _cat_->cat->group_ids->first; it != NULL &&
+             it != _cat_->cat->group_ids->last; it = it->next){
+            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
+                name = comps_object_tostr(it->comps_obj);
+                fprintf(f, "['%s' default=true], ", name);
+                free(name);
             } else {
-                fprintf(f, "'%s', ",
-                        ((COMPS_DocGroupId*)it->data)->name);
+                name = comps_object_tostr(it->comps_obj);
+                fprintf(f, "'%s', ", name);
+                free(name);
             }
         }
         if (it) {
-            if (((COMPS_DocGroupId*)it->data)->def) {
-                fprintf(f, "['%s' default=true]",
-                           ((COMPS_DocGroupId*)it->data)->name);
+            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
+                name = comps_object_tostr(it->comps_obj);
+                fprintf(f, "['%s' default=true]", name);
+                free(name);
             } else {
-                fprintf(f, "'%s'",
-                        ((COMPS_DocGroupId*)it->data)->name);
+                name = comps_object_tostr(it->comps_obj);
+                fprintf(f, "'%s'", name);
+                free(name);
             }
         }
     }
     fprintf(f, "]>");
-}
-
-int PyCOMPSCat_print(PyObject *self, FILE *f, int flags) {
-    (void) flags;
-    comps_cat_print(f, pycomps_cat_oget(self));
     return 0;
+    #undef _cat_
 }
 
 PyObject* PyCOMPSCat_cmp(PyObject *self, PyObject *other, int op) {
@@ -371,7 +190,8 @@ PyObject* PyCOMPSCat_cmp(PyObject *self, PyObject *other, int op) {
     }
     CMP_NONE_CHECK(op, self, other)
 
-    ret = comps_doccategory_cmp(pycomps_cat_oget(self), pycomps_cat_oget(other));
+    ret = COMPS_OBJECT_CMP(((PyCOMPS_Category*)self)->cat,
+                           ((PyCOMPS_Category*)self)->cat);
     if (op == Py_EQ) {
         if (!ret) Py_RETURN_FALSE;
     } else {
@@ -380,66 +200,19 @@ PyObject* PyCOMPSCat_cmp(PyObject *self, PyObject *other, int op) {
     Py_RETURN_TRUE;
 }
 
-PyObject* PyCOMPSCat_get_groupids(PyCOMPS_Category *self, void *closure) {
-    (void) closure;
-    PyObject *ret;
-    if (!self->group_ids_pobj) {
-        ret = PyCOMPSCtoPySeq_new(&PyCOMPS_GIDsType, NULL, NULL);
-        PyCOMPSGIDs_init((PyCOMPS_CtoPySeq*)ret, NULL, NULL);
-        if (pycomps_cat_gget(self)->group_ids == NULL) {
-            pycomps_cat_gget(self)->group_ids = comps_list_create();
-            comps_list_init(pycomps_cat_gget(self)->group_ids);
-            pycomps_cat_get_extra((PyObject*)self)->group_ids_citem->data =
-                                    pycomps_cat_gget(self)->group_ids;
-        }
-        ctopy_citem_destroy(((PyCOMPS_Sequence*)ret)->citem);
-        ((PyCOMPS_CtoPySeq*)ret)->citem =
-                        pycomps_cat_get_extra((PyObject*)self)->group_ids_citem;
-        self->group_ids_pobj = ret;
-        ctopy_citem_incref(((PyCOMPS_CtoPySeq*)ret)->citem);
-        Py_INCREF(ret);
-    } else {
-        ret = self->group_ids_pobj;
-        
-        Py_INCREF(ret);
-    }
-    return  ret;
-}
-
-int PyCOMPSCat_set_groupids(PyCOMPS_Category *self,
-                                  PyObject *value, void *closure) {
-    (void) closure;
-    if (!value) {
-        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute group_list");
-        return -1;
-    }
-    if (value->ob_type != &PyCOMPS_GIDsType) {
-        PyErr_SetString(PyExc_TypeError, "Not GroupIds instance");
-        return -1;
-    }
-    ctopy_citem_decref(pycomps_cat_get_extra((PyObject*)self)->group_ids_citem);
-    pycomps_cat_get_extra((PyObject*)self)->group_ids_citem =
-                                              ((PyCOMPS_Sequence*)value)->citem;
-    ctopy_citem_incref(pycomps_cat_get_extra((PyObject*)self)->group_ids_citem);
-    pycomps_cat_gget(self)->group_ids =
-                    (COMPS_List*)((PyCOMPS_Sequence*)value)->citem->data;
-    if (self->group_ids_pobj) {
-        Py_XDECREF(self->group_ids_pobj);
-    }
-    self->group_ids_pobj = value;
-    Py_INCREF(value);
-    return 0;
-}
-
 inline PyObject* PyCOMPSCat_get_name_by_lang(PyObject *self, void *closure) {
     (void)closure;
-    return pycomps_lang_get_dict(pycomps_cat_get_extra(self)->name_by_lang_citem,
-                                 &((PyCOMPS_Category*)self)->name_by_lang_pobj);
+    (void)self;
+//    return pycomps_lang_get_dict(pycomps_cat_get_extra(self)->name_by_lang_citem,
+//                                 &((PyCOMPS_Category*)self)->name_by_lang_pobj);
 }
 
 inline int PyCOMPSCat_set_name_by_lang(PyObject *self, PyObject *value,
                                                                 void *closure) {
-    if (!value) {
+    (void)closure;
+    (void)self;
+    (void)value;
+/*    if (!value) {
         PyErr_Format(PyExc_TypeError, "Cannot remove attribute '%s'",(char*)closure);
         return -1;
     }
@@ -447,17 +220,24 @@ inline int PyCOMPSCat_set_name_by_lang(PyObject *self, PyObject *value,
                                  &((PyCOMPS_Category*)self)->name_by_lang_pobj,
                                  value,
                        (void**)&pycomps_cat_oget(self)->name_by_lang);
+*/
 }
 
 inline PyObject* PyCOMPSCat_get_desc_by_lang(PyObject *self, void *closure) {
-    (void) closure;
+    (void)closure;
+    (void)self;
+/*    (void) closure;
     return pycomps_lang_get_dict(pycomps_cat_get_extra(self)->desc_by_lang_citem,
                                  &((PyCOMPS_Category*)self)->desc_by_lang_pobj);
+*/
 }
 
 inline int PyCOMPSCat_set_desc_by_lang(PyObject *self, PyObject *value,
                                                               void *closure) {
-    if (!value) {
+    (void)closure;
+    (void)self;
+    (void)value;
+/*    if (!value) {
         PyErr_Format(PyExc_TypeError, "Cannot remove attribute '%s'",(char*)closure);
         return -1;
     }
@@ -465,44 +245,40 @@ inline int PyCOMPSCat_set_desc_by_lang(PyObject *self, PyObject *value,
                                  &((PyCOMPS_Category*)self)->desc_by_lang_pobj,
                                  value,
                        (void**)&pycomps_cat_oget(self)->desc_by_lang);
+*/
 }
 
-int pycomps_cat_strattr_setter(PyObject *self, PyObject *val, void *closure) {
-    char *tmp;
-    COMPS_Prop *tmp_prop;
-    if (!val) {
-        PyErr_Format(PyExc_TypeError, "Cannot remove attribute '%s'",(char*)closure);
-        return -1;
-    }
+__COMPS_LIST_GETSET_CLOSURE(COMPS_DocCategory) DocCat_GroupIdsClosure = {
+    .get_f = &comps_doccategory_group_ids,
+    .set_f = &comps_doccategory_set_group_ids,
+    .p_offset = offsetof(PyCOMPS_Category, p_group_ids),
+    .c_offset = offsetof(PyCOMPS_Category, cat),
+    .list_init = &PyCOMPSGIDs_init
+};
 
-    if (__pycomps_stringable_to_char(val, &tmp) < 0) {
-        return -1;
-    }
-    tmp_prop = comps_dict_get(pycomps_cat_oget(self)->properties, (char*)closure);
-    if (!tmp_prop) {
-        if (tmp) {
-            tmp_prop = comps_doc_prop_str_create(tmp, 0);
-            comps_dict_set(pycomps_cat_oget(self)->properties,
-                           (char*)closure, tmp_prop);
-        }
-    } else {
-        if (tmp)
-            __comps_doc_char_setter((void**)&tmp_prop->prop.str, tmp, 0);
-        else {
-            comps_dict_unset(pycomps_cat_oget(self)->properties, (char*)closure);
-        }
-    }
-    return 0;
-}
+__COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocCategory) DocCategory_IdClosure = {
+    .get_f = &comps_doccategory_get_id,
+    .set_f = &comps_doccategory_set_id,
+    .c_offset = offsetof(PyCOMPS_Category, cat)
+};
 
-PyObject* pycomps_cat_strattr_getter(PyObject *self, void *closure) {
-    COMPS_Prop *tmp_prop;
-    tmp_prop = comps_dict_get(pycomps_cat_oget(self)->properties, (char*)closure);
-    if (tmp_prop != NULL)
-        return PyUnicode_FromString(tmp_prop->prop.str);
-    else
-        Py_RETURN_NONE;
-}
+__COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocCategory) DocCategory_NameClosure = {
+    .get_f = &comps_doccategory_get_name,
+    .set_f = &comps_doccategory_set_name,
+    .c_offset = offsetof(PyCOMPS_Category, cat)
+};
+
+__COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocCategory) DocCategory_DescClosure = {
+    .get_f = &comps_doccategory_get_desc,
+    .set_f = &comps_doccategory_set_desc,
+    .c_offset = offsetof(PyCOMPS_Category, cat)
+};
+
+__COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocCategory) DocCategory_DispOrdClosure = {
+    .get_f = &comps_doccategory_get_display_order,
+    .set_f = &comps_doccategory_set_display_order,
+    .c_offset = offsetof(PyCOMPS_Category, cat)
+};
 
 PyMemberDef PyCOMPSCat_members[] = {
     {NULL}};
@@ -513,38 +289,32 @@ PyMethodDef PyCOMPSCat_methods[] = {
 
 PyGetSetDef PyCOMPSCat_getset[] = {
     {"id",
-     (getter)pycomps_cat_strattr_getter, (setter)pycomps_cat_strattr_setter,
-     "Category id", "id"},
+     (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
+     "Category id", (void*)&DocCategory_IdClosure},
     {"name",
-     (getter)pycomps_cat_strattr_getter, (setter)pycomps_cat_strattr_setter,
-     "Category name", "name"},
+     (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
+     "Category name", (void*)&DocCategory_NameClosure},
     {"desc",
-     (getter)pycomps_cat_strattr_getter, (setter)pycomps_cat_strattr_setter,
-     "Category description", "desc"},
+     (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
+     "Category description", (void*)&DocCategory_DescClosure},
+    {"display_order",
+     (getter)__PyCOMPS_get_numattr, (setter)__PyCOMPS_set_numattr,
+     "Category display order attribute", (void*)&DocCategory_DispOrdClosure},
     {"group_ids",
-     (getter)PyCOMPSCat_get_groupids, (setter)PyCOMPSCat_set_groupids,
-     "Category group ids list", NULL},
+     (getter)__PyCOMPS_get_ids, (setter)__PyCOMPS_set_ids,
+     "Category group ids",
+     (void*)&DocCat_GroupIdsClosure},
     {"name_by_lang",
-     (getter)PyCOMPSCat_get_name_by_lang, (setter)PyCOMPSCat_set_name_by_lang,
-     "Category name locales", "name_by_lang"},
+    (getter)PyCOMPSCat_get_name_by_lang, (setter)PyCOMPSCat_set_name_by_lang,
+     "Category name locales", NULL},
     {"desc_by_lang",
-     (getter)PyCOMPSCat_get_desc_by_lang, (setter)PyCOMPSCat_set_desc_by_lang,
-     "Category description locales", "desc_by_lang"},
+    (getter)PyCOMPSCat_get_desc_by_lang, (setter)PyCOMPSCat_set_desc_by_lang,
+     "Category description locales", NULL},
     {NULL}  /* Sentinel */
 };
 
 PyNumberMethods PyCOMPSCat_Nums = {
     .nb_add = PyCOMPSCat_union
-};
-
-PyCOMPS_CtoPySeqItemMan PyCOMPSCat_ItemMan = {
-    .item_type = &PyCOMPS_CatType,
-    .ctopy_convert = PyCOMPSCat_convert,
-    .data_decref = pycomps_cat_decref,
-    .data_incref = comps_cat_incref,
-    .data_cmp = comps_doccategory_cmp_v,
-    .fprint_f = comps_cat_print,
-    .str_f = comps_cat_str
 };
 
 PyTypeObject PyCOMPS_CatType = {
@@ -588,89 +358,86 @@ PyTypeObject PyCOMPS_CatType = {
     &PyCOMPSCat_new,                 /* tp_new */};
 
 
-int PyCOMPSCats_init(PyCOMPS_CtoPySeq *self, PyObject *args, PyObject *kwds)
+COMPS_Object* comps_cats_in(PyObject *item) {
+    return comps_object_incref((COMPS_Object*)((PyCOMPS_Category*)item)->cat);
+}
+
+PyObject* comps_cats_out(COMPS_Object *cobj) {
+    PyCOMPS_Category *ret;
+    ret = (PyCOMPS_Category*)PyCOMPSCat_new(&PyCOMPS_CatType, NULL, NULL);
+    PyCOMPSCat_init(ret, NULL, NULL);
+    COMPS_OBJECT_DESTROY(ret->cat);
+    ret->cat = (COMPS_DocCategory*)cobj;
+    return (PyObject*)ret;
+}
+
+PyCOMPS_SeqInfo PyCOMPS_CatsInfo = {
+    .itemtypes = (PyTypeObject*[]){&PyCOMPS_CatType},
+    .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
+                        {&comps_cats_in},
+    .out_convert_func = &comps_cats_out,
+    .item_types_len = 1
+};
+
+int PyCOMPSCats_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
 {
     (void) args;
     (void) kwds;
-    self->item_man = &PyCOMPSCat_ItemMan;
+    self->it_info = &PyCOMPS_CatsInfo;
     return 0;
 }
 
-COMPS_List* comps_cats_union(COMPS_List *cats1, COMPS_List *cats2) {
-    COMPS_ListItem *it, *newit;
-    COMPS_HSListItem *hsit;
+COMPS_ObjList* comps_cats_union(COMPS_ObjList *cats1, COMPS_ObjList *cats2) {
+    COMPS_ObjListIt *it;
     COMPS_Set *set;
-    COMPS_List *res;
-    COMPS_DocCategory *tmpcat, *tmpcat2, *unicat;
+    COMPS_DocCategory *tmpcat;
+    COMPS_HSListItem *hsit;
+    COMPS_ObjList *ret;
+    void *tmpdata;
 
-    res = comps_list_create();
-    comps_list_init(res);
+    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_doccategory_idcmp);
-
-    it = cats1?cats1->first:NULL;
-    for (; it != NULL; it = it->next) {
-        comps_cat_incref(it->data);
-        comps_set_add(set, it->data);
+    for (it = cats1 ? cats1->first : NULL; it != NULL; it = it->next) {
+        comps_set_add(set, comps_object_copy(it->comps_obj));
     }
-
-    it = cats2?cats2->first:NULL;
-    for (; it != NULL; it = it->next) {
-        tmpcat = it->data;
-        if (tmpcat->group_ids == NULL) {
-            tmpcat->group_ids = comps_list_create();
-            comps_list_init(tmpcat->group_ids);
-            comps_cat_get_extra(tmpcat)->group_ids_citem->data =
-                                                         tmpcat->group_ids;
-        }
-        if (comps_set_in(set, tmpcat)) {
-            tmpcat2 = (COMPS_DocCategory*)comps_set_data_at(set, tmpcat);
-            unicat = comps_doccategory_union(tmpcat, tmpcat2);
-            unicat->reserved = comps_doccategory_extra_create();
-            ((COMPS_DocCategoryExtra*)(unicat->reserved))->citem =
-                               ctopy_citem_create(unicat, &pycomps_cat_destroy);
-            ((COMPS_DocCategoryExtra*)(unicat->reserved))->group_ids_citem =
-                                        ctopy_citem_create(unicat->group_ids,
-                                                           &comps_list_destroy_v);
-            ((COMPS_DocCategoryExtra*)(unicat->reserved))->name_by_lang_citem =
-                                        ctopy_citem_create(unicat->name_by_lang,
-                                                           &comps_dict_destroy_v);
-            ((COMPS_DocCategoryExtra*)(unicat->reserved))->desc_by_lang_citem =
-                                        ctopy_citem_create(unicat->desc_by_lang,
-                                                           &comps_dict_destroy_v);
-            pycomps_cat_decref(tmpcat2);
-            comps_set_remove(set, tmpcat2);
-            comps_set_add(set, unicat);
-        } else {
-            comps_cat_incref((void*)tmpcat);
+    for (it = cats2 ? cats2->first : NULL; it != NULL; it = it->next) {
+        if (comps_set_in(set, it->comps_obj)) {
+            tmpcat = comps_doccategory_union(
+                                (COMPS_DocCategory*)it->comps_obj,
+                                (COMPS_DocCategory*)comps_set_data_at(set,
+                                                                it->comps_obj));
+            tmpdata = comps_set_data_at(set, it->comps_obj);
+            comps_set_remove(set, it->comps_obj);
+            comps_object_destroy((COMPS_Object*)tmpdata);
             comps_set_add(set, tmpcat);
+        } else {
+            comps_set_add(set, comps_object_copy(it->comps_obj));
         }
     }
     for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
-        newit = comps_list_item_create(hsit->data, NULL, &pycomps_cat_decref);
-        comps_list_append(res, newit);
+        comps_objlist_append_x(ret, (COMPS_Object*)hsit->data);
     }
     comps_set_destroy(&set);
-    return res;
-
+    return ret;
 }
 
 PyObject* PyCOMPSCats_union(PyObject *self, PyObject *other) {
-    PyCOMPS_CtoPySeq *res;
-    COMPS_List *res_list;
+    PyCOMPS_Sequence *res;
+    COMPS_ObjList *res_list;
 
     if (other == NULL || Py_TYPE(other) != &PyCOMPS_CatsType) {
         PyErr_Format(PyExc_TypeError, "Not %s instance", Py_TYPE(self)->tp_name);
         return NULL;
     }
 
-    res = (PyCOMPS_CtoPySeq*) Py_TYPE(self)->tp_new(Py_TYPE(self), NULL, NULL);
+    res = (PyCOMPS_Sequence*) Py_TYPE(self)->tp_new(Py_TYPE(self), NULL, NULL);
     PyCOMPSCats_init(res, NULL, NULL);
-
-    res_list = comps_cats_union(ctopy_get_list(self), ctopy_get_list(other));
-    comps_list_destroy((COMPS_List**)&res->citem->data);
-    res->citem->data = res_list;
+    res_list = comps_cats_union(((PyCOMPS_Sequence*)self)->list,
+                                ((PyCOMPS_Sequence*)other)->list);
+    COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)res)->list);
+    res->list = res_list;
     return (PyObject*)res;
 }
 
@@ -688,9 +455,9 @@ PyNumberMethods PyCOMPSCats_Nums = {
 PyTypeObject PyCOMPS_CatsType = {
     PY_OBJ_HEAD_INIT
     "libcomps.CategoryList",   /*tp_name*/
-    sizeof(PyCOMPS_CtoPySeq), /*tp_basicsize*/
+    sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     sizeof(PyCOMPS_Category),   /*tp_itemsize*/
-    (destructor)PyCOMPSCtoPySeq_dealloc, /*tp_dealloc*/
+    (destructor)PyCOMPSSeq_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -701,7 +468,7 @@ PyTypeObject PyCOMPS_CatsType = {
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
-    PyCOMPSCtoPySeq_str,           /*tp_str*/
+    PyCOMPSSeq_str,           /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
@@ -709,18 +476,18 @@ PyTypeObject PyCOMPS_CatsType = {
     "Comps Category list",           /* tp_doc */
     0,                    /* tp_traverse */
     0,                     /* tp_clear */
-    &PyCOMPSCtoPySeq_cmp,       /* tp_richcompare */
+    &PyCOMPSSeq_cmp,       /* tp_richcompare */
     0,                     /* tp_weaklistoffset */
     0,                     /* tp_iter */
     0,                     /* tp_iternext */
     PyCOMPSCats_methods,        /* tp_methods */
     PyCOMPSCats_members,        /* tp_members */
     0,                         /* tp_getset */
-    &PyCOMPS_CtoPySeqType,           /* tp_base */
+    &PyCOMPS_SeqType,           /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
     (initproc)PyCOMPSCats_init,      /* tp_init */
     0,                               /* tp_alloc */
-    &PyCOMPSCtoPySeq_new,                 /* tp_new */};
+    &PyCOMPSSeq_new,                 /* tp_new */};

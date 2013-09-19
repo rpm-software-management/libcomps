@@ -150,12 +150,12 @@ START_TEST(test_comps_doc_basic)
         for (int x=0; x<4; x++) {
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-            comps_docpackage_set_name(p, (char*)group_mpackages[i][x]);
+            comps_docpackage_set_name(p, (char*)group_mpackages[i][x],1 );
             comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY);
             comps_docgroup_add_package(g, p);
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-            comps_docpackage_set_name(p, (char*)group_opackages[i][x]);
+            comps_docpackage_set_name(p, (char*)group_opackages[i][x], 1);
             comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL);
             comps_docgroup_add_package(g, p);
         }
@@ -168,7 +168,7 @@ START_TEST(test_comps_doc_basic)
         comps_doccategory_set_name(c, (char*)cats_names[i], 1);
         for (int x=0; x<3; x++) {
             gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
-            comps_docgroupid_set_name(gid, (char*)cat_gids[i][x]);
+            comps_docgroupid_set_name(gid, (char*)cat_gids[i][x], 1);
             comps_doccategory_add_groupid(c, gid);
         }
         comps_doc_add_category(doc, c);
@@ -267,12 +267,12 @@ START_TEST(test_comps_doc_setfeats)
         for (int x=0; x<4; x++) {
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-            comps_docpackage_set_name(p, (char*)group_mpackages[i][x]);
+            comps_docpackage_set_name(p, (char*)group_mpackages[i][x], 1);
             comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY);
             comps_docgroup_add_package(g, p);
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-            comps_docpackage_set_name(p, (char*)group_opackages[i][x]);
+            comps_docpackage_set_name(p, (char*)group_opackages[i][x], 1);
             comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL);
             comps_docgroup_add_package(g, p);
         }
@@ -284,12 +284,12 @@ START_TEST(test_comps_doc_setfeats)
         comps_docenv_set_name(e, (char*)envs_names[i], 1);
         for (int x=0; x<3; x++) {
             gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
-            comps_docgroupid_set_name(gid, (char*)env_gids[i][x]);
+            comps_docgroupid_set_name(gid, (char*)env_gids[i][x], 1);
             comps_docenv_add_groupid(e, gid);
         }
         for (int x=0; x<4; x++) {
             gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
-            comps_docgroupid_set_name(gid, (char*)env_opts[i][x]);
+            comps_docgroupid_set_name(gid, (char*)env_opts[i][x], 1);
             comps_docenv_add_optionid(e, gid);
         }
         comps_doc_add_environment(doc, e);
@@ -301,7 +301,7 @@ START_TEST(test_comps_doc_setfeats)
         for (int x=0; x<3; x++) {
             gid = (COMPS_DocGroupId*)comps_object_create(
                                                &COMPS_DocGroupId_ObjInfo, NULL);
-            comps_docgroupid_set_name(gid, (char*)cat_gids[i][x]);
+            comps_docgroupid_set_name(gid, (char*)cat_gids[i][x], 1);
             comps_doccategory_add_groupid(c, gid);
         }
         comps_doc_add_category(doc, c);
@@ -318,12 +318,12 @@ START_TEST(test_comps_doc_setfeats)
         for (int x=0; x<4; x++) {
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-            comps_docpackage_set_name(p, (char*)group_mpackages2[i][x]);
+            comps_docpackage_set_name(p, (char*)group_mpackages2[i][x], 1);
             comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY);
             comps_docgroup_add_package(g, p);
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-            comps_docpackage_set_name(p, (char*)group_opackages2[i][x]);
+            comps_docpackage_set_name(p, (char*)group_opackages2[i][x], 1);
             comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL);
             comps_docgroup_add_package(g, p);
         }
@@ -335,12 +335,12 @@ START_TEST(test_comps_doc_setfeats)
         comps_docenv_set_name(e, (char*)envs_names2[i], 1);
         for (int x=0; x<3; x++) {
             gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
-            comps_docgroupid_set_name(gid, (char*)env_gids2[i][x]);
+            comps_docgroupid_set_name(gid, (char*)env_gids2[i][x], 1);
             comps_docenv_add_groupid(e, gid);
         }
         for (int x=0; x<4; x++) {
             gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
-            comps_docgroupid_set_name(gid, (char*)env_opts2[i][x]);
+            comps_docgroupid_set_name(gid, (char*)env_opts2[i][x], 1);
             comps_docenv_add_optionid(e, gid);
         }
         comps_doc_add_environment(doc2, e);
@@ -351,7 +351,7 @@ START_TEST(test_comps_doc_setfeats)
         comps_doccategory_set_name(c, (char*)cats_names2[i], 1);
         for (int x=0; x<3; x++) {
             gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
-            comps_docgroupid_set_name(gid, (char*)cat_gids2[i][x]);
+            comps_docgroupid_set_name(gid, (char*)cat_gids2[i][x], 1);
             comps_doccategory_add_groupid(c, gid);
         }
         comps_doc_add_category(doc2, c);
@@ -498,12 +498,12 @@ START_TEST(test_comps_doc_xml)
         for (int x=0; x<4; x++) {
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-            comps_docpackage_set_name(p, (char*)group_mpackages[i][x]);
+            comps_docpackage_set_name(p, (char*)group_mpackages[i][x], 1);
             comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY);
             comps_docgroup_add_package(g, p);
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-            comps_docpackage_set_name(p, (char*)group_opackages[i][x]);
+            comps_docpackage_set_name(p, (char*)group_opackages[i][x], 1);
             comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL);
             comps_docgroup_add_package(g, p);
         }
@@ -517,7 +517,7 @@ START_TEST(test_comps_doc_xml)
         comps_doccategory_set_name(c, (char*)cats_names[i], 1);
         for (int x=0; x<3; x++) {
             gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
-            comps_docgroupid_set_name(gid, (char*)cat_gids[i][x]);
+            comps_docgroupid_set_name(gid, (char*)cat_gids[i][x], 1);
             comps_doccategory_add_groupid(c, gid);
         }
         comps_doc_add_category(doc, c);
@@ -549,12 +549,12 @@ START_TEST(test_comps_doc_union)
     
     p = (COMPS_DocGroupPackage*)
         comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-    comps_docpackage_set_name(p, "package1");
+    comps_docpackage_set_name(p, "package1", 1);
     
     comps_docgroup_add_package(g1, p);
     p = (COMPS_DocGroupPackage*)
         comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-    comps_docpackage_set_name(p, "package2");
+    comps_docpackage_set_name(p, "package2", 1);
     comps_docgroup_add_package(g1, p);
 
     g2 = (COMPS_DocGroup*)comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
@@ -562,11 +562,11 @@ START_TEST(test_comps_doc_union)
     comps_docgroup_set_name(g2, "group2", 1);
     p = (COMPS_DocGroupPackage*)
         comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-    comps_docpackage_set_name(p, "package3");
+    comps_docpackage_set_name(p, "package3", 1);
     comps_docgroup_add_package(g2, p);
     p = (COMPS_DocGroupPackage*)
         comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
-    comps_docpackage_set_name(p, "package4");
+    comps_docpackage_set_name(p, "package4", 1);
     comps_docgroup_add_package(g2, p);
 
     g3 = comps_docgroup_union(g1, g2);
@@ -580,10 +580,10 @@ START_TEST(test_comps_doc_union)
     comps_doccategory_set_name(c1, "category 1", 1);
     comps_doccategory_set_desc(c1, "cat desc 1", 1);
     gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
-    comps_docgroupid_set_name(gid, "g1");
+    comps_docgroupid_set_name(gid, "g1", 1);
     comps_doccategory_add_groupid(c1, gid);
     gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
-    comps_docgroupid_set_name(gid, "g2");
+    comps_docgroupid_set_name(gid, "g2", 1);
     comps_doccategory_add_groupid(c1, gid);
 
     c2 = (COMPS_DocCategory*)comps_object_create(&COMPS_DocCategory_ObjInfo, NULL);
@@ -591,10 +591,10 @@ START_TEST(test_comps_doc_union)
     comps_doccategory_set_name(c2, "category 1", 1);
     comps_doccategory_set_desc(c2, "cat desc 1", 1);
     gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
-    comps_docgroupid_set_name(gid, "g1");
+    comps_docgroupid_set_name(gid, "g1", 1);
     comps_doccategory_add_groupid(c2, gid);
     gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
-    comps_docgroupid_set_name(gid, "g2");
+    comps_docgroupid_set_name(gid, "g2", 1);
     comps_doccategory_add_groupid(c2, gid);
 
     c3 = comps_doccategory_union(c1, c2);

@@ -34,7 +34,10 @@ HEAD_COMPS_DESTROY_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
 
 char __comps_docgroupid_cmp_set(void *gid1, void *gid2);
 
-void comps_docgroupid_set_name(COMPS_DocGroupId *gid, char *name);
+COMPS_Object* comps_docgroupid_get_name(COMPS_DocGroupId *gid);
+void comps_docgroupid_set_name(COMPS_DocGroupId *gid, char *name, char copy);
+
+void comps_docgroupid_set_name(COMPS_DocGroupId *gid, char *name, char copy);
 void comps_docgroupid_set_default(COMPS_DocGroupId *gid, int def);
 
 extern COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo;

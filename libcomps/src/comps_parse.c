@@ -535,7 +535,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             //printf("list last group:%p\n", list_last_group);
             if (parsed->tmp_buffer) {
                 comps_docpackage_set_name((COMPS_DocGroupPackage*)list_last_group_package,
-                                          parsed->tmp_buffer);
+                                          parsed->tmp_buffer, 1);
                 free(parsed->tmp_buffer);
             }
             parsed->tmp_buffer = NULL;
@@ -614,7 +614,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                           list_last_cat->group_ids){
                     comps_docgroupid_set_name(
                         (COMPS_DocGroupId*)list_last_cat->group_ids->last->comps_obj,
-                        parsed->tmp_buffer);
+                        parsed->tmp_buffer, 1);
                 }
             } else if (grandparent == COMPS_ELEM_ENV) {
                 list = comps_doc_environments(parsed->comps_doc);
@@ -622,12 +622,12 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                     list_last_env->group_list != NULL) {
                     comps_docgroupid_set_name(
                      (COMPS_DocGroupId*)list_last_env->group_list->last->comps_obj,
-                            parsed->tmp_buffer);
+                            parsed->tmp_buffer, 1);
                 } else if (parent == COMPS_ELEM_OPTLIST &&
                            list_last_env->option_list != NULL) {
                     comps_docgroupid_set_name(
                      (COMPS_DocGroupId*)list_last_env->option_list->last->comps_obj,
-                            parsed->tmp_buffer);
+                            parsed->tmp_buffer, 2);
                 } else if (parent == COMPS_ELEM_GROUPLIST) {
                     comps_log_warning(parsed->log, parsed->tmp_buffer,
                                       COMPS_ERR_GROUPLIST_NOTSET,

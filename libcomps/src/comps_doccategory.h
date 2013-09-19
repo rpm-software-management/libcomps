@@ -50,6 +50,9 @@ HEAD_COMPS_PROP_GETTER(category, COMPS_DocCategory, name) /*comps_utils.h macro*
 HEAD_COMPS_PROP_GETTER(category, COMPS_DocCategory, desc) /*comps_utils.h macro*/
 HEAD_COMPS_PROP_GETTER(category, COMPS_DocCategory, display_order) /*comps_utils.h macro*/
 
+HEAD_COMPS_DOCOBJ_GETOBJLIST(doccategory, COMPS_DocCategory, group_ids, group_ids)
+HEAD_COMPS_DOCOBJ_SETOBJLIST(doccategory, COMPS_DocCategory, group_ids, group_ids)
+
 char __comps_doccategory_idcmp(void *c1, void *c2);
 signed char comps_doccategory_cmp_u(COMPS_Object *cat1, COMPS_Object *cat2);
 

@@ -21,7 +21,7 @@
 #define PYCOMPS_DICT_H
 
 #include "libcomps/comps_doc.h"
-#include "libcomps/comps_dict.h"
+#include "libcomps/comps_objdict.h"
 
 #include "pycomps_utils.h"
 #include "pycomps_ctopy.h"
@@ -32,12 +32,14 @@
 
 typedef struct PyCOMPS_Dict {
     PyObject_HEAD
-    PyCOMPS_CtoPy_CItem *citem;
+    COMPS_ObjDict *dict;
 } PyCOMPS_Dict;
 
 typedef struct PyCOMPS_DictIter{
     PyObject_HEAD
+    COMPS_ObjListIt *it;
     COMPS_HSListItem *hsit;
+    COMPS_ObjList *objlist;
     COMPS_HSList *hslist;
     PyObject* (*out_func)(COMPS_HSListItem *hsit);
 } PyCOMPS_DictIter;

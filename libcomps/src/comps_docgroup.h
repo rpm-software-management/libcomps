@@ -57,6 +57,9 @@ HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, uservisible) /*comps_utils.h macro
 HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, display_order) /*comps_utils.h macro*/
 HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
 
+HEAD_COMPS_DOCOBJ_GETOBJLIST(docgroup, COMPS_DocGroup, packages, packages)
+HEAD_COMPS_DOCOBJ_SETOBJLIST(docgroup, COMPS_DocGroup, packages, packages)
+
 signed char comps_docgroup_cmp_u(COMPS_Object *group1, COMPS_Object *group2);
 char __comps_docgroup_idcmp(void *g1, void *g2);
 

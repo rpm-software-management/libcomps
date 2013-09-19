@@ -21,15 +21,17 @@
 #define PYCOMPS_ENVS_H
 
 #include <Python.h>
+#include "structmember.h"
+
 #include "libcomps/comps_doc.h"
 #include "libcomps/comps_list.h"
-#include "structmember.h"
+
 #include "pycomps_sequence.h"
 #include "pycomps_gids.h"
 #include "pycomps_utils.h"
 #include "pycomps_23macros.h"
 #include "pycomps_dict.h"
-#include "pycomps_ctopy_seq.h"
+#include "pycomps_sequence.h"
 #include "pycomps_lang.h"
 
 /*typedef struct {
@@ -47,17 +49,8 @@ typedef struct {
     PyObject *p_desc_by_lang;
 } PyCOMPS_Env;
 
-typedef struct {
-    COMPS_Object *(*get_f)(COMPS_DocEnv*);
-    void (*set_f)(COMPS_DocEnv*, char*, char copy);
-} PyCOMPS_Env_PropGetSetClosure;
-
-typedef struct {
-    COMPS_ObjList *(*get_f)(COMPS_DocEnv*);
-    void (*set_f)(COMPS_DocEnv*, COMPS_ObjList*);
-    size_t p_offset;
-} PyCOMPS_Env_ListGetSetClosure;
-
+__H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocEnv) /*pycomps_utils.h macro*/
+__H_COMPS_LIST_GETSET_CLOSURE(COMPS_DocEnv) /*pycomps_utils.h macro*/
 
 COMPS_ObjList* comps_envs_union(COMPS_ObjList *envs1, COMPS_ObjList *envs2);
 
@@ -65,17 +58,13 @@ PyObject* PyCOMPSEnv_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int PyCOMPSEnvs_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds);
 
 int PyCOMPSEnv_init(PyCOMPS_Env *self, PyObject *args, PyObject *kwds);
-PyObject* PyCOMPSEnv_get_id(PyCOMPS_Env *self, void *closure);
-PyObject* PyCOMPSEnv_get_name(PyCOMPS_Env *self, void *closure);
-PyObject* PyCOMPSEnv_get_desc(PyCOMPS_Env *self, void *closure);
-int PyCOMPSEnv_set_id(PyCOMPS_Env *self, PyObject *value, void *closure);
-int PyCOMPSEnv_set_name(PyCOMPS_Env *self, PyObject *value, void *closure);
-int PyCOMPSEnv_set_desc(PyCOMPS_Env *self, PyObject *value, void *closure);
 
 PyObject* PyCOMPSEnv_get_name_by_lang(PyObject *self, void *closure);
 int PyCOMPSEnv_set_name_by_lang(PyObject *self, PyObject *value, void *closure);
 PyObject* PyCOMPSEnv_get_desc_by_lang(PyObject *self, void *closure);
 int PyCOMPSEnv_set_desc_by_lang(PyObject *self, PyObject *value, void *closure);
+
+PyObject* PyCOMPSEnvs_append(PyObject * self, PyObject *item);
 
 extern PyTypeObject PyCOMPS_EnvType;
 extern PyTypeObject PyCOMPS_EnvsType;

@@ -31,9 +31,6 @@
 #include "pycomps_envs.h"
 #include "pycomps_utils.h"
 #include "pycomps_dict.h"
-#include "pycomps_ctopy.h"
-#include "pycomps_ctopy_seq.h"
-#include "pycomps_ctopy_seq_iter.h"
 #include "pycomps_gids.h"
 
 #include <Python.h>

@@ -42,10 +42,15 @@ HEAD_COMPS_DESTROY_u(docpackage, COMPS_DocGroupPackagePackage)  /*comps_utils.h 
 signed char comps_docpackage_cmp_u(COMPS_Object *pkg1, COMPS_Object *pkg2);
 char comps_docpackage_cmp_set(void *pkg1, void *pkg2);
 
-void comps_docpackage_set_name(COMPS_DocGroupPackage *pkg, char *name);
-void comps_docpackage_set_requires(COMPS_DocGroupPackage *pkg, char *requires);
+COMPS_Object* comps_docpackage_get_name(COMPS_DocGroupPackage *pkg);
+void comps_docpackage_set_name(COMPS_DocGroupPackage *pkg, char *name, char copy);
+COMPS_Object* comps_docpackage_get_requires(COMPS_DocGroupPackage *pkg);
+void comps_docpackage_set_requires(COMPS_DocGroupPackage *pkg, char *requires, char copy);
+COMPS_Object* comps_docpackage_get_type(COMPS_DocGroupPackage *pkg);
 void comps_docpackage_set_type(COMPS_DocGroupPackage *pkg,
                                    COMPS_PackageType type);
+void comps_docpackage_set_type_i(COMPS_DocGroupPackage *pkg, int type);
+const char* comps_docpackage_type_str(COMPS_PackageType type);
 
 void comps_docpackage_xml(COMPS_DocGroupPackage *package,
                           xmlTextWriterPtr writer,

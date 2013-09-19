@@ -70,6 +70,9 @@ COMPS_PROP_GETTER(group, COMPS_DocGroup, uservisible) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(group, COMPS_DocGroup, display_order) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
 
+COMPS_DOCOBJ_GETOBJLIST(docgroup, COMPS_DocGroup, packages, packages)
+COMPS_DOCOBJ_SETOBJLIST(docgroup, COMPS_DocGroup, packages, packages)
+
 void comps_docgroup_add_package(COMPS_DocGroup *group,
                                 COMPS_DocGroupPackage *package) {
 
