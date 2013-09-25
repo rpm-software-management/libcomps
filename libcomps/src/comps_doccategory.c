@@ -98,11 +98,14 @@ signed char comps_doccategory_cmp_u(COMPS_Object *cat1, COMPS_Object *cat2) {
 }
 
 char __comps_doccategory_idcmp(void *c1, void *c2) {
-    return comps_object_cmp(
-                        comps_objdict_get(((COMPS_DocCategory*)c1)->properties,
-                                              "id"),
-                        comps_objdict_get(((COMPS_DocCategory*)c2)->properties,
-                                              "id"));
+    COMPS_Object *obj1, *obj2;
+    char ret;
+    obj1 = comps_objdict_get(((COMPS_DocCategory*)c1)->properties, "id");
+    obj2 = comps_objdict_get(((COMPS_DocCategory*)c2)->properties, "id");
+    COMPS_OBJECT_DESTROY(obj1);
+    COMPS_OBJECT_DESTROY(obj2);
+    ret = comps_object_cmp(obj1, obj2);
+    return ret;
 }
 
 COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
@@ -134,8 +137,6 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     for (; it != NULL; it = it->next) {
         comps_set_add(set, it->comps_obj);
     }
-    //res->group_ids = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
-    //                                                    NULL);
     for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
         comps_doccategory_add_groupid(res,
                             (COMPS_DocGroupId*)comps_object_copy(hsit->data));
@@ -144,6 +145,7 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     COMPS_OBJECT_DESTROY(res->name_by_lang);
     COMPS_OBJECT_DESTROY(res->desc_by_lang);
     res->name_by_lang = comps_objdict_union(c1->name_by_lang, c2->name_by_lang);
+
     res->desc_by_lang = comps_objdict_union(c1->desc_by_lang, c2->desc_by_lang);
     return res;
 }
@@ -216,6 +218,7 @@ void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
             obj = comps_objdict_get(category->properties, props[i]);
             if (obj) {
                 __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj, writer);
+                COMPS_OBJECT_DESTROY(obj);
             }
         } else {
             pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)
@@ -248,10 +251,57 @@ void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
     xmlTextWriterEndElement(writer);
     xmlTextWriterEndElement(writer);
 }
+
+char* comps_doccategory_tostr_u(COMPS_Object* cat) {
+    #define _cat_ ((COMPS_DocCategory*)cat)
+    char *ret, *name_by_lang_str, *desc_by_lang_str, *group_ids_str;
+    int total_len = 0;
+    const char *head = "<COMPS_Category ";
+    COMPS_Object *tmpprop;
+    COMPS_Object*(*getters[])(COMPS_DocCategory*)= {comps_doccategory_get_id,
+                                     comps_doccategory_get_name,
+                                     comps_doccategory_get_desc,
+                                     comps_doccategory_get_display_order};
+    char *props[4];
+    for (int i=0; i<4; i++) {
+        tmpprop = getters[i](_cat_);
+        props[i] = comps_object_tostr(tmpprop);
+        total_len += strlen(props[i]);
+    }
+    name_by_lang_str = comps_object_tostr((COMPS_Object*)_cat_->name_by_lang);
+    total_len += strlen(name_by_lang_str);
+    desc_by_lang_str = comps_object_tostr((COMPS_Object*)_cat_->desc_by_lang);
+    total_len += strlen(desc_by_lang_str);
+    group_ids_str = comps_object_tostr((COMPS_Object*)_cat_->group_ids);
+    total_len += strlen(group_ids_str);
+    
+    ret = malloc(sizeof(char) * (total_len+2+(6*2)+strlen(head)));
+    ret[0] = 0;
+    strcat(ret, head);
+    for (int i=0; i<4; i++) {
+        strcat(ret, props[i]);
+        free(props[i]);
+        strcat(ret, ", ");
+    }
+    strcat(ret, name_by_lang_str);
+    free(name_by_lang_str);
+    strcat(ret, ", ");
+    strcat(ret, desc_by_lang_str);
+    free(desc_by_lang_str);
+    strcat(ret, ", ");
+    strcat(ret, group_ids_str);
+    free(group_ids_str);
+    strcat(ret, ">");
+    return ret;
+    #undef _cat_
+}
+
+
 COMPS_ObjectInfo COMPS_DocCategory_ObjInfo = {
     .obj_size = sizeof(COMPS_DocCategory),
     .constructor = &comps_doccategory_create_u,
     .destructor = &comps_doccategory_destroy_u,
     .copy = &comps_doccategory_copy_u,
-    .obj_cmp = &comps_doccategory_cmp_u
+    .obj_cmp = &comps_doccategory_cmp_u,
+    .to_str = &comps_doccategory_tostr_u
 };

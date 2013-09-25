@@ -35,9 +35,9 @@
     COMPS_ObjList *ret;\
     ret = (COMPS_ObjList*)comps_objdict_get(doc->objects, #OBJS);\
     if (!ret) {\
-        printf("%s not exitst\n", #OBJS);\
         ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);\
         comps_objdict_set_x(doc->objects, #OBJS, (COMPS_Object*)ret);\
+        ret = (COMPS_ObjList*)comps_object_incref((COMPS_Object*)ret);\
     }\
     return ret;\
 }
@@ -82,9 +82,12 @@
     COMPS_ObjList *ret;\
     ret = (COMPS_ObjList*)comps_objdict_get(doc->objects, #OBJS);\
     if (!ret) {\
+        printf("not exists" #OBJS "\n");\
         ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);\
-        comps_objdict_set_x(doc->objects, #OBJS, (COMPS_Object*)ret);\
+        comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)ret);\
+    } else {\
     }\
+    COMPS_OBJECT_DESTROY(ret);\
     comps_objlist_append_x(ret, (COMPS_Object*)obj);\
 }
 #define HEAD_COMPS_DOC_ADDOBJLIST(OBJNAME, OBJTYPE) void CONCAT(comps_doc_add_,\
@@ -101,9 +104,10 @@
     ret = (COMPS_ObjDict*)comps_objdict_get(doc->objects, #OBJS);\
     if (!ret) {\
         ret = (COMPS_ObjDict*)comps_object_create(&COMPS_ObjDict_ObjInfo, NULL);\
-        comps_objdict_set_x(doc->objects, #OBJS, (COMPS_Object*)ret);\
+        comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)ret);\
     }\
     comps_objdict_set_x(ret, key, (COMPS_Object*)obj);\
+    COMPS_OBJECT_DESTROY(ret);\
 }
 #define HEAD_COMPS_DOC_ADDOBJDICT(OBJNAME) void CONCAT(comps_doc_add_,\
                                                            OBJNAME)\

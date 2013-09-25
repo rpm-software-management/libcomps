@@ -121,11 +121,14 @@ signed char comps_docenv_cmp_u(COMPS_Object *env1, COMPS_Object *env2) {
 }
 
 char __comps_docenv_idcmp(void *e1, void *e2) {
-    return comps_object_cmp(
-                            comps_objdict_get(((COMPS_DocEnv*)e1)->properties,
-                                                  "id"),
-                            comps_objdict_get(((COMPS_DocEnv*)e2)->properties,
-                                                  "id"));
+    COMPS_Object *obj1, *obj2;
+    char ret;
+    obj1 = comps_objdict_get(((COMPS_DocEnv*)e1)->properties, "id");
+    obj2 = comps_objdict_get(((COMPS_DocEnv*)e2)->properties, "id");
+    COMPS_OBJECT_DESTROY(obj1);
+    COMPS_OBJECT_DESTROY(obj2);
+    ret = comps_object_cmp(obj1, obj2);
+    return ret;
 }
 
 COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
@@ -277,6 +280,7 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
             obj = comps_objdict_get(env->properties, props[i]);
             if (obj) {
                 __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj, writer);
+                COMPS_OBJECT_DESTROY(obj);
             }
         } else {
             pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)
@@ -321,10 +325,61 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     xmlTextWriterEndElement(writer);
 }
 
+char* comps_docenv_tostr_u(COMPS_Object* env) {
+    #define _env_ ((COMPS_DocEnv*)env)
+    char *ret, *name_by_lang_str, *desc_by_lang_str, *group_list_str;
+    char *option_list_str;
+    int total_len = 0;
+    const char *head = "<COMPS_Env ";
+    COMPS_Object *tmpprop;
+    COMPS_Object*(*getters[])(COMPS_DocEnv*)= {comps_docenv_get_id,
+                                     comps_docenv_get_name,
+                                     comps_docenv_get_desc,
+                                     comps_docenv_get_display_order};
+    char *props[4];
+    for (int i=0; i<4; i++) {
+        tmpprop = getters[i](_env_);
+        props[i] = comps_object_tostr(tmpprop);
+        total_len += strlen(props[i]);
+    }
+    name_by_lang_str = comps_object_tostr((COMPS_Object*)_env_->name_by_lang);
+    total_len += strlen(name_by_lang_str);
+    desc_by_lang_str = comps_object_tostr((COMPS_Object*)_env_->desc_by_lang);
+    total_len += strlen(desc_by_lang_str);
+    group_list_str = comps_object_tostr((COMPS_Object*)_env_->group_list);
+    total_len += strlen(group_list_str);
+    option_list_str = comps_object_tostr((COMPS_Object*)_env_->option_list);
+    total_len += strlen(option_list_str);
+    
+    ret = malloc(sizeof(char) * (total_len+2+(8*2)+strlen(head)));
+    ret[0] = 0;
+    strcat(ret, head);
+    for (int i=0; i<4; i++) {
+        strcat(ret, props[i]);
+        free(props[i]);
+        strcat(ret, ", ");
+    }
+    strcat(ret, name_by_lang_str);
+    free(name_by_lang_str);
+    strcat(ret, ", ");
+    strcat(ret, desc_by_lang_str);
+    free(desc_by_lang_str);
+    strcat(ret, ", ");
+    strcat(ret, group_list_str);
+    free(group_list_str);
+    strcat(ret, ", ");
+    strcat(ret, option_list_str);
+    free(option_list_str);
+    strcat(ret, ">");
+    return ret;
+    #undef _env_
+}
+
 COMPS_ObjectInfo COMPS_DocEnv_ObjInfo = {
     .obj_size = sizeof(COMPS_DocEnv),
     .constructor = &comps_docenv_create_u,
     .destructor = &comps_docenv_destroy_u,
     .copy = &comps_docenv_copy_u,
-    .obj_cmp = &comps_docenv_cmp_u
+    .obj_cmp = &comps_docenv_cmp_u,
+    .to_str = &comps_docenv_tostr_u
 };

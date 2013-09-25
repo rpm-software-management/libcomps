@@ -44,6 +44,7 @@ typedef struct {
 __H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocCategory) /*pycomps_utils.h macro*/
 __H_COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocCategory) /*pycomps_utils.h macro*/
 __H_COMPS_LIST_GETSET_CLOSURE(COMPS_DocCategory) /*pycomps_utils.h macro*/
+__H_COMPS_DICT_GETSET_CLOSURE(COMPS_DocCategory) /*pycomps_utils.h macro*/
 
 COMPS_ObjList* comps_cats_union(COMPS_ObjList *cats1, COMPS_ObjList *cats2);
 

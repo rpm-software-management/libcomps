@@ -182,6 +182,7 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
     for (it = groups ? groups->first : NULL; it != NULL; it = it->next) {
         comps_set_add(set, comps_object_copy(it->comps_obj));
     }
+    COMPS_OBJECT_DESTROY(groups);
     groups = comps_doc_groups(c2);
     for (it = groups ? groups->first : NULL; it != NULL; it = it->next) {
         if (comps_set_in(set, it->comps_obj)) {
@@ -191,12 +192,13 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
                                                                    it->comps_obj));
             tmpdata = comps_set_data_at(set, it->comps_obj);
             comps_set_remove(set, it->comps_obj);
-            comps_object_destroy((COMPS_Object*)tmpdata);
+            COMPS_OBJECT_DESTROY(tmpdata);
             comps_set_add(set, tmpgroup);
         } else {
             comps_set_add(set, comps_object_copy(it->comps_obj));
         }
     }
+    COMPS_OBJECT_DESTROY(groups);
     for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
         comps_doc_add_group(res, hsit->data);
     }
@@ -206,21 +208,23 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
     for (it = categories ? categories->first : NULL; it != NULL; it = it->next) {
         comps_set_add(set, comps_object_copy(it->comps_obj));
     }
+    COMPS_OBJECT_DESTROY(categories);
     categories = comps_doc_categories(c2);
     for (it = categories ? categories->first : NULL; it != NULL; it = it->next) {
         if (comps_set_in(set, it->comps_obj)) {
-            tmpcat = comps_doccategory_union(
+            /*tmpcat = comps_doccategory_union(
                                 (COMPS_DocCategory*)it->comps_obj,
                                 (COMPS_DocCategory*)comps_set_data_at(set,
                                                                 it->comps_obj));
             tmpdata = comps_set_data_at(set, it->comps_obj);
             comps_set_remove(set, it->comps_obj);
-            comps_object_destroy((COMPS_Object*)tmpdata);
-            comps_set_add(set, tmpcat);
+            COMPS_OBJECT_DESTROY(tmpdata);
+            comps_set_add(set, tmpcat);*/
         } else {
             comps_set_add(set, comps_object_copy(it->comps_obj));
         }
     }
+    COMPS_OBJECT_DESTROY(categories);
     for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
         comps_doc_add_category(res, hsit->data);
     }
@@ -232,6 +236,7 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
             comps_set_add(set, comps_object_copy(it->comps_obj));
         }
     }
+    COMPS_OBJECT_DESTROY(envs);
     envs = comps_doc_environments(c2);
     if (envs) {
         for (it = envs->first; it != NULL; it = it->next) {
@@ -249,6 +254,7 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
             }
         }
     }
+    COMPS_OBJECT_DESTROY(envs);
     for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
         comps_doc_add_environment(res, hsit->data);
     }
@@ -288,6 +294,7 @@ COMPS_Doc* comps_doc_intersect(COMPS_Doc *c1, COMPS_Doc *c2) {
     for (it = groups->first; it != NULL; it = it->next) {
         comps_set_add(set, it->comps_obj);
     }
+    COMPS_OBJECT_DESTROY(groups);
     groups = comps_doc_groups(c2);
     for (it = groups->first; it != NULL; it = it->next) {
         if (comps_set_in(set, it->comps_obj)) {
@@ -304,6 +311,7 @@ COMPS_Doc* comps_doc_intersect(COMPS_Doc *c1, COMPS_Doc *c2) {
     for (it = categories->first; it != NULL; it = it->next) {
         comps_set_add(set, it->comps_obj);
     }
+    COMPS_OBJECT_DESTROY(categories);
     categories = comps_doc_categories(c2);
     for (it = categories->first; it != NULL; it = it->next) {
         if (comps_set_in(set, it->comps_obj)) {
@@ -320,6 +328,7 @@ COMPS_Doc* comps_doc_intersect(COMPS_Doc *c1, COMPS_Doc *c2) {
     for (it = envs->first; it != NULL; it = it->next) {
         comps_set_add(set, it->comps_obj);
     }
+    COMPS_OBJECT_DESTROY(envs);
     envs = comps_doc_environments(c2);
     for (it = envs->first; it != NULL; it = it->next) {
         if (comps_set_in(set, it->comps_obj)) {
@@ -330,6 +339,10 @@ COMPS_Doc* comps_doc_intersect(COMPS_Doc *c1, COMPS_Doc *c2) {
         }
     }
     comps_set_destroy(&set);
+    COMPS_OBJECT_DESTROY(groups);
+    COMPS_OBJECT_DESTROY(categories);
+    COMPS_OBJECT_DESTROY(envs);
+
     return res;
 }
 
@@ -359,6 +372,7 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
         if (id && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objid)) {
             matched++;
         }
+        COMPS_OBJECT_DESTROY(tmp_prop);
         tmp_prop = comps_docgroup_get_name(group);
         if (name && !lang && COMPS_OBJECT_CMP(tmp_prop, objname))
             matched++;
@@ -366,6 +380,7 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
             tmp_prop = comps_objdict_get(group->name_by_lang, lang);
             if (COMPS_OBJECT_CMP(objname, tmp_prop)) matched++;
         }
+        COMPS_OBJECT_DESTROY(tmp_prop);
         tmp_prop = comps_docgroup_get_desc(group);
         if (desc && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objdesc) == 1)
             matched++;
@@ -376,10 +391,12 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
         if (matched == matched_max) {
             comps_objlist_append(ret, (COMPS_Object*)group);
         }
+        COMPS_OBJECT_DESTROY(tmp_prop);
     }
     COMPS_OBJECT_DESTROY(objid);
     COMPS_OBJECT_DESTROY(objname);
     COMPS_OBJECT_DESTROY(objdesc);
+    COMPS_OBJECT_DESTROY(groups);
     return ret;
     #undef group
 }
@@ -403,18 +420,21 @@ void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
             comps_docgroup_xml((COMPS_DocGroup*)it->comps_obj, writer, doc->log);
         }
     }
+    COMPS_OBJECT_DESTROY(list);
     list = comps_doc_categories(doc);
     if (list) {
         for (it = list->first; it != NULL; it = it->next) {
             comps_doccategory_xml((COMPS_DocCategory*)it->comps_obj, writer, doc->log);
         }
     }
+    COMPS_OBJECT_DESTROY(list);
     list = comps_doc_environments(doc);
     if (list) {
         for (it = list->first; it != NULL; it = it->next) {
             comps_docenv_xml((COMPS_DocEnv*)it->comps_obj, writer, doc->log);
         }
     }
+    COMPS_OBJECT_DESTROY(list);
     retc = xmlTextWriterEndElement(writer);
     if (retc<0) comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
 }

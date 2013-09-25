@@ -51,6 +51,7 @@ typedef struct {
 
 __H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocEnv) /*pycomps_utils.h macro*/
 __H_COMPS_LIST_GETSET_CLOSURE(COMPS_DocEnv) /*pycomps_utils.h macro*/
+__H_COMPS_DICT_GETSET_CLOSURE(COMPS_DocEnv) /*pycomps_utils.h macro*/
 
 COMPS_ObjList* comps_envs_union(COMPS_ObjList *envs1, COMPS_ObjList *envs2);
 

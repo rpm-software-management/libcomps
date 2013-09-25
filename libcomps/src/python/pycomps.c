@@ -198,11 +198,13 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
 
 PyObject* PyCOMPS_get_(PyCOMPS *self, void *closure) {
     PyObject *ret;
+    COMPS_ObjList *list;
 
     if (!(PyObject*)GET_FROM(self, get_closure(closure)->pobj_offset)) {
         ret = PyCOMPSSeq_new(get_closure(closure)->type, NULL, NULL);
         Py_TYPE(ret)->tp_init(ret, NULL, NULL);
-        //TODO
+        list = get_closure(closure)->get_f(self->comps_doc);
+        ((PyCOMPS_Sequence*)ret)->list = list;
         SET_TO(self, get_closure(closure)->pobj_offset, ret)
     } else {
         ret = (PyObject*)GET_FROM(self, get_closure(closure)->pobj_offset);

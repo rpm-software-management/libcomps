@@ -30,20 +30,6 @@
 #include "structmember.h"
 
 
-typedef struct PyCOMPS_Dict {
-    PyObject_HEAD
-    COMPS_ObjDict *dict;
-} PyCOMPS_Dict;
-
-typedef struct PyCOMPS_DictIter{
-    PyObject_HEAD
-    COMPS_ObjListIt *it;
-    COMPS_HSListItem *hsit;
-    COMPS_ObjList *objlist;
-    COMPS_HSList *hslist;
-    PyObject* (*out_func)(COMPS_HSListItem *hsit);
-} PyCOMPS_DictIter;
-
 COMPS_Dict * get_dict(PyObject *self);
 
 void PyCOMPSDict_dealloc(PyCOMPS_Dict *self);
@@ -55,11 +41,10 @@ PyObject* PyCOMPSDict_getiteritems(PyObject *self);
 
 PyObject* PyCOMPSDictIter_new(PyTypeObject *type, PyObject *args,
                               PyObject *kwds);
+int PyCOMPSDictIter_init(PyCOMPS_DictIter *self, PyObject *args, PyObject *kwds);
 void PyCOMPSDictIter_dealloc(PyCOMPS_DictIter *self);
 PyObject* PyCOMPSDict_iternext(PyObject *iter_o);
 
 
-extern PyTypeObject PyCOMPS_DictType;
-extern PyTypeObject PyCOMPS_DictIterType;
 
 #endif

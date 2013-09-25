@@ -19,10 +19,6 @@
 
 #include "pycomps_groups.h"
 
-PyObject* PyCOMPSGroup_convert(void *g) {
-   (void)g;
-}
-
 PyObject* PyCOMPSGroup_union(PyObject *self, PyObject *other) {
     COMPS_DocGroup *g;
     PyObject *res;
@@ -103,8 +99,12 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
 }
 
 PyObject* PyCOMPSGroup_str(PyObject *self) {
-    return PyUnicode_FromString(comps_object_tostr((COMPS_Object*)
-                                               ((PyCOMPS_Group*)self)->group));
+    char *x;
+    PyObject *ret;
+    x = comps_object_tostr((COMPS_Object*)((PyCOMPS_Group*)self)->group);
+    ret = PyUnicode_FromString(x);
+    free(x);
+    return ret;
 }
 
 int PyCOMPSGroup_print(PyObject *self, FILE *f, int flags) {
@@ -213,51 +213,6 @@ PyObject* PyCOMPSGroup_cmp(PyObject *self, PyObject *other, int op) {
     Py_RETURN_TRUE;
 }
 
-inline PyObject* PyCOMPSGroup_get_name_by_lang(PyCOMPS_Group *self, void *closure) {
-    (void) closure;
-    (void) self;
-/*    return pycomps_lang_get_dict(
-                   pycomps_group_get_extra((PyObject*)self)->name_by_lang_citem,
-                   &self->name_by_lang_pobj);
-*/
-}
-
-inline int PyCOMPSGroup_set_name_by_lang(PyCOMPS_Group *self,
-                                  PyObject *value, void *closure) {
-    (void) closure;
-    (void) self;
-    (void) value;
-/*    return pycomps_lang_set_dict(
-                  &pycomps_group_get_extra((PyObject*)self)->name_by_lang_citem,
-                  &self->name_by_lang_pobj,
-                  value,
-                  (void**)&pycomps_group_oget((PyObject*)self)->name_by_lang);
-*/
-}
-
-inline PyObject* PyCOMPSGroup_get_desc_by_lang(PyCOMPS_Group *self, void *closure) {
-    (void) closure;
-    (void) self;
-/*    return pycomps_lang_get_dict(
-                   pycomps_group_get_extra((PyObject*)self)->desc_by_lang_citem,
-                   &self->desc_by_lang_pobj);
-*/
-}
-
-inline int PyCOMPSGroup_set_desc_by_lang(PyCOMPS_Group *self,
-                                  PyObject *value, void *closure) {
-    (void) closure;
-    (void) self;
-    (void) value;
-/*    return pycomps_lang_set_dict(
-                  &pycomps_group_get_extra((PyObject*)self)->desc_by_lang_citem,
-                  &self->desc_by_lang_pobj,
-                  value,
-                  (void**)&pycomps_group_oget((PyObject*)self)->desc_by_lang);
-*/
-}
-
-
 int pycomps_group_boolattr_setter(PyObject *self, PyObject *val, void *closure) {
     long tmp;
     COMPS_Object *tmp_prop;
@@ -279,11 +234,13 @@ int pycomps_group_boolattr_setter(PyObject *self, PyObject *val, void *closure) 
 PyObject* pycomps_group_boolattr_getter(PyObject *self, void *closure) {
 
     COMPS_Object *tmp_prop;
+    PyObject *ret;
     tmp_prop = comps_objdict_get(((PyCOMPS_Group*)self)->group->properties,
                                  (char*)closure);
     if (tmp_prop) {
-        Py_XDECREF(tmp_prop);
-        return PyBool_FromLong(((COMPS_Num*)tmp_prop)->val);
+        ret = PyBool_FromLong(((COMPS_Num*)tmp_prop)->val);
+        COMPS_OBJECT_DESTROY(tmp_prop);
+        return ret;
     } else
         Py_RETURN_NONE;
 }
@@ -325,11 +282,24 @@ __COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_DispOrdClosure = {
     .c_offset = offsetof(PyCOMPS_Group, group)
 };
 
+__COMPS_DICT_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_NameByLangClosure = {
+    .c_offset = offsetof(PyCOMPS_Group, group),
+    .p_offset = offsetof(PyCOMPS_Group, p_name_by_lang),
+    .dict_offset = offsetof(COMPS_DocGroup, name_by_lang)
+};
+
+__COMPS_DICT_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_DescByLangClosure = {
+    .c_offset = offsetof(PyCOMPS_Group, group),
+    .p_offset = offsetof(PyCOMPS_Group, p_desc_by_lang),
+    .dict_offset = offsetof(COMPS_DocGroup, desc_by_lang)
+};
+
 __COMPS_LIST_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_Packages = {
     .get_f = &comps_docgroup_packages,
     .set_f = &comps_docgroup_set_packages,
     .p_offset = offsetof(PyCOMPS_Group, p_packages),
-    .c_offset = offsetof(PyCOMPS_Group, group)
+    .c_offset = offsetof(PyCOMPS_Group, group),
+    .type = &PyCOMPS_PacksType
 };
 
 PyGetSetDef PyCOMPSGroup_getset[] = {
@@ -349,21 +319,21 @@ PyGetSetDef PyCOMPSGroup_getset[] = {
      (getter)__PyCOMPS_get_numattr, (setter)__PyCOMPS_set_numattr,
      "Group display order attribute", (void*)&DocGroup_DispOrdClosure},
     {"uservisible",
-     (getter)pycomps_group_boolattr_setter, (setter)pycomps_group_boolattr_setter,
+     (getter)pycomps_group_boolattr_getter, (setter)pycomps_group_boolattr_setter,
      "Group uservisible attribute", "uservisible"},
     {"default",
-     (getter)pycomps_group_boolattr_setter, (setter)pycomps_group_boolattr_setter,
+     (getter)pycomps_group_boolattr_getter, (setter)pycomps_group_boolattr_setter,
      "Group default attribute", "def"},
     {"packages",
     (getter)__PyCOMPS_get_ids, (setter)__PyCOMPS_set_ids,
      "Group packages",
      (void*)&DocGroup_Packages},
     {"name_by_lang",
-    (getter)PyCOMPSGroup_get_name_by_lang, (setter)PyCOMPSGroup_set_name_by_lang,
-     "Group name locales", NULL},
+    (getter)__PyCOMPS_get_dict, (setter)__PyCOMPS_set_dict,
+     "Group name locales", &DocGroup_NameByLangClosure},
     {"desc_by_lang",
-    (getter)PyCOMPSGroup_get_desc_by_lang, (setter)PyCOMPSGroup_set_desc_by_lang,
-     "Group description locales", NULL},
+    (getter)__PyCOMPS_get_dict, (setter)__PyCOMPS_set_dict,
+     "Group name locales", &DocGroup_NameByLangClosure},
     {NULL}  /* Sentinel */
 };
 
@@ -411,12 +381,32 @@ PyTypeObject PyCOMPS_GroupType = {
     0,                               /* tp_alloc */
     PyCOMPSGroup_new,                 /* tp_new */};
 
+COMPS_Object* comps_groups_in(PyObject *item) {
+    return comps_object_incref((COMPS_Object*)((PyCOMPS_Group*)item)->group);
+}
+
+PyObject* comps_groups_out(COMPS_Object *cobj) {
+    PyCOMPS_Group *ret;
+    ret = (PyCOMPS_Group*)PyCOMPSGroup_new(&PyCOMPS_GroupType, NULL, NULL);
+    PyCOMPSGroup_init(ret, NULL, NULL);
+    COMPS_OBJECT_DESTROY(ret->group);
+    ret->group = (COMPS_DocGroup*)cobj;
+    return (PyObject*)ret;
+}
+
+PyCOMPS_SeqInfo PyCOMPS_GroupsInfo = {
+    .itemtypes = (PyTypeObject*[]){&PyCOMPS_GroupType},
+    .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
+                        {&comps_groups_in},
+    .out_convert_func = &comps_groups_out,
+    .item_types_len = 1
+};
 
 int PyCOMPSGroups_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
 {
     (void) args;
     (void) kwds;
-    (void) self;
+    self->it_info = &PyCOMPS_GroupsInfo;
     return 0;
 }
 
@@ -531,11 +521,32 @@ PyTypeObject PyCOMPS_GroupsType = {
     0,                               /* tp_alloc */
     PyCOMPSSeq_new,                 /* tp_new */};
 
+COMPS_Object* comps_pkgs_in(PyObject *item) {
+    return comps_object_incref((COMPS_Object*)((PyCOMPS_Package*)item)->package);
+}
+
+PyObject* comps_pkgs_out(COMPS_Object *cobj) {
+    PyCOMPS_Package *ret;
+    ret = (PyCOMPS_Package*)PyCOMPSPack_new(&PyCOMPS_PackType, NULL, NULL);
+    PyCOMPSPack_init(ret, NULL, NULL);
+    COMPS_OBJECT_DESTROY(ret->package);
+    ret->package = (COMPS_DocGroupPackage*)cobj;
+    return (PyObject*)ret;
+}
+
+PyCOMPS_SeqInfo PyCOMPS_PkgsInfo = {
+    .itemtypes = (PyTypeObject*[]){&PyCOMPS_PackType},
+    .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
+                        {&comps_pkgs_in},
+    .out_convert_func = &comps_pkgs_out,
+    .item_types_len = 1
+};
+
 int PyCOMPSPacks_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
 {
     (void) args;
     (void) kwds;
-    (void) self;
+    self->it_info = &PyCOMPS_PkgsInfo;
     return 0;
 }
 
@@ -586,9 +597,6 @@ PyTypeObject PyCOMPS_PacksType = {
     0,                               /* tp_alloc */
     PyCOMPSSeq_new,                 /* tp_new */};
 
-PyObject* PyCOMPSPack_convert(void *p) {
-    (void)p;
-}
 
 void PyCOMPSPack_dealloc(PyCOMPS_Package *self)
 {
@@ -652,7 +660,7 @@ PyGetSetDef pack_getset[] = {
     {"name",
      (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
      "Package name",
-     (void*)offsetof(COMPS_DocGroupPackage, name)},
+     (void*)&DocGroupPkg_NameClosure},
     {"requires",
      (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
      "Package requires",
@@ -660,7 +668,7 @@ PyGetSetDef pack_getset[] = {
     {"type",
      (getter)__PyCOMPS_get_numattr, (setter)__PyCOMPS_set_numattr,
      "Package type",
-     NULL},
+     (void*)&DocGroupPkg_TypeClosure},
     {NULL}  /* Sentinel */
 };
 

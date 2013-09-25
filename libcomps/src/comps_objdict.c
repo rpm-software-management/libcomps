@@ -29,7 +29,9 @@ inline void comps_objdict_set_n(COMPS_ObjDict *rt, char *key, unsigned int len,
                                 COMPS_Object *data) {
     comps_objrtree_set_n((COMPS_ObjRTree*) rt, key, len, data);
 }
-
+inline COMPS_Object* comps_objdict_get_x(COMPS_ObjRTree * rt, const char * key) {
+    return comps_objrtree_get_x((COMPS_ObjRTree*) rt, key);
+}
 inline COMPS_Object* comps_objdict_get(COMPS_ObjDict *rt, const char *key) {
     return comps_objrtree_get((COMPS_ObjRTree*) rt, key);
 }

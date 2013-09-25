@@ -279,7 +279,7 @@ COMPS_PackageType comps_package_get_type(const XML_Char *s)
 
 void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
 {
-    COMPS_ObjList *list;
+    COMPS_ObjList *list = NULL;
     COMPS_ObjDict *objdict, *prop_dict;
     char *lang;
     COMPS_Object *prop;
@@ -327,13 +327,13 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_ENV:
             list = comps_doc_environments(parsed->comps_doc);
-            if (!comps_objdict_get(list_last_env->properties, "id"))
+            if (!comps_objdict_get_x(list_last_env->properties, "id"))
                 comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!comps_objdict_get(list_last_env->properties, "name"))
+            if (!comps_objdict_get_x(list_last_env->properties, "name"))
                 comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!comps_objdict_get(list_last_env->properties, "desc"))
+            if (!comps_objdict_get_x(list_last_env->properties, "desc"))
                 comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             if (!list_last_env->group_list)
@@ -342,37 +342,40 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             if (!list_last_env->option_list)
                 comps_log_error(parsed->log, "optionlist", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
+            COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_GROUP:
             list = comps_doc_groups(parsed->comps_doc);
-            if (!comps_objdict_get(list_last_group->properties, "id"))
+            if (!comps_objdict_get_x(list_last_group->properties, "id"))
                 comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (comps_objdict_get(list_last_group->properties, "name") == NULL) {
+            if (comps_objdict_get_x(list_last_group->properties, "name") == NULL) {
                 comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             }
-            if (!comps_objdict_get(list_last_group->properties, "desc"))
+            if (!comps_objdict_get_x(list_last_group->properties, "desc"))
                 comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             if (!list_last_group->packages)
                 comps_log_error(parsed->log, "packagelist", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
+            COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_CATEGORY:
             list = comps_doc_categories(parsed->comps_doc);
-            if (!comps_objdict_get(list_last_cat->properties, "id"))
+            if (!comps_objdict_get_x(list_last_cat->properties, "id"))
                 comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!comps_objdict_get(list_last_cat->properties, "name"))
+            if (!comps_objdict_get_x(list_last_cat->properties, "name"))
                 comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!comps_objdict_get(list_last_cat->properties, "desc"))
+            if (!comps_objdict_get_x(list_last_cat->properties, "desc"))
                 comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             if (!list_last_cat->group_ids)
                 comps_log_error(parsed->log, "grouplist", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
+            COMPS_OBJECT_DESTROY(list);
         case COMPS_ELEM_WHITEOUT:
         case COMPS_ELEM_BLACKLIST:
         case COMPS_ELEM_LANGPACKS:
@@ -391,6 +394,9 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 prop = comps_objdict_get(list_last_cat->properties, "id");
             } else if (parent == COMPS_ELEM_ENV) {
                 list = comps_doc_environments(parsed->comps_doc);
+                printf("env id :%p\n", list);
+                printf("last env :%p\n", list_last_env);
+                printf("last env props:%p\n", list_last_env->properties);
                 objdict = list_last_env->properties;
                 prop = comps_objdict_get(list_last_env->properties, "id");
             } else {
@@ -398,6 +404,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 parsed->tmp_buffer = NULL;
                 break;
             }
+            COMPS_OBJECT_DESTROY(list);
             if (prop != NULL) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
@@ -431,6 +438,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 parsed->tmp_buffer = NULL;
                 break;
             }
+            COMPS_OBJECT_DESTROY(list);
             if (lang) {
                 comps_objdict_set_x(objdict, lang,
                                   (COMPS_Object*)comps_str_x(parsed->tmp_buffer));
@@ -468,6 +476,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 parsed->tmp_buffer = NULL;
                 break;
             }
+            COMPS_OBJECT_DESTROY(list);
             if (lang) {
                 comps_objdict_set_x(objdict, lang,
                                 (COMPS_Object*)comps_str_x(parsed->tmp_buffer));
@@ -493,6 +502,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             if (!list_last_group->packages->first)
                 comps_log_error(parsed->log, "packagelist", COMPS_ERR_LIST_EMPTY,
                                 parser_line, parser_col, 0);
+            COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_GROUPLIST:
             if (parent != COMPS_ELEM_CATEGORY &&
@@ -513,6 +523,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                                     COMPS_ERR_LIST_EMPTY,
                                     parser_line, parser_col, 0);
             }
+            COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_OPTLIST:
             if (parent != COMPS_ELEM_ENV) {
@@ -523,6 +534,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             if (!list_last_env->option_list->first)
                 comps_log_error(parsed->log, "optionlist", COMPS_ERR_LIST_EMPTY,
                                 parser_line, parser_col, 0);
+            COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_PACKAGEREQ:
             if (parent != COMPS_ELEM_PACKAGELIST &&
@@ -538,6 +550,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                                           parsed->tmp_buffer, 1);
                 free(parsed->tmp_buffer);
             }
+            COMPS_OBJECT_DESTROY(list);
             parsed->tmp_buffer = NULL;
         break;
         case COMPS_ELEM_DEFAULT:
@@ -564,6 +577,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                                   COMPS_ERR_DEFAULT_PARAM,
                                   parser_line, parser_col, 0);
             }
+            COMPS_OBJECT_DESTROY(list);
             free(parsed->tmp_buffer);
             parsed->tmp_buffer = NULL;
         break;
@@ -593,6 +607,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                                   COMPS_ERR_USERVISIBLE_PARAM,
                                   parser_line, parser_col, 0);
             }
+            COMPS_OBJECT_DESTROY(list);
             free(parsed->tmp_buffer);
             parsed->tmp_buffer = NULL;
         break;
@@ -638,6 +653,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                                       parser_line, parser_col, 0);
                 }
             }
+            COMPS_OBJECT_DESTROY(list);
             free(parsed->tmp_buffer);
             parsed->tmp_buffer = NULL;
         break;
@@ -657,6 +673,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 prop = comps_objdict_get(list_last_group->properties, "display_order");
                 objdict = list_last_group->properties;
             }
+            COMPS_OBJECT_DESTROY(list);
             if (prop) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
@@ -689,6 +706,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 comps_objdict_set_x(list_last_group->properties, "lang_only", prop);
             }
             parsed->tmp_buffer = NULL;
+            COMPS_OBJECT_DESTROY(list);
         break;
     }
     if (parsed->tmp_buffer) {
@@ -716,6 +734,7 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
     COMPS_DocGroupPackage * package;
     COMPS_DocGroupId *groupid;
     COMPS_Object *prop;
+    COMPS_ObjList *list;
     char *tmp;
 
     /* prepare currently processed element. Create it, set text_buffer pointer
@@ -845,6 +864,8 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
             env = (COMPS_DocEnv*)
                        comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
             comps_doc_add_environment(parsed->comps_doc, env);
+            //list = comps_doc_environments(parsed->comps_doc);
+            //printf("envs: %d\n", list->len);
             group = NULL;
             category = NULL;
         break;

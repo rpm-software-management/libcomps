@@ -274,7 +274,7 @@ void comps_objrtree_set_x(COMPS_ObjRTree *rt, char *key, COMPS_Object *data) {
     __comps_objrtree_set(rt, key, data);
 }
 void comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *data) {
-    COMPS_Object *ndata = ndata = comps_object_copy(data);
+    COMPS_Object *ndata = ndata = comps_object_incref(data);
     __comps_objrtree_set(rt, key, ndata);
 }
 
@@ -383,7 +383,7 @@ void comps_objrtree_set_n(COMPS_ObjRTree * rt, char * key,
 
     if (rt->subnodes == NULL)
         return;
-    ndata = comps_object_copy(data);
+    ndata = comps_object_incref(data);
 
     subnodes = rt->subnodes;
     while (offset != len)
@@ -479,13 +479,52 @@ COMPS_Object* comps_objrtree_get(COMPS_ObjRTree * rt, const char * key) {
             if (ended != 0) break;
             if (key[offset+x] != rtdata->key[x]) break;
         }
+        if (ended == 3) return comps_object_incref(rtdata->data);
+        else if (ended == 1) offset+=x;
+        else return NULL;
+        subnodes = ((COMPS_ObjRTreeData*)it->data)->subnodes;
+    }
+    if (it != NULL)
+        return comps_object_incref(((COMPS_ObjRTreeData*)it->data)->data);
+    else return NULL;
+}
+
+COMPS_Object* comps_objrtree_get_x(COMPS_ObjRTree * rt, const char * key) {
+    COMPS_HSList * subnodes;
+    COMPS_HSListItem * it = NULL;
+    COMPS_ObjRTreeData * rtdata;
+    unsigned int offset, len, x;
+    char found, ended;
+
+    len = strlen(key);
+    offset = 0;
+    subnodes = rt->subnodes;
+    while (offset != len) {
+        found = 0;
+        for (it = subnodes->first; it != NULL; it=it->next) {
+            if (((COMPS_ObjRTreeData*)it->data)->key[0] == key[offset]) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found)
+            return NULL;
+        rtdata = (COMPS_ObjRTreeData*)it->data;
+
+        for (x=1; ;x++) {
+            ended=0;
+            if (x == strlen(rtdata->key)) ended += 1;
+            if (x == len-offset) ended += 2;
+            if (ended != 0) break;
+            if (key[offset+x] != rtdata->key[x]) break;
+        }
         if (ended == 3) return rtdata->data;
         else if (ended == 1) offset+=x;
         else return NULL;
         subnodes = ((COMPS_ObjRTreeData*)it->data)->subnodes;
     }
     if (it != NULL)
-        return comps_object_copy(((COMPS_ObjRTreeData*)it->data)->data);
+        return ((COMPS_ObjRTreeData*)it->data)->data;
     else return NULL;
 }
 
@@ -734,8 +773,7 @@ void comps_objrtree_unite(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2) {
             /* current node has data */
             if (((COMPS_ObjRTreeData*)it->data)->data != NULL) {
                     comps_objrtree_set(rt1, pair->key,
-                                       comps_object_copy(
-                                      (((COMPS_ObjRTreeData*)it->data)->data)));
+                                      (((COMPS_ObjRTreeData*)it->data)->data));
             }
             if (((COMPS_ObjRTreeData*)it->data)->subnodes->first) {
                 comps_hslist_append(tmplist, pair, 0);

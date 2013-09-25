@@ -126,8 +126,12 @@ PyGetSetDef gid_getset[] = {
 };
 
 PyObject* PyCOMPSGID_str(PyObject *self) {
-    return PyUnicode_FromString(comps_object_tostr((COMPS_Object*)
-                                           ((PyCOMPS_GID*)self)->gid));
+    char *x;
+    PyObject *ret;
+    x = comps_object_tostr((COMPS_Object*)((PyCOMPS_GID*)self)->gid);
+    ret = PyUnicode_FromString(x);
+    free(x);
+    return ret;
 }
 
 int PyCOMPSGID_print(PyObject *self, FILE *f, int flags) {
@@ -159,17 +163,27 @@ COMPS_DocGroupId* comps_gid_from_str(PyObject *other) {
 PyObject* PyCOMPSGID_cmp(PyObject *self, PyObject *other, int op) {
     char ret;
     CMP_OP_EQ_NE_CHECK(op)
+    COMPS_DocGroupId *gid2;
+    char created = 0;
 
-    if (other == NULL || ( Py_TYPE(other) != &PyCOMPS_GIDType
+    if (PyUnicode_Check(other) || PyBytes_Check(other)) {
+        gid2 = comps_gid_from_str(other);
+        created = 1;
+    } else if (other == NULL || ( Py_TYPE(other) != &PyCOMPS_GIDType
                            && other != Py_None)) {
         PyErr_Format(PyExc_TypeError, "Not %s instance",
                         Py_TYPE(self)->tp_name);
         return NULL;
+    } else {
+        gid2 = ((PyCOMPS_GID*)other)->gid;
     }
     CMP_NONE_CHECK(op, self, other)
 
     ret = COMPS_OBJECT_CMP((COMPS_Object*)((PyCOMPS_GID*)self)->gid,
-                           (COMPS_Object*)((PyCOMPS_GID*)other)->gid);
+                           (COMPS_Object*)gid2);
+    if (created) {
+        COMPS_OBJECT_DESTROY(gid2);
+    }
     if (op == Py_EQ) {
         if (!ret) Py_RETURN_FALSE;
     } else {
@@ -199,7 +213,7 @@ PyTypeObject PyCOMPS_GIDType = {
     0,                         /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
+    PyCOMPS_hash,              /*tp_hash */
     0,                         /*tp_call*/
     PyCOMPSGID_str,           /*tp_str*/
     0,                         /*tp_getattro*/

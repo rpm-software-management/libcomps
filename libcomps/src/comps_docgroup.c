@@ -136,10 +136,14 @@ signed char comps_docgroup_cmp_u(COMPS_Object *group1, COMPS_Object *group2) {
 }
 
 char __comps_docgroup_idcmp(void *g1, void *g2) {
-    return comps_object_cmp(comps_objdict_get(((COMPS_DocGroup*)g1)->properties,
-                                              "id"),
-                            comps_objdict_get(((COMPS_DocGroup*)g2)->properties,
-                                              "id"));
+    COMPS_Object *obj1, *obj2;
+    char ret;
+    obj1 = comps_objdict_get(((COMPS_DocGroup*)g1)->properties, "id");
+    obj2 = comps_objdict_get(((COMPS_DocGroup*)g2)->properties, "id");
+    COMPS_OBJECT_DESTROY(obj1);
+    COMPS_OBJECT_DESTROY(obj2);
+    ret = comps_object_cmp(obj1, obj2);
+    return ret;
 }
 
 COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
@@ -258,6 +262,7 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
             obj = comps_objdict_get(group->properties, props[i]);
             if (obj) {
                 __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj, writer);
+                COMPS_OBJECT_DESTROY(obj);
             }
         } else {
             pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)

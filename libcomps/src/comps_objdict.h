@@ -49,6 +49,7 @@ void comps_objdict_set_n(COMPS_ObjDict *rt, char *key, unsigned int len,
 //                            void *data);
 
 COMPS_Object* comps_objdict_get(COMPS_ObjDict *rt, const char *key);
+COMPS_Object* comps_objdict_get_x(COMPS_ObjRTree * rt, const char * key);
 //COMPS_HSList * comps_mdict_get(COMPS_MDict *rt, const char *key);
 //COMPS_HSList ** comps_mdict_getp(COMPS_MDict *rt, const char * key);
 

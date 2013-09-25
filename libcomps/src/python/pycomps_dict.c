@@ -27,8 +27,12 @@ PyObject* __pycomps_dict_key_out(COMPS_HSListItem *hsit) {
 
 PyObject* __pycomps_dict_pair_out(COMPS_HSListItem *hsit) {
     PyObject *key, *val, *tuple;
+    char *x;
+
     key = PyUnicode_FromString((char*) ((COMPS_ObjRTreePair*)hsit->data)->key);
-    val = PyUnicode_FromString((char*) ((COMPS_ObjRTreePair*)hsit->data)->data);
+    x = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
+    val = PyUnicode_FromString(x);
+    free(x);
     tuple = PyTuple_Pack(2, key, val);
     Py_DECREF(key);
     Py_DECREF(val);
@@ -70,6 +74,7 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
     PyObject *ret, *tmp, *tmp2, *tmpkey, *tmpval;
     ret = PyUnicode_FromString("{");
     pairlist = comps_objdict_pairs(((PyCOMPS_Dict*)self)->dict);
+    char *tmpstr;
 
     for (it = pairlist->first; it != pairlist->last; it = it->next) {
         tmp = ret;
@@ -78,7 +83,10 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
             PyErr_SetString(PyExc_TypeError, "key convert error");
             return NULL;
         }
-        tmpval = __pycomps_lang_decode((char*)((COMPS_ObjRTreePair*)it->data)->data);
+        tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
+        printf("Dict_str val:%s\n", tmpstr);
+        tmpval = __pycomps_lang_decode(tmpstr);
+        free(tmpstr);
         if (!tmpval) {
             PyErr_SetString(PyExc_TypeError, "val convert error");
             return NULL;
@@ -121,17 +129,20 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
 int PyCOMPSDict_print(PyObject *self, FILE *f, int flags) {
     COMPS_HSList *pairlist;
     COMPS_HSListItem *it;
+    char *tmpstr;
 
     (void)flags;
     fprintf(f, "{");
     pairlist = comps_objdict_pairs(((PyCOMPS_Dict*)self)->dict);
     for (it = pairlist->first; it != pairlist->last; it = it->next) {
-        fprintf(f, "%s = '%s', ", ((COMPS_RTreePair*)it->data)->key,
-                                 (char*)((COMPS_ObjRTreePair*)it->data)->data);
+        tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
+        fprintf(f, "%s = '%s', ", ((COMPS_RTreePair*)it->data)->key, tmpstr);
+        free(tmpstr);
     }
     if (it) {
-        fprintf(f, "%s = '%s'", ((COMPS_ObjRTreePair*)it->data)->key,
-                                 (char*)((COMPS_ObjRTreePair*)it->data)->data);
+        tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
+        fprintf(f, "%s = '%s'", ((COMPS_RTreePair*)it->data)->key, tmpstr);
+        free(tmpstr);
     }
     fprintf(f, "}");
     comps_hslist_destroy(&pairlist);
@@ -195,6 +206,7 @@ Py_ssize_t PyCOMPSDict_len(PyObject *self) {
 PyObject* PyCOMPSDict_get(PyObject *self, PyObject *key) {
     char *ckey;
     COMPS_Object* val;
+    PyObject *ret;
 
     if (__pycomps_stringable_to_char(key, &ckey)) {
         return NULL;
@@ -203,8 +215,13 @@ PyObject* PyCOMPSDict_get(PyObject *self, PyObject *key) {
     free(ckey);
     if (!val)
         Py_RETURN_NONE;
-    else
-       return PyUnicode_FromString(comps_object_tostr(val));
+    else {
+        ckey = comps_object_tostr(val);
+        COMPS_OBJECT_DESTROY(val);
+        ret = PyUnicode_FromString(ckey);
+        free(ckey);
+        return ret;
+    }
 }
 
 int PyCOMPSDict_set(PyObject *self, PyObject *key, PyObject *val) {
@@ -224,6 +241,7 @@ int PyCOMPSDict_set(PyObject *self, PyObject *key, PyObject *val) {
         if (!cval) {
             return -1;
         }
+        //printf("dict set %s %s");
         comps_objdict_set_x(((PyCOMPS_Dict*)self)->dict, ckey,
                           (COMPS_Object*)comps_str_x(cval));
     } else {
@@ -252,6 +270,7 @@ PyObject* PyCOMPSDict_has_key(PyObject * self, PyObject *key) {
 PyObject* PyCOMPSDict_getiter(PyObject *self) {
     PyObject *res;
     res = PyCOMPSDictIter_new(&PyCOMPS_DictIterType, NULL, NULL);
+    PyCOMPSDictIter_init((PyCOMPS_DictIter*)res, NULL, NULL);
     ((PyCOMPS_DictIter*)res)->hslist = comps_objdict_keys(((PyCOMPS_Dict*)self)->dict);
     ((PyCOMPS_DictIter*)res)->hsit = ((PyCOMPS_DictIter*)res)->hslist->first;
     ((PyCOMPS_DictIter*)res)->out_func = &__pycomps_dict_key_out;
@@ -261,6 +280,7 @@ PyObject* PyCOMPSDict_getiter(PyObject *self) {
 PyObject* PyCOMPSDict_getiteritems(PyObject *self) {
     PyObject *res;
     res = PyCOMPSDictIter_new(&PyCOMPS_DictIterType, NULL, NULL);
+    PyCOMPSDictIter_init((PyCOMPS_DictIter*)res, NULL, NULL);
     ((PyCOMPS_DictIter*)res)->hslist = comps_objdict_pairs(((PyCOMPS_Dict*)self)->dict);
     ((PyCOMPS_DictIter*)res)->hsit = ((PyCOMPS_DictIter*)res)->hslist->first;
     ((PyCOMPS_DictIter*)res)->out_func = &__pycomps_dict_pair_out;
@@ -270,6 +290,7 @@ PyObject* PyCOMPSDict_getiteritems(PyObject *self) {
 PyObject* PyCOMPSDict_getitervalues(PyObject *self) {
     PyObject *res;
     res = PyCOMPSDictIter_new(&PyCOMPS_DictIterType, NULL, NULL);
+    PyCOMPSDictIter_init((PyCOMPS_DictIter*)res, NULL, NULL);
     ((PyCOMPS_DictIter*)res)->objlist = comps_objdict_values(((PyCOMPS_Dict*)self)->dict);
     ((PyCOMPS_DictIter*)res)->it = ((PyCOMPS_DictIter*)res)->objlist->first;
     ((PyCOMPS_DictIter*)res)->out_func = &__pycomps_dict_key_out;
@@ -352,12 +373,15 @@ PyObject* PyCOMPSDictIter_new(PyTypeObject *type, PyObject *args, PyObject *kwds
     (void)kwds;
     PyCOMPS_DictIter *self;
     self = (PyCOMPS_DictIter*)type->tp_alloc(type, 0);
+    self->hslist = NULL;
+    self->hsit = NULL;
     return (PyObject*) self;
 }
 
 void PyCOMPSDictIter_dealloc(PyCOMPS_DictIter *self)
 {
     comps_hslist_destroy(&self->hslist);
+    COMPS_OBJECT_DESTROY(self->objlist);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -380,6 +404,8 @@ int PyCOMPSDictIter_init(PyCOMPS_DictIter *self, PyObject *args, PyObject *kwds)
     (void)kwds;
     self->hsit = NULL;
     self->hslist = NULL;
+    self->objlist = NULL;
+    self->it = NULL;
     return 0;
 }
 

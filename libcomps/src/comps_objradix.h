@@ -73,6 +73,7 @@ void comps_objrtree_set_n(COMPS_ObjRTree *rt, char *key, unsigned int len,
                           COMPS_Object *data);
 
 COMPS_Object* comps_objrtree_get(COMPS_ObjRTree * rt, const char * key);
+COMPS_Object* comps_objrtree_get_x(COMPS_ObjRTree * rt, const char * key);
 void comps_objrtree_unset(COMPS_ObjRTree *rt, const char *key);
 void comps_objrtree_clear(COMPS_ObjRTree *rt);
 

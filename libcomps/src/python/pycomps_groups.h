@@ -49,6 +49,7 @@ typedef struct {
 __H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroup) /*pycomps_utils.h macro*/
 __H_COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocGroup) /*pycomps_utils.h macro*/
 __H_COMPS_LIST_GETSET_CLOSURE(COMPS_DocGroup) /*pycomps_utils.h macro*/
+__H_COMPS_DICT_GETSET_CLOSURE(COMPS_DocGroup) /*pycomps_utils.h macro*/
 
 __H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) /*pycomps_utils.h macro*/
 __H_COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) /*pycomps_utils.h macro*/

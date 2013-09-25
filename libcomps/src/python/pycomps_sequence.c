@@ -362,7 +362,7 @@ PyObject* PyCOMPSSeq_iternext(PyObject *iter_o) {
     PyCOMPS_SeqIter *iter = ((PyCOMPS_SeqIter*)iter_o);
     ret = iter->it?iter->it->comps_obj: NULL;
     if (ret) {
-        retp = iter->seq->it_info->out_convert_func(ret);
+        retp = iter->seq->it_info->out_convert_func(comps_object_incref(ret));
         iter->it = iter->it->next;
         return retp;
     }
@@ -459,6 +459,7 @@ int PyCOMPSSeqIter_init(PyCOMPS_SeqIter *self, PyObject *args, PyObject *kwds)
     (void)args;
     (void)kwds;
     self->it = NULL;
+    self->seq = NULL;
     return 0;
 }
 
@@ -493,7 +494,7 @@ PyTypeObject PyCOMPS_SeqIterType = {
     PyCOMPSSeqIter_methods,         /* tp_methods */
     PyCOMPSSeqIter_members,         /* tp_members */
     0,                          /* tp_getset */
-    &PySeqIter_Type,                          /* tp_base */
+    0,                          /* tp_base */
     0,                          /* tp_dict */
     0,                          /* tp_descr_get */
     0,                          /* tp_descr_set */
