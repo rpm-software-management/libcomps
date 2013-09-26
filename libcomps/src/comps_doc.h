@@ -82,7 +82,6 @@
     COMPS_ObjList *ret;\
     ret = (COMPS_ObjList*)comps_objdict_get(doc->objects, #OBJS);\
     if (!ret) {\
-        printf("not exists" #OBJS "\n");\
         ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);\
         comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)ret);\
     } else {\

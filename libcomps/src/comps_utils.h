@@ -143,5 +143,6 @@ void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
 
 char __comps_strcmp(void *s1, void *s2);
 void* __comps_str_clone(void *str);
-void __comps_xml_prop(char *key, COMPS_Object *val, xmlTextWriterPtr writer);
+void __comps_xml_prop(char *key, char *val, xmlTextWriterPtr writer);
+char* __comps_num2boolstr(COMPS_Object* obj);
 #endif

@@ -88,23 +88,31 @@ START_TEST(test_comps_parse1)
                 "\n%s\n", err_log);
         free(err_log);
     }
-    fail_if(comps_doc_groups(parsed->comps_doc)->len != 3, "Should have 3 groups parsed."
-            "Have %d", comps_doc_groups(parsed->comps_doc)->len);
-    fail_if(comps_doc_categories(parsed->comps_doc)->len != 2, "Should have 2 categories"
-            "parsed. Have %d", comps_doc_categories(parsed->comps_doc)->len);
-    fail_if(comps_doc_environments(parsed->comps_doc)->len != 1,
-            "Should have 1 environment parsed. Have %d",
-            comps_doc_environments(parsed->comps_doc)->len);
+    tmplist = comps_doc_groups(parsed->comps_doc);
+    fail_if(tmplist->len != 3, "Should have 3 groups parsed."
+            "Have %d", tmplist->len);
+    COMPS_OBJECT_DESTROY(tmplist);
+    tmplist = comps_doc_categories(parsed->comps_doc);
+    fail_if(tmplist->len != 2, "Should have 2 categories"
+            "parsed. Have %d", tmplist->len);
+    COMPS_OBJECT_DESTROY(tmplist);
+    tmplist = comps_doc_environments(parsed->comps_doc);
+    fail_if(tmplist->len != 1,
+            "Should have 1 environment parsed. Have %d", tmplist->len);
+    COMPS_OBJECT_DESTROY(tmplist);
+
 
     for (int i=0; i<3; i++) {
-        tmpobj2 = comps_objlist_get(comps_doc_groups(parsed->comps_doc), i);
-        fail_if(tmpobj == NULL, "Group not found");
+        tmplist = comps_doc_groups(parsed->comps_doc);
+        tmpobj2 = comps_objlist_get_x(tmplist, i);
+        fail_if(tmpobj2 == NULL, "Group not found");
         tmpobj = comps_docgroup_get_id((COMPS_DocGroup*)tmpobj2);
         tmpstr = comps_object_tostr(tmpobj);
         fail_if(strcmp(tmpstr, groups_ids[i]) != 0,
                        "%d.group should have id:%s not %s",
                         i, groups_ids[i], tmpstr);
         free(tmpstr);
+        COMPS_OBJECT_DESTROY(tmpobj);
 
         tmpobj = comps_docgroup_get_name((COMPS_DocGroup*)tmpobj2);
         tmpstr = comps_object_tostr(tmpobj);
@@ -112,6 +120,7 @@ START_TEST(test_comps_parse1)
                        "%d.group should have name:%s not %s",
                         i, groups_names[i], tmpstr);
         free(tmpstr);
+        COMPS_OBJECT_DESTROY(tmpobj);
 
         tmpobj = comps_docgroup_get_desc((COMPS_DocGroup*)tmpobj2);
         tmpstr = comps_object_tostr(tmpobj);
@@ -119,6 +128,8 @@ START_TEST(test_comps_parse1)
                        "%d.group should have desc:%s not %s",
                         i, groups_descs[i], tmpstr);
         free(tmpstr);
+        COMPS_OBJECT_DESTROY(tmpobj);
+        COMPS_OBJECT_DESTROY(tmplist);
 
         tmplist = comps_docgroup_get_packages((COMPS_DocGroup*)tmpobj2, NULL,
                                              COMPS_PACKAGE_DEFAULT);
@@ -132,30 +143,34 @@ START_TEST(test_comps_parse1)
                 " %d optional packages, Have %d", i, group_packages[i][1],
                 tmplist->len);
         COMPS_OBJECT_DESTROY(tmplist);
-        COMPS_OBJECT_DESTROY(tmpobj2);
     }
     for (int i=0; i<2; i++) {
-        tmpobj2 = comps_objlist_get(comps_doc_categories(parsed->comps_doc), i);
+        tmplist = comps_doc_categories(parsed->comps_doc);
+        tmpobj2 = comps_objlist_get(tmplist, i);
         tmpobj = comps_doccategory_get_id((COMPS_DocCategory*)tmpobj2);
         tmpstr = comps_object_tostr(tmpobj);
         fail_if(strcmp(tmpstr, cats_ids[i]) != 0,
                        "%s. category should have id:%s not %s",
                         i, cats_ids[i], tmpstr);
         free(tmpstr);
+        COMPS_OBJECT_DESTROY(tmpobj);
+
         tmpobj = comps_doccategory_get_name((COMPS_DocCategory*)tmpobj2);
         tmpstr = comps_object_tostr(tmpobj);
         fail_if(strcmp(tmpstr, cats_names[i]) != 0,
                        "%s. category should have name:%s not %s",
                         i, cats_names[i], tmpstr);
         free(tmpstr);
+        COMPS_OBJECT_DESTROY(tmpobj);
+
         fail_if(((COMPS_DocCategory*)tmpobj2)->group_ids->len != cats_gids[i],
                 "Category #%d should have %d groupids, have %d", i,
                 cats_gids[i], ((COMPS_DocCategory*)tmpobj2)->group_ids->len);
         COMPS_OBJECT_DESTROY(tmpobj2);
+        COMPS_OBJECT_DESTROY(tmplist);
     }
     fp = fopen("sample-bad-elem.xml", "r");
     comps_parse_parsed_destroy(parsed);
-    return;
 
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
@@ -244,6 +259,7 @@ START_TEST(test_comps_parse2)
     i = check_errors(parsed->log, known_errors, 8);
 
     fail_if(i != 7);
+
     comps_parse_parsed_destroy(parsed);
     for (i = 0; i < 7; i++) {
         comps_log_entry_destroy(known_errors[i]);
@@ -292,13 +308,17 @@ START_TEST(test_comps_parse3)
         printf("%s = %s\n", ((COMPS_RTreePair*)hsit->data)->key,
                           ((COMPS_RTreePair*)hsit->data)->data);
     }*/
+    COMPS_OBJECT_DESTROY(tmplist);
 
     tmpobj = comps_docgroup_get_id((COMPS_DocGroup*)it->comps_obj);
     fail_if(tmpobj, "%d. category should have NULL id\n");
+    COMPS_OBJECT_DESTROY(tmpobj);
     tmpobj = comps_docgroup_get_name((COMPS_DocGroup*)it->comps_obj);
     fail_if(tmpobj, "%d. category should have NULL name\n");
+    COMPS_OBJECT_DESTROY(tmpobj);
     tmpobj = comps_docgroup_get_desc((COMPS_DocGroup*)it->comps_obj);
     fail_if(tmpobj, "%d. category should have NULL description\n");
+    COMPS_OBJECT_DESTROY(tmpobj);
     comps_parse_parsed_destroy(parsed);
 }
 END_TEST
@@ -430,11 +450,11 @@ Suite* basic_suite (void)
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
     tcase_add_test (tc_core, test_comps_parse1);
-    //tcase_add_test (tc_core, test_comps_parse2);
-    //tcase_add_test (tc_core, test_comps_parse3);
-    //tcase_add_test (tc_core, test_comps_parse4);
-    //tcase_add_test (tc_core, test_comps_parse5);
-    //tcase_add_test (tc_core, test_comps_fedora_parse);
+    tcase_add_test (tc_core, test_comps_parse2);
+    tcase_add_test (tc_core, test_comps_parse3);
+    tcase_add_test (tc_core, test_comps_parse4);
+    tcase_add_test (tc_core, test_comps_parse5);
+    tcase_add_test (tc_core, test_comps_fedora_parse);
     tcase_set_timeout(tc_core, 15);
     suite_add_tcase (s, tc_core);
 

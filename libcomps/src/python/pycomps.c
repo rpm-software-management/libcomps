@@ -108,8 +108,8 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
     COMPS_OBJECT_DESTROY(self_comps->comps_doc);
     if (parsed->comps_doc) {
         self_comps->comps_doc = parsed->comps_doc;
-        self_comps->comps_doc->encoding = parsed->comps_doc->encoding;
-        parsed->comps_doc->encoding = NULL;
+        //self_comps->comps_doc->encoding = parsed->comps_doc->encoding;
+        //parsed->comps_doc->encoding = NULL;
     } else {
         self_comps->comps_doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
                         (COMPS_Object*[]){(COMPS_Object*)comps_str_x("UTF-8")});
@@ -214,8 +214,7 @@ PyObject* PyCOMPS_get_(PyCOMPS *self, void *closure) {
 }
 
 int PyCOMPS_set_(PyCOMPS *self, PyObject *val, void *closure) {
-
-    (void)closure;
+    COMPS_ObjList *list;
 
     if (Py_TYPE(val) != get_closure(closure)->type) {
         PyErr_Format(PyExc_TypeError, "Not %s instance",
@@ -330,7 +329,8 @@ static PyObject* PyCOMPS_union(PyObject *self, PyObject *other) {
 
     COMPS_Doc *un_comps = comps_doc_union(self_t->comps_doc,
                                           other_t->comps_doc);
-    res = (PyCOMPS*)PyCOMPS_new(&PyCOMPS_Type, NULL, NULL);
+    res = PyCOMPS_new(&PyCOMPS_Type, NULL, NULL);
+    PyCOMPS_init(res, NULL, NULL);
     COMPS_OBJECT_DESTROY(res->comps_doc);
     res->comps_doc = un_comps;
     return (PyObject*)res;

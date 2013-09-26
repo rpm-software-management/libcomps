@@ -239,6 +239,8 @@ COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,
     return res;
 }
 
+
+
 void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                         COMPS_Logger *log) {
     COMPS_ObjListIt *it;
@@ -254,15 +256,28 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                               0, 0, 0};
     static char* aliases[] = {NULL, NULL, NULL, "description", "description",
                               "default", NULL, NULL, NULL};
+    static char*(*tostrf[])(COMPS_Object*) = {&comps_object_tostr,
+                                               &comps_object_tostr,
+                                               &comps_object_tostr,
+                                               &comps_object_tostr,
+                                               &comps_object_tostr,
+                                               &__comps_num2boolstr,
+                                               &__comps_num2boolstr,
+                                               &comps_object_tostr,
+                                               &comps_object_tostr};
     char *str;
 
     xmlTextWriterStartElement(writer, BAD_CAST "group");
     for (int i=0; i<9; i++) {
+        printf("%s\n", props[i]);
         if (!type[i]) {
-            obj = comps_objdict_get(group->properties, props[i]);
+            obj = comps_objdict_get_x(group->properties, props[i]);
             if (obj) {
-                __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj, writer);
-                COMPS_OBJECT_DESTROY(obj);
+                str = tostrf[i](obj);
+                __comps_xml_prop((aliases[i])?aliases[i]:props[i], str, writer);
+                free(str);
+            } else {
+                printf("missing %s\n", props[i]);
             }
         } else {
             pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)
@@ -272,7 +287,7 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                             (const xmlChar*)((aliases[i])?aliases[i]:props[i]));
                 xmlTextWriterWriteAttribute(writer, (xmlChar*) BAD_CAST "xml:lang",
                         (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
-                str = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
+                str = tostrf[i](((COMPS_ObjRTreePair*)hsit->data)->data);
                 xmlTextWriterWriteString(writer, (xmlChar*)str);
                 free(str);
                 xmlTextWriterEndElement(writer);
