@@ -37,9 +37,9 @@ typedef struct {
     COMPS_ObjList *packages;
 } COMPS_DocGroup;
 
-HEAD_COMPS_CREATE_u(docgroup, COMPS_DocGroup)  /*comps_utils.h macro*/
-HEAD_COMPS_COPY_u(docgroup, COMPS_DocGroup)  /*comps_utils.h macro*/
-HEAD_COMPS_DESTROY_u(docgroup, COMPS_DocGroup)  /*comps_utils.h macro*/
+//HEAD_COMPS_CREATE_u(docgroup, COMPS_DocGroup)  /*comps_utils.h macro*/
+//HEAD_COMPS_COPY_u(docgroup, COMPS_DocGroup)  /*comps_utils.h macro*/
+//HEAD_COMPS_DESTROY_u(docgroup, COMPS_DocGroup)  /*comps_utils.h macro*/
 
 HEAD_COMPS_STRPROP_SETTER(group, COMPS_DocGroup, id) /*comps_utils.h macro*/
 HEAD_COMPS_STRPROP_SETTER(group, COMPS_DocGroup, name) /*comps_utils.h macro*/

@@ -28,9 +28,9 @@ typedef struct {
     char def;
 } COMPS_DocGroupId;
 
-HEAD_COMPS_CREATE_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
-HEAD_COMPS_COPY_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
-HEAD_COMPS_DESTROY_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
+//HEAD_COMPS_CREATE_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
+//HEAD_COMPS_COPY_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
+//HEAD_COMPS_DESTROY_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
 
 char __comps_docgroupid_cmp_set(void *gid1, void *gid2);
 

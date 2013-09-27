@@ -110,12 +110,13 @@ COMPS_Object* CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _get_), PROPNAME)\
                                                         (COMPS_Object* obj_dst,\
                                                          COMPS_Object* obj_src);
 
-#define COMPS_DESTROY_u(NAME, TYPE) void CONCAT(CONCAT(comps_, NAME), _destroy_u)\
-                                                            (COMPS_Object* obj){\
+#define COMPS_DESTROY_u(NAME, TYPE)\
+static void CONCAT(CONCAT(comps_, NAME), _destroy_u)(COMPS_Object* obj){\
     CONCAT(CONCAT(comps_, NAME),_destroy) ((TYPE*)obj);\
 }
-#define HEAD_COMPS_DESTROY_u(NAME, TYPE) void CONCAT(CONCAT(comps_, NAME), _destroy_u)\
-                                                            (COMPS_Object* obj);
+#define HEAD_COMPS_DESTROY_u(NAME, TYPE)\
+static void CONCAT(CONCAT(comps_, NAME), _destroy_u)(COMPS_Object* obj);
+
 #define COMPS_CMP_u(NAME, TYPE) signed char CONCAT(CONCAT(comps_,NAME),_cmp_u)\
                                                             (COMPS_Object* obj_dst,\
                                                              COMPS_Object* obj_src){\

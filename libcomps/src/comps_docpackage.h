@@ -35,9 +35,9 @@ typedef struct {
 } COMPS_DocGroupPackage;
 
 
-HEAD_COMPS_CREATE_u(docpackage, COMPS_DocGroupPackagePackage)  /*comps_utils.h macro*/
-HEAD_COMPS_COPY_u(docpackage, COMPS_DocGroupPackagePackage)  /*comps_utils.h macro*/
-HEAD_COMPS_DESTROY_u(docpackage, COMPS_DocGroupPackagePackage)  /*comps_utils.h macro*/
+//HEAD_COMPS_CREATE_u(docpackage, COMPS_DocGroupPackagePackage)  /*comps_utils.h macro*/
+//HEAD_COMPS_COPY_u(docpackage, COMPS_DocGroupPackagePackage)  /*comps_utils.h macro*/
+//HEAD_COMPS_DESTROY_u(docpackage, COMPS_DocGroupPackagePackage)  /*comps_utils.h macro*/
 
 signed char comps_docpackage_cmp_u(COMPS_Object *pkg1, COMPS_Object *pkg2);
 char comps_docpackage_cmp_set(void *pkg1, void *pkg2);

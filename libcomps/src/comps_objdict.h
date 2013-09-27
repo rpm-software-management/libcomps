@@ -59,7 +59,7 @@ void comps_objdict_unset(COMPS_ObjDict * rt, const char * key);
 void comps_objdict_clear(COMPS_ObjDict * rt);
 //void comps_mdict_clear(COMPS_MDict * rt);
 
-COMPS_ObjList * comps_objdict_values(COMPS_ObjDict * rt);
+COMPS_HSList * comps_objdict_values(COMPS_ObjDict * rt);
 
 void comps_objdict_values_walk(COMPS_ObjRTree * rt, void* udata,
                               void (*walk_f)(void*, COMPS_Object*));

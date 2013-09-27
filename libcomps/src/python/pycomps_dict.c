@@ -25,6 +25,14 @@ PyObject* __pycomps_dict_key_out(COMPS_HSListItem *hsit) {
     return PyUnicode_FromString((char*)hsit->data);
 }
 
+PyObject* __pycomps_dict_val_out(COMPS_HSListItem *hsit) {
+    char *str = comps_object_tostr((COMPS_Object*)hsit->data);
+    PyObject *ret;
+    ret = PyUnicode_FromString(str);
+    free(str);
+    return ret;
+}
+
 PyObject* __pycomps_dict_pair_out(COMPS_HSListItem *hsit) {
     PyObject *key, *val, *tuple;
     char *x;
@@ -291,9 +299,9 @@ PyObject* PyCOMPSDict_getitervalues(PyObject *self) {
     PyObject *res;
     res = PyCOMPSDictIter_new(&PyCOMPS_DictIterType, NULL, NULL);
     PyCOMPSDictIter_init((PyCOMPS_DictIter*)res, NULL, NULL);
-    ((PyCOMPS_DictIter*)res)->objlist = comps_objdict_values(((PyCOMPS_Dict*)self)->dict);
-    ((PyCOMPS_DictIter*)res)->it = ((PyCOMPS_DictIter*)res)->objlist->first;
-    ((PyCOMPS_DictIter*)res)->out_func = &__pycomps_dict_key_out;
+    ((PyCOMPS_DictIter*)res)->hslist = comps_objdict_values(((PyCOMPS_Dict*)self)->dict);
+    ((PyCOMPS_DictIter*)res)->hsit = ((PyCOMPS_DictIter*)res)->hslist->first;
+    ((PyCOMPS_DictIter*)res)->out_func = &__pycomps_dict_val_out;
     return res;
 }
 

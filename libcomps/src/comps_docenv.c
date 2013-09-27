@@ -48,7 +48,7 @@ void comps_docenv_copy(COMPS_DocEnv *env_dst, COMPS_DocEnv *env_src) {
 }
 COMPS_COPY_u(docenv, COMPS_DocEnv)    /*comps_utils.h macro*/
 
-void comps_docenv_destroy(COMPS_DocEnv *env) {
+static void comps_docenv_destroy(COMPS_DocEnv *env) {
     comps_object_destroy((COMPS_Object*)env->properties);
     comps_object_destroy((COMPS_Object*)env->name_by_lang);
     comps_object_destroy((COMPS_Object*)env->desc_by_lang);
@@ -277,10 +277,13 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     xmlTextWriterStartElement(writer, BAD_CAST "env");
     for (int i=0; i<6; i++) {
         if (!type[i]) {
-            obj = comps_objdict_get(env->properties, props[i]);
+            obj = comps_objdict_get_x(env->properties, props[i]);
             if (obj) {
-                __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj, writer);
-                COMPS_OBJECT_DESTROY(obj);
+                str = comps_object_tostr(obj);
+                __comps_xml_prop((aliases[i])?aliases[i]:props[i], str, writer);
+                free(str);
+            } else {
+                //printf("missing %s\n", props[i]);
             }
         } else {
             pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)
@@ -305,8 +308,9 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
             xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
                                                 BAD_CAST "true");
         }
-        xmlTextWriterWriteString(writer,
-                            BAD_CAST ((COMPS_DocGroupId*)it->comps_obj)->name);
+        str = comps_object_tostr((COMPS_Object*)((COMPS_DocGroupId*)it->comps_obj)->name);
+        xmlTextWriterWriteString(writer, BAD_CAST str);
+        free(str);
         xmlTextWriterEndElement(writer);
     }
     xmlTextWriterEndElement(writer);
@@ -317,8 +321,9 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
             xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
                                                 BAD_CAST "true");
         }
-        xmlTextWriterWriteString(writer,
-                            BAD_CAST ((COMPS_DocGroupId*)it->comps_obj)->name);
+        str = comps_object_tostr((COMPS_Object*)((COMPS_DocGroupId*)it->comps_obj)->name);
+        xmlTextWriterWriteString(writer, BAD_CAST str);
+        free(str);
         xmlTextWriterEndElement(writer);
     }
     xmlTextWriterEndElement(writer);

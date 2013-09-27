@@ -41,7 +41,7 @@ inline void comps_objdict_unset(COMPS_ObjDict * rt, const char * key) {
 inline void comps_objdict_clear(COMPS_ObjDict * rt) {
     comps_objrtree_clear((COMPS_ObjRTree*) rt);
 }
-inline COMPS_ObjList * comps_objdict_values(COMPS_ObjDict * rt) {
+inline COMPS_HSList * comps_objdict_values(COMPS_ObjDict * rt) {
     return comps_objrtree_values((COMPS_ObjRTree*)rt);
 }
 inline void comps_objdict_values_walk(COMPS_ObjRTree * rt, void* udata,

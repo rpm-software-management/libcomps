@@ -50,6 +50,7 @@ signed char comps_doc_cmp_u(COMPS_Object *obj1, COMPS_Object *obj2) {
     if (!comps_object_cmp((COMPS_Object*)((COMPS_Doc*)obj1)->encoding,
                           (COMPS_Object*)((COMPS_Doc*)obj2)->encoding))
                             return 0;
+    printf("encoding pass\n");
     return (!comps_object_cmp((COMPS_Object*)((COMPS_Doc*)obj1)->objects,
                               (COMPS_Object*)((COMPS_Doc*)obj2)->objects));
 }
@@ -153,7 +154,7 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
     COMPS_Set *set;
     COMPS_Doc *res;
     COMPS_DocGroup *tmpgroup;
-    COMPS_DocCategory *tmpcat;
+    //COMPS_DocCategory *tmpcat;
     COMPS_DocEnv *tmpenv;
     COMPS_HSListItem *hsit;
     COMPS_ObjList *groups = comps_doc_groups(c1);

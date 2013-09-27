@@ -194,6 +194,7 @@ PyObject* PyCOMPSGroup_cmp(PyObject *self, PyObject *other, int op) {
 
     // Only eq and neq operators allowed
     CMP_OP_EQ_NE_CHECK(op)
+    printf("pygroup cmp\n");
 
     if (other == NULL || ( Py_TYPE(other) != Py_TYPE(self)
                            && other != Py_None)) {
@@ -205,6 +206,7 @@ PyObject* PyCOMPSGroup_cmp(PyObject *self, PyObject *other, int op) {
 
     ret = COMPS_OBJECT_CMP(((PyCOMPS_Group*)self)->group,
                            ((PyCOMPS_Group*)other)->group);
+    //printf("pygroup cmp 2\n");
     if (op == Py_EQ) {
         if (!ret) Py_RETURN_FALSE;
     } else {

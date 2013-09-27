@@ -19,9 +19,9 @@ typedef struct {
     COMPS_ObjList *option_list;
 } COMPS_DocEnv;
 
-HEAD_COMPS_CREATE_u(docenv, COMPS_DocEnv)  /*comps_utils.h macro*/
-HEAD_COMPS_COPY_u(docenv, COMPS_DocEnv)  /*comps_utils.h macro*/
-HEAD_COMPS_DESTROY_u(docenv, COMPS_DocEnv)  /*comps_utils.h macro*/
+//HEAD_COMPS_CREATE_u(docenv, COMPS_DocEnv)  /*comps_utils.h macro*/
+//HEAD_COMPS_COPY_u(docenv, COMPS_DocEnv)  /*comps_utils.h macro*/
+//HEAD_COMPS_DESTROY_u(docenv, COMPS_DocEnv)  /*comps_utils.h macro*/
 
 HEAD_COMPS_PROP_GETTER(env, COMPS_DocEnv, id) /*comps_utils.h macro*/
 HEAD_COMPS_PROP_GETTER(env, COMPS_DocEnv, name) /*comps_utils.h macro*/

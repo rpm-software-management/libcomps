@@ -45,7 +45,7 @@ void comps_doccategory_copy(COMPS_DocCategory *category_dst,
 }
 COMPS_COPY_u(doccategory, COMPS_DocCategory)    /*comps_utils.h macro*/
 
-void comps_doccategory_destroy(COMPS_DocCategory *category) {
+static void comps_doccategory_destroy(COMPS_DocCategory *category) {
     COMPS_OBJECT_DESTROY(category->properties);
     COMPS_OBJECT_DESTROY(category->name_by_lang);
     COMPS_OBJECT_DESTROY(category->desc_by_lang);
@@ -215,10 +215,14 @@ void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
     xmlTextWriterStartElement(writer, BAD_CAST "category");
     for (int i=0; i<6; i++) {
         if (!type[i]) {
-            obj = comps_objdict_get(category->properties, props[i]);
+            obj = comps_objdict_get_x(category->properties, props[i]);
             if (obj) {
-                __comps_xml_prop((aliases[i])?aliases[i]:props[i], obj, writer);
-                COMPS_OBJECT_DESTROY(obj);
+                str = comps_object_tostr(obj);
+                //printf("%s = %s\n", props[i], str);
+                __comps_xml_prop((aliases[i])?aliases[i]:props[i], str, writer);
+                free(str);
+            } else {
+                //printf("missing %s\n", props[i]);
             }
         } else {
             pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)

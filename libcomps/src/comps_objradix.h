@@ -80,7 +80,7 @@ void comps_objrtree_clear(COMPS_ObjRTree *rt);
 char comps_objrtree_paircmp(void *obj1, void *obj2);
 void comps_objrtree_values_walk(COMPS_ObjRTree * rt, void* udata,
                                 void (*walk_f)(void*, COMPS_Object*));
-COMPS_ObjList * comps_objrtree_values(COMPS_ObjRTree * rt);
+COMPS_HSList * comps_objrtree_values(COMPS_ObjRTree * rt);
 COMPS_HSList* comps_objrtree_keys(COMPS_ObjRTree *rt);
 COMPS_HSList* comps_objrtree_pairs(COMPS_ObjRTree * rt);
 COMPS_ObjRTree* comps_objrtree_clone(COMPS_ObjRTree *rt);

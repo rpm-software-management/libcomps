@@ -65,7 +65,7 @@ COMPS_ObjRTreeData * comps_objrtree_data_create_n(char *key, unsigned keylen,
     return rtd;
 }
 
-void comps_objrtree_create(COMPS_ObjRTree *rtree, COMPS_Object **args) {
+static void comps_objrtree_create(COMPS_ObjRTree *rtree, COMPS_Object **args) {
     (void)args;
     rtree->subnodes = comps_hslist_create();
     comps_hslist_init(rtree->subnodes, NULL, NULL, &comps_objrtree_data_destroy_v);
@@ -75,18 +75,24 @@ void comps_objrtree_create(COMPS_ObjRTree *rtree, COMPS_Object **args) {
     }
     rtree->len = 0;
 }
-COMPS_CREATE_u(objrtree, COMPS_ObjRTree)
+void comps_objrtree_create_u(COMPS_Object * obj, COMPS_Object **args) {
+    (void)args;
+    comps_objrtree_create((COMPS_ObjRTree*)obj, NULL);
+}
 
-void comps_objrtree_destroy(COMPS_ObjRTree * rt) {
+static void comps_objrtree_destroy(COMPS_ObjRTree * rt) {
     comps_hslist_destroy(&(rt->subnodes));
 }
-COMPS_DESTROY_u(objrtree, COMPS_ObjRTree)
+void comps_objrtree_destroy_u(COMPS_Object *obj) {
+    comps_objrtree_destroy((COMPS_ObjRTree*)obj);
+}
 
-COMPS_ObjList * comps_objrtree_values(COMPS_ObjRTree * rt) {
-    COMPS_ObjList *ret;
+COMPS_HSList * comps_objrtree_values(COMPS_ObjRTree * rt) {
+    COMPS_HSList *ret;
     COMPS_HSList *tmplist, *tmp_subnodes;
     COMPS_HSListItem *it, *firstit;
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = comps_hslist_create();
+    comps_hslist_init(ret, NULL, NULL, NULL);
     tmplist = comps_hslist_create();
     comps_hslist_init(tmplist, NULL, NULL, NULL);
     comps_hslist_append(tmplist, rt->subnodes, 0);
@@ -101,8 +107,8 @@ COMPS_ObjList * comps_objrtree_values(COMPS_ObjRTree * rt) {
                                     ((COMPS_ObjRTreeData*)it->data)->subnodes, 0);
             }
             if (((COMPS_ObjRTreeData*)it->data)->data != NULL) {
-                comps_objlist_append(ret,
-                                    ((COMPS_ObjRTreeData*)it->data)->data);
+                comps_hslist_append(ret,
+                                    ((COMPS_ObjRTreeData*)it->data)->data, 0);
             }
         }
         free(firstit);
@@ -249,6 +255,8 @@ void comps_objrtree_values_walk(COMPS_ObjRTree * rt, void* udata,
 }
 
 char comps_objrtree_paircmp(void *obj1, void *obj2) {
+    //printf("comparing %s with %s\n", ((COMPS_ObjRTreePair*)obj1)->key,
+    //                               ((COMPS_ObjRTreePair*)obj2)->key);
     if (strcmp(((COMPS_ObjRTreePair*)obj1)->key,
                ((COMPS_ObjRTreePair*)obj2)->key) != 0)
         return 0;
@@ -259,14 +267,30 @@ char comps_objrtree_paircmp(void *obj1, void *obj2) {
 
 signed char comps_objrtree_cmp(COMPS_ObjRTree *ort1, COMPS_ObjRTree *ort2) {
     COMPS_HSList *values1, *values2;
+    COMPS_HSListItem *it;
+    COMPS_Set *set1, *set2;
     signed char ret;
     values1 = comps_objrtree_pairs(ort1);
     values2 = comps_objrtree_pairs(ort2);
-    
-    ret = comps_hslist_values_equal(values1, values2, &comps_objrtree_paircmp);
+    set1 = comps_set_create();
+    comps_set_init(set1, NULL, NULL, NULL, &comps_objrtree_paircmp);
+    set2 = comps_set_create();
+    comps_set_init(set2, NULL, NULL, NULL, &comps_objrtree_paircmp);
+    for (it = values1->first; it != NULL; it = it->next) {
+        comps_set_add(set1, it->data);
+    }
+    for (it = values2->first; it != NULL; it = it->next) {
+        comps_set_add(set2, it->data);
+    }
+
+    ret = comps_set_cmp(set1, set2);
+    comps_set_destroy(&set1);
+    comps_set_destroy(&set2);
+    printf("objrtree cmp %d\n", !ret);
+
     comps_hslist_destroy(&values1);
     comps_hslist_destroy(&values2);
-    return ret;
+    return !ret;
 }
 COMPS_CMP_u(objrtree, COMPS_ObjRTree)
 

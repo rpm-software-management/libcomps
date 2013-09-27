@@ -122,9 +122,9 @@ typedef struct {
     COMPS_Str *encoding;
     } COMPS_Doc;
 
-HEAD_COMPS_CREATE_u(doc, COMPS_Doc)  /*comps_utils.h macro*/
-HEAD_COMPS_COPY_u(doc, COMPS_Doc)  /*comps_utils.h macro*/
-HEAD_COMPS_DESTROY_u(doc, COMPS_Doc)  /*comps_utils.h macro*/
+//HEAD_COMPS_CREATE_u(doc, COMPS_Doc)  /*comps_utils.h macro*/
+//HEAD_COMPS_COPY_u(doc, COMPS_Doc)  /*comps_utils.h macro*/
+//HEAD_COMPS_DESTROY_u(doc, COMPS_Doc)  /*comps_utils.h macro*/
 
 void comps_doc_create(COMPS_Doc* doc, COMPS_Object **args);
 void comps_doc_copy(COMPS_Doc *doc_dst, COMPS_Doc *doc_src);

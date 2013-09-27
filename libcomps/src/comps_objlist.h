@@ -45,10 +45,11 @@ typedef struct COMPS_ObjList {
 } COMPS_ObjList;
 
 
-void comps_objlist_create(COMPS_ObjList *objlist, COMPS_Object **args);
-void comps_objlist_create_u(COMPS_Object *uobj, COMPS_Object **args);
-void comps_objlist_destroy(COMPS_ObjList *objlist);
-void comps_objlist_destroy_u(COMPS_Object *objlist);
+//void comps_objlist_create(COMPS_ObjList *objlist, COMPS_Object **args);
+//void comps_objlist_create_u(COMPS_Object *uobj, COMPS_Object **args);
+//void comps_objlist_destroy(COMPS_ObjList *objlist);
+//void comps_objlist_destroy_u(COMPS_Object *objlist);
+
 void comps_objlist_clear(COMPS_ObjList *objlist);
 
 

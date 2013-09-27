@@ -694,7 +694,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 break;
             }
             list = comps_doc_groups(parsed->comps_doc);
-            prop = comps_objdict_get_x(list_last_cat->properties, "lang_only");
+            prop = comps_objdict_get_x(list_last_cat->properties, "langonly");
             if (prop) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
@@ -702,7 +702,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 free(parsed->tmp_buffer);
             } else {
                 prop = (COMPS_Object*)comps_str_x(parsed->tmp_buffer);
-                comps_objdict_set_x(list_last_group->properties, "lang_only", prop);
+                comps_objdict_set_x(list_last_group->properties, "langonly", prop);
             }
             parsed->tmp_buffer = NULL;
             COMPS_OBJECT_DESTROY(list);
@@ -733,7 +733,7 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
     COMPS_DocGroupPackage * package;
     COMPS_DocGroupId *groupid;
     COMPS_Object *prop;
-    COMPS_ObjList *list;
+    //COMPS_ObjList *list;
     char *tmp;
 
     /* prepare currently processed element. Create it, set text_buffer pointer
@@ -914,7 +914,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
 
             package->type = comps_package_get_type(comps_dict_get(elem->attrs,
                                                                   "type"));
-            package->requires = comps_str(comps_dict_get(elem->attrs, "requires"));
+            tmp = comps_dict_get(elem->attrs, "requires");
+            if (tmp)
+                package->requires = comps_str(tmp);
 
             if (package->type == COMPS_PACKAGE_UNKNOWN)
                 comps_log_warning(parsed->log,

@@ -18,7 +18,7 @@
  */
 
 #include "comps_docpackage.h"
-void comps_docpackage_create(COMPS_DocGroupPackage* package, COMPS_Object **args) {
+static void comps_docpackage_create(COMPS_DocGroupPackage* package, COMPS_Object **args) {
 
     (void)args;
     package->name = NULL;
@@ -27,7 +27,7 @@ void comps_docpackage_create(COMPS_DocGroupPackage* package, COMPS_Object **args
 }
 COMPS_CREATE_u(docpackage, COMPS_DocGroupPackage)
 
-void comps_docpackage_copy(COMPS_DocGroupPackage *pkg_dst,
+static void comps_docpackage_copy(COMPS_DocGroupPackage *pkg_dst,
                            COMPS_DocGroupPackage *pkg_src) {
     pkg_dst->name = (COMPS_Str*)comps_object_copy((COMPS_Object*)pkg_src->name);
     pkg_dst->requires = (COMPS_Str*)comps_object_copy(
@@ -36,7 +36,7 @@ void comps_docpackage_copy(COMPS_DocGroupPackage *pkg_dst,
 }
 COMPS_COPY_u(docpackage, COMPS_DocGroupPackage)    /*comps_utils.h macro*/
 
-void comps_docpackage_destroy(COMPS_DocGroupPackage *pkg) {
+static void comps_docpackage_destroy(COMPS_DocGroupPackage *pkg) {
     comps_object_destroy((COMPS_Object*)pkg->name);
     comps_object_destroy((COMPS_Object*)pkg->requires);
 }

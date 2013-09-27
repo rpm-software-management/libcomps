@@ -45,7 +45,7 @@ void comps_docgroup_copy(COMPS_DocGroup *group_dst,
 }
 COMPS_COPY_u(docgroup, COMPS_DocGroup)    /*comps_utils.h macro*/
 
-void comps_docgroup_destroy(COMPS_DocGroup *group) {
+static void comps_docgroup_destroy(COMPS_DocGroup *group) {
     
     COMPS_OBJECT_DESTROY(group->properties);
     COMPS_OBJECT_DESTROY(group->name_by_lang);
@@ -122,14 +122,20 @@ signed char comps_docgroup_cmp_u(COMPS_Object *group1, COMPS_Object *group2) {
     #define _group1 ((COMPS_DocGroup*)group1)
     #define _group2 ((COMPS_DocGroup*)group2)
 
+    printf("group cmp start\n");
     if (!comps_object_cmp((COMPS_Object*)_group1->properties,
                           (COMPS_Object*)_group2->properties)) return 0;
+    printf("group cmp properties pass\n");
     if (!comps_object_cmp((COMPS_Object*)_group1->name_by_lang,
                           (COMPS_Object*)_group2->name_by_lang)) return 0;
+    printf("group cmp name_by_lang pass\n");
     if (!comps_object_cmp((COMPS_Object*)_group1->desc_by_lang,
                           (COMPS_Object*)_group2->desc_by_lang)) return 0;
+    printf("group cmp desc_by_lang pass\n");
     if (!comps_object_cmp((COMPS_Object*)_group1->packages,
                           (COMPS_Object*)_group2->packages)) return 0;
+    printf("group cmp packages pass\n");
+    printf("---------------------------\n");
     return 1;
     #undef _group1
     #undef _group2
@@ -269,7 +275,7 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
 
     xmlTextWriterStartElement(writer, BAD_CAST "group");
     for (int i=0; i<9; i++) {
-        printf("%s\n", props[i]);
+        //printf("%s\n", props[i]);
         if (!type[i]) {
             obj = comps_objdict_get_x(group->properties, props[i]);
             if (obj) {
@@ -277,7 +283,7 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                 __comps_xml_prop((aliases[i])?aliases[i]:props[i], str, writer);
                 free(str);
             } else {
-                printf("missing %s\n", props[i]);
+                //printf("missing %s\n", props[i]);
             }
         } else {
             pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)
@@ -295,10 +301,11 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
             comps_hslist_destroy(&pairlist);
         }
     }
-    xmlTextWriterStartElement(writer, (xmlChar*)"packages");
+    xmlTextWriterStartElement(writer, (xmlChar*)"packagelist");
     for (it = group->packages->first; it != NULL; it = it->next) {
         comps_docpackage_xml((COMPS_DocGroupPackage*)it->comps_obj, writer, log);
     }
+    xmlTextWriterEndElement(writer);
     xmlTextWriterEndElement(writer);
 }
 
