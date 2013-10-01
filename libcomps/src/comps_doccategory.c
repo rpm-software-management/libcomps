@@ -85,13 +85,26 @@ signed char comps_doccategory_cmp_u(COMPS_Object *cat1, COMPS_Object *cat2) {
     #define _cat2 ((COMPS_DocCategory*)cat2)
 
     if (!comps_object_cmp((COMPS_Object*)_cat1->properties,
-                          (COMPS_Object*)_cat2->properties)) return 0;
+                          (COMPS_Object*)_cat2->properties)) {
+        //printf("Category properties cmp fail\n");
+        return 0;
+    }
     if (!comps_object_cmp((COMPS_Object*)_cat1->name_by_lang,
-                          (COMPS_Object*)_cat2->name_by_lang)) return 0;
+                          (COMPS_Object*)_cat2->name_by_lang)) {
+        //printf("Category name_by_lang cmp fail\n");
+        return 0;
+    }
     if (!comps_object_cmp((COMPS_Object*)_cat1->desc_by_lang,
-                          (COMPS_Object*)_cat2->desc_by_lang)) return 0;
+                          (COMPS_Object*)_cat2->desc_by_lang)) {
+        //printf("Category desc_by_lang cmp fail\n");
+        return 0;
+    }
     if (!comps_object_cmp((COMPS_Object*)_cat1->group_ids,
-                          (COMPS_Object*)_cat2->group_ids)) return 0;
+                          (COMPS_Object*)_cat2->group_ids)) {
+        //printf("Category group_ids cmp fail\n");
+        return 0;
+    }
+    //printf("group category pass\n");
     return 1;
     #undef _cat1
     #undef _cat2

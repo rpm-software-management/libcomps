@@ -92,6 +92,7 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
     char *fname;
     signed char parsed_ret;
     PyCOMPS *self_comps = (PyCOMPS*)self;
+    COMPS_Object *tmpstr;
 
     if (__pycomps_arg_to_char(other, &fname)) return NULL;
 
@@ -111,8 +112,13 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
         //self_comps->comps_doc->encoding = parsed->comps_doc->encoding;
         //parsed->comps_doc->encoding = NULL;
     } else {
+        //printf("comps error\n");
+        //self_comps->comps_doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
+        //                                                        NULL);
+        tmpstr = (COMPS_Object*)comps_str("UTF-8");
         self_comps->comps_doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
-                        (COMPS_Object*[]){(COMPS_Object*)comps_str_x("UTF-8")});
+                        (COMPS_Object*[]){tmpstr});
+        COMPS_OBJECT_DESTROY(tmpstr);
     }
     comps_log_destroy(self_comps->comps_doc->log);
     self_comps->comps_doc->log = parsed->log;
@@ -204,6 +210,7 @@ PyObject* PyCOMPS_get_(PyCOMPS *self, void *closure) {
         ret = PyCOMPSSeq_new(get_closure(closure)->type, NULL, NULL);
         Py_TYPE(ret)->tp_init(ret, NULL, NULL);
         list = get_closure(closure)->get_f(self->comps_doc);
+        COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)ret)->list);
         ((PyCOMPS_Sequence*)ret)->list = list;
         SET_TO(self, get_closure(closure)->pobj_offset, ret)
     } else {
@@ -214,7 +221,7 @@ PyObject* PyCOMPS_get_(PyCOMPS *self, void *closure) {
 }
 
 int PyCOMPS_set_(PyCOMPS *self, PyObject *val, void *closure) {
-    COMPS_ObjList *list;
+    //COMPS_ObjList *list;
 
     if (Py_TYPE(val) != get_closure(closure)->type) {
         PyErr_Format(PyExc_TypeError, "Not %s instance",
@@ -225,7 +232,7 @@ int PyCOMPS_set_(PyCOMPS *self, PyObject *val, void *closure) {
         Py_DECREF((PyObject*)GET_FROM(self, get_closure(closure)->pobj_offset));
         SET_TO(self, get_closure(closure)->pobj_offset, NULL);
     }
-    //TODO
+    get_closure(closure)->set_f(self->comps_doc, ((PyCOMPS_Sequence*)val)->list);
     SET_TO(self, get_closure(closure)->pobj_offset, val);
     Py_INCREF(val);
     return 0;
@@ -329,7 +336,7 @@ static PyObject* PyCOMPS_union(PyObject *self, PyObject *other) {
 
     COMPS_Doc *un_comps = comps_doc_union(self_t->comps_doc,
                                           other_t->comps_doc);
-    res = PyCOMPS_new(&PyCOMPS_Type, NULL, NULL);
+    res = (PyCOMPS*)PyCOMPS_new(&PyCOMPS_Type, NULL, NULL);
     PyCOMPS_init(res, NULL, NULL);
     COMPS_OBJECT_DESTROY(res->comps_doc);
     res->comps_doc = un_comps;

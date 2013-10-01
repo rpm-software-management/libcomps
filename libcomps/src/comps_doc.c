@@ -26,7 +26,9 @@ void comps_doc_create(COMPS_Doc* doc, COMPS_Object **args) {
                                                        NULL);
     doc->log = comps_log_create(0);
     if (args && args[0]->obj_info == &COMPS_Str_ObjInfo) {
-        doc->encoding = (COMPS_Str*) comps_object_copy(args[0]);
+        doc->encoding = (COMPS_Str*) comps_object_incref(args[0]);
+    } else {
+        doc->encoding = NULL;
     }
 }
 COMPS_CREATE_u(doc, COMPS_Doc)
@@ -47,12 +49,77 @@ void comps_doc_destroy(COMPS_Doc *doc) {
 COMPS_DESTROY_u(doc, COMPS_Doc)
 
 signed char comps_doc_cmp_u(COMPS_Object *obj1, COMPS_Object *obj2) {
-    if (!comps_object_cmp((COMPS_Object*)((COMPS_Doc*)obj1)->encoding,
-                          (COMPS_Object*)((COMPS_Doc*)obj2)->encoding))
-                            return 0;
-    printf("encoding pass\n");
-    return (!comps_object_cmp((COMPS_Object*)((COMPS_Doc*)obj1)->objects,
-                              (COMPS_Object*)((COMPS_Doc*)obj2)->objects));
+    COMPS_Object *tmp1, *tmp2;
+    signed char ret;
+
+    #define _doc1_ ((COMPS_Doc*)obj1)
+    #define _doc2_ ((COMPS_Doc*)obj2)
+ 
+    if (!comps_object_cmp((COMPS_Object*)_doc1_->encoding,
+                          (COMPS_Object*)_doc2_->encoding)) {
+        return 0;
+    }
+    tmp1 = (COMPS_Object*) comps_doc_categories(_doc1_);
+    tmp2 = (COMPS_Object*) comps_doc_categories(_doc2_);
+    ret = comps_object_cmp(tmp1, tmp2);
+    COMPS_OBJECT_DESTROY(tmp1);
+    COMPS_OBJECT_DESTROY(tmp2);
+    if (!ret) {
+        //printf("categories cmp fail\n");
+        return ret;
+    }
+
+    tmp1 = (COMPS_Object*) comps_doc_groups(_doc1_);
+    tmp2 = (COMPS_Object*) comps_doc_groups(_doc2_);
+    ret = comps_object_cmp(tmp1, tmp2);
+    COMPS_OBJECT_DESTROY(tmp1);
+    COMPS_OBJECT_DESTROY(tmp2);
+    if (!ret) {
+        //printf("groups cmp fail\n");
+        return ret;
+    }
+
+    tmp1 = (COMPS_Object*) comps_doc_environments(_doc1_);
+    tmp2 = (COMPS_Object*) comps_doc_environments(_doc2_);
+    ret = comps_object_cmp(tmp1, tmp2);
+    COMPS_OBJECT_DESTROY(tmp1);
+    COMPS_OBJECT_DESTROY(tmp2);
+    if (!ret) {
+        //printf("envs cmp fail\n");
+        return ret;
+    }
+
+    tmp1 = (COMPS_Object*) comps_doc_langpacks(_doc1_);
+    tmp2 = (COMPS_Object*) comps_doc_langpacks(_doc2_);
+    ret = comps_object_cmp(tmp1, tmp2);
+    COMPS_OBJECT_DESTROY(tmp1);
+    COMPS_OBJECT_DESTROY(tmp2);
+    if (!ret) {
+        //printf("langpacks cmp fail\n");
+        return ret;
+    }
+
+    tmp1 = (COMPS_Object*) comps_doc_blacklist(_doc1_);
+    tmp2 = (COMPS_Object*) comps_doc_blacklist(_doc2_);
+    ret = comps_object_cmp(tmp1, tmp2);
+    COMPS_OBJECT_DESTROY(tmp1);
+    COMPS_OBJECT_DESTROY(tmp2);
+    if (!ret) {
+        //printf("blacklist cmp fail\n");
+        return ret;
+    }
+
+    tmp1 = (COMPS_Object*) comps_doc_whiteout(_doc1_);
+    tmp2 = (COMPS_Object*) comps_doc_whiteout(_doc2_);
+    ret = comps_object_cmp(tmp1, tmp2);
+    COMPS_OBJECT_DESTROY(tmp1);
+    COMPS_OBJECT_DESTROY(tmp2);
+    if (!ret) {
+        //printf("whiteout cmp fail\n");
+        return ret;
+    }
+
+    return ret;
 }
 
 inline void comps_doc_clear(COMPS_Doc *doc) {
@@ -72,12 +139,12 @@ COMPS_DOC_ADDOBJLIST(environments, environment, COMPS_DocEnv) /*comps_doc.h macr
 COMPS_DOC_GETOBJDICT(langpacks)     /*comps_doc.h macro*/
 COMPS_DOC_SETOBJDICT(langpacks) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJDICT(langpacks, langpack) /*comps_doc.h macro*/
-COMPS_DOC_GETOBJDICT(blacklist)     /*comps_doc.h macro*/
-COMPS_DOC_SETOBJDICT(blacklist) /*comps_doc.h macro*/
-COMPS_DOC_ADDOBJDICT(blacklist,  blacklist) /*comps_doc.h macro*/
-COMPS_DOC_GETOBJDICT(whiteout)      /*comps_doc.h macro*/
-COMPS_DOC_SETOBJDICT(whiteout) /*comps_doc.h macro*/
-COMPS_DOC_ADDOBJDICT(whiteout,  whiteout) /*comps_doc.h macro*/
+COMPS_DOC_GETOBJMDICT(blacklist)     /*comps_doc.h macro*/
+COMPS_DOC_SETOBJMDICT(blacklist) /*comps_doc.h macro*/
+COMPS_DOC_ADDOBJMDICT(blacklist,  blacklist) /*comps_doc.h macro*/
+COMPS_DOC_GETOBJMDICT(whiteout)      /*comps_doc.h macro*/
+COMPS_DOC_SETOBJMDICT(whiteout) /*comps_doc.h macro*/
+COMPS_DOC_ADDOBJMDICT(whiteout,  whiteout) /*comps_doc.h macro*/
 
 
 void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
@@ -402,19 +469,29 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
     #undef group
 }
 
+inline void __comps_check_xml_get(int retcode, COMPS_Logger * log) {
+    if (retcode<0)
+        comps_log_error(log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
+}
+
 void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
     COMPS_ObjListIt *it;
     COMPS_ObjList *list;
+    COMPS_ObjDict *dict;
+    COMPS_ObjMDict *mdict;
+    COMPS_HSList *hslist;
+    COMPS_HSListItem *hsit;
+    char *tmp;
     int retc;
 
     retc = xmlTextWriterWriteDTD(writer, BAD_CAST "comps",
                                          BAD_CAST "-//Red Hat, Inc.//DTD Comps"
                                                   " info//EN",
                                          BAD_CAST "comps.dtd", NULL);
-    if (retc<0) comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
+    __comps_check_xml_get(retc, doc->log);
 
     retc = xmlTextWriterStartElement(writer, BAD_CAST "comps");
-    if (retc<0) comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
+    __comps_check_xml_get(retc, doc->log);
     list = comps_doc_groups(doc);
     if (list) {
         for (it = list->first; it != NULL; it = it->next) {
@@ -436,8 +513,93 @@ void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
         }
     }
     COMPS_OBJECT_DESTROY(list);
+    dict = comps_doc_langpacks(doc);
+    if (dict && dict->len) {
+        retc = xmlTextWriterStartElement(writer, BAD_CAST "langpacks");
+        __comps_check_xml_get(retc, doc->log);
+        hslist = comps_objrtree_pairs(dict);
+
+        for (hsit = hslist->first; hsit != NULL; hsit = hsit->next) {
+            retc = xmlTextWriterStartElement(writer, BAD_CAST "match");
+            __comps_check_xml_get(retc, doc->log);
+
+            xmlTextWriterWriteAttribute(writer, BAD_CAST "name",
+                    (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
+
+            tmp = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
+            xmlTextWriterWriteAttribute(writer, BAD_CAST "install", BAD_CAST tmp);
+            free(tmp);
+
+            retc = xmlTextWriterEndElement(writer);
+            __comps_check_xml_get(retc, doc->log);
+        }
+        comps_hslist_destroy(&hslist);
+
+        retc = xmlTextWriterEndElement(writer);
+        __comps_check_xml_get(retc, doc->log);
+    }
+    COMPS_OBJECT_DESTROY(dict);
+
+    mdict = comps_doc_blacklist(doc);
+    if (mdict && mdict->len) {
+        retc = xmlTextWriterStartElement(writer, BAD_CAST "blacklist");
+        __comps_check_xml_get(retc, doc->log);
+        hslist = comps_objmrtree_pairs(mdict);
+
+        for (hsit = hslist->first; hsit != NULL; hsit = hsit->next) {
+            for (it = ((COMPS_ObjMRTreePair*)hsit->data)->data->first;
+                 it != NULL; it = it->next) {
+                retc = xmlTextWriterStartElement(writer, BAD_CAST "package");
+                __comps_check_xml_get(retc, doc->log);
+
+                xmlTextWriterWriteAttribute(writer, BAD_CAST "name",
+                        (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
+
+                tmp = comps_object_tostr(it->comps_obj);
+                xmlTextWriterWriteAttribute(writer, BAD_CAST "arch", BAD_CAST tmp);
+                free(tmp);
+
+                retc = xmlTextWriterEndElement(writer);
+                __comps_check_xml_get(retc, doc->log);
+            }
+        }
+        comps_hslist_destroy(&hslist);
+
+        retc = xmlTextWriterEndElement(writer);
+        __comps_check_xml_get(retc, doc->log);
+    }
+    COMPS_OBJECT_DESTROY(mdict);
+    mdict = comps_doc_whiteout(doc);
+    if (mdict && mdict->len) {
+        retc = xmlTextWriterStartElement(writer, BAD_CAST "whiteout");
+        __comps_check_xml_get(retc, doc->log);
+        hslist = comps_objmrtree_pairs(mdict);
+
+        for (hsit = hslist->first; hsit != NULL; hsit = hsit->next) {
+            for (it = ((COMPS_ObjMRTreePair*)hsit->data)->data->first;
+                 it != NULL; it = it->next) {
+                retc = xmlTextWriterStartElement(writer, BAD_CAST "ignoredep");
+                __comps_check_xml_get(retc, doc->log);
+
+                xmlTextWriterWriteAttribute(writer, BAD_CAST "requires",
+                        (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
+
+                tmp = comps_object_tostr(it->comps_obj);
+                xmlTextWriterWriteAttribute(writer, BAD_CAST "package", BAD_CAST tmp);
+                free(tmp);
+
+                retc = xmlTextWriterEndElement(writer);
+                __comps_check_xml_get(retc, doc->log);
+            }
+        }
+        comps_hslist_destroy(&hslist);
+
+        retc = xmlTextWriterEndElement(writer);
+        __comps_check_xml_get(retc, doc->log);
+    }
+    COMPS_OBJECT_DESTROY(mdict);
     retc = xmlTextWriterEndElement(writer);
-    if (retc<0) comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
+    __comps_check_xml_get(retc, doc->log);
 }
 
 COMPS_ObjectInfo COMPS_Doc_ObjInfo = {

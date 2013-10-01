@@ -194,7 +194,7 @@ PyObject* PyCOMPSGroup_cmp(PyObject *self, PyObject *other, int op) {
 
     // Only eq and neq operators allowed
     CMP_OP_EQ_NE_CHECK(op)
-    printf("pygroup cmp\n");
+    //printf("pygroup cmp\n");
 
     if (other == NULL || ( Py_TYPE(other) != Py_TYPE(self)
                            && other != Py_None)) {

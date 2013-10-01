@@ -449,11 +449,11 @@ Suite* basic_suite (void)
     Suite *s = suite_create ("Basic Tests");
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
-    tcase_add_test (tc_core, test_comps_parse1);
+    /*tcase_add_test (tc_core, test_comps_parse1);
     tcase_add_test (tc_core, test_comps_parse2);
     tcase_add_test (tc_core, test_comps_parse3);
     tcase_add_test (tc_core, test_comps_parse4);
-    tcase_add_test (tc_core, test_comps_parse5);
+    tcase_add_test (tc_core, test_comps_parse5);*/
     tcase_add_test (tc_core, test_comps_fedora_parse);
     tcase_set_timeout(tc_core, 15);
     suite_add_tcase (s, tc_core);

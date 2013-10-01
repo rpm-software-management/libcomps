@@ -21,63 +21,60 @@
 #define COMPS_OBJDICT_H
 
 #include "comps_objradix.h"
-#include "comps_mradix.h"
+#include "comps_objmradix.h"
 
 typedef COMPS_ObjRTree COMPS_ObjDict;
 //typedef COMPS_ObjRTree_ObjInfo COMPS_ObjDict_ObjInfo;
-//typedef COMPS_MRTree COMPS_MDict;
+typedef COMPS_ObjMRTree COMPS_ObjMDict;
 
-COMPS_ObjDict* comps_objdict_create(void* (*data_constructor)(void*),
-                                     void* (*data_cloner)(void*),
-                                     void (*data_destructor)(void*));
-/*COMPS_MDict* comps_mdict_create(void* (*data_constructor)(void*),
-                                       void* (*data_cloner)(void*),
-                                       void (*data_destructor)(void*));
-*/
+COMPS_ObjDict* comps_objdict_create();
+COMPS_MDict* comps_mdict_create();
+
 
 void comps_objdict_destroy(COMPS_ObjDict *rt);
 void comps_objdict_destroy_v(void *rt);
-//void comps_mdict_destroy(COMPS_MDict *rt);
-//void comps_mdict_destroy_v(void *rt);
+void comps_objmdict_destroy(COMPS_ObjMDict *rt);
+void comps_objmdict_destroy_v(void *rt);
 
 void comps_objdict_set(COMPS_ObjDict *rt, char *key, COMPS_Object *data);
 void comps_objdict_set_x(COMPS_ObjDict *rt, char *key, COMPS_Object *data);
 void comps_objdict_set_n(COMPS_ObjDict *rt, char *key, unsigned int len,
                          COMPS_Object *data);
-//void comps_mdict_set(COMPS_MDict *rt, char *key, void *data);
-//void comps_mdict_set_n(COMPS_MDict *rt, char *key, unsigned int len,
-//                            void *data);
+void comps_objmdict_set(COMPS_ObjMDict *rt, char *key, COMPS_Object *data);
+void comps_objmdict_set_x(COMPS_ObjMDict *rt, char *key, COMPS_Object *data);
+void comps_objmdict_set_n(COMPS_ObjMDict *rt, char *key, unsigned int len,
+                            COMPS_Object *data);
 
 COMPS_Object* comps_objdict_get(COMPS_ObjDict *rt, const char *key);
 COMPS_Object* comps_objdict_get_x(COMPS_ObjRTree * rt, const char * key);
-//COMPS_HSList * comps_mdict_get(COMPS_MDict *rt, const char *key);
-//COMPS_HSList ** comps_mdict_getp(COMPS_MDict *rt, const char * key);
+COMPS_ObjList * comps_objmdict_get(COMPS_ObjMDict *rt, const char *key);
 
 void comps_objdict_unset(COMPS_ObjDict * rt, const char * key);
-//void comps_mdict_unset(COMPS_MDict * rt, const char * key);
+void comps_objmdict_unset(COMPS_ObjMDict * rt, const char * key);
 
 void comps_objdict_clear(COMPS_ObjDict * rt);
-//void comps_mdict_clear(COMPS_MDict * rt);
+void comps_objmdict_clear(COMPS_ObjMDict * rt);
 
 COMPS_HSList * comps_objdict_values(COMPS_ObjDict * rt);
 
 void comps_objdict_values_walk(COMPS_ObjRTree * rt, void* udata,
                               void (*walk_f)(void*, COMPS_Object*));
-//void comps_mdict_values_walk(COMPS_MDict *rt, void *udata,
-//                              void (*walk_f)(void*, void*));
+void comps_objmdict_values_walk(COMPS_ObjMDict *rt, void *udata,
+                              void (*walk_f)(void*, void*));
 
 COMPS_ObjDict* comps_objdict_clone(COMPS_ObjDict *rt);
 void * comps_objdict_clone_v(void * rt);
 
-//COMPS_MDict* comps_mdict_clone(COMPS_MDict *rt);
-void* comps_mdict_clone_v(void *rt);
+COMPS_ObjMDict* comps_objmdict_clone(COMPS_ObjMDict *rt);
+void* comps_objmdict_clone_v(void *rt);
 
-//COMPS_HSList* comps_mdict_keys(COMPS_MDict *rt);
+COMPS_HSList* comps_objmdict_keys(COMPS_ObjMDict *rt);
 COMPS_HSList* comps_objdict_keys(COMPS_ObjDict *rt);
 COMPS_HSList* comps_objdict_pairs(COMPS_ObjDict *rt);
 //void comps_mdict_unite(COMPS_MDict *d1, COMPS_MDict *d2);
 COMPS_ObjDict* comps_objdict_union(COMPS_ObjDict *d1, COMPS_ObjDict *d2);
 
 extern COMPS_ObjectInfo COMPS_ObjDict_ObjInfo;
+extern COMPS_ObjectInfo COMPS_ObjMDict_ObjInfo;
 
 #endif

@@ -106,15 +106,30 @@ signed char comps_docenv_cmp_u(COMPS_Object *env1, COMPS_Object *env2) {
     #define _env2 ((COMPS_DocEnv*)env2)
 
     if (!comps_object_cmp((COMPS_Object*)_env1->properties,
-                          (COMPS_Object*)_env2->properties)) return 0;
+                          (COMPS_Object*)_env2->properties)) {
+        //printf("Env properties cmp fail\n");
+        return 0;
+    }
     if (!comps_object_cmp((COMPS_Object*)_env1->name_by_lang,
-                          (COMPS_Object*)_env2->name_by_lang)) return 0;
+                          (COMPS_Object*)_env2->name_by_lang)) {
+        //printf("Env name_by_lang cmp fail\n");
+        return 0;
+    }
     if (!comps_object_cmp((COMPS_Object*)_env1->desc_by_lang,
-                          (COMPS_Object*)_env2->desc_by_lang)) return 0;
+                          (COMPS_Object*)_env2->desc_by_lang)) {
+        //printf("Env desc_by_lang cmp fail\n");
+        return 0;
+    }
     if (!comps_object_cmp((COMPS_Object*)_env1->group_list,
-                          (COMPS_Object*)_env2->group_list)) return 0;
+                          (COMPS_Object*)_env2->group_list)) {
+        //printf("Env group_list cmp fail\n");
+        return 0;
+    }
     if (!comps_object_cmp((COMPS_Object*)_env1->option_list,
-                          (COMPS_Object*)_env2->option_list)) return 0;
+                          (COMPS_Object*)_env2->option_list)) {
+        //printf("Env option_list cmp fail\n");
+        return 0;
+    }
     return 1;
     #undef _env1
     #undef _env2
@@ -274,7 +289,7 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
                               NULL};
     char *str;
 
-    xmlTextWriterStartElement(writer, BAD_CAST "env");
+    xmlTextWriterStartElement(writer, BAD_CAST "environment");
     for (int i=0; i<6; i++) {
         if (!type[i]) {
             obj = comps_objdict_get_x(env->properties, props[i]);

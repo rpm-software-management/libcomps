@@ -122,20 +122,31 @@ signed char comps_docgroup_cmp_u(COMPS_Object *group1, COMPS_Object *group2) {
     #define _group1 ((COMPS_DocGroup*)group1)
     #define _group2 ((COMPS_DocGroup*)group2)
 
-    printf("group cmp start\n");
+    //printf("group cmp start\n");
     if (!comps_object_cmp((COMPS_Object*)_group1->properties,
-                          (COMPS_Object*)_group2->properties)) return 0;
-    printf("group cmp properties pass\n");
+                          (COMPS_Object*)_group2->properties)) {
+        //printf("Group properties cmp fail\n");
+        return 0;
+    }
+    //printf("group cmp properties pass\n");
     if (!comps_object_cmp((COMPS_Object*)_group1->name_by_lang,
-                          (COMPS_Object*)_group2->name_by_lang)) return 0;
-    printf("group cmp name_by_lang pass\n");
+                          (COMPS_Object*)_group2->name_by_lang)) {
+        //printf("Group name_by_lang cmp fail\n");
+        return 0;
+    }
+    //printf("group cmp name_by_lang pass\n");
     if (!comps_object_cmp((COMPS_Object*)_group1->desc_by_lang,
-                          (COMPS_Object*)_group2->desc_by_lang)) return 0;
-    printf("group cmp desc_by_lang pass\n");
+                          (COMPS_Object*)_group2->desc_by_lang)) {
+        //printf("Group desc_by_lang cmp fail\n");
+        return 0;
+    }
+    //printf("group cmp desc_by_lang pass\n");
     if (!comps_object_cmp((COMPS_Object*)_group1->packages,
-                          (COMPS_Object*)_group2->packages)) return 0;
-    printf("group cmp packages pass\n");
-    printf("---------------------------\n");
+                          (COMPS_Object*)_group2->packages)) {
+        //printf("Group packages cmp fail\n");
+        return 0;
+    }
+    //printf("group cmp packages pass\n");
     return 1;
     #undef _group1
     #undef _group2

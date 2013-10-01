@@ -64,60 +64,55 @@ inline COMPS_ObjDict* comps_objdict_union(COMPS_ObjDict *d1, COMPS_ObjDict *d2) 
     return comps_objrtree_union((COMPS_ObjRTree*)d1, (COMPS_ObjRTree*)d2);
 }
 
-/*
-inline COMPS_MDict* comps_mdict_create(void* (*data_constructor)(void*),
-                                       void* (*data_cloner)(void*),
-                                       void (*data_destructor)(void*)) {
-    return (COMPS_MRTree*) comps_mrtree_create(data_constructor,
-                                               data_cloner, data_destructor);
+inline void comps_objmdict_set_x(COMPS_ObjMDict *rt, char *key, COMPS_Object *data){
+    comps_objmrtree_set_x((COMPS_ObjMRTree*) rt, key, data);
+}
+inline void comps_objmdict_set(COMPS_ObjMDict *rt, char *key, COMPS_Object *data) {
+    comps_objmrtree_set((COMPS_ObjMRTree*) rt, key, data);
 }
 
-inline void comps_mdict_destroy(COMPS_MDict *rt) {
-    comps_mrtree_destroy((COMPS_MRTree*)rt);
-}
-inline void comps_mdict_destroy_v(void *rt) {
-    comps_mrtree_destroy((COMPS_MRTree*)rt);
+inline void comps_objmdict_set_n(COMPS_ObjMDict *rt, char *key, unsigned int len,
+                                 COMPS_Object *data) {
+    comps_objmrtree_set_n((COMPS_ObjMRTree*) rt, key, len, data);
 }
 
-inline void comps_mdict_set(COMPS_MDict *rt, char *key, void *data) {
-    comps_mrtree_set((COMPS_MRTree*) rt, key, data);
+inline COMPS_ObjList* comps_objmdict_get(COMPS_ObjMDict *rt, const char *key) {
+    return comps_objmrtree_get((COMPS_ObjMRTree*) rt, key);
 }
-
-inline void comps_mdict_set_n(COMPS_MDict *rt, char *key, unsigned int len,
-                            void *data) {
-    comps_mrtree_set_n((COMPS_MRTree*) rt, key, len, data);
+/*inline COMPS_HSList** comps_objmdict_getp(COMPS_ObjMDict *rt, const char *key) {
+    return comps_obj_mrtree_getp((COMPS_ObjMRTree*) rt, key);
+}*/
+inline void comps_objmdict_unset(COMPS_ObjMDict * rt, const char * key) {
+    comps_objmrtree_unset((COMPS_ObjMRTree*) rt, key);
 }
-
-inline COMPS_HSList* comps_mdict_get(COMPS_MDict *rt, const char *key) {
-    return comps_mrtree_get((COMPS_MRTree*) rt, key);
+inline void comps_objmdict_clear(COMPS_ObjMDict * rt) {
+    comps_objmrtree_clear((COMPS_ObjMRTree*) rt);
 }
-inline COMPS_HSList** comps_mdict_getp(COMPS_MDict *rt, const char *key) {
-    return comps_mrtree_getp((COMPS_MRTree*) rt, key);
-}
-inline void comps_mdict_unset(COMPS_MDict * rt, const char * key) {
-    comps_mrtree_unset((COMPS_MRTree*) rt, key);
-}
-inline void comps_mdict_clear(COMPS_MDict * rt) {
-    comps_mrtree_clear((COMPS_MRTree*) rt);
-}
-inline void comps_mdict_values_walk(COMPS_MDict * rt, void* udata,
+inline void comps_objmdict_values_walk(COMPS_ObjMDict * rt, void* udata,
                               void (*walk_f)(void*, void*)) {
-    comps_mrtree_values_walk((COMPS_MRTree*)rt, udata, walk_f);
+    comps_objmrtree_values_walk((COMPS_ObjMRTree*)rt, udata, walk_f);
 }
 
-inline COMPS_MDict* comps_mdict_clone(COMPS_MDict * rt) {
-    return (COMPS_MRTree*) comps_mrtree_clone((COMPS_MRTree*)rt);
+inline COMPS_ObjMDict* comps_objmdict_clone(COMPS_ObjMDict * rt) {
+    return (COMPS_ObjMDict*) comps_objmrtree_clone((COMPS_ObjMRTree*)rt);
 }
-inline void* comps_mdict_clone_v(void *rt) {
-    return (COMPS_MRTree*) comps_mrtree_clone((COMPS_MRTree*)rt);
+inline void* comps_objmdict_clone_v(void *rt) {
+    return (COMPS_ObjMRTree*) comps_objmrtree_clone((COMPS_ObjMRTree*)rt);
 }
-inline COMPS_HSList* comps_mdict_keys(COMPS_MDict * rt) {
-    return comps_mrtree_keys((COMPS_MRTree*)rt);
+inline COMPS_HSList* comps_objmdict_keys(COMPS_ObjMDict * rt) {
+    return comps_objmrtree_keys((COMPS_ObjMRTree*)rt);
 }
-inline void comps_mdict_unite(COMPS_MDict * d1, COMPS_MDict *d2) {
-    comps_mrtree_unite((COMPS_MRTree*)d1, (COMPS_MRTree*)d2);
+inline void comps_objmdict_unite(COMPS_ObjMDict * d1, COMPS_ObjMDict *d2) {
+    comps_objmrtree_unite((COMPS_ObjMRTree*)d1, (COMPS_ObjMRTree*)d2);
 }
-*/
+
+COMPS_ObjectInfo COMPS_ObjMDict_ObjInfo = {
+    .obj_size = sizeof(COMPS_ObjMRTree),
+    .constructor = &comps_objmrtree_create_u,
+    .destructor = &comps_objmrtree_destroy_u,
+    .copy = &comps_objmrtree_copy_u,
+    .obj_cmp = &comps_objmrtree_cmp_u
+};
 
 COMPS_ObjectInfo COMPS_ObjDict_ObjInfo = {
     .obj_size = sizeof(COMPS_ObjRTree),
