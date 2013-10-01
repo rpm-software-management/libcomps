@@ -16,53 +16,47 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA
  */
-
-#include <Python.h>
-#include "libcomps/comps.h"
-#include "structmember.h"
-#include "libcomps/comps_list.h"
+#include "libcomps/comps_objlist.h"
 #include "pycomps_sequence.h"
 #include "pycomps_23macros.h"
-#include "pycomps_utils.h"
+//#include "pycomps_utils.h"
 
-void py_xdecref(void* obj) {
-    Py_XDECREF((PyObject*)obj);
-}
+#include <Python.h>
+#include "structmember.h"
 
-
-inline COMPS_List * get_list(PyObject *self) {
-    return (COMPS_List*)((PyCOMPS_Sequence*)self)->citem->data;
-}
-inline COMPS_List** get_listp(PyObject *self) {
-    return (COMPS_List**)&((PyCOMPS_Sequence*)self)->citem->data;
-}
 
 Py_ssize_t PyCOMPSSeq_len(PyObject *self) {
-    return get_list(self)->len;
+    return ((PyCOMPS_Sequence*)self)->list->len;
 }
 
 inline PyObject *list_getitem(PyObject *self, Py_ssize_t index) {
-    COMPS_ListItem *it;
-    it = comps_list_at(get_list(self), index);
-    if (it == NULL) {
+    COMPS_Object *obj;
+    PyObject *ret;
+    int i;
+    if (index < 0)
+        i = ((PyCOMPS_Sequence*)self)->list->len + index;
+    else
+        i = index;
+    obj = comps_objlist_get(((PyCOMPS_Sequence*)self)->list, i);
+    if (obj == NULL) {
         PyErr_SetString(PyExc_IndexError,"Index out of range");
         return NULL;
     }
-    return ((PyCOMPS_Sequence*)self)->out_convert_func(it->data);
+    //COMPS_OBJECT_DESTROY(obj);
+    ret = ((PyCOMPS_Sequence*)self)->it_info->out_convert_func(obj);
+    return ret;
 }
 
 inline int list_setitem(PyObject *self, Py_ssize_t index, PyObject *item) {
-    COMPS_ListItem *it;
-    PyObject * converted_item = NULL;
+    #define _seq_ ((PyCOMPS_Sequence*)self)
+    COMPS_Object *converted_item = NULL;
     unsigned i;
     if (item) {
-        for (i = 0; i < ((PyCOMPS_Sequence*)self)->item_types_len; i++) {
-            if (Py_TYPE(item) == ((PyCOMPS_Sequence*)self)->itemtypes[i]) {
-                if (((PyCOMPS_Sequence*)self)->in_convert_funcs[i])
-                    converted_item = ((PyCOMPS_Sequence*)self)->in_convert_funcs[i](item);
-                else
-                    converted_item = item;
-                break;
+        for (i = 0; i < _seq_->it_info->item_types_len; i++) {
+            if (Py_TYPE(item) == _seq_->it_info->itemtypes[i]) {
+                if (_seq_->it_info->in_convert_funcs[i])
+                    converted_item = _seq_->it_info->in_convert_funcs[i](item);
+                    break;
             }
         }
     }
@@ -73,23 +67,21 @@ inline int list_setitem(PyObject *self, Py_ssize_t index, PyObject *item) {
         return -1;
     }
 
-    if ((int)index > (int)(get_list(self)->len-1)) {
+    if ((int)index > (int)(_seq_->list->len-1)) {
         PyErr_SetString(PyExc_IndexError,"Index out of range");
         return -1;
     }
     if (item != NULL) {
-        it = comps_list_at(get_list(self), index);
-        Py_XDECREF(it->data);
-        it->data = converted_item;
-        Py_INCREF(converted_item);
+        comps_objlist_set(_seq_->list, index, converted_item);
     } else {
-        comps_list_remove_pos(get_list(self), index);
+        comps_objlist_remove_at(_seq_->list, index);
     }
     return 0;
+    #undef _seq_
 }
 
 PyObject* list_concat(PyObject *self, PyObject *other) {
-    COMPS_ListItem *it, *newit;
+    COMPS_ObjListIt *it;
     PyCOMPS_Sequence *result;
     //PyErr_SetString(PyExc_TypeError, "list concat");
 
@@ -97,29 +89,26 @@ PyObject* list_concat(PyObject *self, PyObject *other) {
         PyErr_SetString(PyExc_TypeError, "different object class");
         return NULL;
     }
+    printf("list concat\n");
 
-    result = (PyCOMPS_Sequence*)self->ob_type->tp_new(self->ob_type, NULL, NULL);
-    self->ob_type->tp_init((PyObject*)result, NULL, NULL);
+    result = (PyCOMPS_Sequence*)Py_TYPE(self)->tp_new(self->ob_type, NULL, NULL);
+    Py_TYPE(self)->tp_init((PyObject*)result, NULL, NULL);
 
-    it = get_list(self)->first;
+    it = ((PyCOMPS_Sequence*)self)->list->first;
 
     for (; it != NULL; it = it->next){
-        Py_INCREF(it->data);
-        newit = comps_list_item_create(it->data, NULL, NULL);
-        comps_list_append(get_list((PyObject*)result), newit);
+        comps_objlist_append(result->list, it->comps_obj);
     }
 
-    it = get_list(other)->first;
+    it = ((PyCOMPS_Sequence*)other)->list->first;
     for (; it != NULL; it = it->next){
-        Py_INCREF(it->data);
-        newit = comps_list_item_create(it->data, NULL, NULL);
-        comps_list_append(get_list((PyObject*)result), newit);
+        comps_objlist_append(result->list, it->comps_obj);
     }
     return (PyObject*)result;
 }
 
 PyObject* list_repeat(PyObject *self, Py_ssize_t count) {
-    COMPS_ListItem *it, *newit, *end;
+    COMPS_ObjListIt *it, *end;
     //PyObject *data;
     int i;
     PyCOMPS_Sequence *result;
@@ -127,29 +116,27 @@ PyObject* list_repeat(PyObject *self, Py_ssize_t count) {
     result = (PyCOMPS_Sequence*)self->ob_type->tp_new(self->ob_type, NULL, NULL);
     self->ob_type->tp_init((PyObject*)result, NULL, NULL);
 
-    end = get_list(self)->last;
+    end = ((PyCOMPS_Sequence*)self)->list->last;
     for (i = 0; i < count; i++) {
-        for (it = get_list(self)->first;
-             it != end->next;
-             it = it->next) {
-            Py_INCREF(it->data);
-            newit = comps_list_item_create(it->data, NULL, &py_xdecref);
-            comps_list_append(get_list((PyObject*)result), newit);
+        for (it = ((PyCOMPS_Sequence*)self)->list->first;
+             it != end->next; it = it->next) {
+            comps_objlist_append(result->list, it->comps_obj);
         }
     }
     return (PyObject*)result;
 }
 
-PyObject *PyCOMPSSeq_get(PyObject *self, PyObject *key) {
+PyObject* PyCOMPSSeq_get(PyObject *self, PyObject *key) {
     PyCOMPS_Sequence *result;
-    COMPS_ListItem *newit, *it;
+    COMPS_ObjListIt *it;
     int i;
     unsigned int n, uret;
     Py_ssize_t istart, istop, istep, ilen, clen;
 
     if (PySlice_Check(key)) {
-        n = get_list(self)->len;
-        result = (PyCOMPS_Sequence*)self->ob_type->tp_new(self->ob_type,
+        n = ((PyCOMPS_Sequence*)self)->list->len;
+        result = (PyCOMPS_Sequence*)Py_TYPE((PyCOMPS_Sequence*)self)->tp_new(
+                                                          Py_TYPE(self),
                                                           NULL, NULL);
         self->ob_type->tp_init((PyObject*)result, NULL, NULL);
         uret = PySlice_GetIndicesEx((SLICE_CAST)key, n,
@@ -160,15 +147,13 @@ PyObject *PyCOMPSSeq_get(PyObject *self, PyObject *key) {
         }
 
         clen = 0;
-        it = get_list(self)->first;
+        it = ((PyCOMPS_Sequence*)self)->list->first;
         for (i=0 ; i<istart; it=it->next, i++);
         while (clen != ilen) {
-            Py_INCREF((PyObject*)it->data);
-            newit = comps_list_item_create(it->data, NULL, &py_xdecref);
-            comps_list_append(get_list((PyObject*)result), newit);
+            comps_objlist_append(result->list, it->comps_obj);
             clen+=1;
             for (i=0 ; i<istep && it != NULL; it=it->next,  i++);
-            if (!it) it = get_list(self)->first;
+            if (!it) it = ((PyCOMPS_Sequence*)self)->list->first;
             for (; i<istep; it=it->next, i++);
         }
         return (PyObject*)result;
@@ -182,13 +167,13 @@ PyObject *PyCOMPSSeq_get(PyObject *self, PyObject *key) {
 }
 
 int PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val) {
-    COMPS_ListItem *it, *it2, *newit;
+    COMPS_ObjListIt *it, *it2;
 
     unsigned int n, uret;
     Py_ssize_t istart, istop, istep, ilen, i, c, clen;
 
     if (PySlice_Check(key)) {
-        n = get_list(self)->len;
+        n = ((PyCOMPS_Sequence*)self)->list->len;
         uret = PySlice_GetIndicesEx((SLICE_CAST)key, n,
                                    &istart, &istop, &istep, &ilen);
         if (ilen == 0) {
@@ -210,18 +195,17 @@ int PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val) {
                 return -1;
             }
             clen = 0;
-            it = get_list(self)->first;
-            it2 = get_list(val)->first;
+            it = ((PyCOMPS_Sequence*)self)->list->first;
+            it2 = ((PyCOMPS_Sequence*)val)->list->first;
             for (i=0 ; i<istart && it != NULL; it=it->next, i++);
             if (istep != 1) {
                 while (clen != ilen) {
-                    Py_XDECREF((PyObject*)it->data);
-                    Py_INCREF((PyObject*)it2->data);
-                    it->data = it2->data;
+                    COMPS_OBJECT_DESTROY(it->comps_obj);
+                    it->comps_obj = comps_object_incref(it2->comps_obj);
                     clen += 1;
                     it2 = it2->next;
                     for (i=0 ; i<istep && it != NULL; it=it->next,  i++);
-                    if (!it) it = get_list(self)->first;
+                    if (!it) it = ((PyCOMPS_Sequence*)self)->list->first;
                     for (; i<istep; it=it->next, i++);
                 }
             } else {
@@ -230,50 +214,46 @@ int PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val) {
 
                 for (; it2 != NULL && it != NULL;
                        it2 = it2->next, it = it->next, i++) {
-                    Py_INCREF((PyObject*)it2->data);
-                    Py_XDECREF((PyObject*)it->data);
-                    it->data = it2->data;
+                    COMPS_OBJECT_DESTROY(it->comps_obj);
+                    it->comps_obj = comps_object_incref(it2->comps_obj);
                 }
                 if (it == NULL) {
                     for (;it2 != NULL; it2 = it2->next) {
-
-                        newit = comps_list_item_create(it2->data, NULL, &py_xdecref);
-                        comps_list_append(get_list(self), newit);
-                        Py_INCREF(it2->data);
+                        comps_objlist_append(((PyCOMPS_Sequence*)self)->list,
+                                          it2->comps_obj);
                     }
                 }
                 if (it != NULL) {
                     for (c = i; c < istop; c++) {
-                        comps_list_remove_pos(get_list(self), i);
+                        comps_objlist_remove_at(((PyCOMPS_Sequence*)self)->list,
+                                              i);
                     }
                 }
             }
             return 0;
         } else {
             clen = 0;
-            it = get_list(self)->first;
+            it = ((PyCOMPS_Sequence*)self)->list->first;
             for (i=0 ; i<istart && it != NULL; it=it->next, i++);
             while (clen != ilen) {
-                if (it->data) {
-                    Py_XDECREF((PyObject*)it->data);
-                    it->data = NULL;
+                if (it->comps_obj) {
+                    COMPS_OBJECT_DESTROY(it->comps_obj);
+                    it->comps_obj = NULL;
                 }
                 clen+=1;
                 for (i=0 ; i<istep && it != NULL; it=it->next,  i++);
-                if (!it) it = get_list(self)->first;
+                if (!it) it = ((PyCOMPS_Sequence*)self)->list->first;
                 for (; i<istep; it=it->next, i++);
             }
             it2 = NULL;
-            for (it = get_list(self)->first;
-                 it != NULL; it2 = it, it = it->next) {
-                if (it2 && !it2->data) {
-                    comps_list_remove_item(get_list(self), it2);
-                    free(it2);
+            for (i=0, it = ((PyCOMPS_Sequence*)self)->list->first;
+                 it != NULL; it2 = it, it = it->next, i++) {
+                if (it2 && !it2->comps_obj) {
+                    comps_objlist_remove_at(((PyCOMPS_Sequence*)self)->list, i);
                 }
             }
-            if (it2 && !it2->data) {
-                comps_list_remove_item(get_list(self), it2);
-                free(it2);
+            if (it2 && !it2->comps_obj) {
+                comps_objlist_remove_at(((PyCOMPS_Sequence*)self)->list, i);
             }
             return 0;
         }
@@ -287,16 +267,15 @@ int PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val) {
 }
 
 PyObject* PyCOMPSSeq_append(PyObject * self, PyObject *item) {
-    COMPS_ListItem *it;
     unsigned i;
-    void *converted_item = NULL;
-    for (i = 0; i < ((PyCOMPS_Sequence*)self)->item_types_len; i++) {
-        if (Py_TYPE(item) == ((PyCOMPS_Sequence*)self)->itemtypes[i]) {
-            if (((PyCOMPS_Sequence*)self)->in_convert_funcs[i])
-                converted_item = ((PyCOMPS_Sequence*)self)->in_convert_funcs[i](item);
-            else
-                converted_item = item;
-            break;
+    COMPS_Object *converted_item = NULL;
+    #define _seq_ ((PyCOMPS_Sequence*)self)
+    for (i = 0; i < _seq_->it_info->item_types_len; i++) {
+        if (Py_TYPE(item) == _seq_->it_info->itemtypes[i]) {
+            if (_seq_->it_info->in_convert_funcs[i]) {
+                converted_item = _seq_->it_info->in_convert_funcs[i](item);
+                break;
+            }
         }
     }
     if (!converted_item) {
@@ -305,18 +284,15 @@ PyObject* PyCOMPSSeq_append(PyObject * self, PyObject *item) {
                       Py_TYPE(self)->tp_name);
         return NULL;
     }
-    it = comps_list_item_create(converted_item, NULL, &free);
-    comps_list_append(get_list(self), it);
+    comps_objlist_append_x(_seq_->list, converted_item);
     Py_RETURN_NONE;
+    #undef _seq_
 }
 
 
 void PyCOMPSSeq_dealloc(PyCOMPS_Sequence *self)
 {
-
-    free(self->itemtypes);
-    free(self->in_convert_funcs);
-    ctopy_citem_decref(self->citem);
+    COMPS_OBJECT_DESTROY(self->list);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -326,17 +302,13 @@ PyObject* PyCOMPSSeq_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     (void)kwds;
 
     PyCOMPS_Sequence *self;
-    COMPS_List *list;
 
     self = (PyCOMPS_Sequence*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        list = comps_list_create();
-        comps_list_init(list);
-        self->citem = ctopy_citem_create(list, &comps_list_destroy_v);
+        self->list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
+                                                         NULL);
     } else return NULL;
-    self->itemtypes = NULL;
-    self->in_convert_funcs = NULL;
-    self->out_convert_func = NULL;
+    self->it_info = NULL;
     return (PyObject*) self;
 }
 
@@ -349,114 +321,48 @@ int PyCOMPSSeq_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
 }
 
 PyObject* PyCOMPSSeq_str(PyObject *self) {
-    PyObject *ret, *tmp, *tmp2;
-    COMPS_ListItem *it;
-    ret = PyUnicode_FromString("[");
-    if (((PyCOMPS_Sequence*)self)->citem->data == NULL) {
-        tmp = ret;
-        tmp2 = PyUnicode_FromString(" NULL ");
-        ret = PyUnicode_Concat(ret, tmp2);
-        Py_XDECREF(tmp);
-        Py_XDECREF(tmp2);
-    }
-    else if (get_list(self)->first != NULL) {
-        for (it = get_list(self)->first;
-             it != NULL; it = it->next) {
-            tmp = ret;
-            tmp2 = ((PyCOMPS_Sequence*)self)->out_convert_func(it->data);
-            ret = PyUnicode_Concat(ret, tmp2);
-            Py_XDECREF(tmp);
-            Py_XDECREF(tmp2);
-            if (it != get_list(self)->last) {
-                tmp2 = PyUnicode_FromString(", ");
-                tmp = ret;
-                ret = PyUnicode_Concat(ret, tmp2);
-                Py_XDECREF(tmp);
-                Py_XDECREF(tmp2);
-            }
-        }
-    }
-    tmp = ret;
-    tmp2 = PyUnicode_FromString("]");
-    ret = PyUnicode_Concat(ret, tmp2);
-    Py_XDECREF(tmp);
-    Py_XDECREF(tmp2);
-    return ret;
+    return PyUnicode_FromString(comps_object_tostr(
+                            (COMPS_Object*)((PyCOMPS_Sequence*)self)->list));
 }
 int PyCOMPSSeq_print(PyObject *self, FILE *f, int flags) {
-    COMPS_ListItem *it;
-    COMPS_List *list;
+    COMPS_ObjList *_list;
     (void) flags;
-
-    fprintf(f, "[");
-        list = get_list(self);
-        if (!list) {
-            fprintf(f, "]");
-            return 0;
-        }
-        for (it = list->first; it != list->last; it = it->next) {
-            fprintf(f, "%s, ", (char*)it->data);
-        }
-        fprintf(f, "%s", (char*)it->data);
-    fprintf(f, "]");
+    char *tmpstr;
+    _list = ((PyCOMPS_Sequence*)self)->list;
+    tmpstr = comps_object_tostr((COMPS_Object*)_list);
+    fprintf(f, "%s", tmpstr);
+    free(tmpstr);
     return 0;
 }
 
 PyObject* PyCOMPSSeq_cmp(PyObject *self, PyObject *other, int op) {
-    COMPS_ListItem *it, *it2;
-    PyObject *ret;
-    char cmpret;
-
-    if (other == NULL || !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self))) {
-        PyErr_Format(PyExc_TypeError, "Not %s subclass, %s",
-                     Py_TYPE(self)->tp_name, Py_TYPE(other)->tp_name);
-        return NULL;
-    }
-    if (op != Py_EQ && op != Py_NE) {
-        PyErr_Format(PyExc_TypeError, "Unsuported operator");
-        return Py_INCREF(Py_NotImplemented), Py_NotImplemented;
-    }
-    if (other == Py_None && self == Py_None) {
-        return Py_NotImplemented;
-    } else if ((other == Py_None && self != Py_None) ||  
-             (other != Py_None && self == Py_None)) {
-        return Py_NotImplemented;
-    }
-    ret = (op == Py_EQ)?Py_True:Py_False;
-
-    it = get_list(self)->first;
-    it2 = get_list(other)->first;
-    for (; it!= NULL && it2 != NULL; it = it->next, it2 = it2->next) {
-        cmpret = ((PyCOMPS_Sequence*)self)->item_cmp_func(it->data, it2->data); 
-        if (op == Py_EQ) {
-            if (!cmpret) Py_RETURN_FALSE;
-        } else {
-            if (!cmpret) Py_RETURN_TRUE;
-        }
-    }
-    if (it != NULL || it2 != NULL) {
-        if (op == Py_EQ) Py_RETURN_FALSE;
-        else Py_RETURN_TRUE;
+    char res;
+    res = COMPS_OBJECT_CMP(((PyCOMPS_Sequence*)self)->list,
+                           ((PyCOMPS_Sequence*)other)->list);
+    if (op == Py_EQ && res) {
+        Py_RETURN_TRUE;
+    } else if (op == Py_NE && !res){
+        Py_RETURN_TRUE;
     } else {
-        return Py_INCREF(ret),ret;
+        Py_RETURN_FALSE;
     }
 }
 
 PyObject* PyCOMPSSeq_getiter(PyObject *self) {
     PyObject *res;
     res = PyCOMPSSeqIter_new(&PyCOMPS_SeqIterType, NULL, NULL);
-    ((PyCOMPS_SeqIter*)res)->it = get_list(self)->first;
+    ((PyCOMPS_SeqIter*)res)->it = ((PyCOMPS_Sequence*)self)->list->first;
     ((PyCOMPS_SeqIter*)res)->seq = (PyCOMPS_Sequence*)self;
     return res;
 }
 
 PyObject* PyCOMPSSeq_iternext(PyObject *iter_o) {
-    void *ret;
+    COMPS_Object *ret;
     PyObject *retp;
     PyCOMPS_SeqIter *iter = ((PyCOMPS_SeqIter*)iter_o);
-    ret = iter->it?iter->it->data: NULL;
+    ret = iter->it?iter->it->comps_obj: NULL;
     if (ret) {
-        retp = iter->seq->out_convert_func(ret);
+        retp = iter->seq->it_info->out_convert_func(comps_object_incref(ret));
         iter->it = iter->it->next;
         return retp;
     }
@@ -464,7 +370,7 @@ PyObject* PyCOMPSSeq_iternext(PyObject *iter_o) {
 }
 
 PyObject* PyCOMPSSeq_clear(PyObject *self) {
-    comps_list_clear(get_list(self));
+    comps_objlist_clear(((PyCOMPS_Sequence*)self)->list);
     Py_RETURN_NONE;
 }
 
@@ -553,6 +459,7 @@ int PyCOMPSSeqIter_init(PyCOMPS_SeqIter *self, PyObject *args, PyObject *kwds)
     (void)args;
     (void)kwds;
     self->it = NULL;
+    self->seq = NULL;
     return 0;
 }
 
@@ -587,7 +494,7 @@ PyTypeObject PyCOMPS_SeqIterType = {
     PyCOMPSSeqIter_methods,         /* tp_methods */
     PyCOMPSSeqIter_members,         /* tp_members */
     0,                          /* tp_getset */
-    &PySeqIter_Type,                          /* tp_base */
+    0,                          /* tp_base */
     0,                          /* tp_dict */
     0,                          /* tp_descr_get */
     0,                          /* tp_descr_set */

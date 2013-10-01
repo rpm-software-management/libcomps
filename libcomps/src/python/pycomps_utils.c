@@ -165,12 +165,162 @@ PyObject* __pycomps_lang_decode(char * lang) {
     return ret;
 }
 
-long PyCOMPS_hash(PyObject *self) {
-    PyObject * str;
-    char *cstr = NULL;
+PyObject* __PyCOMPS_get_ids(PyObject *self, void *closure) {
+    #define _closure_ ((__PyCOMPS_ListGetSetClosure*)closure)
 
-    str = Py_TYPE(self)->tp_str(self);
-    __pycomps_PyUnicode_AsString(str, &cstr);
-    Py_DECREF(str);
-    return crc32(0, cstr, strlen(cstr));
+    PyCOMPS_Sequence *ret = (PyCOMPS_Sequence*)GET_FROM(self, _closure_->p_offset);
+    COMPS_Object * c_obj;
+
+    if (!ret) {
+        ret = (PyCOMPS_Sequence*)_closure_->type->tp_new(_closure_->type,
+                                                          NULL, NULL);
+        _closure_->type->tp_init((PyObject*)ret, NULL, NULL);
+        COMPS_OBJECT_DESTROY(ret->list);
+        c_obj = (COMPS_Object*) GET_FROM(self, _closure_->c_offset);
+        ret->list = (COMPS_ObjList*)
+                    comps_object_incref((COMPS_Object*)_closure_->get_f(c_obj));
+    } else {
+        Py_INCREF(ret);
+    }
+    return  (PyObject*)ret;
+    #undef _closure_
+}
+
+int __PyCOMPS_set_ids(PyObject *self, PyObject *value, void *closure) {
+    #define _closure_ ((__PyCOMPS_ListGetSetClosure*)closure)
+    PyCOMPS_Sequence *pobj;
+    (void) closure;
+    (void) self;
+    if (!value) {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute option_ids");
+        return -1;
+    }
+    if (value->ob_type != _closure_->type) {
+        PyErr_Format(PyExc_TypeError, "Not %s instance",_closure_->type->tp_name);
+        return -1;
+    }
+    COMPS_Object * c_obj;
+    c_obj = (COMPS_Object*) GET_FROM(self, _closure_->c_offset);
+
+    _closure_->set_f(c_obj, ((PyCOMPS_Sequence*)value)->list);
+    pobj = (PyCOMPS_Sequence*)GET_FROM(self, _closure_->p_offset);
+    Py_XDECREF(pobj);
+    Py_INCREF(value);
+    SET_TO(self, _closure_->p_offset, pobj);
+    return 0;
+    #undef _closure_
+}
+
+PyObject* __PyCOMPS_get_dict(PyObject *self, void *closure) {
+    #define _closure_ ((__PyCOMPS_DictGetSetClosure*)closure)
+
+    PyCOMPS_Dict *ret = (PyCOMPS_Dict*)GET_FROM(self, _closure_->p_offset);
+    COMPS_Object * c_obj;
+    COMPS_ObjDict * dict;
+
+    if (!ret) {
+        ret = (PyCOMPS_Dict*)PyCOMPS_DictType.tp_new(&PyCOMPS_DictType,
+                                                          NULL, NULL);
+        PyCOMPS_DictType.tp_init((PyObject*)ret, NULL, NULL);
+        COMPS_OBJECT_DESTROY(ret->dict);
+        c_obj = (COMPS_Object*) GET_FROM(self, _closure_->c_offset);
+        dict = (COMPS_ObjDict*) GET_FROM(c_obj, _closure_->dict_offset);
+        ret->dict = (COMPS_ObjDict*)comps_object_incref((COMPS_Object*)dict);
+    } else {
+        Py_INCREF(ret);
+    }
+    return  (PyObject*)ret;
+    #undef _closure_
+}
+
+int __PyCOMPS_set_dict(PyObject *self, PyObject *value, void *closure) {
+    #define _closure_ ((__PyCOMPS_DictGetSetClosure*)closure)
+    PyCOMPS_Dict *pobj;
+    COMPS_Object * c_obj;
+    COMPS_ObjDict *dict;
+    if (!value) {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute option_ids");
+        return -1;
+    }
+    if (Py_TYPE(value) != &PyCOMPS_DictType) {
+        PyErr_Format(PyExc_TypeError, "Not %s instance", PyCOMPS_DictType.tp_name);
+        return -1;
+    }
+    c_obj = (COMPS_Object*) GET_FROM(self, _closure_->c_offset);
+    dict = (COMPS_ObjDict*) GET_FROM(c_obj, _closure_->dict_offset);
+    COMPS_OBJECT_DESTROY(dict);
+    comps_object_incref((COMPS_Object*)((PyCOMPS_Dict*)value)->dict);
+    SET_TO(c_obj, _closure_->dict_offset, ((PyCOMPS_Dict*)value)->dict);
+
+    pobj = (PyCOMPS_Dict*)GET_FROM(self, _closure_->p_offset);
+    Py_XDECREF(pobj);
+    Py_INCREF(value);
+    SET_TO(self, _closure_->p_offset, value);
+    return 0;
+    #undef _closure_
+}
+
+int __PyCOMPS_set_strattr(PyObject *self, PyObject *val, void *closure) {
+    #define _closure_ ((__PyCOMPS_StrPropGetSetClosure*)closure)
+    char *tmp;
+    COMPS_Object *obj;
+    if (__pycomps_stringable_to_char(val, &tmp) < 0) {
+        return -1;
+    }
+    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    _closure_->set_f(obj, tmp, 0);
+    free(tmp);
+    #undef _closure_
+    return 0;
+}
+
+PyObject* __PyCOMPS_get_strattr(PyObject *self, void *closure) {
+    #define _closure_ ((__PyCOMPS_StrPropGetSetClosure*)closure)
+    COMPS_Object* tmp_prop, *obj;
+    PyObject *ret;
+    char *x;
+
+    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    tmp_prop = _closure_->get_f(obj);
+
+    if (tmp_prop) {
+        x = comps_object_tostr(tmp_prop);
+        ret = PyUnicode_FromString(x);
+        free(x);
+        COMPS_OBJECT_DESTROY(tmp_prop);
+        return ret;
+    } else
+        Py_RETURN_NONE;
+    #undef _closure_
+}
+
+int __PyCOMPS_set_numattr(PyObject *self, PyObject *val, void *closure) {
+    #define _closure_ ((__PyCOMPS_NumPropGetSetClosure*)closure)
+    long tmp;
+    COMPS_Object *obj;
+    if (!PyINT_CHECK(val)) {
+        PyErr_SetString(PyExc_TypeError, "Not int object");
+        return -1;
+    }
+    tmp = PyINT_ASLONG(val);
+    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    _closure_->set_f(obj, tmp);
+    #undef _closure_
+    return 0;
+}
+
+PyObject* __PyCOMPS_get_numattr(PyObject *self, void *closure) {
+    #define _closure_ ((__PyCOMPS_NumPropGetSetClosure*)closure)
+    COMPS_Object* tmp_prop, *obj;
+    PyObject *ret;
+
+    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    tmp_prop = _closure_->get_f(obj);
+    if (tmp_prop) {
+        ret = PyINT_FROM_LONG(((COMPS_Num*)tmp_prop)->val);
+        COMPS_OBJECT_DESTROY(tmp_prop);
+        return ret;
+    } else
+        Py_RETURN_NONE;
+    #undef _closure_
 }

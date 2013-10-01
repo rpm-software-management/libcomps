@@ -104,8 +104,9 @@ void comps_set_add(COMPS_Set * set, void *item) {
     COMPS_HSListItem * it;
 
     for (it = set->data->first; it != NULL; it = it->next) {
-        if (set->eqf(it->data, item))
+        if (set->eqf(it->data, item)) {
             return;
+        }
     }
     if (set->data_constructor)
         comps_hslist_append(set->data, item, 1);

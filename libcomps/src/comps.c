@@ -79,40 +79,11 @@ inline COMPS_Prop * __comps_docgroup_get_prop(void *group, const char *key) {
     return (COMPS_Prop*)comps_dict_get(((COMPS_DocGroup*)group)->properties, key);
 }
 
-char __comps_doccategory_idcmp(void* cat1, void *cat2) {
-    COMPS_Prop *prop1, *prop2;
-    prop1 = __comps_doccat_get_prop(cat1, "id");
-    prop2 = __comps_doccat_get_prop(cat2, "id");
-    if (prop1 == NULL && prop2 == NULL) return 1;
-    if (prop1 == NULL || prop2 == NULL) return 0;
+COMPS_PROP_CMP(doccategory, id, __comps_doccat_get_prop)
 
-    if (prop1->prop_type != COMPS_PROP_STR ||
-        prop2->prop_type != COMPS_PROP_STR) return 0;
-    return __comps_strcmp(prop1->prop.str, prop2->prop.str);
-}
+COMPS_PROP_CMP(docgroup, id, __comps_docgroup_get_prop)
 
-char __comps_docgroup_idcmp(void* g1, void *g2) {
-    COMPS_Prop *prop1, *prop2;
-    prop1 = __comps_docgroup_get_prop(g1, "id");
-    prop2 = __comps_docgroup_get_prop(g2, "id");
-    if (prop1 == NULL && prop2 == NULL) return 1;
-    if (prop1 == NULL || prop2 == NULL) return 0;
-
-    if (prop1->prop_type != COMPS_PROP_STR ||
-        prop2->prop_type != COMPS_PROP_STR) return 0;
-    return __comps_strcmp(prop1->prop.str, prop2->prop.str);
-}
-char __comps_docenv_idcmp(void* e1, void *e2) {
-    COMPS_Prop *prop1, *prop2;
-    prop1 = __comps_docenv_get_prop(e1, "id");
-    prop2 = __comps_docenv_get_prop(e2, "id");
-    if (prop1 == NULL && prop2 == NULL) return 1;
-    if (prop1 == NULL || prop2 == NULL) return 0;
-
-    if (prop1->prop_type != COMPS_PROP_STR ||
-        prop2->prop_type != COMPS_PROP_STR) return 0;
-    return __comps_strcmp(prop1->prop.str, prop2->prop.str);
-}
+COMPS_PROP_CMP(docenv, id, __comps_docenv_get_prop)
 
 inline void __comps_doc_add_lang_prop(COMPS_Dict *dict, char *lang, char *prop,
                                char copy) {
@@ -214,13 +185,6 @@ void comps_doc_destroy(COMPS_Doc **doc) {
 inline void comps_doc_destroy_v(void *doc)
 {
     comps_doc_destroy((COMPS_Doc**)&doc);
-    /*if (doc) {
-        comps_dict_destroy(((COMPS_Doc*)doc)->lobjects);
-        comps_dict_destroy(((COMPS_Doc*)doc)->dobjects);
-        comps_dict_destroy(((COMPS_Doc*)doc)->mdobjects);
-        comps_log_destroy(((COMPS_Doc*)doc)->log);
-        free(doc);
-    }*/
 }
 
 /**
@@ -260,11 +224,11 @@ COMPS_List* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
         matched = 0;
         tmp_prop = __comps_docgroup_get_prop(it->data, "id");
         if (id != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
-            && __comps_strcmp(tmp_prop->prop.str, id) == 0)
+            && __comps_strcmp(tmp_prop->prop.str, id) == 1)
             matched++;
         tmp_prop = __comps_docgroup_get_prop(it->data, "name");
         if (name != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
-            && __comps_strcmp(tmp_prop->prop.str, name) == 0)
+            && __comps_strcmp(tmp_prop->prop.str, name) == 1)
             matched++;
         else if (lang != NULL) {
             lang_match = comps_dict_get(
@@ -274,7 +238,7 @@ COMPS_List* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
         }
         tmp_prop = __comps_docgroup_get_prop(it->data, "desc");
         if (desc != NULL && tmp_prop && tmp_prop->prop_type == COMPS_PROP_STR
-            && __comps_strcmp(tmp_prop->prop.str, desc) == 0)
+            && __comps_strcmp(tmp_prop->prop.str, desc) == 1)
             matched++;
         else if (lang != NULL) {
             lang_match = comps_dict_get(
@@ -754,7 +718,6 @@ char comps_doc_cmp(COMPS_Doc *c1, COMPS_Doc *c2) {
     for (it = categories?categories->first:NULL; it != NULL; it = it->next) {
         tmpcat = comps_set_data_at(set, it->data);
         if (!tmpcat || !comps_doccategory_cmp(tmpcat, it->data)) {
-            printf("cat differ\n");
             comps_set_destroy(&set);
             return 0;
         }
@@ -769,7 +732,6 @@ char comps_doc_cmp(COMPS_Doc *c1, COMPS_Doc *c2) {
     for (it = envs?envs->first:NULL; it != NULL; it = it->next) {
         tmpenv = comps_set_data_at(set, it->data);
         if (!tmpenv || !comps_docenv_cmp(tmpenv, it->data)) {
-            printf("env differ\n");
             comps_set_destroy(&set);
             return 0;
         }
@@ -789,15 +751,9 @@ COMPS_DocGroup* comps_docgroup_create()
         return NULL;
     group->properties = comps_dict_create(NULL, &comps_doc_prop_clone_v,
                                                 &comps_doc_prop_destroy_v);
-    /*group->id = NULL;
-    group->name = NULL;*/
     group->name_by_lang = comps_dict_create(NULL, &__comps_str_clone, &free);
-    //group->desc = NULL;
     group->desc_by_lang = comps_dict_create(NULL, &__comps_str_clone, &free);
-    //group->def = 2;
-    //group->uservisible = 2;
     group->packages = NULL;
-    //group->lang_only = NULL;
     return group;
 }
 
@@ -807,10 +763,6 @@ COMPS_DocGroup* comps_docgroup_create()
  */
 void comps_docgroup_destroy(void *group)
 {
-    //free(((COMPS_DocGroup*)group)->id);
-    //free(((COMPS_DocGroup*)group)->name);
-    //free(((COMPS_DocGroup*)group)->lang_only);
-    //free(((COMPS_DocGroup*)group)->desc);
     comps_dict_destroy(((COMPS_DocGroup*)group)->properties);
     comps_dict_destroy(((COMPS_DocGroup*)group)->name_by_lang);
     comps_dict_destroy(((COMPS_DocGroup*)group)->desc_by_lang);
@@ -828,13 +780,7 @@ void comps_docgroup_destroy(void *group)
  * @param id new group id
  * @)param copy if copy indicator
  */
-inline void comps_docgroup_set_id(COMPS_DocGroup *group, char *id, char copy) {
-    if (id) {
-        __comps_doc_add_prop(group->properties, "id",
-                             comps_doc_prop_str_create(id, copy));
-    }
-//    __comps_doc_char_setter((void**)&group->id, id, copy);
-}
+COMPS_STRPROP_SETTER(group, COMPS_DocGroup, id) /*comps_utils.h macro*/
 
 /**
  * Set group name. If copy param is 1, copy passed name buffer to new buffer
@@ -847,14 +793,8 @@ inline void comps_docgroup_set_id(COMPS_DocGroup *group, char *id, char copy) {
  * @param name new group name
  * @param copy if copy indicator
  */
-inline void comps_docgroup_set_name(COMPS_DocGroup *group, char *name,
-                                    char copy) {
-    if (name) {
-        __comps_doc_add_prop(group->properties, "name",
-                             comps_doc_prop_str_create(name, copy));
-    }
-//    __comps_doc_char_setter((void**)&group->name, name, copy);
-}
+COMPS_STRPROP_SETTER(group, COMPS_DocGroup, name) /*comps_utils.h macro*/
+
 inline void comps_docgroup_add_lang_name(COMPS_DocGroup *group, char *lang,
                                   char *name, char copy) {
     __comps_doc_add_lang_prop(group->name_by_lang, lang, name, copy);
@@ -871,14 +811,8 @@ inline void comps_docgroup_add_lang_name(COMPS_DocGroup *group, char *lang,
  * @param desc new group description
  * @param copy if copy indicator
  */
-inline void comps_docgroup_set_desc(COMPS_DocGroup *group, char *desc,
-                                    char copy) {
-    if (desc) {
-        __comps_doc_add_prop(group->properties, "desc",
-                             comps_doc_prop_str_create(desc, copy));
-    }
-    //__comps_doc_char_setter((void**)&group->desc, desc, copy);
-}
+COMPS_STRPROP_SETTER(group, COMPS_DocGroup, desc) /*comps_utils.h macro*/
+
 inline void comps_docgroup_add_lang_desc(COMPS_DocGroup *group, char *lang,
                                   char *desc, char copy) {
     __comps_doc_add_lang_prop(group->desc_by_lang, lang, desc, copy);
@@ -892,7 +826,6 @@ inline void comps_docgroup_add_lang_desc(COMPS_DocGroup *group, char *lang,
 inline void comps_docgroup_set_default(COMPS_DocGroup *group, unsigned def) {
     __comps_doc_add_prop(group->properties, "def",
                          comps_doc_prop_num_create(def));
-    //group->def = def;
 }
 
 /**
@@ -904,14 +837,12 @@ inline void comps_docgroup_set_uservisible(COMPS_DocGroup *group,
                                            unsigned uservisible) {
     __comps_doc_add_prop(group->properties, "uservisible",
                          comps_doc_prop_num_create(uservisible));
-    //group->uservisible = uservisible;
 }
 
 inline void comps_docgroup_set_displayorder(COMPS_DocGroup *group,
                                            unsigned display_order) {
     __comps_doc_add_prop(group->properties, "display_order",
                          comps_doc_prop_num_create(display_order));
-    //group->uservisible = uservisible;
 }
 
 /**
@@ -1108,12 +1039,6 @@ COMPS_DocGroup* comps_docgroup_clone(COMPS_DocGroup *g) {
     COMPS_ListItem *it;
 
     res = comps_docgroup_create();
-    //comps_docgroup_set_name(res, g->name, 1);
-    //comps_docgroup_set_id(res, g->id, 1);
-    //comps_docgroup_set_desc(res, g->desc, 1);
-    //res->def = g->def;
-    //res->lang_only = __comps_str_clone(g->lang_only);
-    //res->uservisible = g->uservisible;
     comps_dict_destroy(res->name_by_lang);
     comps_dict_destroy(res->desc_by_lang);
     comps_dict_destroy(res->properties);
@@ -1154,12 +1079,6 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
 
     res = comps_docgroup_create();
     comps_dict_destroy(res->properties);
-    /*pairs = comps_dict_pairs(g2->properties);
-    for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
-        printf("%s = ", ((COMPS_RTreePair*)hsit->data)->key);
-        printf("%s\n", ((COMPS_Prop*)((COMPS_RTreePair*)hsit->data)->data)->prop.str);
-    }
-    comps_hslist_destroy(&pairs);*/
 
     res->properties = comps_dict_clone(g2->properties);
     pairs = comps_dict_pairs(g1->properties);
@@ -1312,13 +1231,7 @@ void comps_doccategory_destroy(void *category)
  * @param id id new category id
  * @param copy copy indicator
  */
-inline void comps_doccategory_set_id(COMPS_DocCategory *category, char *id,
-                                     char copy) {
-    if (id) {
-        __comps_doc_add_prop(category->properties, "id",
-                             comps_doc_prop_str_create(id, copy));
-    }
-}
+COMPS_STRPROP_SETTER(category, COMPS_DocCategory, id) /*comps_utils.h macro*/
 
 /**
  * Set category name. If copy param is 1, copy passed id buffer to new
@@ -1331,13 +1244,9 @@ inline void comps_doccategory_set_id(COMPS_DocCategory *category, char *id,
  * @param name new category name
  * @param copy copy indicator
  */
-inline void comps_doccategory_set_name(COMPS_DocCategory *category, char *name,
-                                       char copy) {
-    if (name) {
-        __comps_doc_add_prop(category->properties, "name",
-                             comps_doc_prop_str_create(name, copy));
-    }
-}
+COMPS_STRPROP_SETTER(category, COMPS_DocCategory, name) /*comps_utils.h macro*/
+
+
 inline void comps_doccategory_add_lang_name(COMPS_DocCategory *category,
                                             char *lang, char *name, char copy){
     __comps_doc_add_lang_prop(category->name_by_lang, lang, name, copy);
@@ -1354,13 +1263,9 @@ inline void comps_doccategory_add_lang_name(COMPS_DocCategory *category,
  * @param desc new category id
  * @param copy copy indicator
  */
-inline void comps_doccategory_set_desc(COMPS_DocCategory *category, char *desc,
-                                       char copy) {
-    if (desc) {
-        __comps_doc_add_prop(category->properties, "desc",
-                             comps_doc_prop_str_create(desc, copy));
-    }
-}
+COMPS_STRPROP_SETTER(category, COMPS_DocCategory, desc) /*comps_utils.h macro*/
+
+
 inline void comps_doccategory_add_lang_desc(COMPS_DocCategory *category,
                                             char *lang, char *desc, char copy){
     __comps_doc_add_lang_prop(category->desc_by_lang, lang, desc, copy);
@@ -1691,11 +1596,7 @@ void comps_docenv_destroy(void *env) {
  * @param id new environment id
  * @param copy copy indicator
  */
-inline void comps_docenv_set_id(COMPS_DocEnv * env, char *id, char copy) {
-    if (id)
-        __comps_doc_add_prop(env->properties, "id",
-                             comps_doc_prop_str_create(id, copy));
-}
+COMPS_STRPROP_SETTER(env, COMPS_DocEnv, id) /*comps_utils.h macro*/
 
 /**
  * Set environment name. If copy param is 1, copy passed name buffer to new
@@ -1708,11 +1609,8 @@ inline void comps_docenv_set_id(COMPS_DocEnv * env, char *id, char copy) {
  * @param name new environment name
  * @param copy copy indicator
  */
-inline void comps_docenv_set_name(COMPS_DocEnv * env, char *name, char copy) {
-    if (name)
-        __comps_doc_add_prop(env->properties, "name",
-                             comps_doc_prop_str_create(name, copy));
-}
+COMPS_STRPROP_SETTER(env, COMPS_DocEnv, name) /*comps_utils.h macro*/
+
 inline void comps_docenv_add_lang_name(COMPS_DocEnv *env,
                                        char *lang, char *name, char copy){
     __comps_doc_add_lang_prop(env->name_by_lang, lang, name, copy);
@@ -1729,11 +1627,8 @@ inline void comps_docenv_add_lang_name(COMPS_DocEnv *env,
  * @param desc new environment description
  * @param copy copy indicator
  */
-inline void comps_docenv_set_desc(COMPS_DocEnv * env, char *desc, char copy) {
-    if (desc)
-        __comps_doc_add_prop(env->properties, "desc",
-                             comps_doc_prop_str_create(desc, copy));
-}
+COMPS_STRPROP_SETTER(env, COMPS_DocEnv, desc) /*comps_utils.h macro*/
+
 inline void comps_docenv_add_lang_desc(COMPS_DocEnv *env,
                                        char *lang, char *desc, char copy){
     __comps_doc_add_lang_prop(env->desc_by_lang, lang, desc, copy);

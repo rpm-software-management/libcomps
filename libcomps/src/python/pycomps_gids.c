@@ -19,36 +19,9 @@
 
 #include "pycomps_gids.h"
 
-inline COMPS_DocGroupId* pycomps_gid_get(PyObject *pygid) {
-    return (COMPS_DocGroupId*)((PyCOMPS_GID*)pygid)->citem->data;
-}
-
-inline void pycomps_gid_destroy(void * gid) {
-    comps_docgroupid_destroy(gid);
-}
-
-inline void pycomps_gid_incref(void * gid) {
-    ctopy_citem_incref(
-                (PyCOMPS_CtoPy_CItem*)((COMPS_DocGroupId*)gid)->reserved);
-}
-
-inline void pycomps_gid_decref(void * gid) {
-    ctopy_citem_destroy(((COMPS_DocGroupId*)gid)->reserved);
-}
-
-PyObject* PyCOMPSGID_convert(void *gid) {
-    PyObject *ret;
-    ret = PyCOMPSGID_new(&PyCOMPS_GIDType, NULL, NULL);
-    PyCOMPSGID_init((PyCOMPS_GID*)ret, NULL, NULL);
-    ctopy_citem_decref(((PyCOMPS_GID*)ret)->citem);
-    ((PyCOMPS_GID*)ret)->citem = ((COMPS_DocGroupId*)gid)->reserved;
-    ctopy_citem_incref(((PyCOMPS_GID*)ret)->citem);
-    return ret;
-}
-
 void PyCOMPSGID_dealloc(PyCOMPS_GID *self)
 {
-    ctopy_citem_decref(self->citem);
+    COMPS_OBJECT_DESTROY(self->gid);
     Py_TYPE(self)->tp_free((PyObject*)self);
     self = NULL;
 }
@@ -56,16 +29,14 @@ void PyCOMPSGID_dealloc(PyCOMPS_GID *self)
 PyObject* PyCOMPSGID_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyCOMPS_GID *self;
-    COMPS_DocGroupId *gid;
 
    (void) args;
    (void) kwds;
 
     self = (PyCOMPS_GID*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        gid = comps_docgroupid_create();
-        gid->reserved = ctopy_citem_create(gid, &pycomps_gid_destroy);
-        self->citem = gid->reserved;
+        self->gid = (COMPS_DocGroupId*)comps_object_create(
+                                            &COMPS_DocGroupId_ObjInfo, NULL);
     }
     return (PyObject*) self;
 }
@@ -102,39 +73,23 @@ int PyCOMPSGID_init(PyCOMPS_GID *self, PyObject *args, PyObject *kwds)
                                         "s|O&", keywords, &name,
                                         &pycomps_p2c_bool_convert, &def
                                            )) {
-            comps_docgroupid_set_name(pycomps_gid_get((PyObject*)self), name, 1);
-            comps_docgroupid_set_default(pycomps_gid_get((PyObject*)self), def);
+            comps_docgroupid_set_name(((PyCOMPS_GID*)self)->gid, name, 1);
+            comps_docgroupid_set_default(((PyCOMPS_GID*)self)->gid, def);
             return 0;
         } else {
             return -1;
         }
     } else {
-        pycomps_gid_get((PyObject*)self)->name = NULL;
-        pycomps_gid_get((PyObject*)self)->def = 0;
+        self->gid->name = NULL;
+        self->gid->def = 0;
         return 0;
     }
     return -1;
 }
 
-PyObject* PyCOMPSGID_strget_(PyCOMPS_GID *self, void *closure) {
-    char *tmp = GET_FROM(pycomps_gid_get((PyObject*)self),
-                                         (size_t)closure);
-    return PyUnicode_FromString(tmp);
-}
-int PyCOMPSGID_strset_(PyCOMPS_GID *self, PyObject *value, void *closure) {
-    char *tmp;
-    (void) closure;
-    if (__pycomps_arg_to_char(value, &tmp)) {
-        return -1;
-    }
-    __comps_doc_char_setter((void**)&GET_FROM(pycomps_gid_get((PyObject*)self),
-                                    (size_t)closure), tmp, 0);
-    return 0;
-}
-
 PyObject* PyCOMPSGID_get_default(PyCOMPS_GID *self, void *closure) {
     (void) closure;
-    char def = pycomps_gid_get((PyObject*)self)->def;
+    char def = self->gid->def;
         return Py_BuildValue("O&", &pycomps_c2p_bool_convert, &def);
     Py_RETURN_NONE;
 }
@@ -146,15 +101,21 @@ int PyCOMPSGID_set_default(PyCOMPS_GID *self, PyObject *value, void *closure){
         return -1;
     }
     if (value == Py_True)
-        pycomps_gid_get((PyObject*)self)->def = 1;
+        self->gid->def = 1;
     else
-        pycomps_gid_get((PyObject*)self)->def = 0;
+        self->gid->def = 0;
     return 0;
 }
 
+__COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroupId) DocGroupId_NameClosure = {
+    .get_f = &comps_docgroupid_get_name,
+    .set_f = &comps_docgroupid_set_name,
+    .c_offset = offsetof(PyCOMPS_GID, gid)
+};
+
 PyGetSetDef gid_getset[] = {
     {"name",
-     (getter)PyCOMPSGID_strget_, (setter)PyCOMPSGID_strset_,
+     (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
      "Group ID name",
      (void*)offsetof(COMPS_DocGroupId, name)},
     {"default",
@@ -164,105 +125,71 @@ PyGetSetDef gid_getset[] = {
     {NULL}  /* Sentinel */
 };
 
-PyObject* comps_gid_str(void *gid) {
-    PyObject * ret;
-    char *name;
-    const char *def;
-    char * empty = "";
-    printf("gid str def:%d\n", ((COMPS_DocGroupId*)gid)->def);
-    name = (((COMPS_DocGroupId*)gid)->name)?
-          ((COMPS_DocGroupId*)gid)->name:empty;
-    def = ((COMPS_DocGroupId*)gid)->def?"true":"false";
-    ret = PyUnicode_FromFormat("<COMPS_GroupID: name='%s', default=%s>",
-                               name, def);
+PyObject* PyCOMPSGID_str(PyObject *self) {
+    char *x;
+    PyObject *ret;
+    x = comps_object_tostr((COMPS_Object*)((PyCOMPS_GID*)self)->gid);
+    ret = PyUnicode_FromString(x);
+    free(x);
     return ret;
 }
 
-PyObject* PyCOMPSGID_str(PyObject *self) {
-    return comps_gid_str(pycomps_gid_get(self));
-}
-
-inline void comps_gid_print(FILE *f, void *gid) {
-    const char *def;
-    def = (((COMPS_DocGroupId*)gid)->def)?"true":"false";
-    fprintf(f, "<COPMS_Package name='%s' default='%s'>",
-            ((COMPS_DocGroupId*)gid)->name, def);
-}
-
 int PyCOMPSGID_print(PyObject *self, FILE *f, int flags) {
+    const char *def;
+    char *name;
+
     (void) flags;
-    comps_gid_print(f, (void*)pycomps_gid_get(self));
+    def = (((PyCOMPS_GID*)self)->gid->def)?"true":"false";
+    name = comps_object_tostr((COMPS_Object*)((PyCOMPS_GID*)self)->gid->name);
+    fprintf(f, "<COPMS_GroupId name='%s' default='%s'>", name, def);
+    free(name);
     return 0;
 }
 
 COMPS_DocGroupId* comps_gid_from_str(PyObject *other) {
     COMPS_DocGroupId *gid;
-    gid = comps_docgroupid_create();
-    gid->reserved = ctopy_citem_create(gid, &pycomps_gid_destroy);
-    __pycomps_stringable_to_char(other, &gid->name);
+    char *name;
+    gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo,
+                                                 NULL);
+    __pycomps_stringable_to_char(other, &name);
+    gid->name = comps_str_x(name);
     if (!gid->name) {
-        pycomps_gid_decref(gid);
+        COMPS_OBJECT_DESTROY(gid);
         return NULL;
     }
     return gid;
 }
 
-PyObject* pycomps_gid_from_str(PyObject *other) {
-    PyObject *pygid = PyCOMPSGID_new(&PyCOMPS_GIDType, NULL, NULL);
-    PyCOMPSGID_init((PyCOMPS_GID*)pygid, NULL, NULL);
-    __pycomps_stringable_to_char(other, &pycomps_gid_get(pygid)->name);
-    if (!pycomps_gid_get(pygid)->name) {
-        PyCOMPSGID_dealloc((PyCOMPS_GID*)pygid);
-        return NULL;
-    }
-    return pygid;
-}
-
 PyObject* PyCOMPSGID_cmp(PyObject *self, PyObject *other, int op) {
-    PyObject *tmpgid;
     char ret;
-    char created = 0;
-    if (PyUnicode_Check(other) || PyBytes_Check(other)) {
-        created = 1;
-        tmpgid = pycomps_gid_from_str(other);
-    } else if (other && other->ob_type == &PyCOMPS_GIDType) {
-        tmpgid = other;
-    } else if (other == Py_None){
-        if (op == Py_EQ){
-            Py_RETURN_FALSE;
-        } else {
-            Py_RETURN_TRUE;
-        }
-    } else {
-        PyErr_Format(PyExc_TypeError, "Cannot compare %s with %s",
-                                    Py_TYPE(self)->tp_name,
-                                    Py_TYPE(other)->tp_name);
-        return NULL;
-    }
     CMP_OP_EQ_NE_CHECK(op)
+    COMPS_DocGroupId *gid2;
+    char created = 0;
 
-    ret = comps_docgroupid_cmp(pycomps_gid_get(self), pycomps_gid_get(tmpgid));
-    if (created) {
-        Py_DECREF(tmpgid);
-    }
-    if (ret) {
-        if (op == Py_EQ){
-            Py_RETURN_TRUE;
-        } else {
-            Py_RETURN_FALSE;
-        }
+    if (PyUnicode_Check(other) || PyBytes_Check(other)) {
+        gid2 = comps_gid_from_str(other);
+        created = 1;
+    } else if (other == NULL || ( Py_TYPE(other) != &PyCOMPS_GIDType
+                           && other != Py_None)) {
+        PyErr_Format(PyExc_TypeError, "Not %s instance",
+                        Py_TYPE(self)->tp_name);
+        return NULL;
     } else {
-        if (op == Py_EQ){
-            Py_RETURN_FALSE;
-        } else {
-            Py_RETURN_TRUE;
-        }
+        gid2 = ((PyCOMPS_GID*)other)->gid;
     }
-}
+    CMP_NONE_CHECK(op, self, other)
 
-char pycomps_gid_cmp(void *gid1, void *gid2) {
-    return comps_docgroupid_cmp((COMPS_DocGroupId*)gid1,
-                                (COMPS_DocGroupId*)gid2);
+    ret = COMPS_OBJECT_CMP((COMPS_Object*)((PyCOMPS_GID*)self)->gid,
+                           (COMPS_Object*)gid2);
+    if (created) {
+        COMPS_OBJECT_DESTROY(gid2);
+    }
+    if (op == Py_EQ) {
+        if (!ret) Py_RETURN_FALSE;
+    } else {
+        if (ret) Py_RETURN_FALSE;
+    }
+    Py_RETURN_TRUE;
 }
 
 PyMemberDef PyCOMPSGID_members[] = {
@@ -270,16 +197,6 @@ PyMemberDef PyCOMPSGID_members[] = {
 
 PyMethodDef PyCOMPSGID_methods[] = {
     {NULL}  /* Sentinel */
-};
-
-PyCOMPS_CtoPySeqItemMan PyCOMPSGID_ItemMan = {
-    .item_type = &PyCOMPS_GIDType,
-    .ctopy_convert = PyCOMPSGID_convert,
-    .data_incref = pycomps_gid_incref,
-    .data_cmp = pycomps_gid_cmp,
-    .data_decref = pycomps_gid_decref,
-    .fprint_f = comps_gid_print,
-    .str_f = comps_gid_str
 };
 
 PyTypeObject PyCOMPS_GIDType = {
@@ -296,7 +213,7 @@ PyTypeObject PyCOMPS_GIDType = {
     0,                         /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
+    PyCOMPS_hash,              /*tp_hash */
     0,                         /*tp_call*/
     PyCOMPSGID_str,           /*tp_str*/
     0,                         /*tp_getattro*/
@@ -322,65 +239,57 @@ PyTypeObject PyCOMPS_GIDType = {
     0,                               /* tp_alloc */
     PyCOMPSGID_new,                 /* tp_new */};
 
-int PyCOMPSGIDs_init(PyCOMPS_CtoPySeq *self, PyObject *args, PyObject *kwds)
-{
-    (void) args;
-    (void) kwds;
-    self->item_man = &PyCOMPSGID_ItemMan;
-    return 0;
+COMPS_Object* comps_gids_in(PyObject *item) {
+    return comps_object_incref((COMPS_Object*)((PyCOMPS_GID*)item)->gid);
 }
 
-PyObject* PyCOMPSGIDs_append(PyObject * self, PyObject *item) {
-    COMPS_ListItem *it;
-    void *key;
-    PyCOMPS_CtoPySeq *self_seq = (PyCOMPS_CtoPySeq*)self;
-    if (PyUnicode_Check(item) || PyBytes_Check(item)) {
-        COMPS_DocGroupId* gid = comps_gid_from_str(item);
-        if (!gid)
-            return NULL;
-        it = comps_list_item_create(gid, NULL, &pycomps_gid_decref);
+COMPS_Object* comps_gids_str_in(PyObject *item) {
+    //printf("comps gids str in\n");
+    return (COMPS_Object*)comps_gid_from_str(item);
+}
 
-        //key = ctopy_make_key(it->data);
-        //comps_brtree_set(self_seq->ctopy_map, key, item2);
-        //Py_INCREF(item2);
-        //ctopy_key_destroy(key);
-        if (!comps_list_append(ctopy_get_list(self), it)) {
-            PyErr_SetString(PyExc_TypeError, "Cannot append\n");
-            return NULL;
-        }
-    } else if (Py_TYPE(item) == self_seq->item_man->item_type) {
-        self_seq->item_man->data_incref(
-                                        ((PyCOMPS_CtoPy_PItem*)item)->citem->data);
+PyObject* comps_gids_out(COMPS_Object *cobj) {
+    PyCOMPS_GID *ret;
+    ret = (PyCOMPS_GID*)PyCOMPSGID_new(&PyCOMPS_GIDType, NULL, NULL);
+    PyCOMPSGID_init(ret, NULL, NULL);
+    COMPS_OBJECT_DESTROY(ret->gid);
+    ret->gid = (COMPS_DocGroupId*)cobj;
+    //printf("out\n");
+    return (PyObject*)ret;
+}
 
-        it = comps_list_item_create(((PyCOMPS_CtoPy_PItem*)item)->citem->data,
-                                     NULL,
-                                    self_seq->item_man
-                                    ->data_decref);
-        key = ctopy_make_key(it->data);
-        comps_brtree_set(self_seq->ctopy_map, key, item);
-        Py_INCREF(item);
-        ctopy_key_destroy(key);
-        if (!comps_list_append(ctopy_get_list(self), it)) {
-            PyErr_SetString(PyExc_TypeError, "Cannot append\n");
-            return NULL;
-        }
-    } else {
-        PyErr_Format(PyExc_TypeError, "Cannot append %s to %s %s|",
-                      Py_TYPE(item)->tp_name,
-                      Py_TYPE(self)->tp_name,
-                      self_seq->item_man->item_type->tp_name);
-        return NULL;
+PyCOMPS_SeqInfo PyCOMPS_GIDsInfo = {
+#if PY_MAJOR_VERSION >= 3
+    .itemtypes = (PyTypeObject*[]){&PyCOMPS_GIDType,
+                                   &PyUnicode_Type},
+    .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
+                        {&comps_gids_in,
+                         &comps_gids_str_in},
+#else
+    .itemtypes = (PyTypeObject*[]){&PyCOMPS_GIDType, &PyString_Type,
+                                   &PyUnicode_Type},
+    .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
+                        {&comps_gids_in,
+                         &comps_gids_str_in,
+                         &comps_gids_str_in},
+#endif
+    .out_convert_func = &comps_gids_out,
+    .item_types_len = 3
+};
 
-    }
-    Py_RETURN_NONE;
+int PyCOMPSGIDs_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
+{
+    //printf("gids init\n");
+    (void) args;
+    (void) kwds;
+    self->it_info = &PyCOMPS_GIDsInfo;
+    return 0;
 }
 
 PyMemberDef PyCOMPSGIDs_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSGIDs_methods[] = {
-     {"append", (PyCFunction)PyCOMPSGIDs_append, METH_O,
-     "Append item to new of the list"},
     {NULL}  /* Sentinel */
 };
 
@@ -389,9 +298,9 @@ PyNumberMethods PyCOMPSGIDs_Nums = {0};
 PyTypeObject PyCOMPS_GIDsType = {
     PY_OBJ_HEAD_INIT
     "libcomps.IdList",   /*tp_name*/
-    sizeof(PyCOMPS_CtoPySeq), /*tp_basicsize*/
+    sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     sizeof(PyCOMPS_GID),   /*tp_itemsize*/
-    (destructor)PyCOMPSCtoPySeq_dealloc, /*tp_dealloc*/
+    (destructor)PyCOMPSSeq_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -402,7 +311,7 @@ PyTypeObject PyCOMPS_GIDsType = {
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
-    PyCOMPSCtoPySeq_str,       /*tp_str*/
+    PyCOMPSSeq_str,       /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
@@ -410,18 +319,18 @@ PyTypeObject PyCOMPS_GIDsType = {
     "Comps GIDs list",           /* tp_doc */
     0,                    /* tp_traverse */
     0,                     /* tp_clear */
-    &PyCOMPSCtoPySeq_cmp,       /* tp_richcompare */
+    &PyCOMPSSeq_cmp,       /* tp_richcompare */
     0,                     /* tp_weaklistoffset */
     0,                     /* tp_iter */
     0,                     /* tp_iternext */
     PyCOMPSGIDs_methods,        /* tp_methods */
     PyCOMPSGIDs_members,        /* tp_members */
     0,                         /* tp_getset */
-    &PyCOMPS_CtoPySeqType,           /* tp_base */
+    &PyCOMPS_SeqType,           /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
     (initproc)PyCOMPSGIDs_init,      /* tp_init */
     0,                               /* tp_alloc */
-    &PyCOMPSCtoPySeq_new,                 /* tp_new */};
+    &PyCOMPSSeq_new,                 /* tp_new */};

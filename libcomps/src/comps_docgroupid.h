@@ -17,34 +17,29 @@
  * USA
  */
 
-#ifndef PYCOMPS_GIDS_H
-#define PYCOMPS_GIDS_H
+#ifndef COMPS_DOCGROUPID_H
+#define COMPS_DOCGROUPID_H
 
-#include <Python.h>
-#include "structmember.h"
-
-#include "libcomps/comps_doc.h"
-#include "libcomps/comps_list.h"
-#include "libcomps/comps_docgroupid.h"
-
-#include "pycomps_types.h"
-#include "pycomps_utils.h"
-#include "pycomps_23macros.h"
-#include "pycomps_sequence.h"
+#include "comps_utils.h"
 
 typedef struct {
-    PyObject_HEAD
-    COMPS_DocGroupId *gid;
-} PyCOMPS_GID;
+    COMPS_Object_HEAD
+    COMPS_Str *name;
+    char def;
+} COMPS_DocGroupId;
 
-__H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroupId) /*pycomps_utils.h macro*/
+//HEAD_COMPS_CREATE_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
+//HEAD_COMPS_COPY_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
+//HEAD_COMPS_DESTROY_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
 
-COMPS_DocGroupId* pycomps_gid_get(PyObject *pygid);
-PyObject* PyCOMPSGID_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
-int PyCOMPSGID_init(PyCOMPS_GID *self, PyObject *args, PyObject *kwds);
-PyObject* PyCOMPSGID_convert(void *gid);
+char __comps_docgroupid_cmp_set(void *gid1, void *gid2);
 
-int PyCOMPSGIDs_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds);
+COMPS_Object* comps_docgroupid_get_name(COMPS_DocGroupId *gid);
+void comps_docgroupid_set_name(COMPS_DocGroupId *gid, char *name, char copy);
 
+void comps_docgroupid_set_name(COMPS_DocGroupId *gid, char *name, char copy);
+void comps_docgroupid_set_default(COMPS_DocGroupId *gid, int def);
+
+extern COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo;
 
 #endif

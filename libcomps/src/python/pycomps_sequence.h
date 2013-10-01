@@ -19,32 +19,23 @@
 
 #ifndef PYCOMPS_SEQ_H
 #define PYCOMPS_SEQ_H
-#include "pycomps_ctopy.h"
 
-typedef void* (*PyCOMPSSeq_in_itemconvert)(PyObject*);
+#include "pycomps_hash.h"
+#include "pycomps_types.h"
 
-typedef PyObject* (*PyCOMPSSeq_out_itemconvert)(void*);
+#include "libcomps/comps_objlist.h"
+#include "libcomps/comps_utils.h"
 
-typedef char (*PyCOMPSSeq_cmp_func)(void*, void*);
+#include <Python.h>
+#include "structmember.h"
 
-typedef struct PyCOMPS_Sequence {
-    PyObject_HEAD
-    PyCOMPS_CtoPy_CItem *citem;
 
-    PyTypeObject ** itemtypes;
-    PyCOMPSSeq_in_itemconvert *in_convert_funcs;
-    PyCOMPSSeq_out_itemconvert out_convert_func;
-    PyCOMPSSeq_cmp_func item_cmp_func;
-    unsigned item_types_len;
-} PyCOMPS_Sequence;
 
 typedef struct PyCOMPS_SeqIter{
     PyObject_HEAD
-    COMPS_ListItem *it;
+    COMPS_ObjListIt *it;
     PyCOMPS_Sequence *seq;
 } PyCOMPS_SeqIter;
-
-COMPS_List * get_list(PyObject *self);
 
 Py_ssize_t list_len(PyObject *self);
 PyObject *list_getitem(PyObject *self, Py_ssize_t index);
@@ -70,8 +61,5 @@ PyObject *list_getitem_X(PyObject *self, PyObject *key);
 
 PyObject* PyCOMPSSeqIter_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int PyCOMPSSeqIter_init(PyCOMPS_SeqIter *self, PyObject *args, PyObject *kwds);
-
-extern PyTypeObject PyCOMPS_SeqType;
-extern PyTypeObject PyCOMPS_SeqIterType;
 
 #endif

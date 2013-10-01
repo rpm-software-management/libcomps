@@ -23,7 +23,8 @@
 #include <signal.h>
 
 #include "comps_list.h"
-#include "comps.h"
+#include "comps_obj.h"
+#include "comps_doc.h"
 #include "comps_types.h"
 #include "comps_logger.h"
 #include "comps_elem.h"

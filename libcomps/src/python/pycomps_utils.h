@@ -22,9 +22,93 @@
 
 #include <Python.h>
 #include "structmember.h"
-#include "pycomps_23macros.h"
-#include "crc32.h"
 
+#include "pycomps_types.h"
+#include "pycomps_23macros.h"
+
+#include "libcomps/comps_objdict.h"
+#include "libcomps/comps_objlist.h"
+#include "libcomps/comps_utils.h"
+
+typedef struct {
+    COMPS_Object* (*get_f)(COMPS_Object*);
+    void (*set_f)(COMPS_Object*, int);
+    size_t c_offset;
+} __PyCOMPS_NumPropGetSetClosure;
+
+typedef struct {
+    COMPS_Object* (*get_f)(COMPS_Object*);
+    void (*set_f)(COMPS_Object*, char*, char);
+    size_t c_offset;
+} __PyCOMPS_StrPropGetSetClosure;
+
+typedef struct {
+    COMPS_ObjList* (*get_f)(COMPS_Object*);
+    PyTypeObject *type;
+    void (*set_f)(COMPS_Object*, COMPS_ObjList*);
+    size_t p_offset;
+    size_t c_offset;
+} __PyCOMPS_ListGetSetClosure;
+
+typedef struct {
+    size_t p_offset;
+    size_t c_offset;
+    size_t dict_offset;
+} __PyCOMPS_DictGetSetClosure;
+
+#define __H_COMPS_NUMPROP_GETSET_CLOSURE(C_TYPE)\
+typedef struct {\
+    COMPS_Object* (*get_f)(C_TYPE*);\
+    void (*set_f)(C_TYPE*, int);\
+    size_t c_offset;\
+} CONCAT(CONCAT(PyCOMPS_, C_TYPE), _NumPropGetSetClosure);
+
+#define __COMPS_NUMPROP_GETSET_CLOSURE(C_TYPE)\
+        CONCAT(CONCAT(PyCOMPS_, C_TYPE), _NumPropGetSetClosure)
+
+#define __H_COMPS_STRPROP_GETSET_CLOSURE(C_TYPE)\
+typedef struct {\
+    COMPS_Object* (*get_f)(C_TYPE*);\
+    void (*set_f)(C_TYPE*, char*, char);\
+    size_t c_offset;\
+} CONCAT(CONCAT(PyCOMPS_, C_TYPE), _StrPropGetSetClosure);
+
+#define __COMPS_STRPROP_GETSET_CLOSURE(C_TYPE)\
+        CONCAT(CONCAT(PyCOMPS_, C_TYPE), _StrPropGetSetClosure)
+
+#define __H_COMPS_LIST_GETSET_CLOSURE(C_TYPE)\
+typedef struct {\
+    COMPS_ObjList *(*get_f)(C_TYPE*);\
+    PyTypeObject *type;\
+    void (*set_f)(C_TYPE*, COMPS_ObjList*);\
+    size_t p_offset;\
+    size_t c_offset;\
+} CONCAT(CONCAT(PyCOMPS_, C_TYPE), _ListGetSetClosure);
+
+#define __COMPS_LIST_GETSET_CLOSURE(C_TYPE)\
+        CONCAT(CONCAT(PyCOMPS_, C_TYPE), _ListGetSetClosure)
+
+#define __H_COMPS_DICT_GETSET_CLOSURE(C_TYPE)\
+typedef struct {\
+    size_t p_offset;\
+    size_t c_offset;\
+    size_t dict_offset;\
+} CONCAT(CONCAT(PyCOMPS_, C_TYPE), _DictGetSetClosure);
+
+#define __COMPS_DICT_GETSET_CLOSURE(C_TYPE)\
+        CONCAT(CONCAT(PyCOMPS_, C_TYPE), _DictGetSetClosure)
+
+
+PyObject* __PyCOMPS_get_ids(PyObject *self, void *closure);
+int __PyCOMPS_set_ids(PyObject *self, PyObject *value, void *closure);
+
+PyObject* __PyCOMPS_get_dict(PyObject *self, void *closure);
+int __PyCOMPS_set_dict(PyObject *self, PyObject *value, void *closure);
+
+PyObject* __PyCOMPS_get_strattr(PyObject *self, void *closure);
+int __PyCOMPS_set_strattr(PyObject *self, PyObject *val, void *closure);
+PyObject* __PyCOMPS_get_numattr(PyObject *self, void *closure);
+int __PyCOMPS_set_numattr(PyObject *self, PyObject *val, void *closure);
 
 PyObject* __pycomps_str_getter(char * prop);
 char __pycomps_strcmp(const char *s1, const char *s2);

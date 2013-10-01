@@ -89,7 +89,8 @@ void comps_parse_parsed_reinit(COMPS_Parsed *parsed) {
     comps_list_clear(parsed->elem_stack);
     comps_list_clear(parsed->text_buffer);
     comps_list_clear(parsed->log->logger_data);
-    comps_doc_destroy(&parsed->comps_doc);
+    COMPS_OBJECT_DESTROY(parsed->comps_doc);
+    //comps_doc_destroy(&parsed->comps_doc);
 }
 
 void comps_parse_parsed_destroy(COMPS_Parsed *parsed) {
@@ -97,7 +98,8 @@ void comps_parse_parsed_destroy(COMPS_Parsed *parsed) {
     comps_list_destroy(&parsed->text_buffer);
     if (parsed->log)
         comps_log_destroy(parsed->log);
-    comps_doc_destroy(&parsed->comps_doc);
+    COMPS_OBJECT_DESTROY(parsed->comps_doc);
+    //comps_doc_destroy(&parsed->comps_doc);
     XML_ParserFree(parsed->parser);
     free(parsed);
 }
@@ -277,10 +279,10 @@ COMPS_PackageType comps_package_get_type(const XML_Char *s)
 
 void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
 {
-    COMPS_List *list;
-    COMPS_Dict *dict, *prop_dict;
+    COMPS_ObjList *list = NULL;
+    COMPS_ObjDict *objdict, *prop_dict;
     char *lang;
-    COMPS_Prop *prop;
+    COMPS_Object *prop;
 
     /* check if there's all important data for currently processed element.
        This is also done by dtd checking, but if dtd rules missing, validation
@@ -288,9 +290,10 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
 
     #define parent ((COMPS_Elem*)parsed->elem_stack->last->prev->data)->type
     #define grandparent ((COMPS_Elem*)parsed->elem_stack->last->prev->prev->data)->type
-    #define list_last_cat ((COMPS_DocCategory*)list->last->data)
-    #define list_last_env ((COMPS_DocEnv*)list->last->data)
-    #define list_last_group ((COMPS_DocGroup*)list->last->data)
+    #define list_last_cat ((COMPS_DocCategory*)list->last->comps_obj)
+    #define list_last_env ((COMPS_DocEnv*)list->last->comps_obj)
+    #define list_last_group ((COMPS_DocGroup*)list->last->comps_obj)
+    #define list_last_group_package list_last_group->packages->last->comps_obj
     #define lastelem ((COMPS_Elem*)parsed->elem_stack->last->data)
     #define parser_line XML_GetCurrentLineNumber(parsed->parser)
     #define parser_col XML_GetCurrentColumnNumber(parsed->parser)
@@ -323,14 +326,14 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         case COMPS_ELEM_DOC:
         break;
         case COMPS_ELEM_ENV:
-            list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
-            if (!comps_dict_get(list_last_env->properties, "id"))
+            list = comps_doc_environments(parsed->comps_doc);
+            if (!comps_objdict_get_x(list_last_env->properties, "id"))
                 comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!comps_dict_get(list_last_env->properties, "name"))
+            if (!comps_objdict_get_x(list_last_env->properties, "name"))
                 comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!comps_dict_get(list_last_env->properties, "desc"))
+            if (!comps_objdict_get_x(list_last_env->properties, "desc"))
                 comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             if (!list_last_env->group_list)
@@ -339,37 +342,40 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             if (!list_last_env->option_list)
                 comps_log_error(parsed->log, "optionlist", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
+            COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_GROUP:
-            list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-            if (!comps_dict_get(list_last_group->properties, "id"))
+            list = comps_doc_groups(parsed->comps_doc);
+            if (!comps_objdict_get_x(list_last_group->properties, "id"))
                 comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (comps_dict_get(list_last_group->properties, "name") == NULL) {
+            if (comps_objdict_get_x(list_last_group->properties, "name") == NULL) {
                 comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             }
-            if (!comps_dict_get(list_last_group->properties, "desc"))
+            if (!comps_objdict_get_x(list_last_group->properties, "desc"))
                 comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             if (!list_last_group->packages)
                 comps_log_error(parsed->log, "packagelist", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
+            COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_CATEGORY:
-            list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
-            if (!comps_dict_get(list_last_cat->properties, "id"))
+            list = comps_doc_categories(parsed->comps_doc);
+            if (!comps_objdict_get_x(list_last_cat->properties, "id"))
                 comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!comps_dict_get(list_last_cat->properties, "name"))
+            if (!comps_objdict_get_x(list_last_cat->properties, "name"))
                 comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
-            if (!comps_dict_get(list_last_cat->properties, "desc"))
+            if (!comps_objdict_get_x(list_last_cat->properties, "desc"))
                 comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
             if (!list_last_cat->group_ids)
                 comps_log_error(parsed->log, "grouplist", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
+            COMPS_OBJECT_DESTROY(list);
         case COMPS_ELEM_WHITEOUT:
         case COMPS_ELEM_BLACKLIST:
         case COMPS_ELEM_LANGPACKS:
@@ -379,66 +385,68 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_ID:
             if (parent == COMPS_ELEM_GROUP) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-                dict = list_last_group->properties;
-                prop = comps_dict_get(list_last_group->properties, "id");
+                list = comps_doc_groups(parsed->comps_doc);
+                objdict = list_last_group->properties;
+                prop = comps_objdict_get_x(list_last_group->properties, "id");
             } else if (parent == COMPS_ELEM_CATEGORY) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
-                dict = list_last_cat->properties;
-                prop = comps_dict_get(list_last_cat->properties, "id");
+                list = comps_doc_categories(parsed->comps_doc);
+                objdict = list_last_cat->properties;
+                prop = comps_objdict_get_x(list_last_cat->properties, "id");
             } else if (parent == COMPS_ELEM_ENV) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
-                dict = list_last_env->properties;
-                prop = comps_dict_get(list_last_env->properties, "id");
+                list = comps_doc_environments(parsed->comps_doc);
+                objdict = list_last_env->properties;
+                prop = comps_objdict_get_x(list_last_env->properties, "id");
             } else {
                 free(parsed->tmp_buffer);
                 parsed->tmp_buffer = NULL;
                 break;
             }
+            COMPS_OBJECT_DESTROY(list);
             if (prop != NULL) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
-                __comps_doc_char_setter((void**)&prop->prop.str,
-                                        parsed->tmp_buffer, 0);
+                
+                comps_str_set((COMPS_Str*)prop, parsed->tmp_buffer);
             } else {
-                prop = comps_doc_prop_str_create(parsed->tmp_buffer, 0);
-                comps_dict_set(dict, "id", prop);
+                prop = (COMPS_Object*)comps_str_x(parsed->tmp_buffer);
+                comps_objdict_set_x(objdict, "id", prop);
             }
             parsed->tmp_buffer = NULL;
         break;
         case COMPS_ELEM_NAME:
             lang = comps_dict_get(lastelem->attrs, "xml:lang");
             if (parent == COMPS_ELEM_GROUP) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-                dict = list_last_group->name_by_lang;
+                list = comps_doc_groups(parsed->comps_doc);
+                objdict = list_last_group->name_by_lang;
                 prop_dict = list_last_group->properties;
-                prop = comps_dict_get(list_last_group->properties, "name");
+                prop = comps_objdict_get_x(list_last_group->properties, "name");
             } else if (parent == COMPS_ELEM_CATEGORY) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
-                dict = list_last_cat->name_by_lang;
+                list = comps_doc_categories(parsed->comps_doc);
+                objdict = list_last_cat->name_by_lang;
                 prop_dict = list_last_cat->properties;
-                prop = comps_dict_get(list_last_cat->properties, "name");
+                prop = comps_objdict_get_x(list_last_cat->properties, "name");
             } else if (parent == COMPS_ELEM_ENV) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
-                dict = list_last_env->name_by_lang;
+                list = comps_doc_environments(parsed->comps_doc);
+                objdict = list_last_env->name_by_lang;
                 prop_dict = list_last_env->properties;
-                prop = comps_dict_get(list_last_env->properties, "name");
+                prop = comps_objdict_get_x(list_last_env->properties, "name");
             } else {
                 free(parsed->tmp_buffer);
                 parsed->tmp_buffer = NULL;
                 break;
             }
+            COMPS_OBJECT_DESTROY(list);
             if (lang) {
-                comps_dict_set(dict, lang, parsed->tmp_buffer);
+                comps_objdict_set_x(objdict, lang,
+                                  (COMPS_Object*)comps_str_x(parsed->tmp_buffer));
             } else {
                 if (prop != NULL) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
-                __comps_doc_char_setter((void**)&prop->prop.str,
-                                        parsed->tmp_buffer, 0);
+                comps_str_set((COMPS_Str*)prop, parsed->tmp_buffer);
                 } else {
-                    prop = comps_doc_prop_str_create(parsed->tmp_buffer, 0);
-                    comps_dict_set(prop_dict, "name", prop);
+                    prop = (COMPS_Object*)comps_str_x(parsed->tmp_buffer);
+                    comps_objdict_set_x(prop_dict, "name", prop);
                 }
             }
             parsed->tmp_buffer = NULL;
@@ -446,36 +454,40 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         case COMPS_ELEM_DESC:
             lang = comps_dict_get(lastelem->attrs, "xml:lang");
             if (parent == COMPS_ELEM_GROUP) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-                dict = list_last_group->desc_by_lang;
+                list = comps_doc_groups(parsed->comps_doc);
+                objdict = list_last_group->desc_by_lang;
                 prop_dict = list_last_group->properties;
-                prop = comps_dict_get(list_last_group->properties, "desc");
+                prop = comps_objdict_get_x(list_last_group->properties, "desc");
             } else if (parent == COMPS_ELEM_CATEGORY) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
-                dict = list_last_cat->desc_by_lang;
+                list = comps_doc_categories(parsed->comps_doc);
+                objdict = list_last_cat->desc_by_lang;
                 prop_dict = list_last_cat->properties;
-                prop = comps_dict_get(list_last_cat->properties, "desc");
+                prop = comps_objdict_get_x(list_last_cat->properties, "desc");
             } else if (parent == COMPS_ELEM_ENV) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
-                dict = list_last_env->desc_by_lang;
+                list = comps_doc_environments(parsed->comps_doc);
+                objdict = list_last_env->desc_by_lang;
                 prop_dict = list_last_env->properties;
-                prop = comps_dict_get(list_last_env->properties, "desc");
+                prop = comps_objdict_get_x(list_last_env->properties, "desc");
             } else {
                 free(parsed->tmp_buffer);
                 parsed->tmp_buffer = NULL;
                 break;
             }
+            COMPS_OBJECT_DESTROY(list);
             if (lang) {
-                comps_dict_set(dict, lang, parsed->tmp_buffer);
+                comps_objdict_set_x(objdict, lang,
+                                (COMPS_Object*)comps_str_x(parsed->tmp_buffer));
             } else {
                 if (prop != NULL) {
                     comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                       parser_line, parser_col, 0);
-                    __comps_doc_char_setter((void**)&prop->prop.str,
-                                            parsed->tmp_buffer, 0);
+                    comps_str_set((COMPS_Str*)prop, parsed->tmp_buffer);
                 } else {
-                    prop = comps_doc_prop_str_create(parsed->tmp_buffer, 0);
-                    comps_dict_set(prop_dict, "desc", prop);
+                    //printf("elem desc:%s\n", parsed->tmp_buffer);
+                    //printf("elem desc len:%d\n", strlen(parsed->tmp_buffer));
+                    //printf("elem desc p:%p\n", parsed->tmp_buffer);
+                    prop = (COMPS_Object*)comps_str_x(parsed->tmp_buffer);
+                    comps_objdict_set_x(prop_dict, "desc", prop);
                 }
             }
             parsed->tmp_buffer = NULL;
@@ -486,10 +498,11 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 parsed->tmp_buffer = NULL;
                 break;
             }
-            list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
+            list = comps_doc_groups(parsed->comps_doc);
             if (!list_last_group->packages->first)
                 comps_log_error(parsed->log, "packagelist", COMPS_ERR_LIST_EMPTY,
                                 parser_line, parser_col, 0);
+            COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_GROUPLIST:
             if (parent != COMPS_ELEM_CATEGORY &&
@@ -498,35 +511,47 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 break;
             }
             if (parent == COMPS_ELEM_CATEGORY) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
+                list = comps_doc_categories(parsed->comps_doc);
                 if (!list_last_cat->group_ids->first)
                     comps_log_error(parsed->log, "grouplist",
                                     COMPS_ERR_LIST_EMPTY,
                                     parser_line, parser_col, 0);
             } else {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
+                list = comps_doc_environments(parsed->comps_doc);
                 if (!list_last_env->group_list->first)
                     comps_log_error(parsed->log, "grouplist",
                                     COMPS_ERR_LIST_EMPTY,
                                     parser_line, parser_col, 0);
             }
+            COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_OPTLIST:
             if (parent != COMPS_ELEM_ENV) {
                 parsed->tmp_buffer = NULL;
                 break;
             }
-            list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
+            list = comps_doc_environments(parsed->comps_doc);
             if (!list_last_env->option_list->first)
                 comps_log_error(parsed->log, "optionlist", COMPS_ERR_LIST_EMPTY,
                                 parser_line, parser_col, 0);
+            COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_PACKAGEREQ:
             if (parent != COMPS_ELEM_PACKAGELIST &&
                 grandparent != COMPS_ELEM_GROUP) {
                 free(parsed->tmp_buffer);
                 parsed->tmp_buffer = NULL;
+                break;
             }
+            list = comps_doc_groups(parsed->comps_doc);
+            //printf("list last group:%p\n", list_last_group);
+            if (parsed->tmp_buffer) {
+                comps_docpackage_set_name((COMPS_DocGroupPackage*)list_last_group_package,
+                                          parsed->tmp_buffer, 1);
+                free(parsed->tmp_buffer);
+            }
+            COMPS_OBJECT_DESTROY(list);
+            parsed->tmp_buffer = NULL;
         break;
         case COMPS_ELEM_DEFAULT:
             if (parent != COMPS_ELEM_GROUP) {
@@ -534,24 +559,25 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 parsed->tmp_buffer = NULL;
                 break;
             }
-            list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-            prop = comps_dict_get(list_last_group->properties, "def");
+            list = comps_doc_groups(parsed->comps_doc);
+            prop = comps_objdict_get_x(list_last_group->properties, "def");
             if (prop) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
             } else {
-                prop = comps_doc_prop_num_create(0);
-                comps_dict_set(list_last_group->properties, "def", prop);
+                prop = (COMPS_Object*)comps_num(0);
+                comps_objdict_set_x(list_last_group->properties, "def", prop);
             }
             if (strcmp(parsed->tmp_buffer,"false") == 0)
-                prop->prop.num = 0;
+                ((COMPS_Num*)prop)->val = 0;
             else if (strcmp(parsed->tmp_buffer,"true") == 0)
-                prop->prop.num = 1;
+                ((COMPS_Num*)prop)->val = 1;
             else {
                 comps_log_warning(parsed->log, parsed->tmp_buffer,
                                   COMPS_ERR_DEFAULT_PARAM,
                                   parser_line, parser_col, 0);
             }
+            COMPS_OBJECT_DESTROY(list);
             free(parsed->tmp_buffer);
             parsed->tmp_buffer = NULL;
         break;
@@ -563,24 +589,25 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 parsed->tmp_buffer = NULL;
                 break;
             }
-            list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-            prop = comps_dict_get(list_last_group->properties, "uservisible");
+            list = comps_doc_groups(parsed->comps_doc);
+            prop = comps_objdict_get_x(list_last_group->properties, "uservisible");
             if (prop) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
             } else {
-                prop = comps_doc_prop_num_create(0);
-                comps_dict_set(list_last_group->properties, "uservisible", prop);
+                prop = (COMPS_Object*)comps_num(0);
+                comps_objdict_set_x(list_last_group->properties, "uservisible", prop);
             }
             if (strcmp(parsed->tmp_buffer,"false") == 0)
-                prop->prop.num = 0;
+                ((COMPS_Num*)prop)->val = 0;
             else if (strcmp(parsed->tmp_buffer,"true") == 0)
-                prop->prop.num = 1;
+                ((COMPS_Num*)prop)->val = 1;
             else {
                 comps_log_warning(parsed->log, parsed->tmp_buffer,
                                   COMPS_ERR_USERVISIBLE_PARAM,
                                   parser_line, parser_col, 0);
             }
+            COMPS_OBJECT_DESTROY(list);
             free(parsed->tmp_buffer);
             parsed->tmp_buffer = NULL;
         break;
@@ -592,7 +619,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 break;
             }
             if (grandparent == COMPS_ELEM_CATEGORY) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
+                list = comps_doc_categories(parsed->comps_doc);
                 if (parent == COMPS_ELEM_GROUPLIST &&
                     list_last_cat->group_ids == NULL) {
                     comps_log_warning(parsed->log, parsed->tmp_buffer,
@@ -601,22 +628,21 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 } else if (parent == COMPS_ELEM_GROUPLIST &&
                           list_last_cat->group_ids){
                     comps_docgroupid_set_name(
-                            (COMPS_DocGroupId*)list_last_cat->group_ids->last->data,
-                            parsed->tmp_buffer, 0);
+                        (COMPS_DocGroupId*)list_last_cat->group_ids->last->comps_obj,
+                        parsed->tmp_buffer, 1);
                 }
             } else if (grandparent == COMPS_ELEM_ENV) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
+                list = comps_doc_environments(parsed->comps_doc);
                 if (parent == COMPS_ELEM_GROUPLIST &&
                     list_last_env->group_list != NULL) {
                     comps_docgroupid_set_name(
-                     (COMPS_DocGroupId*)list_last_env->group_list->last->data,
-                            parsed->tmp_buffer, 0);
-
+                     (COMPS_DocGroupId*)list_last_env->group_list->last->comps_obj,
+                            parsed->tmp_buffer, 1);
                 } else if (parent == COMPS_ELEM_OPTLIST &&
                            list_last_env->option_list != NULL) {
                     comps_docgroupid_set_name(
-                     (COMPS_DocGroupId*)list_last_env->option_list->last->data,
-                            parsed->tmp_buffer, 0);
+                     (COMPS_DocGroupId*)list_last_env->option_list->last->comps_obj,
+                            parsed->tmp_buffer, 2);
                 } else if (parent == COMPS_ELEM_GROUPLIST) {
                     comps_log_warning(parsed->log, parsed->tmp_buffer,
                                       COMPS_ERR_GROUPLIST_NOTSET,
@@ -626,38 +652,37 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                                       COMPS_ERR_OPTIONLIST_NOTSET,
                                       parser_line, parser_col, 0);
                 }
-            } else {
-                free(parsed->tmp_buffer);
-                parsed->tmp_buffer = NULL;
-                break;
             }
+            COMPS_OBJECT_DESTROY(list);
+            free(parsed->tmp_buffer);
             parsed->tmp_buffer = NULL;
         break;
         case COMPS_ELEM_DISPLAYORDER:
             prop = NULL;
-            dict = NULL;
+            objdict = NULL;
             if (parent == COMPS_ELEM_CATEGORY) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "categories");
-                prop = comps_dict_get(list_last_cat->properties, "display_order");
-                dict = list_last_cat->properties;
+                list = comps_doc_categories(parsed->comps_doc);
+                prop = comps_objdict_get_x(list_last_cat->properties, "display_order");
+                objdict = list_last_cat->properties;
             } else if (parent == COMPS_ELEM_ENV) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "envs");
-                prop = comps_dict_get(list_last_env->properties, "display_order");
-                dict = list_last_env->properties;
+                list = comps_doc_environments(parsed->comps_doc);
+                prop = comps_objdict_get_x(list_last_env->properties, "display_order");
+                objdict = list_last_env->properties;
             } else if (parent == COMPS_ELEM_GROUP) {
-                list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-                prop = comps_dict_get(list_last_group->properties, "display_order");
-                dict = list_last_group->properties;
+                list = comps_doc_groups(parsed->comps_doc);
+                prop = comps_objdict_get_x(list_last_group->properties, "display_order");
+                objdict = list_last_group->properties;
             }
+            COMPS_OBJECT_DESTROY(list);
             if (prop) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
-            } else if (dict) {
-                prop = comps_doc_prop_num_create(0);
-                comps_dict_set(dict, "display_order", prop);
+            } else if (objdict) {
+                prop = (COMPS_Object*)comps_num(0);
+                comps_objdict_set_x(objdict, "display_order", prop);
             }
             if (prop)
-                sscanf(parsed->tmp_buffer, "%d", &prop->prop.num);
+                sscanf(parsed->tmp_buffer, "%d", &((COMPS_Num*)prop)->val);
 
             free(parsed->tmp_buffer);
             parsed->tmp_buffer = NULL;
@@ -668,18 +693,19 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 parsed->tmp_buffer = NULL;
                 break;
             }
-            list = comps_dict_get(parsed->comps_doc->lobjects, "groups");
-            prop = comps_dict_get(list_last_cat->properties, "lang_only");
+            list = comps_doc_groups(parsed->comps_doc);
+            prop = comps_objdict_get_x(list_last_cat->properties, "langonly");
             if (prop) {
                 comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
                                   parser_line, parser_col, 0);
-                __comps_doc_char_setter((void**)&prop->prop.str,
-                                        parsed->tmp_buffer, 0);
+                comps_str_set((COMPS_Str*)prop, parsed->tmp_buffer);
+                free(parsed->tmp_buffer);
             } else {
-                prop = comps_doc_prop_str_create(parsed->tmp_buffer, 0);
-                comps_dict_set(list_last_group->properties, "lang_only", prop);
+                prop = (COMPS_Object*)comps_str_x(parsed->tmp_buffer);
+                comps_objdict_set_x(list_last_group->properties, "langonly", prop);
             }
             parsed->tmp_buffer = NULL;
+            COMPS_OBJECT_DESTROY(list);
         break;
     }
     if (parsed->tmp_buffer) {
@@ -691,6 +717,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
     #undef grandparent
     #undef list_last_cat
     #undef list_last_group
+    #undef list_last_group_package
     #undef list_last_env
     #undef lastelem
     #undef parser_line
@@ -702,9 +729,11 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
     static COMPS_DocGroup * group;
     static COMPS_DocCategory * category;
     static COMPS_DocEnv * env;
-    COMPS_ListItem * it;
+    //COMPS_ListItem * it;
     COMPS_DocGroupPackage * package;
     COMPS_DocGroupId *groupid;
+    COMPS_Object *prop;
+    //COMPS_ObjList *list;
     char *tmp;
 
     /* prepare currently processed element. Create it, set text_buffer pointer
@@ -745,8 +774,10 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         case COMPS_ELEM_NONE:
         break;
         case COMPS_ELEM_DOC:
-            parsed->comps_doc = comps_doc_create(parsed->enc);
-            comps_doc_init(parsed->comps_doc);
+            prop = (COMPS_Object*)comps_str(parsed->enc);
+            parsed->comps_doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
+                                                    (COMPS_Object*[]){prop});
+            comps_object_destroy(prop);
         break;
         case COMPS_ELEM_GROUP:
             if (parent != COMPS_ELEM_DOC) {
@@ -754,7 +785,8 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                                 COMPS_ERR_NOPARENT, parser_line, parser_col, 0);
                 break;
             }
-            group = comps_docgroup_create();
+            group = (COMPS_DocGroup*)
+                    comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
             category = NULL;
             env = NULL;
             comps_doc_add_group(parsed->comps_doc, group);
@@ -765,7 +797,7 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                                 COMPS_ERR_NOPARENT, parser_line, parser_col, 0);
                 break;
             }
-            if (category) {
+            /*if (category) {
                 if (category->group_ids != NULL) {
                     comps_log_warning(parsed->log,
                                       comps_elem_get_name(elem->type),
@@ -773,8 +805,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                                       parser_col, 0);
                     break;
                }
-                category->group_ids = comps_list_create();
-                comps_list_init(category->group_ids);
+                //category->group_ids = (COMPS_ObjList*)
+                //                     comps_object_create(&COMPS_ObjList_ObjInfo,
+                //                                         NULL);
             } else if (env) {
                 if (env->group_list != NULL) {
                     comps_log_warning(parsed->log,
@@ -783,9 +816,10 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                                       parser_col, 0);
                     break;
                 }
-                env->group_list = comps_list_create();
-                comps_list_init(env->group_list);
-            }
+                //env->group_list = (COMPS_ObjList*)
+                //                  comps_object_create(&COMPS_ObjList_ObjInfo,
+                //                                      NULL);
+            }*/
         break;
         case COMPS_ELEM_OPTLIST:
             if (parent != COMPS_ELEM_ENV) {
@@ -794,15 +828,17 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                                 0);
                 break;
             }
-            if (env->option_list != NULL) {
+            /*if (env->option_list != NULL) {
                 comps_log_warning(parsed->log,
                                   comps_elem_get_name(elem->type),
                                   COMPS_ERR_ELEM_ALREADYSET, parser_line,
                                   parser_col, 0);
                 break;
             }
-            env->option_list = comps_list_create();
-            comps_list_init(env->option_list);
+            env->option_list = (COMPS_ObjList*)
+                               comps_object_create(&COMPS_ObjList_ObjInfo,
+                                                   NULL);
+            */
         break;
         case COMPS_ELEM_CATEGORY:
             if (parent != COMPS_ELEM_DOC) {
@@ -811,7 +847,8 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                                 0);
                 break;
             }
-            category = comps_doccategory_create();
+            category = (COMPS_DocCategory*)
+                       comps_object_create(&COMPS_DocCategory_ObjInfo, NULL);
             group = NULL;
             env = NULL;
             comps_doc_add_category(parsed->comps_doc, category);
@@ -823,8 +860,11 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                                 0);
                 break;
             }
-            env = comps_docenv_create();
-            comps_doc_add_env(parsed->comps_doc, env);
+            env = (COMPS_DocEnv*)
+                       comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
+            comps_doc_add_environment(parsed->comps_doc, env);
+            //list = comps_doc_environments(parsed->comps_doc);
+            //printf("envs: %d\n", list->len);
             group = NULL;
             category = NULL;
         break;
@@ -858,27 +898,25 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                                 0);
                 break;
             }
-            group->packages = comps_list_create();
-            comps_list_init(group->packages);
         break;
         case COMPS_ELEM_PACKAGEREQ:
+            parsed->text_buffer_pt = &parsed->tmp_buffer;
             if (grandparent != COMPS_ELEM_GROUP || parent != COMPS_ELEM_PACKAGELIST){
                 comps_log_error(parsed->log, comps_elem_get_name(elem->type),
                                 COMPS_ERR_NOPARENT, parser_line, parser_col,
                                 0);
-                parsed->text_buffer_pt = &parsed->tmp_buffer;
                 break;
             }
-            package = comps_docpackage_create();
-            it = comps_list_item_create(package,
-                                   NULL, &comps_docpackage_destroy);
-            comps_list_append(group->packages, it);
+            package = (COMPS_DocGroupPackage*)
+                      comps_object_create(&COMPS_DocGroupPackage_ObjInfo,
+                                          NULL);
+            comps_docgroup_add_package(group, package);
 
-            parsed->text_buffer_pt = &package->name;
             package->type = comps_package_get_type(comps_dict_get(elem->attrs,
                                                                   "type"));
-            __comps_doc_char_setter((void**)&package->requires,
-                            comps_dict_get(elem->attrs, "requires"), 1);
+            tmp = comps_dict_get(elem->attrs, "requires");
+            if (tmp)
+                package->requires = comps_str(tmp);
 
             if (package->type == COMPS_PACKAGE_UNKNOWN)
                 comps_log_warning(parsed->log,
@@ -897,7 +935,8 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_GROUPID:
             parsed->text_buffer_pt = &parsed->tmp_buffer;
-            groupid = comps_docgroupid_create();
+            groupid = (COMPS_DocGroupId*)
+                      comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
             tmp = comps_dict_get(elem->attrs, "default");
             comps_docgroupid_set_default(groupid, __comps_strcmp(tmp, "true"));
 
@@ -910,7 +949,7 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                     comps_log_error(parsed->log, comps_elem_get_name(elem->type),
                                     COMPS_ERR_NOPARENT, parser_line, parser_col,
                                     0);
-                    comps_docgroupid_destroy((void*)groupid);
+                    COMPS_OBJECT_DESTROY(groupid);
                 }
             } else if (parent == COMPS_ELEM_OPTLIST) {
                 if (grandparent == COMPS_ELEM_ENV) {
@@ -919,13 +958,13 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                     comps_log_error(parsed->log, comps_elem_get_name(elem->type),
                                     COMPS_ERR_NOPARENT, parser_line, parser_col,
                                     0);
-                    comps_docgroupid_destroy((void*)groupid);
+                    COMPS_OBJECT_DESTROY(groupid);
                 }
             } else {
                 comps_log_error(parsed->log, comps_elem_get_name(elem->type),
                                 COMPS_ERR_NOPARENT, parser_line, parser_col,
                                 0);
-                comps_docgroupid_destroy((void*)groupid);
+                    COMPS_OBJECT_DESTROY(groupid);
             }
         break;
         case COMPS_ELEM_MATCH:
@@ -935,9 +974,10 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                                 0);
                 break;
             }
+            
             comps_doc_add_langpack(parsed->comps_doc,
                      comps_dict_get(elem->attrs, "name"),
-                     __comps_str_clone(comps_dict_get(elem->attrs, "install")));
+                     comps_str(comps_dict_get(elem->attrs, "install")));
         break;
         case COMPS_ELEM_PACKAGE:
             if (parent != COMPS_ELEM_BLACKLIST){
@@ -948,7 +988,7 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
             }
             comps_doc_add_blacklist(parsed->comps_doc,
                                     comps_dict_get(elem->attrs, "name"),
-                     __comps_str_clone(comps_dict_get(elem->attrs, "arch")));
+                            comps_str((comps_dict_get(elem->attrs, "arch"))));
         break;
         case COMPS_ELEM_IGNOREDEP:
             if (parent != COMPS_ELEM_WHITEOUT){
@@ -959,7 +999,7 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
             }
             comps_doc_add_whiteout(parsed->comps_doc,
                                       comps_dict_get(elem->attrs, "requires"),
-                    __comps_str_clone(comps_dict_get(elem->attrs, "package")));
+                    comps_str((comps_dict_get(elem->attrs, "package"))));
             
         break;
         case COMPS_ELEM_UNKNOWN:

@@ -42,6 +42,13 @@ COMPS_Dict *comps_doc_langpacks(COMPS_Doc *doc);
 COMPS_MDict *comps_doc_whiteout(COMPS_Doc *doc);
 COMPS_MDict *comps_doc_blacklist(COMPS_Doc *doc);
 
+COMPS_List *comps_doc_groups_v(void *doc);
+COMPS_List *comps_doc_categories_v(void *doc);
+COMPS_List *comps_doc_environments_v(void *doc);
+COMPS_Dict *comps_doc_langpacks_v(void *doc);
+COMPS_MDict *comps_doc_whiteout_v(void *doc);
+COMPS_MDict *comps_doc_blacklist_v(void *doc);
+
 void comps_doc_set_groups(COMPS_Doc *doc, COMPS_List *groups);
 void comps_doc_set_cats(COMPS_Doc *doc, COMPS_List *cats);
 void comps_doc_set_envs(COMPS_Doc *doc, COMPS_List *envs);
@@ -49,9 +56,19 @@ void comps_doc_set_langpacks(COMPS_Doc *doc, COMPS_Dict *langs);
 void comps_doc_set_whiteout(COMPS_Doc *doc, COMPS_MDict *whiteout);
 void comps_doc_set_blacklist(COMPS_Doc *doc, COMPS_MDict *blist);
 
+void comps_doc_set_groups_v(void *doc, COMPS_List *groups);
+void comps_doc_set_cats_v(void *doc, COMPS_List *cats);
+void comps_doc_set_envs_v(void *doc, COMPS_List *envs);
+void comps_doc_set_langpacks_v(void *doc, COMPS_Dict *langs);
+void comps_doc_set_whiteout_v(void *doc, COMPS_MDict *whiteout);
+void comps_doc_set_blacklist_v(void *doc, COMPS_MDict *blist);
+
 char comps_doc_add_group(COMPS_Doc *doc, COMPS_DocGroup *group);
 char comps_doc_add_env(COMPS_Doc *doc, COMPS_DocEnv *env);
 char comps_doc_add_category(COMPS_Doc *doc, COMPS_DocCategory *category);
+char comps_doc_add_langpack(COMPS_Doc *doc, char *name, char *install);
+char comps_doc_add_blacklist(COMPS_Doc *doc, char *name, char *arch);
+char comps_doc_add_whiteout(COMPS_Doc *doc, char *requires, char *package);
 
 char comps_doc_del_group(COMPS_Doc *doc, COMPS_DocGroup *group);
 char comps_doc_del_env(COMPS_Doc *doc, COMPS_DocEnv *env);
