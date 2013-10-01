@@ -426,8 +426,8 @@ char* comps_objlist_tostr_u(COMPS_Object* list) {
         items[i] = tmps;
         total_strlen += strlen(tmps);
     }
-    printf("total len:%d", total_strlen);
-    printf("list len:%d\n", ((COMPS_ObjList*)list)->len);
+    //printf("total len:%d", total_strlen);
+    //printf("list len:%d\n", ((COMPS_ObjList*)list)->len);
     total2=0;
     ret = malloc(sizeof(char) * (total_strlen));
     ret[0]=0;
@@ -448,7 +448,7 @@ char* comps_objlist_tostr_u(COMPS_Object* list) {
     }
     strcat(ret, "]");
     total2 += strlen("]");
-    printf("total len2:%d\n", total2);
+    //printf("total len2:%d\n", total2);
     return ret;
 }
 
