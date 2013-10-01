@@ -76,7 +76,8 @@ SET(changelog_commits 946584c5a01d83bf9ec4c26d3f9d73e37bfb5456;
                       997835ec69b72ded9acbd785502c5f3bbf888be8;
                       8108808bbcdfacbb2732536ddcc05cd44318dd9c;
                       08008e492804c488a4a97712785ed99880343d69;
-                      36fd42e21c7a4aaf605d8bd9407ae9023c1b95e3
+                      36fd42e21c7a4aaf605d8bd9407ae9023c1b95e3;
+                      706260866c0d2d5f48992d2140b96bf9f2b2a988
 )
 
 set(CHANGELOG "")
