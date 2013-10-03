@@ -186,6 +186,8 @@ char * comps_log_entry_str(COMPS_LoggerEntry *entry) {
     for (int x = 0; x<4; x++) {
         pstr[x] = NULL;
     }
+    //printf("Log Entry code:%d %s", entry->code,
+    //                                  COMPS_LogMessages[entry->code].format);
 
     total_used = 0;
     len = strlen(COMPS_LogMessages[entry->code].format);
@@ -208,9 +210,9 @@ char * comps_log_entry_str(COMPS_LoggerEntry *entry) {
     if (COMPS_LogMessages[entry->code].used1 != 0) {
         total_used++;
         if (entry->opt_code1) {
-            len += (int)ceil(log10(entry->opt_code1));
+            len += digits_count(entry->opt_code1);
             pstr[COMPS_LogMessages[entry->code].used1 - 1] = malloc(
-                    sizeof(char) * ((int)ceil(log10(entry->opt_code1)) + 1));
+                    sizeof(char) * (digits_count(entry->opt_code1) + 1));
             sprintf(pstr[COMPS_LogMessages[entry->code].used1 - 1],
                     "%d", entry->opt_code1);
         } else {
@@ -225,9 +227,12 @@ char * comps_log_entry_str(COMPS_LoggerEntry *entry) {
     if (COMPS_LogMessages[entry->code].used2 != 0) {
         total_used++;
         if (entry->opt_code2) {
-            len += (int)ceil(log10(entry->opt_code2));
+            //printf("opt_code2:%d %d\n", entry->opt_code2,
+            //                            (int)ceil(log10(entry->opt_code2)));
+            len += digits_count(entry->opt_code2);
+
             pstr[COMPS_LogMessages[entry->code].used2 - 1] = malloc(
-                    sizeof(char) * ((int)ceil(log10(entry->opt_code2)) + 1));
+                    sizeof(char) * (digits_count(entry->opt_code2) + 1));
             sprintf(pstr[COMPS_LogMessages[entry->code].used2 - 1],
                     "%d", entry->opt_code2);
         } else {
@@ -242,9 +247,9 @@ char * comps_log_entry_str(COMPS_LoggerEntry *entry) {
     if (COMPS_LogMessages[entry->code].used3 != 0) {
         total_used++;
         if (entry->opt_code3) {
-            len += (int)ceil(log10(entry->opt_code3));
+            len += digits_count(entry->opt_code3);
             pstr[COMPS_LogMessages[entry->code].used3 - 1] = malloc(
-                    sizeof(char) * ((int)ceil(log10(entry->opt_code3)) + 1));
+                    sizeof(char) * (digits_count(entry->opt_code3) + 1));
             sprintf(pstr[COMPS_LogMessages[entry->code].used3 - 1],
                     "%d", entry->opt_code3);
         } else {

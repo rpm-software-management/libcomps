@@ -361,7 +361,15 @@ PyObject* PyCOMPSSeq_iternext(PyObject *iter_o) {
     PyObject *retp;
     PyCOMPS_SeqIter *iter = ((PyCOMPS_SeqIter*)iter_o);
     ret = iter->it?iter->it->comps_obj: NULL;
+    //printf("%p \n", iter);
+    //printf("%p \n", iter->seq);
     if (ret) {
+        //if (iter->it == iter->seq->list->first) {
+        //    printf("%p \n", iter);
+        //    printf("%p \n", iter->seq);
+        //    printf("%p \n", iter->seq->it_info);
+        //    printf("%p \n", iter->seq->it_info->out_convert_func);
+        //}
         retp = iter->seq->it_info->out_convert_func(comps_object_incref(ret));
         iter->it = iter->it->next;
         return retp;

@@ -316,32 +316,39 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
             comps_hslist_destroy(&pairlist);
         }
     }
-    xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
-    for (it = env->group_list->first; it != NULL; it = it->next) {
-        xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
-        if (((COMPS_DocGroupId*)it->comps_obj)->def) {
-            xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
-                                                BAD_CAST "true");
+    if (env->group_list->len) {
+        xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
+        for (it = env->group_list->first; it != NULL; it = it->next) {
+            xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
+            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
+                xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                                    BAD_CAST "true");
+            }
+            str = comps_object_tostr((COMPS_Object*)
+                                     ((COMPS_DocGroupId*)it->comps_obj)->name);
+            xmlTextWriterWriteString(writer, BAD_CAST str);
+            free(str);
+            xmlTextWriterEndElement(writer);
         }
-        str = comps_object_tostr((COMPS_Object*)((COMPS_DocGroupId*)it->comps_obj)->name);
-        xmlTextWriterWriteString(writer, BAD_CAST str);
-        free(str);
         xmlTextWriterEndElement(writer);
     }
-    xmlTextWriterEndElement(writer);
-    xmlTextWriterStartElement(writer, (xmlChar*)"optionlist");
-    for (it = env->option_list->first; it != NULL; it = it->next) {
-        xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
-        if (((COMPS_DocGroupId*)it->comps_obj)->def) {
-            xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
-                                                BAD_CAST "true");
+
+    if (env->option_list->len) {
+        xmlTextWriterStartElement(writer, (xmlChar*)"optionlist");
+        for (it = env->option_list->first; it != NULL; it = it->next) {
+            xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
+            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
+                xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                                    BAD_CAST "true");
+            }
+            str = comps_object_tostr((COMPS_Object*)
+                                     ((COMPS_DocGroupId*)it->comps_obj)->name);
+            xmlTextWriterWriteString(writer, BAD_CAST str);
+            free(str);
+            xmlTextWriterEndElement(writer);
         }
-        str = comps_object_tostr((COMPS_Object*)((COMPS_DocGroupId*)it->comps_obj)->name);
-        xmlTextWriterWriteString(writer, BAD_CAST str);
-        free(str);
         xmlTextWriterEndElement(writer);
     }
-    xmlTextWriterEndElement(writer);
     xmlTextWriterEndElement(writer);
 }
 

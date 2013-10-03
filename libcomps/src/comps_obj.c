@@ -59,7 +59,7 @@ signed char comps_object_cmp(COMPS_Object *obj1, COMPS_Object *obj2) {
 
 char* comps_object_tostr(COMPS_Object *obj1) {
     char *ret;
-    if (obj1->obj_info->to_str != NULL) {
+    if (obj1 && obj1->obj_info->to_str != NULL) {
        return obj1->obj_info->to_str(obj1);
     } else {
         ret = malloc(sizeof(char));

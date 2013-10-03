@@ -119,7 +119,8 @@ void comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
         str = "conditional";
     else
         str = "default";
-    xmlTextWriterWriteAttribute(writer, BAD_CAST "type", BAD_CAST str);
+    if (pkg->type != COMPS_PACKAGE_MANDATORY)
+        xmlTextWriterWriteAttribute(writer, BAD_CAST "type", BAD_CAST str);
     if (pkg->requires) {
         str = comps_object_tostr((COMPS_Object*)pkg->requires);
         xmlTextWriterWriteAttribute(writer, (xmlChar*) "requires",
@@ -132,10 +133,29 @@ void comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
     xmlTextWriterEndElement(writer);
 }
 
+static char* comps_docpackage_str_u(COMPS_Object* docpackage) {
+    const int len = strlen("<COMPS_DocGroupPackage name='' type='' requires=''>");
+    char *name = comps_object_tostr((COMPS_Object*)
+                                    ((COMPS_DocGroupPackage*)docpackage)->name);
+    const char *type = comps_docpackage_type_str(((COMPS_DocGroupPackage*)
+                                            docpackage)->type);
+    char *requires = comps_object_tostr((COMPS_Object*)
+                                ((COMPS_DocGroupPackage*)docpackage)->requires);
+    char *ret = malloc(sizeof(char)*(len + strlen(name) +
+                                           strlen(type)+
+                                           strlen(requires)+1));
+    sprintf(ret, "<COMPS_DocGroupPackage name='%s' type='%s' requires='%s'>",
+                 name, type, requires);
+    free(name);
+    free(requires);
+    return ret;
+}
+
 COMPS_ObjectInfo COMPS_DocGroupPackage_ObjInfo = {
     .obj_size = sizeof(COMPS_DocGroupPackage),
     .constructor = &comps_docpackage_create_u,
     .destructor = &comps_docpackage_destroy_u,
     .copy = &comps_docpackage_copy_u,
-    .obj_cmp = &comps_docpackage_cmp_u
+    .obj_cmp = &comps_docpackage_cmp_u,
+    .to_str = &comps_docpackage_str_u
 };

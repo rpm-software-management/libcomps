@@ -312,11 +312,13 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
             comps_hslist_destroy(&pairlist);
         }
     }
-    xmlTextWriterStartElement(writer, (xmlChar*)"packagelist");
-    for (it = group->packages->first; it != NULL; it = it->next) {
-        comps_docpackage_xml((COMPS_DocGroupPackage*)it->comps_obj, writer, log);
+    if (group->packages->len) {
+        xmlTextWriterStartElement(writer, (xmlChar*)"packagelist");
+        for (it = group->packages->first; it != NULL; it = it->next) {
+            comps_docpackage_xml((COMPS_DocGroupPackage*)it->comps_obj, writer, log);
+        }
+        xmlTextWriterEndElement(writer);
     }
-    xmlTextWriterEndElement(writer);
     xmlTextWriterEndElement(writer);
 }
 

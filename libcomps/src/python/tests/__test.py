@@ -897,6 +897,23 @@ class COMPSTest(unittest.TestCase):
         c = c1 + c2
         c.xml_f("f21_united.xml")
 
+    def test_f21_in(self):
+        comps = libcomps.Comps()
+        ret = comps.fromxml_f("comps-f21.xml.in")
+
+        for i in comps.groups:
+            #print i.id
+            #print i.packages
+            for j in i.packages:
+                x = j
+        #for x in comps.get_last_parse_log():
+        #    print x
+        self.assertTrue(ret != -1)
+        comps.xml_f("f21-2.xml")
+        comps2 = libcomps.Comps()
+        comps2.fromxml_f("f21-2.xml")
+        self.assertTrue(comps == comps2)
+
 if __name__ == "__main__":
     unittest.main(testRunner = MyRunner)
     #unittest.main()

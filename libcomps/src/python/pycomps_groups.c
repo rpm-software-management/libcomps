@@ -652,6 +652,12 @@ __COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) DocGroupPkg_NameClosure = 
     .c_offset = offsetof(PyCOMPS_Package, package)
 };
 
+__COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) DocGroupPkg_RequiresClosure = {
+    .get_f = &comps_docpackage_get_requires,
+    .set_f = &comps_docpackage_set_requires,
+    .c_offset = offsetof(PyCOMPS_Package, package)
+};
+
 __COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) DocGroupPkg_TypeClosure = {
     .get_f = &comps_docpackage_get_type,
     .set_f = &comps_docpackage_set_type_i,
@@ -666,7 +672,7 @@ PyGetSetDef pack_getset[] = {
     {"requires",
      (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
      "Package requires",
-     (void*)offsetof(COMPS_DocGroupPackage, requires)},
+     (void*)&DocGroupPkg_RequiresClosure},
     {"type",
      (getter)__PyCOMPS_get_numattr, (setter)__PyCOMPS_set_numattr,
      "Package type",

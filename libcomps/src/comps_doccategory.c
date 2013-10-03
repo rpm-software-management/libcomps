@@ -253,20 +253,23 @@ void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
             comps_hslist_destroy(&pairlist);
         }
     }
-    xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
-    for (it = category->group_ids->first; it != NULL; it = it->next) {
-        xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
-        if (((COMPS_DocGroupId*)it->comps_obj)->def) {
-            xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
-                                                BAD_CAST "true");
+    if (category->group_ids->len) {
+        xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
+        for (it = category->group_ids->first; it != NULL; it = it->next) {
+            xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
+            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
+                xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                                    BAD_CAST "true");
+            }
+            str = comps_object_tostr((COMPS_Object*)
+                                     ((COMPS_DocGroupId*)it->comps_obj)->name);
+            xmlTextWriterWriteString(writer, BAD_CAST str);
+            free(str);
+            xmlTextWriterEndElement(writer);
         }
-        str = comps_object_tostr((COMPS_Object*)((COMPS_DocGroupId*)it->comps_obj)->name);
-        xmlTextWriterWriteString(writer, BAD_CAST str);
-        free(str);
+        xmlTextWriterEndElement(writer);
         xmlTextWriterEndElement(writer);
     }
-    xmlTextWriterEndElement(writer);
-    xmlTextWriterEndElement(writer);
 }
 
 char* comps_doccategory_tostr_u(COMPS_Object* cat) {
