@@ -37,8 +37,13 @@ typedef struct PyCOMPS_Sequence {
     PyObject_HEAD
     COMPS_ObjList *list;
     PyCOMPS_SeqInfo *it_info;
-
 } PyCOMPS_Sequence;
+
+typedef struct PyCOMPS_SeqIter{
+    PyObject_HEAD
+    COMPS_ObjListIt *it;
+    PyCOMPS_Sequence *seq;
+} PyCOMPS_SeqIter;
 
 typedef struct PyCOMPS_Dict {
     PyObject_HEAD

@@ -350,9 +350,14 @@ PyObject* PyCOMPSSeq_cmp(PyObject *self, PyObject *other, int op) {
 
 PyObject* PyCOMPSSeq_getiter(PyObject *self) {
     PyObject *res;
+    //printf("get iter\n");
+    //printf("get iter - seq it info %p\n", ((PyCOMPS_Sequence*)self)->it_info);
     res = PyCOMPSSeqIter_new(&PyCOMPS_SeqIterType, NULL, NULL);
     ((PyCOMPS_SeqIter*)res)->it = ((PyCOMPS_Sequence*)self)->list->first;
+    Py_INCREF((PyCOMPS_Sequence*)self);
     ((PyCOMPS_SeqIter*)res)->seq = (PyCOMPS_Sequence*)self;
+    //printf("res-seq:%p\n", ((PyCOMPS_SeqIter*)res)->seq);
+    //printf("get iter - seq it info %p\n", ((PyCOMPS_SeqIter*)res)->seq->it_info);
     return res;
 }
 
@@ -360,6 +365,10 @@ PyObject* PyCOMPSSeq_iternext(PyObject *iter_o) {
     COMPS_Object *ret;
     PyObject *retp;
     PyCOMPS_SeqIter *iter = ((PyCOMPS_SeqIter*)iter_o);
+    //printf("iternext self-type:%s\n", Py_TYPE(iter_o)->tp_name);
+    //printf("res-seq:%p\n", ((PyCOMPS_SeqIter*)iter)->seq);
+    //printf("get iter - seq it info %p\n", iter->seq->it_info);
+
     ret = iter->it?iter->it->comps_obj: NULL;
     //printf("%p \n", iter);
     //printf("%p \n", iter->seq);
@@ -370,7 +379,8 @@ PyObject* PyCOMPSSeq_iternext(PyObject *iter_o) {
         //    printf("%p \n", iter->seq->it_info);
         //    printf("%p \n", iter->seq->it_info->out_convert_func);
         //}
-        retp = iter->seq->it_info->out_convert_func(comps_object_incref(ret));
+        ret = comps_object_incref(ret);
+        retp = iter->seq->it_info->out_convert_func(ret);
         iter->it = iter->it->next;
         return retp;
     }
@@ -471,12 +481,20 @@ int PyCOMPSSeqIter_init(PyCOMPS_SeqIter *self, PyObject *args, PyObject *kwds)
     return 0;
 }
 
+void PyCOMPSSeqIter_dealloc(PyObject *self)
+{
+    #define _iter_ ((PyCOMPS_SeqIter*)self)
+    Py_XDECREF(_iter_->seq);
+    Py_TYPE(self)->tp_free((PyObject*)self);
+    #undef _iter_
+}
+
 PyTypeObject PyCOMPS_SeqIterType = {
     PY_OBJ_HEAD_INIT
     "libcomps.SeqIter",   /*tp_name*/
     sizeof(PyCOMPS_SeqIter), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0, /*tp_dealloc*/
+    &PyCOMPSSeqIter_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/

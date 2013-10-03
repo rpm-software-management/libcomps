@@ -30,13 +30,6 @@
 #include "structmember.h"
 
 
-
-typedef struct PyCOMPS_SeqIter{
-    PyObject_HEAD
-    COMPS_ObjListIt *it;
-    PyCOMPS_Sequence *seq;
-} PyCOMPS_SeqIter;
-
 Py_ssize_t list_len(PyObject *self);
 PyObject *list_getitem(PyObject *self, Py_ssize_t index);
 int list_setitem(PyObject *self, Py_ssize_t index, PyObject *value);

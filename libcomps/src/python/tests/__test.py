@@ -853,6 +853,7 @@ class COMPSTest(unittest.TestCase):
         ret = reduce(lambda x,y : y and (x or env.option_ids), groups, False)
         self.assertTrue(ret)
 
+    #@unittest.skip("")
     def test_gid(self):
         gid1 = libcomps.GroupId("gid1")
         gid2 = libcomps.GroupId("gid2", default=False)
@@ -867,6 +868,7 @@ class COMPSTest(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             gid1 < gid2
 
+    #@unittest.skip("")
     def test_default(self):
         e = libcomps.Environment("e1", "enviroment1", "env desc")
         e.group_ids.append("groupid1")
@@ -889,6 +891,7 @@ class COMPSTest(unittest.TestCase):
         self.assertFalse(e.group_ids[3].default)
         self.assertFalse(e.group_ids[4].default)
 
+    #@unittest.skip("")
     def test21(self):
         c1 = libcomps.Comps()
         c1.fromxml_f("f21-rawhide-comps.xml")
@@ -897,6 +900,7 @@ class COMPSTest(unittest.TestCase):
         c = c1 + c2
         c.xml_f("f21_united.xml")
 
+    #@unittest.skip("")
     def test_f21_in(self):
         comps = libcomps.Comps()
         ret = comps.fromxml_f("comps-f21.xml.in")
@@ -913,6 +917,28 @@ class COMPSTest(unittest.TestCase):
         comps2 = libcomps.Comps()
         comps2.fromxml_f("f21-2.xml")
         self.assertTrue(comps == comps2)
+
+    def test_envs(self):
+        comps = libcomps.Comps()
+        ret = comps.fromxml_f("f21-rawhide-comps.xml")
+        env = comps.environments[0]
+        self.assertEqual(env.name_by_lang['cs'], u'Pracovní prostředí GNOME')
+        self.assertEqual(env.desc_by_lang['de'],
+                         u'GNOME ist eine hoch-intuitive und benutzerfreundliche Benutzeroberfläche')
+        group_ids = ("base-x", "standard", "core", "dial-up",
+                     "fonts", "input-methods", "multimedia",
+                     "hardware-support", "printing", "firefox",
+                     "guest-desktop-agents", "gnome-desktop")
+
+        self.assertItemsEqual((id_.name for id_ in env.group_ids),
+                              group_ids)
+        self.assertItemsEqual((id_.default for id_ in env.group_ids),
+                              (False, False, False, False,
+                              False, False, False, False,
+                              False, False, False, False))
+        option_ids = ("libreoffice", "gnome-games", "epiphany", "3d-printing")
+
+        self.assertItemsEqual((x.name for x in env.option_ids), option_ids)
 
 if __name__ == "__main__":
     unittest.main(testRunner = MyRunner)

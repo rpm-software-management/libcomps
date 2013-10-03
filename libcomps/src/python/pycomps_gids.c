@@ -117,7 +117,7 @@ PyGetSetDef gid_getset[] = {
     {"name",
      (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
      "Group ID name",
-     (void*)offsetof(COMPS_DocGroupId, name)},
+     (void*)&DocGroupId_NameClosure},
     {"default",
      (getter)PyCOMPSGID_get_default, (setter)PyCOMPSGID_set_default,
      "Group ID default",
@@ -254,32 +254,31 @@ PyObject* comps_gids_out(COMPS_Object *cobj) {
     PyCOMPSGID_init(ret, NULL, NULL);
     COMPS_OBJECT_DESTROY(ret->gid);
     ret->gid = (COMPS_DocGroupId*)cobj;
-    //printf("out\n");
     return (PyObject*)ret;
 }
 
 PyCOMPS_SeqInfo PyCOMPS_GIDsInfo = {
-#if PY_MAJOR_VERSION >= 3
+/*#if PY_MAJOR_VERSION >= 3
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_GIDType,
                                    &PyUnicode_Type},
     .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
                         {&comps_gids_in,
                          &comps_gids_str_in},
-#else
+    .item_types_len = 2,
+#else*/
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_GIDType, &PyString_Type,
                                    &PyUnicode_Type},
     .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
                         {&comps_gids_in,
                          &comps_gids_str_in,
                          &comps_gids_str_in},
-#endif
-    .out_convert_func = &comps_gids_out,
-    .item_types_len = 3
+    .item_types_len = 3,
+//#endif
+    .out_convert_func = &comps_gids_out
 };
 
 int PyCOMPSGIDs_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
 {
-    //printf("gids init\n");
     (void) args;
     (void) kwds;
     self->it_info = &PyCOMPS_GIDsInfo;
