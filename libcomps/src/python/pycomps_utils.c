@@ -153,7 +153,7 @@ PyObject* __pycomps_lang_decode(char * lang) {
     #else
         tmp = PyUnicode_Decode(lang, strlen(lang), "UTF-8", errors);
         if (!tmp) {
-            PyErr_SetString(PyExc_TypeError, "PyUnicode_Decode error");
+            //PyErr_SetString(PyExc_TypeError, "PyUnicode_Decode error");
             return NULL;
         }
         ret = PyUnicode_FromObject(tmp);

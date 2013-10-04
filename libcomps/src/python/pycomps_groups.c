@@ -335,7 +335,7 @@ PyGetSetDef PyCOMPSGroup_getset[] = {
      "Group name locales", &DocGroup_NameByLangClosure},
     {"desc_by_lang",
     (getter)__PyCOMPS_get_dict, (setter)__PyCOMPS_set_dict,
-     "Group name locales", &DocGroup_NameByLangClosure},
+     "Group name locales", &DocGroup_DescByLangClosure},
     {NULL}  /* Sentinel */
 };
 
