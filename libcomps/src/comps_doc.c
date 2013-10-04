@@ -160,7 +160,7 @@ void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
     free(str);
     if (retc<0)
         comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
-    comps_doc_xml(doc, writer);
+    comps_doc_xml(doc, writer, doc->log);
     retc = xmlTextWriterEndDocument(writer);
     if (retc<0)
         comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
@@ -191,7 +191,7 @@ char* comps2xml_str(COMPS_Doc *doc) {
     free(str);
 
     if (retc<0) comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
-    comps_doc_xml(doc, writer);
+    comps_doc_xml(doc, writer, doc->log);
     retc = xmlTextWriterEndDocument(writer);
     if (retc<0) comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
     xmlSaveFormatFileTo(xmlobuff, xmldoc, NULL, 1);

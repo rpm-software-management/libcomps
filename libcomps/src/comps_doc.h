@@ -203,7 +203,7 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
 
 void comps_doc_xml_f(COMPS_Doc* doc,  char *filename, char *enc, COMPS_Logger *log);
 char* comps_doc_xml_str(COMPS_Doc* doc, char *enc, COMPS_Logger *log);
-void comps_doc_xml(COMPS_Doc *obj, xmlTextWriterPtr writer);
+void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer, COMPS_Logger *log);
 
 void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect);
 char* comps2xml_str(COMPS_Doc *doc);
