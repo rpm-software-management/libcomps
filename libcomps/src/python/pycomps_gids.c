@@ -258,14 +258,14 @@ PyObject* comps_gids_out(COMPS_Object *cobj) {
 }
 
 PyCOMPS_SeqInfo PyCOMPS_GIDsInfo = {
-/*#if PY_MAJOR_VERSION >= 3
+#if PY_MAJOR_VERSION >= 3
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_GIDType,
                                    &PyUnicode_Type},
     .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
                         {&comps_gids_in,
                          &comps_gids_str_in},
     .item_types_len = 2,
-#else*/
+else
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_GIDType, &PyString_Type,
                                    &PyUnicode_Type},
     .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
@@ -273,7 +273,7 @@ PyCOMPS_SeqInfo PyCOMPS_GIDsInfo = {
                          &comps_gids_str_in,
                          &comps_gids_str_in},
     .item_types_len = 3,
-//#endif
+#endif
     .out_convert_func = &comps_gids_out
 };
 
