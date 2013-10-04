@@ -69,7 +69,8 @@ char* comps_object_tostr(COMPS_Object *obj1) {
 }
 
 inline COMPS_Object* comps_object_incref(COMPS_Object *obj) {
-    comps_refc_incref(obj->refc);
+    if (obj)
+        comps_refc_incref(obj->refc);
     return obj;
 }
 

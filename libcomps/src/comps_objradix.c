@@ -495,6 +495,7 @@ COMPS_Object* comps_objrtree_get(COMPS_ObjRTree * rt, const char * key) {
     len = strlen(key);
     offset = 0;
     subnodes = rt->subnodes;
+
     while (offset != len) {
         found = 0;
         for (it = subnodes->first; it != NULL; it=it->next) {
@@ -503,8 +504,9 @@ COMPS_Object* comps_objrtree_get(COMPS_ObjRTree * rt, const char * key) {
                 break;
             }
         }
-        if (!found)
+        if (!found) {
             return NULL;
+        }
         rtdata = (COMPS_ObjRTreeData*)it->data;
 
         for (x=1; ;x++) {
@@ -514,14 +516,21 @@ COMPS_Object* comps_objrtree_get(COMPS_ObjRTree * rt, const char * key) {
             if (ended != 0) break;
             if (key[offset+x] != rtdata->key[x]) break;
         }
-        if (ended == 3) return comps_object_incref(rtdata->data);
+        if (ended == 3) {
+            return comps_object_incref(rtdata->data);
+        }
         else if (ended == 1) offset+=x;
-        else return NULL;
+        else {
+            return NULL;
+        }
         subnodes = ((COMPS_ObjRTreeData*)it->data)->subnodes;
     }
-    if (it != NULL)
+    if (it != NULL) {
         return comps_object_incref(((COMPS_ObjRTreeData*)it->data)->data);
-    else return NULL;
+    }
+    else {
+        return NULL;
+    }
 }
 
 COMPS_Object* comps_objrtree_get_x(COMPS_ObjRTree * rt, const char * key) {

@@ -45,6 +45,8 @@ PyObject* PyCOMPS_toxml_f(PyObject *self, PyObject *other) {
     if (__pycomps_arg_to_char(other, &tmps)) return NULL;
     if (!self_comps->comps_doc->encoding)
        self_comps->comps_doc->encoding = comps_str("UTF-8");
+    comps_list_clear(self_comps->comps_doc->log->logger_data);
+ 
     comps2xml_f(self_comps->comps_doc, tmps, 0);
     free(tmps);
 

@@ -474,7 +474,7 @@ inline void __comps_check_xml_get(int retcode, COMPS_Logger * log) {
         comps_log_error(log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
 }
 
-void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
+void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer, COMPS_Logger *log) {
     COMPS_ObjListIt *it;
     COMPS_ObjList *list;
     COMPS_ObjDict *dict;
