@@ -92,8 +92,9 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
             return NULL;
         }
         tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
-        //printf("Dict_str val:%s\n", tmpstr);
+        printf("Dict_str val:%s\n", tmpstr);
         tmpval = __pycomps_lang_decode(tmpstr);
+        printf("after decode\n");
         free(tmpstr);
         if (!tmpval) {
             PyErr_SetString(PyExc_TypeError, "val convert error");
@@ -112,7 +113,11 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
         //PyErr_SetString(PyExc_TypeError, "key convert error");
         return NULL;
     }
-    tmpval = __pycomps_lang_decode((char*)((COMPS_RTreePair*)it->data)->data);
+    tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
+    printf("Dict_str val:%s\n", tmpstr);
+    tmpval = __pycomps_lang_decode(tmpstr);
+    printf("after decode\n");
+    free(tmpstr);
     if (!tmpval) {
         //PyErr_SetString(PyExc_TypeError, "val convert error");
         return NULL;
@@ -143,7 +148,7 @@ int PyCOMPSDict_print(PyObject *self, FILE *f, int flags) {
     fprintf(f, "{");
     pairlist = comps_objdict_pairs(((PyCOMPS_Dict*)self)->dict);
     for (it = pairlist->first; it != pairlist->last; it = it->next) {
-        printf("x\n");
+        //printf("x\n");
         tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
         fprintf(f, "%s = '%s', ", ((COMPS_RTreePair*)it->data)->key, tmpstr);
         free(tmpstr);

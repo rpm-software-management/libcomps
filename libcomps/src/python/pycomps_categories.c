@@ -148,14 +148,17 @@ int PyCOMPSCat_print(PyObject *self, FILE *f, int flags) {
     fprintf(f, ", desc_by_lang={");
     pairlist = comps_objrtree_pairs(_cat_->cat->desc_by_lang);
     for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
-        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key,
-                               (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
+        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
+        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
+        free(name);
     }
-    if (hsit)
-        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key,
-                               (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
-    else
+    if (hsit) {
+        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
+        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
+        free(name);
+    } else {
         printf("}");
+    }
     comps_hslist_destroy(&pairlist);
 
     fprintf(f, ", group_ids=[");

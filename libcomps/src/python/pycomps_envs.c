@@ -125,23 +125,33 @@ int PyCOMPSEnv_print(PyObject *self, FILE *f, int flags) {
     fprintf(f, ", name_by_lang={");
     pairlist = comps_objrtree_pairs(_env_->name_by_lang);
     for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
-        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key,
-                               (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
+        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
+        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
+        free(name);
     }
-    if (hsit)
-        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key,
-                           (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
+    if (hsit) {
+        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
+        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
+        free(name);
+    } else {
+        printf("}");
+    }
     comps_hslist_destroy(&pairlist);
 
     fprintf(f, ", desc_by_lang={");
     pairlist = comps_objrtree_pairs(_env_->desc_by_lang);
     for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
-        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key,
-                               (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
+        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
+        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
+        free(name);
     }
-    if (hsit)
-        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key,
-                           (char*)((COMPS_ObjRTreePair*)hsit->data)->data);
+    if (hsit) {
+        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
+        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
+        free(name);
+    } else {
+        printf("}");
+    }
     comps_hslist_destroy(&pairlist);
 
     fprintf(f, ", group_list=[");
@@ -159,7 +169,6 @@ int PyCOMPSEnv_print(PyObject *self, FILE *f, int flags) {
         }
     }
     fprintf(f, "]");
-    fprintf(f, ", ");
     fprintf(f, ", option_list=[");
     if (_env_->option_list) {
         for (it = _env_->option_list->first;
