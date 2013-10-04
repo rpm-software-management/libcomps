@@ -265,7 +265,7 @@ PyCOMPS_SeqInfo PyCOMPS_GIDsInfo = {
                         {&comps_gids_in,
                          &comps_gids_str_in},
     .item_types_len = 2,
-else
+#else
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_GIDType, &PyString_Type,
                                    &PyUnicode_Type},
     .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
