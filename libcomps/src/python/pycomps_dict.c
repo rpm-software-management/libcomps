@@ -226,10 +226,13 @@ PyObject* PyCOMPSDict_get(PyObject *self, PyObject *key) {
         return NULL;
     }
     val = comps_objdict_get(((PyCOMPS_Dict*)self)->dict, ckey);
-    free(ckey);
-    if (!val)
-        Py_RETURN_NONE;
+    if (!val) {
+        PyErr_Format(PyExc_KeyError, "KeyError: '%s'", ckey);
+        free(ckey);
+        return NULL;
+    }
     else {
+        free(ckey);
         ckey = comps_object_tostr(val);
         COMPS_OBJECT_DESTROY(val);
         ret = PyUnicode_FromString(ckey);

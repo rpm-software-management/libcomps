@@ -25,6 +25,7 @@
 #include "comps_objdict.h"
 #include "comps_objlist.h"
 #include "comps_docpackage.h"
+#include "comps_validate.h"
 
 #include <stddef.h>
 #include <assert.h>

@@ -242,6 +242,12 @@ __COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_DescClosure = {
     .c_offset = offsetof(PyCOMPS_Env, env)
 };
 
+__COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_DispOrdClosure = {
+    .get_f = &comps_docenv_get_display_order,
+    .set_f = &comps_docenv_set_display_order,
+    .c_offset = offsetof(PyCOMPS_Env, env)
+};
+
 __COMPS_DICT_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_NameByLangClosure = {
     .c_offset = offsetof(PyCOMPS_Env, env),
     .p_offset = offsetof(PyCOMPS_Env, p_name_by_lang),
@@ -280,6 +286,9 @@ PyGetSetDef PyCOMPSEnv_getset[] = {
     {"desc",
      (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
      "Env description", (void*)&DocEnv_DescClosure},
+    {"display_order",
+     (getter)__PyCOMPS_get_numattr, (setter)__PyCOMPS_set_numattr,
+     "Env display order attribute", (void*)&DocEnv_DispOrdClosure},
     {"group_ids",
      (getter)__PyCOMPS_get_ids, (setter)__PyCOMPS_set_ids,
      "Env group ids",

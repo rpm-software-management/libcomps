@@ -50,6 +50,7 @@ typedef struct {
 } PyCOMPS_Env;
 
 __H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocEnv) /*pycomps_utils.h macro*/
+__H_COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocEnv) /*pycomps_utils.h macro*/
 __H_COMPS_LIST_GETSET_CLOSURE(COMPS_DocEnv) /*pycomps_utils.h macro*/
 __H_COMPS_DICT_GETSET_CLOSURE(COMPS_DocEnv) /*pycomps_utils.h macro*/
 

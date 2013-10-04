@@ -440,7 +440,6 @@ char* comps_objlist_tostr_u(COMPS_Object* list) {
         total2 += strlen(", ");
         free(items[i]);
     }
-    printf("i:%d\n",i);
     if (((COMPS_ObjList*)list)->len) {
         strcat(ret, items[i]);
         total2 += strlen(items[i]);
