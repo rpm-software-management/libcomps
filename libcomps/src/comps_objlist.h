@@ -71,6 +71,7 @@ int comps_objlist_insert_at(COMPS_ObjList *objlist,
                            unsigned int pos,
                            COMPS_Object *obj);
 int comps_objlist_remove_at(COMPS_ObjList *objlist, unsigned int atpos);
+int comps_objlist_remove(COMPS_ObjList *objlist, COMPS_Object *obj);
 COMPS_ObjList* comps_objlist_sublist_it(COMPS_ObjListIt *startit,
                                       COMPS_ObjListIt *end);
 COMPS_ObjList* comps_objlist_filter(COMPS_ObjList *list,

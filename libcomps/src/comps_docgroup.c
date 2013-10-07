@@ -284,6 +284,8 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                                                &comps_object_tostr};
     char *str;
 
+    if (group->packages->len == 0)
+        return;
     xmlTextWriterStartElement(writer, BAD_CAST "group");
     for (int i=0; i<9; i++) {
         //printf("%s\n", props[i]);
@@ -312,13 +314,13 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
             comps_hslist_destroy(&pairlist);
         }
     }
-    if (group->packages->len) {
-        xmlTextWriterStartElement(writer, (xmlChar*)"packagelist");
-        for (it = group->packages->first; it != NULL; it = it->next) {
-            comps_docpackage_xml((COMPS_DocGroupPackage*)it->comps_obj, writer, log);
-        }
-        xmlTextWriterEndElement(writer);
+    //if (group->packages->len) {
+    xmlTextWriterStartElement(writer, (xmlChar*)"packagelist");
+    for (it = group->packages->first; it != NULL; it = it->next) {
+        comps_docpackage_xml((COMPS_DocGroupPackage*)it->comps_obj, writer, log);
     }
+    xmlTextWriterEndElement(writer);
+    //}
     xmlTextWriterEndElement(writer);
 }
 

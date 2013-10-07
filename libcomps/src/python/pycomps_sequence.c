@@ -289,6 +289,35 @@ PyObject* PyCOMPSSeq_append(PyObject * self, PyObject *item) {
     #undef _seq_
 }
 
+PyObject* PyCOMPSSeq_remove(PyObject * self, PyObject *item) {
+    unsigned i;
+    COMPS_Object *converted_item = NULL;
+    #define _seq_ ((PyCOMPS_Sequence*)self)
+    for (i = 0; i < _seq_->it_info->item_types_len; i++) {
+        if (Py_TYPE(item) == _seq_->it_info->itemtypes[i]) {
+            if (_seq_->it_info->in_convert_funcs[i]) {
+                converted_item = _seq_->it_info->in_convert_funcs[i](item);
+                break;
+            }
+        }
+    }
+    if (!converted_item) {
+        PyErr_Format(PyExc_TypeError, "Cannot remove %s from %s",
+                      Py_TYPE(item)->tp_name,
+                      Py_TYPE(self)->tp_name);
+        return NULL;
+    }
+    i = comps_objlist_remove(_seq_->list, converted_item);
+    if (!i) {
+        char *tmpstr;
+        tmpstr = comps_object_tostr(converted_item);
+        PyErr_Format(PyExc_ValueError, "Canot remove %s. Not in list", tmpstr);
+        free(tmpstr);
+        return NULL;
+    }
+    Py_RETURN_NONE;
+    #undef _seq_
+}
 
 void PyCOMPSSeq_dealloc(PyCOMPS_Sequence *self)
 {

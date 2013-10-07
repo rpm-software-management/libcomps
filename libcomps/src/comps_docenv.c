@@ -289,6 +289,8 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
                               NULL};
     char *str;
 
+    if (env->group_list->len == 0 && env->group_list->len == 0)
+        return;
     xmlTextWriterStartElement(writer, BAD_CAST "environment");
     for (int i=0; i<6; i++) {
         if (!type[i]) {

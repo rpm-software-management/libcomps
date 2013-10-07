@@ -225,6 +225,8 @@ void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
     static char* aliases[] = {NULL, NULL, NULL, "description", "description", NULL};
     char *str;
 
+    if (category->group_ids->len == 0)
+        return;
     xmlTextWriterStartElement(writer, BAD_CAST "category");
     for (int i=0; i<6; i++) {
         if (!type[i]) {
@@ -253,23 +255,23 @@ void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
             comps_hslist_destroy(&pairlist);
         }
     }
-    if (category->group_ids->len) {
-        xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
-        for (it = category->group_ids->first; it != NULL; it = it->next) {
-            xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
-            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
-                xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
-                                                    BAD_CAST "true");
-            }
-            str = comps_object_tostr((COMPS_Object*)
-                                     ((COMPS_DocGroupId*)it->comps_obj)->name);
-            xmlTextWriterWriteString(writer, BAD_CAST str);
-            free(str);
-            xmlTextWriterEndElement(writer);
+    //if (category->group_ids->len) {
+    xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
+    for (it = category->group_ids->first; it != NULL; it = it->next) {
+        xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
+        if (((COMPS_DocGroupId*)it->comps_obj)->def) {
+            xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                                BAD_CAST "true");
         }
-        xmlTextWriterEndElement(writer);
+        str = comps_object_tostr((COMPS_Object*)
+                                 ((COMPS_DocGroupId*)it->comps_obj)->name);
+        xmlTextWriterWriteString(writer, BAD_CAST str);
+        free(str);
         xmlTextWriterEndElement(writer);
     }
+    xmlTextWriterEndElement(writer);
+    xmlTextWriterEndElement(writer);
+    //}
 }
 
 char* comps_doccategory_tostr_u(COMPS_Object* cat) {

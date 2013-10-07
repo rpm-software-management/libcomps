@@ -276,6 +276,36 @@ int comps_objlist_remove_at(COMPS_ObjList *objlist, unsigned int atpos) {
     return 1;
 }
 
+int comps_objlist_remove(COMPS_ObjList *objlist, COMPS_Object *obj) {
+    int pos;
+    COMPS_ObjListIt *it, *itprev = NULL;
+    if (!objlist) return 0;
+
+    for (it = objlist->first; it != NULL && it->comps_obj != obj;
+         it = it->next) {
+        itprev = it;
+    }
+    if (it == NULL)
+        return 0;
+
+    if (itprev == NULL && it->comps_obj == obj) {
+        if (objlist->last == objlist->first)
+            objlist->last = NULL;
+        objlist->first = objlist->first->next;
+        comps_object_destroy(it->comps_obj);
+        free(it);
+    } else {
+        itprev->next = it->next;
+        comps_object_destroy(it->comps_obj);
+        free(it);
+        if (it == objlist->last) {
+            objlist->last = itprev;
+        }
+    }
+    objlist->len--;
+    return 1;
+}
+
 
 COMPS_ObjList* comps_objlist_sublist_it(COMPS_ObjListIt *startit,
                                       COMPS_ObjListIt *end) {

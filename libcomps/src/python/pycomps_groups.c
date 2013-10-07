@@ -72,7 +72,8 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
     char *id = NULL;
     char *desc = NULL;
     char *lang = NULL;
-    unsigned def=0, uservis=0, disp_order=0;
+    unsigned def=0, uservis=0;
+    int disp_order=-1;
 
     static char *kwlist[] = {"id", "name", "desc", "display_order", "default",
                               "uservisible", "langonly", NULL};
@@ -89,7 +90,8 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
         comps_docgroup_set_desc(_group_, desc, 1);
         comps_docgroup_set_def(_group_, def);
         comps_docgroup_set_uservisible(_group_, uservis);
-        comps_docgroup_set_display_order(_group_, disp_order);
+        if (disp_order > 0)
+            comps_docgroup_set_display_order(_group_, disp_order);
         comps_docgroup_set_langonly(_group_, lang, 1);
         return 0;
     } else {
