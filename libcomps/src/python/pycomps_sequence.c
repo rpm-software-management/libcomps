@@ -434,6 +434,8 @@ PyMemberDef PyCOMPSSeq_members[] = {
 PyMethodDef PyCOMPSSeq_methods[] = {
      {"append", (PyCFunction)PyCOMPSSeq_append, METH_O,
      "Append item to new of the list"},
+     {"remove", (PyCFunction)PyCOMPSSeq_remove, METH_O,
+     "Remove item from list"},
      {"clear", (PyCFunction)PyCOMPSSeq_clear, METH_NOARGS,
      "Clear the list"},
     {NULL}  /* Sentinel */

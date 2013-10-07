@@ -73,13 +73,13 @@ PyObject* PyCOMPSEnv_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 int PyCOMPSEnv_init(PyCOMPS_Env *self, PyObject *args, PyObject *kwds)
 {
     char *name, *id, *desc;
-    unsigned disp_ord;
+    int disp_ord;
     static char *kwlist[] = {"id", "name", "desc", "display_order", NULL};
 
     name = NULL;
     id = NULL;
     desc = NULL;
-    disp_ord = 0;
+    disp_ord = -1;
     if (!args && !kwds){
         return 0;
     }
@@ -88,7 +88,8 @@ int PyCOMPSEnv_init(PyCOMPS_Env *self, PyObject *args, PyObject *kwds)
         comps_docenv_set_id(self->env, id, 1);
         comps_docenv_set_name(self->env, name, 1);
         comps_docenv_set_desc(self->env, desc, 1);
-        comps_docenv_set_display_order(self->env, disp_ord);
+        if (disp_ord)
+            comps_docenv_set_display_order(self->env, disp_ord);
         return 0;
     } else {
         return -1;
