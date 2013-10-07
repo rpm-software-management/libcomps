@@ -155,8 +155,8 @@ ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
 
 set(VERSION ${libcomps_VERSION_MAJOR}.${libcomps_VERSION_MINOR}.${libcomps_VERSION_PATCH})
 
-exec_program("git" ARGS rev-parse --short HEAD OUTPUT_VARIABLE GITREV)
-exec_program("git" ARGS rev-parse HEAD OUTPUT_VARIABLE GITREVLONG)
+exec_program("git" ARGS rev-parse --short ${TOP_COMMIT} OUTPUT_VARIABLE GITREV)
+exec_program("git" ARGS rev-parse ${TOP_COMMIT} OUTPUT_VARIABLE GITREVLONG)
 
 
 set(GITARG archive ${GITREV} "--format=tar.gz" "--prefix=libcomps-${GITREVLONG}/")
