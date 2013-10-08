@@ -324,3 +324,4 @@ PyObject* __PyCOMPS_get_numattr(PyObject *self, void *closure) {
         Py_RETURN_NONE;
     #undef _closure_
 }
+

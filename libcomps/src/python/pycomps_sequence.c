@@ -29,7 +29,7 @@ Py_ssize_t PyCOMPSSeq_len(PyObject *self) {
     return ((PyCOMPS_Sequence*)self)->list->len;
 }
 
-inline PyObject *list_getitem(PyObject *self, Py_ssize_t index) {
+inline PyObject* list_getitem(PyObject *self, Py_ssize_t index) {
     COMPS_Object *obj;
     PyObject *ret;
     int i;
@@ -44,6 +44,44 @@ inline PyObject *list_getitem(PyObject *self, Py_ssize_t index) {
     }
     //COMPS_OBJECT_DESTROY(obj);
     ret = ((PyCOMPS_Sequence*)self)->it_info->out_convert_func(obj);
+    return ret;
+}
+
+inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
+    char *strid=NULL;
+    COMPS_ObjListIt *it;
+    COMPS_ObjDict *props;
+    COMPS_Object *oid;
+    PyObject *ret = NULL;
+    COMPS_Object *tmpstr;
+
+    if (PyUnicode_Check(id)) {
+        if (!__pycomps_stringable_to_char(id, &strid)) {
+            return NULL;
+        }
+    } else if (PyBytes_Check(id)){
+        strid = PyBytes_AsString(id);
+    }
+    tmpstr = (COMPS_Object*)comps_str(strid);
+    for (it = ((PyCOMPS_Sequence*)self)->list->first; it != NULL;
+         it = it->next) {
+        props = (COMPS_ObjDict*)GET_FROM(it->comps_obj,
+                                         ((PyCOMPS_Sequence*)self)->it_info->props_offset);
+
+        oid = comps_objdict_get_x(props, "id");
+        if (comps_object_cmp(oid, tmpstr)) {
+            comps_object_incref(it->comps_obj);
+            ret = ((PyCOMPS_Sequence*)self)->it_info->out_convert_func(it->comps_obj);
+            break;
+        }
+    }
+    if (!ret) {
+        PyErr_Format(PyExc_KeyError, "Object with id '%s' is not in list", strid);
+    }
+    if (PyUnicode_Check(id)) {
+        free(strid);
+    }
+    COMPS_OBJECT_DESTROY(tmpstr);
     return ret;
 }
 
@@ -126,42 +164,59 @@ PyObject* list_repeat(PyObject *self, Py_ssize_t count) {
     return (PyObject*)result;
 }
 
-PyObject* PyCOMPSSeq_get(PyObject *self, PyObject *key) {
+PyObject* list_get_slice(PyObject *self, PyObject *key) {
     PyCOMPS_Sequence *result;
     COMPS_ObjListIt *it;
     int i;
     unsigned int n, uret;
     Py_ssize_t istart, istop, istep, ilen, clen;
 
+    n = ((PyCOMPS_Sequence*)self)->list->len;
+    result = (PyCOMPS_Sequence*)Py_TYPE((PyCOMPS_Sequence*)self)->tp_new(
+                                                      Py_TYPE(self),
+                                                      NULL, NULL);
+    self->ob_type->tp_init((PyObject*)result, NULL, NULL);
+    uret = PySlice_GetIndicesEx((SLICE_CAST)key, n,
+                               &istart, &istop, &istep, &ilen);
+
+    if (uret) {
+        return NULL;
+    }
+
+    clen = 0;
+    it = ((PyCOMPS_Sequence*)self)->list->first;
+    for (i=0 ; i<istart; it=it->next, i++);
+    while (clen != ilen) {
+        comps_objlist_append(result->list, it->comps_obj);
+        clen+=1;
+        for (i=0 ; i<istep && it != NULL; it=it->next,  i++);
+        if (!it) it = ((PyCOMPS_Sequence*)self)->list->first;
+        for (; i<istep; it=it->next, i++);
+    }
+    return (PyObject*)result;
+}
+
+PyObject* PyCOMPSSeq_get(PyObject *self, PyObject *key) {
     if (PySlice_Check(key)) {
-        n = ((PyCOMPS_Sequence*)self)->list->len;
-        result = (PyCOMPS_Sequence*)Py_TYPE((PyCOMPS_Sequence*)self)->tp_new(
-                                                          Py_TYPE(self),
-                                                          NULL, NULL);
-        self->ob_type->tp_init((PyObject*)result, NULL, NULL);
-        uret = PySlice_GetIndicesEx((SLICE_CAST)key, n,
-                                   &istart, &istop, &istep, &ilen);
-
-        if (uret) {
-            return NULL;
-        }
-
-        clen = 0;
-        it = ((PyCOMPS_Sequence*)self)->list->first;
-        for (i=0 ; i<istart; it=it->next, i++);
-        while (clen != ilen) {
-            comps_objlist_append(result->list, it->comps_obj);
-            clen+=1;
-            for (i=0 ; i<istep && it != NULL; it=it->next,  i++);
-            if (!it) it = ((PyCOMPS_Sequence*)self)->list->first;
-            for (; i<istep; it=it->next, i++);
-        }
-        return (PyObject*)result;
-
+        return list_get_slice(self, key);
     } else if (PyINT_CHECK(key)) {
         return list_getitem(self, PyINT_ASLONG(key));
     } else {
         PyErr_SetString(PyExc_TypeError, "Key must be index interger or slice");
+        return NULL;
+    }
+}
+
+PyObject* PyCOMPSSeq_id_get(PyObject *self, PyObject *key) {
+    if (PySlice_Check(key)) {
+        return list_get_slice(self, key);
+    } else if (PyINT_CHECK(key)) {
+        return list_getitem(self, PyINT_ASLONG(key));
+    } else if (PyUnicode_Check(key) || PyBytes_Check(key)){
+        return list_getitem_byid(self, key);
+    } else {
+        PyErr_SetString(PyExc_TypeError, "Key must be index interger or slice"
+                                         "or string id");
         return NULL;
     }
 }
@@ -427,6 +482,13 @@ static PyMappingMethods PyCOMPSSeq_mapping = {
     PyCOMPSSeq_get,
     PyCOMPSSeq_set
 };
+
+PyMappingMethods PyCOMPSSeq_mapping_extra = {
+    PyCOMPSSeq_len,
+    PyCOMPSSeq_id_get,
+    PyCOMPSSeq_set
+};
+
 
 PyMemberDef PyCOMPSSeq_members[] = {
     {NULL}};

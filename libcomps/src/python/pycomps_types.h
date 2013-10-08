@@ -31,6 +31,7 @@ typedef struct PyCOMPS_SeqInfo {
     PyCOMPSSeq_in_itemconvert *in_convert_funcs;
     PyCOMPSSeq_out_itemconvert out_convert_func;
     unsigned item_types_len;
+    size_t props_offset;
 } PyCOMPS_SeqInfo;
 
 typedef struct PyCOMPS_Sequence {

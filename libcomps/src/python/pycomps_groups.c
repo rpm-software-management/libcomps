@@ -102,10 +102,25 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
 
 PyObject* PyCOMPSGroup_str(PyObject *self) {
     char *x;
+    COMPS_Object *id;
     PyObject *ret;
-    x = comps_object_tostr((COMPS_Object*)((PyCOMPS_Group*)self)->group);
-    ret = PyUnicode_FromString(x);
+    id = comps_docgroup_get_id(((PyCOMPS_Group*)self)->group);
+    x = comps_object_tostr(id);
+    ret = PyUnicode_FromFormat("%s", x);
     free(x);
+    comps_object_destroy(id);
+    return ret;
+}
+
+PyObject* PyCOMPSGroup_repr(PyObject *self) {
+    char *x;
+    COMPS_Object *id;
+    PyObject *ret;
+    id = comps_docgroup_get_id(((PyCOMPS_Group*)self)->group);
+    x = comps_object_tostr(id);
+    ret = PyUnicode_FromFormat("<libcomps.Group object '%s' at %p>", x, self);
+    free(x);
+    comps_object_destroy(id);
     return ret;
 }
 
@@ -351,6 +366,7 @@ PyNumberMethods PyCOMPSGroup_Nums = {
     .nb_add = PyCOMPSGroup_union
 };
 
+
 PyTypeObject PyCOMPS_GroupType = {
     PY_OBJ_HEAD_INIT
     "libcomps.Group",   /*tp_name*/
@@ -361,7 +377,7 @@ PyTypeObject PyCOMPS_GroupType = {
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,//PyCOMPSGroup_cmp,            /*tp_compare*/
-    0,                         /*tp_repr*/
+    &PyCOMPSGroup_repr,                         /*tp_repr*/
     &PyCOMPSGroup_Nums,                         /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
@@ -409,7 +425,8 @@ PyCOMPS_SeqInfo PyCOMPS_GroupsInfo = {
     .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
                         {&comps_groups_in},
     .out_convert_func = &comps_groups_out,
-    .item_types_len = 1
+    .item_types_len = 1,
+    .props_offset = offsetof(COMPS_DocGroup, properties)
 };
 
 int PyCOMPSGroups_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
@@ -478,6 +495,20 @@ PyObject* PyCOMPSGroups_union(PyObject *self, PyObject *other) {
     return (PyObject*)res;
 }
 
+PyObject* PyCOMPSGroups_get(PyObject *self, PyObject *key) {
+    if (PySlice_Check(key)) {
+        return list_get_slice(self, key);
+    } else if (PyINT_CHECK(key)) {
+        return list_getitem(self, PyINT_ASLONG(key));
+    } else if (PyUnicode_Check(key) || PyBytes_Check(key)){
+        return list_getitem_byid(self, key);
+    } else {
+        PyErr_SetString(PyExc_TypeError, "Key must be index interger or slice"
+                                         "or string id");
+        return NULL;
+    }
+}
+
 PyMemberDef PyCOMPSGroups_members[] = {
     {NULL}};
 
@@ -504,7 +535,7 @@ PyTypeObject PyCOMPS_GroupsType = {
     0,                         /*tp_repr*/
     &PyCOMPSGroups_Nums,         /*tp_as_number*/
     0,//&PyCOMPSGroup_sequence,       /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
+    &PyCOMPSSeq_mapping_extra, /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
     PyCOMPSSeq_str,           /*tp_str*/
@@ -689,8 +720,27 @@ PyGetSetDef pack_getset[] = {
 };
 
 PyObject* PyCOMPSPack_str(PyObject *self) {
-    return PyUnicode_FromString(comps_object_tostr((COMPS_Object*)
-                                           ((PyCOMPS_Package*)self)->package));
+    char *x;
+    COMPS_Object *name;
+    PyObject *ret;
+    name = comps_docpackage_get_name(((PyCOMPS_Package*)self)->package);
+    x = comps_object_tostr(name);
+    ret = PyUnicode_FromFormat("%s", x);
+    free(x);
+    comps_object_destroy(name);
+    return ret;
+}
+
+PyObject* PyCOMPSPack_repr(PyObject *self) {
+    char *x;
+    COMPS_Object *name;
+    PyObject *ret;
+    name = comps_docpackage_get_name(((PyCOMPS_Package*)self)->package);
+    x = comps_object_tostr(name);
+    ret = PyUnicode_FromFormat("<libcomps.Package object '%s' at %p>", x, self);
+    free(x);
+    comps_object_destroy(name);
+    return ret;
 }
 
 int PyCOMPSPack_print(PyObject *self, FILE *f, int flags) {
@@ -750,7 +800,7 @@ PyTypeObject PyCOMPS_PackType = {
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,//PyCOMPSPack_cmp,           /*tp_compare*/
-    0,                         /*tp_repr*/
+    PyCOMPSPack_repr,          /*tp_repr*/
     0,                         /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/

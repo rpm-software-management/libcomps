@@ -94,10 +94,25 @@ int PyCOMPSCat_init(PyCOMPS_Category *self, PyObject *args, PyObject *kwds)
 
 PyObject* PyCOMPSCat_str(PyObject *self) {
     char *x;
+    COMPS_Object *id;
     PyObject *ret;
-    x = comps_object_tostr((COMPS_Object*)((PyCOMPS_Category*)self)->cat);
-    ret = PyUnicode_FromString(x);
+    id = comps_doccategory_get_id(((PyCOMPS_Category*)self)->cat);
+    x = comps_object_tostr(id);
+    ret = PyUnicode_FromFormat("%s", x);
     free(x);
+    comps_object_destroy(id);
+    return ret;
+}
+
+PyObject* PyCOMPSCat_repr(PyObject *self) {
+    char *x;
+    COMPS_Object *id;
+    PyObject *ret;
+    id = comps_doccategory_get_id(((PyCOMPS_Category*)self)->cat);
+    x = comps_object_tostr(id);
+    ret = PyUnicode_FromFormat("<libcomps.Category object '%s' at %p>", x, self);
+    free(x);
+    comps_object_destroy(id);
     return ret;
 }
 
@@ -305,7 +320,7 @@ PyTypeObject PyCOMPS_CatType = {
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,//PyCOMPSCat_cmp,            /*tp_compare*/
-    0,                         /*tp_repr*/
+    &PyCOMPSCat_repr,          /*tp_repr*/
     &PyCOMPSCat_Nums,          /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
@@ -354,7 +369,8 @@ PyCOMPS_SeqInfo PyCOMPS_CatsInfo = {
     .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
                         {&comps_cats_in},
     .out_convert_func = &comps_cats_out,
-    .item_types_len = 1
+    .item_types_len = 1,
+    .props_offset = offsetof(COMPS_DocCategory, properties)
 };
 
 int PyCOMPSCats_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
@@ -443,7 +459,7 @@ PyTypeObject PyCOMPS_CatsType = {
     0,                         /*tp_repr*/
     &PyCOMPSCats_Nums,         /*tp_as_number*/
     0,//&PyCOMPSCat_sequence,       /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
+    &PyCOMPSSeq_mapping_extra, /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
     PyCOMPSSeq_str,           /*tp_str*/

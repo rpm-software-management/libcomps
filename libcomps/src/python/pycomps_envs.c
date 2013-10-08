@@ -191,10 +191,25 @@ int PyCOMPSEnv_print(PyObject *self, FILE *f, int flags) {
 
 PyObject* PyCOMPSEnv_str(PyObject *self) {
     char *x;
+    COMPS_Object *id;
     PyObject *ret;
-    x = comps_object_tostr((COMPS_Object*)((PyCOMPS_Env*)self)->env);
-    ret = PyUnicode_FromString(x);
+    id = comps_docenv_get_id(((PyCOMPS_Env*)self)->env);
+    x = comps_object_tostr(id);
+    ret = PyUnicode_FromFormat("%s", x);
     free(x);
+    comps_object_destroy(id);
+    return ret;
+}
+
+PyObject* PyCOMPSEnv_repr(PyObject *self) {
+    char *x;
+    COMPS_Object *id;
+    PyObject *ret;
+    id = comps_docenv_get_id(((PyCOMPS_Env*)self)->env);
+    x = comps_object_tostr(id);
+    ret = PyUnicode_FromFormat("<libcomps.Environment object '%s' at %p>", x, self);
+    free(x);
+    comps_object_destroy(id);
     return ret;
 }
 
@@ -321,7 +336,7 @@ PyTypeObject PyCOMPS_EnvType = {
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,//PyCOMPSEnv_cmp,            /*tp_compare*/
-    0,                         /*tp_repr*/
+    &PyCOMPSEnv_repr,          /*tp_repr*/
     &PyCOMPSEnv_Nums,          /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
@@ -370,7 +385,8 @@ PyCOMPS_SeqInfo PyCOMPS_EnvsInfo = {
     .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
                         {&comps_envs_in},
     .out_convert_func = &comps_envs_out,
-    .item_types_len = 1
+    .item_types_len = 1,
+    .props_offset = offsetof(COMPS_DocEnv, properties)
 };
 
 int PyCOMPSEnvs_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
@@ -466,7 +482,7 @@ PyTypeObject PyCOMPS_EnvsType = {
     0,                         /*tp_repr*/
     &PyCOMPSEnvs_Nums,         /*tp_as_number*/
     0,//&PyCOMPSEnv_sequence,       /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
+    &PyCOMPSSeq_mapping_extra, /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
     PyCOMPSSeq_str,           /*tp_str*/

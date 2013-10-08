@@ -125,4 +125,6 @@ PyObject *str_to_unicode(void* str);
 
 long PyCOMPS_hash(PyObject *self);
 
+PyObject* PyCOMPSSeq_extra_get(PyObject *self, PyObject *key);
+
 #endif

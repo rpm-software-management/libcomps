@@ -32,9 +32,13 @@
 
 Py_ssize_t list_len(PyObject *self);
 PyObject *list_getitem(PyObject *self, Py_ssize_t index);
+PyObject* list_getitem_byid(PyObject *self, PyObject *id);
+PyObject* list_get_slice(PyObject *self, PyObject *key);
+
 int list_setitem(PyObject *self, Py_ssize_t index, PyObject *value);
 PyObject* list_concat(PyObject *self, PyObject *other);
 PyObject *PyCOMPSSeq_get(PyObject *self, PyObject *key);
+PyObject* PyCOMPSSeq_id_get(PyObject *self, PyObject *key);
 int PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val);
 
 PyObject* list_repeat(PyObject *self, Py_ssize_t count);
@@ -54,5 +58,7 @@ PyObject *list_getitem_X(PyObject *self, PyObject *key);
 
 PyObject* PyCOMPSSeqIter_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int PyCOMPSSeqIter_init(PyCOMPS_SeqIter *self, PyObject *args, PyObject *kwds);
+
+extern PyMappingMethods PyCOMPSSeq_mapping_extra;
 
 #endif
