@@ -529,6 +529,21 @@ class BaseListTestClass(object):
                                     getattr(item, k),
                                     getattr(tmpobj, k)))
 
+    def test_get_by_id(self):
+        listobj1 = self.list_type()
+        for x in self.items_data[0:4]:
+            listobj1.append(self.item_type(**x))
+            for k,vals in _iteritems(self.items_extra_data):
+                for val in vals[0:3]:
+                    self.items_extra_data_setter[k](getattr(listobj1[-1], k),
+                                                    val)
+        index = 0
+        for x in self.items_data[0:4]:
+            item = listobj1[x["id"]]
+            self.assertTrue(item == listobj1[index])
+            index += 1
+        self.assertRaises(KeyError, listobj1.__getitem__, "notid")
+
 #@unittest.skip(" ")
 class CategoryList_Test(unittest.TestCase, BaseListTestClass):
     list_type = libcomps.CategoryList
@@ -706,7 +721,7 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(x == y)
         os.remove(fname)
 
-    #@unittest.skip("")
+    @unittest.skip("")
     def test_fedora(self):
         comps = libcomps.Comps()
         ret = comps.fromxml_f("fedora_comps.xml")
@@ -718,7 +733,7 @@ class COMPSTest(unittest.TestCase):
         comps2.fromxml_f("fed2.xml")
         self.assertTrue(comps == comps2)
 
-    #@unittest.skip("skip")
+    @unittest.skip("skip")
     def test_sample(self):
         comps = libcomps.Comps()
         ret = comps.fromxml_f("sample_comps.xml")
@@ -788,7 +803,7 @@ class COMPSTest(unittest.TestCase):
         dbl2 = g1.desc_by_lang
         self.assertTrue(g1.desc_by_lang == g.desc_by_lang)
 
-    #@unittest.skip("skip")
+    @unittest.skip("skip")
     def test_union(self):
         comps = libcomps.Comps()
         comps.fromxml_f("sample_comps.xml")
