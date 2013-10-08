@@ -461,6 +461,8 @@ PyMemberDef PyCOMPSEnvs_members[] = {
 
 
 PyMethodDef PyCOMPSEnvs_methods[] = {
+     {"append", (PyCFunction)PyCOMPSSeq_append_unique, METH_O,
+     "Append item to new of the list"},
     {NULL}  /* Sentinel */
 };
 

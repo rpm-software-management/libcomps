@@ -48,6 +48,7 @@ inline PyObject* list_getitem(PyObject *self, Py_ssize_t index) {
 }
 
 inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
+    #define _seq_ ((PyCOMPS_Sequence*)self)
     char *strid=NULL;
     COMPS_ObjListIt *it;
     COMPS_ObjDict *props;
@@ -66,7 +67,7 @@ inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
     for (it = ((PyCOMPS_Sequence*)self)->list->first; it != NULL;
          it = it->next) {
         props = (COMPS_ObjDict*)GET_FROM(it->comps_obj,
-                                         ((PyCOMPS_Sequence*)self)->it_info->props_offset);
+                                         _seq_->it_info->props_offset);
 
         oid = comps_objdict_get_x(props, "id");
         if (comps_object_cmp(oid, tmpstr)) {
@@ -83,25 +84,33 @@ inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
     }
     COMPS_OBJECT_DESTROY(tmpstr);
     return ret;
+    #undef _seq_
+}
+
+inline COMPS_Object *list_setitem_convert(PyObject *self, PyObject *item) {
+    #define _seq_ ((PyCOMPS_Sequence*)self)
+    COMPS_Object *ret = NULL;
+    if (!item)
+        return NULL;
+    for (unsigned i = 0; i < _seq_->it_info->item_types_len; i++) {
+        if (Py_TYPE(item) != _seq_->it_info->itemtypes[i])
+            continue;
+        if (_seq_->it_info->in_convert_funcs[i]) {
+            ret = _seq_->it_info->in_convert_funcs[i](item);
+            break;
+        }
+    }
+    return ret;
+    #undef _seq_
 }
 
 inline int list_setitem(PyObject *self, Py_ssize_t index, PyObject *item) {
     #define _seq_ ((PyCOMPS_Sequence*)self)
-    COMPS_Object *converted_item = NULL;
-    unsigned i;
-    if (item) {
-        for (i = 0; i < _seq_->it_info->item_types_len; i++) {
-            if (Py_TYPE(item) == _seq_->it_info->itemtypes[i]) {
-                if (_seq_->it_info->in_convert_funcs[i])
-                    converted_item = _seq_->it_info->in_convert_funcs[i](item);
-                    break;
-            }
-        }
-    }
+    COMPS_Object *converted_item = list_setitem_convert(self, item);
     if (!converted_item && item) {
         PyErr_Format(PyExc_TypeError, "Cannot set %s to %s",
-                      Py_TYPE(item)->tp_name,
-                      Py_TYPE(self)->tp_name);
+                     Py_TYPE(item)->tp_name,
+                     Py_TYPE(self)->tp_name);
         return -1;
     }
 
@@ -118,6 +127,62 @@ inline int list_setitem(PyObject *self, Py_ssize_t index, PyObject *item) {
     #undef _seq_
 }
 
+int list_unique_id_check(PyObject *self, COMPS_Object *converted) {
+    #define _seq_ ((PyCOMPS_Sequence*)self)
+    COMPS_ObjDict *props1, *props2;
+    COMPS_Object *strid1, *strid2;
+
+    props1 = (COMPS_ObjDict*)GET_FROM(converted,
+                                     _seq_->it_info->props_offset);
+    strid1 = comps_objdict_get_x(props1, "id");
+    for (COMPS_ObjListIt *it = _seq_->list->first; it != NULL;
+         it = it->next) {
+        props2 = (COMPS_ObjDict*)GET_FROM(it->comps_obj,
+                                          _seq_->it_info->props_offset);
+        strid2 = comps_objdict_get_x(props2, "id");
+
+        if (comps_object_cmp(strid1, strid2)) {
+            char *cstrid;
+            cstrid = comps_object_tostr(strid1);
+            PyErr_Format(PyExc_KeyError, "Object with id '%s' already "
+                                         "exists in list", cstrid);
+            free(cstrid);
+            return -1;
+        }
+    }
+    return 0;
+}
+
+inline int list_setitem_id_unique(PyObject *self,
+                                  Py_ssize_t index,
+                                  PyObject *item) {
+    #define _seq_ ((PyCOMPS_Sequence*)self)
+
+    COMPS_Object *converted_item = list_setitem_convert(self, item);
+    if (!converted_item && item) {
+        PyErr_Format(PyExc_TypeError, "Cannot set %s to %s",
+                     Py_TYPE(item)->tp_name,
+                     Py_TYPE(self)->tp_name);
+        return -1;
+    }
+
+    if ((int)index > (int)(_seq_->list->len-1)) {
+        PyErr_SetString(PyExc_IndexError,"Index out of range");
+        return -1;
+    }
+    if (!item) {
+        comps_objlist_remove_at(_seq_->list, index);
+        return 0;
+    }
+    if (list_unique_id_check(self, converted_item)) {
+        COMPS_OBJECT_DESTROY(converted_item);
+        return -1;
+    }
+    comps_objlist_set(_seq_->list, index, converted_item);
+    return 0;
+    #undef _seq_
+}
+
 PyObject* list_concat(PyObject *self, PyObject *other) {
     COMPS_ObjListIt *it;
     PyCOMPS_Sequence *result;
@@ -127,7 +192,6 @@ PyObject* list_concat(PyObject *self, PyObject *other) {
         PyErr_SetString(PyExc_TypeError, "different object class");
         return NULL;
     }
-    printf("list concat\n");
 
     result = (PyCOMPS_Sequence*)Py_TYPE(self)->tp_new(self->ob_type, NULL, NULL);
     Py_TYPE(self)->tp_init((PyObject*)result, NULL, NULL);
@@ -221,14 +285,14 @@ PyObject* PyCOMPSSeq_id_get(PyObject *self, PyObject *key) {
     }
 }
 
-int PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val) {
+int list_set_slice(PyObject *self, PyObject *key, PyObject *val) {
+    #define _seq_ ((PyCOMPS_Sequence*)self)
     COMPS_ObjListIt *it, *it2;
 
     unsigned int n, uret;
     Py_ssize_t istart, istop, istep, ilen, i, c, clen;
-
     if (PySlice_Check(key)) {
-        n = ((PyCOMPS_Sequence*)self)->list->len;
+        n = _seq_->list->len;
         uret = PySlice_GetIndicesEx((SLICE_CAST)key, n,
                                    &istart, &istop, &istep, &ilen);
         if (ilen == 0) {
@@ -249,8 +313,17 @@ int PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val) {
                              n, (unsigned int)ilen);
                 return -1;
             }
+            COMPS_ObjListIt *it;
+            it = ((PyCOMPS_Sequence*)val)->list->first;
+            for (; it != NULL; it = it->next) {
+                if (list_unique_id_check(self, it->comps_obj)) {
+                    return -1;
+                }
+            }
+
+
             clen = 0;
-            it = ((PyCOMPS_Sequence*)self)->list->first;
+            it = _seq_->list->first;
             it2 = ((PyCOMPS_Sequence*)val)->list->first;
             for (i=0 ; i<istart && it != NULL; it=it->next, i++);
             if (istep != 1) {
@@ -312,7 +385,13 @@ int PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val) {
             }
             return 0;
         }
+    }
+    return 0;
+}
 
+int PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val) {
+    if (PySlice_Check(key)) {
+        return list_set_slice(self, key, val);
     } else if (PyINT_CHECK(key)) {
         return list_setitem(self, PyINT_ASLONG(key), val);
     } else {
@@ -321,18 +400,20 @@ int PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val) {
     }
 }
 
-PyObject* PyCOMPSSeq_append(PyObject * self, PyObject *item) {
-    unsigned i;
-    COMPS_Object *converted_item = NULL;
-    #define _seq_ ((PyCOMPS_Sequence*)self)
-    for (i = 0; i < _seq_->it_info->item_types_len; i++) {
-        if (Py_TYPE(item) == _seq_->it_info->itemtypes[i]) {
-            if (_seq_->it_info->in_convert_funcs[i]) {
-                converted_item = _seq_->it_info->in_convert_funcs[i](item);
-                break;
-            }
-        }
+int PyCOMPSSeq_set_unique(PyObject *self, PyObject *key, PyObject *val) {
+    if (PySlice_Check(key)) {
+        return list_set_slice(self, key, val);
+    } else if (PyINT_CHECK(key)) {
+        return list_setitem_id_unique(self, PyINT_ASLONG(key), val);
+    } else {
+        PyErr_SetString(PyExc_TypeError, "Key must be index interger or slice");
+        return -1;
     }
+}
+
+PyObject* PyCOMPSSeq_append(PyObject * self, PyObject *item) {
+    #define _seq_ ((PyCOMPS_Sequence*)self)
+    COMPS_Object *converted_item = list_setitem_convert(self, item);
     if (!converted_item) {
         PyErr_Format(PyExc_TypeError, "Cannot append %s to %s",
                       Py_TYPE(item)->tp_name,
@@ -344,18 +425,28 @@ PyObject* PyCOMPSSeq_append(PyObject * self, PyObject *item) {
     #undef _seq_
 }
 
-PyObject* PyCOMPSSeq_remove(PyObject * self, PyObject *item) {
-    unsigned i;
-    COMPS_Object *converted_item = NULL;
+PyObject* PyCOMPSSeq_append_unique(PyObject * self, PyObject *item) {
     #define _seq_ ((PyCOMPS_Sequence*)self)
-    for (i = 0; i < _seq_->it_info->item_types_len; i++) {
-        if (Py_TYPE(item) == _seq_->it_info->itemtypes[i]) {
-            if (_seq_->it_info->in_convert_funcs[i]) {
-                converted_item = _seq_->it_info->in_convert_funcs[i](item);
-                break;
-            }
-        }
+    COMPS_Object *converted_item = list_setitem_convert(self, item);
+    if (!converted_item) {
+        PyErr_Format(PyExc_TypeError, "Cannot append %s to %s",
+                      Py_TYPE(item)->tp_name,
+                      Py_TYPE(self)->tp_name);
+        return NULL;
     }
+    if (list_unique_id_check(self, converted_item)) {
+        COMPS_OBJECT_DESTROY(converted_item);
+        return NULL;
+    }
+    comps_objlist_append_x(_seq_->list, converted_item);
+    Py_RETURN_NONE;
+    #undef _seq_
+}
+
+PyObject* PyCOMPSSeq_remove(PyObject * self, PyObject *item) {
+    #define _seq_ ((PyCOMPS_Sequence*)self)
+    int i;
+    COMPS_Object *converted_item = list_setitem_convert(self, item);
     if (!converted_item) {
         PyErr_Format(PyExc_TypeError, "Cannot remove %s from %s",
                       Py_TYPE(item)->tp_name,
@@ -486,7 +577,7 @@ static PyMappingMethods PyCOMPSSeq_mapping = {
 PyMappingMethods PyCOMPSSeq_mapping_extra = {
     PyCOMPSSeq_len,
     PyCOMPSSeq_id_get,
-    PyCOMPSSeq_set
+    PyCOMPSSeq_set_unique
 };
 
 

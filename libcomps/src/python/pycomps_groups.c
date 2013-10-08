@@ -513,8 +513,8 @@ PyMemberDef PyCOMPSGroups_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSGroups_methods[] = {
-//    {"append", (PyCFunction)PyCOMPSGroups_append, METH_O,
-//    "Append item to new of the list"},
+     {"append", (PyCFunction)PyCOMPSSeq_append_unique, METH_O,
+     "Append item to new of the list"},
     {NULL}  /* Sentinel */
 };
 

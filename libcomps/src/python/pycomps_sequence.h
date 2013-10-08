@@ -36,6 +36,7 @@ PyObject* list_getitem_byid(PyObject *self, PyObject *id);
 PyObject* list_get_slice(PyObject *self, PyObject *key);
 
 int list_setitem(PyObject *self, Py_ssize_t index, PyObject *value);
+int PyCOMPSSeq_set_unique(PyObject *self, PyObject *key, PyObject *val);
 PyObject* list_concat(PyObject *self, PyObject *other);
 PyObject *PyCOMPSSeq_get(PyObject *self, PyObject *key);
 PyObject* PyCOMPSSeq_id_get(PyObject *self, PyObject *key);
@@ -48,6 +49,7 @@ void PyCOMPSSeq_dealloc(PyCOMPS_Sequence *self);
 PyObject* PyCOMPSSeq_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int PyCOMPSSeq_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds);
 PyObject* PyCOMPSSeq_append(PyObject * self, PyObject *item);
+PyObject* PyCOMPSSeq_append_unique(PyObject * self, PyObject *item);
 PyObject* PyCOMPSSeq_str(PyObject *self);
 int PyCOMPSSeq_print(PyObject *self, FILE *f, int flags);
 PyObject* PyCOMPSSeq_cmp(PyObject *self, PyObject *other, int op);
