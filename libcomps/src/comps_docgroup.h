@@ -26,6 +26,7 @@
 #include "comps_objlist.h"
 #include "comps_docpackage.h"
 #include "comps_validate.h"
+#include "comps_radix.h"
 
 #include <stddef.h>
 #include <assert.h>
@@ -74,8 +75,9 @@ COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,
                                          COMPS_DocGroup *g2);
 
 void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
-                        COMPS_Logger *log);
+                        COMPS_Log *log);
 
 extern COMPS_ObjectInfo COMPS_DocGroup_ObjInfo;
+extern COMPS_ValRuleGeneric* COMPS_DocGroup_ValidateRules[];
 
 #endif

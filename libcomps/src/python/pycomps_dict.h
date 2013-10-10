@@ -30,8 +30,6 @@
 #include "structmember.h"
 
 
-COMPS_Dict * get_dict(PyObject *self);
-
 void PyCOMPSDict_dealloc(PyCOMPS_Dict *self);
 PyObject* PyCOMPSDict_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int PyCOMPSDict_init(PyCOMPS_Dict *self, PyObject *args, PyObject *kwds);

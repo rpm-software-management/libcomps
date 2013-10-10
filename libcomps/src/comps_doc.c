@@ -24,7 +24,8 @@
 void comps_doc_create(COMPS_Doc* doc, COMPS_Object **args) {
     doc->objects = (COMPS_ObjDict*) comps_object_create(&COMPS_ObjDict_ObjInfo,
                                                        NULL);
-    doc->log = comps_log_create(0);
+    doc->log = (COMPS_Log*)comps_object_create(&COMPS_Log_ObjInfo, NULL);
+    //doc->log = comps_log_create(0);
     if (args && args[0]->obj_info == &COMPS_Str_ObjInfo) {
         doc->encoding = (COMPS_Str*) comps_object_incref(args[0]);
     } else {
@@ -41,9 +42,9 @@ COMPS_COPY_u(doc, COMPS_Doc)
 
 void comps_doc_destroy(COMPS_Doc *doc) {
     if (doc != NULL) {
-    comps_log_destroy(doc->log);
-    comps_object_destroy((COMPS_Object*)doc->objects);
-    comps_object_destroy((COMPS_Object*)doc->encoding);
+    COMPS_OBJECT_DESTROY(doc->log);
+    COMPS_OBJECT_DESTROY((COMPS_Object*)doc->objects);
+    COMPS_OBJECT_DESTROY((COMPS_Object*)doc->encoding);
     }
 }
 COMPS_DESTROY_u(doc, COMPS_Doc)
@@ -152,22 +153,24 @@ void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
     int retc;
     char *str;
 
-    doc->log->redirect2output = stdoutredirect;
+    //doc->log->redirect2output = stdoutredirect;
     xmlTextWriterPtr writer = xmlNewTextWriterDoc(&xmldoc, 0);
     
     str = comps_object_tostr((COMPS_Object*)doc->encoding);
     retc = xmlTextWriterStartDocument(writer, NULL, str, NULL);
     free(str);
+    doc->log->std_out = stdoutredirect;
     if (retc<0)
-        comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
-    comps_doc_xml(doc, writer, doc->log);
+        comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
+    comps_doc_xml(doc, writer);
     retc = xmlTextWriterEndDocument(writer);
     if (retc<0)
-        comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
+        comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
 
     retc = xmlSaveFormatFileEnc(filename, xmldoc, NULL, 1);
     if (retc<0)
-        comps_log_error(doc->log, filename, COMPS_ERR_WRITEF, 0, 0, 0);
+        comps_log_error_x(doc->log, COMPS_ERR_WRITEF,
+                          1, comps_str(filename));
 
     xmlFreeTextWriter(writer);
     xmlFreeDoc(xmldoc);
@@ -190,10 +193,10 @@ char* comps2xml_str(COMPS_Doc *doc) {
     retc = xmlTextWriterStartDocument(writer, NULL, str, NULL);
     free(str);
 
-    if (retc<0) comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
-    comps_doc_xml(doc, writer, doc->log);
+    if (retc<0) comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
+    comps_doc_xml(doc, writer);
     retc = xmlTextWriterEndDocument(writer);
-    if (retc<0) comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
+    if (retc<0) comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
     xmlSaveFormatFileTo(xmlobuff, xmldoc, NULL, 1);
 
     xmlFreeTextWriter(writer);
@@ -469,12 +472,12 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
     #undef group
 }
 
-inline void __comps_check_xml_get(int retcode, COMPS_Logger * log) {
+inline void __comps_check_xml_get(int retcode, COMPS_Log * log) {
     if (retcode<0)
-        comps_log_error(log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
+        comps_log_error(log, COMPS_ERR_XMLGEN, 0);
 }
 
-void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer, COMPS_Logger *log) {
+void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
     COMPS_ObjListIt *it;
     COMPS_ObjList *list;
     COMPS_ObjDict *dict;

@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "comps_logger.h"
+#include "comps_log.h"
 #include "comps_obj.h"
 
 #include <libxml/encoding.h>
@@ -141,6 +141,13 @@ void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
 #define HEAD_COMPS_DOCOBJ_SETOBJLIST(OBJ, OBJTYPE, MEMBER, OBJS)\
 void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
                                                    COMPS_ObjList *list);
+
+
+
+#define COMPS_XMLRET_CHECK if (ret == -1) {\
+    comps_log_error(log, COMPS_ERR_XMLGEN, 0);\
+    return;\
+}
 
 char __comps_strcmp(void *s1, void *s2);
 void* __comps_str_clone(void *str);

@@ -54,7 +54,7 @@ const char* comps_docpackage_type_str(COMPS_PackageType type);
 
 void comps_docpackage_xml(COMPS_DocGroupPackage *package,
                           xmlTextWriterPtr writer,
-                          COMPS_Logger *log);
+                          COMPS_Log *log);
 
 
 extern COMPS_ObjectInfo COMPS_DocGroupPackage_ObjInfo;

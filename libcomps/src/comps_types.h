@@ -20,6 +20,7 @@
 #ifndef COMPS_TYPES_H
 #define COMPS_TYPES_H
 
-typedef struct COMPS_Logger COMPS_Logger;
+typedef struct COMPS_Log COMPS_Log;
+typedef struct COMPS_LogEntry COMPS_LogEntry;
 
 #endif

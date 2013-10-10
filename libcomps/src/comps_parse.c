@@ -60,7 +60,8 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
     parsed->text_buffer_len = 0;
     parsed->text_buffer_pt = NULL;
     parsed->tmp_buffer = NULL;
-    parsed->log = comps_log_create(log_stdout?1:0);
+    parsed->log = (COMPS_Log*)comps_object_create(&COMPS_Log_ObjInfo, NULL);
+    parsed->log->std_out = log_stdout;
     parsed->comps_doc = NULL;
     parsed->fatal_error = 0;
     if (parsed->elem_stack == NULL || parsed->text_buffer == NULL) {
@@ -68,7 +69,7 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
             comps_list_destroy(&parsed->elem_stack);
         if (!parsed->text_buffer)
             comps_list_destroy(&parsed->text_buffer);
-        comps_log_destroy(parsed->log);
+        COMPS_OBJECT_DESTROY(parsed->log);
         free(parsed);
         return 0;
     }
@@ -88,7 +89,7 @@ void comps_parse_parsed_reinit(COMPS_Parsed *parsed) {
     XML_SetUserData(parsed->parser, parsed);
     comps_list_clear(parsed->elem_stack);
     comps_list_clear(parsed->text_buffer);
-    comps_list_clear(parsed->log->logger_data);
+    comps_hslist_clear(parsed->log->entries);
     COMPS_OBJECT_DESTROY(parsed->comps_doc);
     //comps_doc_destroy(&parsed->comps_doc);
 }
@@ -96,8 +97,9 @@ void comps_parse_parsed_reinit(COMPS_Parsed *parsed) {
 void comps_parse_parsed_destroy(COMPS_Parsed *parsed) {
     comps_list_destroy(&parsed->elem_stack);
     comps_list_destroy(&parsed->text_buffer);
-    if (parsed->log)
-        comps_log_destroy(parsed->log);
+    COMPS_OBJECT_DESTROY(parsed->log);
+    //if (parsed->log)
+    //    comps_log_destroy(parsed->log);
     COMPS_OBJECT_DESTROY(parsed->comps_doc);
     //comps_doc_destroy(&parsed->comps_doc);
     XML_ParserFree(parsed->parser);
@@ -153,7 +155,7 @@ signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
     int bytes_read;
 
     if (!f) {
-        comps_log_error(parsed->log, NULL, COMPS_ERR_READFD, 0, 0, 0);
+        comps_log_error(parsed->log, COMPS_ERR_READFD, 0);
         parsed->fatal_error = 1;
         return -1;
     }
@@ -162,24 +164,25 @@ signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
     for (;;) {
         buff = XML_GetBuffer(parsed->parser, BUFF_SIZE);
         if (buff == NULL) {
-            comps_log_error(parsed->log, NULL, COMPS_ERR_MALLOC, 0, 0, 0);
+            comps_log_error(parsed->log, COMPS_ERR_MALLOC, 0);
             raise(SIGABRT);
             return -1;
         }
         bytes_read = fread(buff, sizeof(char), BUFF_SIZE, f);
         if (bytes_read < 0)
-            comps_log_error(parsed->log, NULL, COMPS_ERR_READFD, 0, 0, 0);
+            comps_log_error(parsed->log, COMPS_ERR_READFD, 0);
         if (!XML_ParseBuffer(parsed->parser, bytes_read, bytes_read == 0)) {
-            comps_log_error(parsed->log,
-                            XML_ErrorString(XML_GetErrorCode(parsed->parser)),
-                            COMPS_ERR_PARSER, XML_GetErrorCode(parsed->parser),
-                            0, 0);
+            comps_log_error_x(parsed->log, COMPS_ERR_PARSER, 3,
+                          comps_num(XML_GetCurrentLineNumber(parsed->parser)),
+                          comps_num(XML_GetCurrentColumnNumber(parsed->parser)),
+                          comps_str(XML_ErrorString(
+                                    XML_GetErrorCode(parsed->parser))));
             parsed->fatal_error = 1;
         }
         if (bytes_read == 0) break;
     }
     fclose(f);
-    if (parsed->fatal_error == 0 && parsed->log->logger_data->len == 0)
+    if (parsed->fatal_error == 0 && parsed->log->entries->first == NULL)
         return 0;
     else if (parsed->fatal_error != 1)
         return 1;
@@ -189,13 +192,14 @@ signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
 
 signed char comps_parse_str(COMPS_Parsed *parsed, char *str) {
     if (!XML_Parse(parsed->parser, str, strlen(str), 1)) {
-        comps_log_error(parsed->log,
-                        XML_ErrorString(XML_GetErrorCode(parsed->parser)),
-                        COMPS_ERR_PARSER, XML_GetErrorCode(parsed->parser),
-                        0, 0);
+        comps_log_error_x(parsed->log, COMPS_ERR_PARSER, 3,
+                          comps_num(XML_GetCurrentLineNumber(parsed->parser)),
+                          comps_num(XML_GetCurrentColumnNumber(parsed->parser)),
+                          comps_str(XML_ErrorString(
+                                            XML_GetErrorCode(parsed->parser))));
         parsed->fatal_error = 1;
     }
-    if (parsed->fatal_error == 0 && parsed->log->logger_data->len == 0)
+    if (parsed->fatal_error == 0 && parsed->log->entries->first == NULL)
         return 0;
     else if (parsed->fatal_error != 1)
         return 1;
@@ -213,18 +217,18 @@ void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
 
     /* check if there's some text in recent element - are we interested in?*/
     if (parsed->text_buffer_pt) {
-        all = malloc(sizeof(char)*(parsed->text_buffer_len+1));
+        all = malloc(sizeof(char)*(parsed->text_buffer_len + 1));
         if (all == NULL) {
-            comps_log_error(parsed->log, NULL,
-                            COMPS_ERR_MALLOC, 0, 0, 0);
+            comps_log_error(parsed->log, COMPS_ERR_MALLOC, 0);
             raise(SIGABRT);
         }
     }
     /* remove all items of "text_buffer" list and append it into one string,
        but only if we're interested in text data in current element */
     if (all == NULL && parsed->text_buffer->first) {
-        comps_log_error(parsed->log, (char*)parsed->text_buffer->first->data,
-                        COMPS_ERR_TEXT_BETWEEN, parser_line, parser_col, 0);
+        comps_log_error_x(parsed->log, COMPS_ERR_TEXT_BETWEEN, 3,
+                         comps_str((char*)parsed->text_buffer->first->data),
+                         comps_num(parser_line), comps_num(parser_col));
     }
 
     while ((item = comps_list_shift(parsed->text_buffer)) != NULL) {
@@ -237,8 +241,8 @@ void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
     /* set zero char at the end of string */
     if (all) {
         if (parsed->text_buffer_len == 0)
-            comps_log_error(parsed->log, s, COMPS_ERR_NOCONTENT,
-                            parser_line, parser_col, 0);
+            comps_log_error_x(parsed->log, COMPS_ERR_NOCONTENT, 3, comps_str(s),
+                            comps_num(parser_line), comps_num(parser_col));
         memset(all+parsed->text_buffer_len, 0, sizeof(char));
         *parsed->text_buffer_pt = all;
     }
@@ -314,8 +318,8 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         }
     }
     if (parsed->text_buffer_pt && !*parsed->text_buffer_pt) {
-        comps_log_error(parsed->log, s, COMPS_ERR_ELEM_REQUIRED,
-                        parser_line, parser_col, 0);
+        comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3, comps_str(s),
+                        comps_num(parser_line), comps_num(parser_col));
     }
     switch (comps_elem_get_type(s)) {
         case COMPS_ELEM_UNKNOWN:
@@ -328,53 +332,66 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
         case COMPS_ELEM_ENV:
             list = comps_doc_environments(parsed->comps_doc);
             if (!comps_objdict_get_x(list_last_env->properties, "id"))
-                comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("id"),
+                                  comps_num(parser_line), comps_num(parser_col));
             if (!comps_objdict_get_x(list_last_env->properties, "name"))
-                comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("name"),
+                                  comps_num(parser_line), comps_num(parser_col));
             if (!comps_objdict_get_x(list_last_env->properties, "desc"))
-                comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("description"),
+                                  comps_num(parser_line), comps_num(parser_col));
             if (!list_last_env->group_list)
-                comps_log_error(parsed->log, "grouplist", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("grouplist"),
+                                  comps_num(parser_line), comps_num(parser_col));
             if (!list_last_env->option_list)
-                comps_log_error(parsed->log, "optionlist", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("optionlist"),
+                                  comps_num(parser_line), comps_num(parser_col));
             COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_GROUP:
             list = comps_doc_groups(parsed->comps_doc);
             if (!comps_objdict_get_x(list_last_group->properties, "id"))
-                comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("id"),
+                                  comps_num(parser_line), comps_num(parser_col));
             if (comps_objdict_get_x(list_last_group->properties, "name") == NULL) {
-                comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("name"),
+                                  comps_num(parser_line), comps_num(parser_col));
             }
             if (!comps_objdict_get_x(list_last_group->properties, "desc"))
-                comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("description"),
+                                  comps_num(parser_line), comps_num(parser_col));
             if (!list_last_group->packages)
-                comps_log_error(parsed->log, "packagelist", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("packagelist"),
+                                  comps_num(parser_line), comps_num(parser_col));
             COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_CATEGORY:
             list = comps_doc_categories(parsed->comps_doc);
             if (!comps_objdict_get_x(list_last_cat->properties, "id"))
-                comps_log_error(parsed->log, "id", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("id"),
+                                  comps_num(parser_line), comps_num(parser_col));
             if (!comps_objdict_get_x(list_last_cat->properties, "name"))
-                comps_log_error(parsed->log, "name", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("name"),
+                                  comps_num(parser_line), comps_num(parser_col));
             if (!comps_objdict_get_x(list_last_cat->properties, "desc"))
-                comps_log_error(parsed->log, "description", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("description"),
+                                  comps_num(parser_line), comps_num(parser_col));
             if (!list_last_cat->group_ids)
-                comps_log_error(parsed->log, "grouplist", COMPS_ERR_ELEM_REQUIRED,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_ELEM_REQUIRED, 3,
+                                  comps_str("grouplist"),
+                                  comps_num(parser_line), comps_num(parser_col));
             COMPS_OBJECT_DESTROY(list);
         case COMPS_ELEM_WHITEOUT:
         case COMPS_ELEM_BLACKLIST:
@@ -403,9 +420,9 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             }
             COMPS_OBJECT_DESTROY(list);
             if (prop != NULL) {
-                comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
-                                  parser_line, parser_col, 0);
-                
+                comps_log_warning_x(parsed->log, COMPS_ERR_ELEM_ALREADYSET, 3,
+                                    comps_str(s), comps_num(parser_line),
+                                    comps_num(parser_col));
                 comps_str_set((COMPS_Str*)prop, parsed->tmp_buffer);
             } else {
                 prop = (COMPS_Object*)comps_str_x(parsed->tmp_buffer);
@@ -441,9 +458,10 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                                   (COMPS_Object*)comps_str_x(parsed->tmp_buffer));
             } else {
                 if (prop != NULL) {
-                comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
-                                  parser_line, parser_col, 0);
-                comps_str_set((COMPS_Str*)prop, parsed->tmp_buffer);
+                    comps_log_warning_x(parsed->log, COMPS_ERR_ELEM_ALREADYSET,
+                                        3, comps_str(s), comps_num(parser_line),
+                                        comps_num(parser_col));
+                    comps_str_set((COMPS_Str*)prop, parsed->tmp_buffer);
                 } else {
                     prop = (COMPS_Object*)comps_str_x(parsed->tmp_buffer);
                     comps_objdict_set_x(prop_dict, "name", prop);
@@ -479,8 +497,9 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                                 (COMPS_Object*)comps_str_x(parsed->tmp_buffer));
             } else {
                 if (prop != NULL) {
-                    comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
-                                      parser_line, parser_col, 0);
+                    comps_log_warning_x(parsed->log, COMPS_ERR_ELEM_ALREADYSET,
+                                        3, comps_str(s), comps_num(parser_line),
+                                        comps_num(parser_col));
                     comps_str_set((COMPS_Str*)prop, parsed->tmp_buffer);
                 } else {
                     //printf("elem desc:%s\n", parsed->tmp_buffer);
@@ -500,8 +519,9 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             }
             list = comps_doc_groups(parsed->comps_doc);
             if (!list_last_group->packages->first)
-                comps_log_error(parsed->log, "packagelist", COMPS_ERR_LIST_EMPTY,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_LIST_EMPTY, 3,
+                                  comps_str("packagelist"),
+                                  comps_num(parser_line), comps_num(parser_col));
             COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_GROUPLIST:
@@ -513,15 +533,17 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             if (parent == COMPS_ELEM_CATEGORY) {
                 list = comps_doc_categories(parsed->comps_doc);
                 if (!list_last_cat->group_ids->first)
-                    comps_log_error(parsed->log, "grouplist",
-                                    COMPS_ERR_LIST_EMPTY,
-                                    parser_line, parser_col, 0);
+                    comps_log_error_x(parsed->log, COMPS_ERR_LIST_EMPTY, 3,
+                                      comps_str("grouplist"),
+                                      comps_num(parser_line),
+                                      comps_num(parser_col));
             } else {
                 list = comps_doc_environments(parsed->comps_doc);
                 if (!list_last_env->group_list->first)
-                    comps_log_error(parsed->log, "grouplist",
-                                    COMPS_ERR_LIST_EMPTY,
-                                    parser_line, parser_col, 0);
+                    comps_log_error_x(parsed->log, COMPS_ERR_LIST_EMPTY, 3,
+                                      comps_str("grouplist"),
+                                      comps_num(parser_line),
+                                      comps_num(parser_col));
             }
             COMPS_OBJECT_DESTROY(list);
         break;
@@ -532,8 +554,10 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             }
             list = comps_doc_environments(parsed->comps_doc);
             if (!list_last_env->option_list->first)
-                comps_log_error(parsed->log, "optionlist", COMPS_ERR_LIST_EMPTY,
-                                parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_LIST_EMPTY, 3,
+                                  comps_str("optionlist"),
+                                  comps_num(parser_line),
+                                  comps_num(parser_col));
             COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_PACKAGEREQ:
@@ -562,8 +586,9 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             list = comps_doc_groups(parsed->comps_doc);
             prop = comps_objdict_get_x(list_last_group->properties, "def");
             if (prop) {
-                comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
-                                  parser_line, parser_col, 0);
+                comps_log_warning_x(parsed->log, COMPS_ERR_ELEM_ALREADYSET, 3,
+                                    comps_str(s), comps_num(parser_line),
+                                    comps_num(parser_col));
             } else {
                 prop = (COMPS_Object*)comps_num(0);
                 comps_objdict_set_x(list_last_group->properties, "def", prop);
@@ -573,9 +598,10 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             else if (strcmp(parsed->tmp_buffer,"true") == 0)
                 ((COMPS_Num*)prop)->val = 1;
             else {
-                comps_log_warning(parsed->log, parsed->tmp_buffer,
-                                  COMPS_ERR_DEFAULT_PARAM,
-                                  parser_line, parser_col, 0);
+                comps_log_warning_x(parsed->log, COMPS_ERR_DEFAULT_PARAM, 3,
+                                    comps_str(parsed->tmp_buffer),
+                                    comps_num(parser_line),
+                                    comps_num(parser_col));
             }
             COMPS_OBJECT_DESTROY(list);
             free(parsed->tmp_buffer);
@@ -592,8 +618,9 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             list = comps_doc_groups(parsed->comps_doc);
             prop = comps_objdict_get_x(list_last_group->properties, "uservisible");
             if (prop) {
-                comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
-                                  parser_line, parser_col, 0);
+                comps_log_warning_x(parsed->log, COMPS_ERR_ELEM_ALREADYSET, 3,
+                                    comps_str(s), comps_num(parser_line),
+                                    comps_num(parser_col));
             } else {
                 prop = (COMPS_Object*)comps_num(0);
                 comps_objdict_set_x(list_last_group->properties, "uservisible", prop);
@@ -603,9 +630,9 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             else if (strcmp(parsed->tmp_buffer,"true") == 0)
                 ((COMPS_Num*)prop)->val = 1;
             else {
-                comps_log_warning(parsed->log, parsed->tmp_buffer,
-                                  COMPS_ERR_USERVISIBLE_PARAM,
-                                  parser_line, parser_col, 0);
+                comps_log_warning_x(parsed->log, COMPS_ERR_USERVISIBLE_PARAM, 3,
+                                    comps_str(parsed->tmp_buffer),
+                                    comps_num(parser_line), comps_num(parser_col));
             }
             COMPS_OBJECT_DESTROY(list);
             free(parsed->tmp_buffer);
@@ -622,9 +649,10 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                 list = comps_doc_categories(parsed->comps_doc);
                 if (parent == COMPS_ELEM_GROUPLIST &&
                     list_last_cat->group_ids == NULL) {
-                    comps_log_warning(parsed->log, parsed->tmp_buffer,
-                                      COMPS_ERR_GROUPLIST_NOTSET,
-                                      parser_line, parser_col, 0);
+                    comps_log_warning_x(parsed->log, COMPS_ERR_GROUPLIST_NOTSET,
+                                       3, comps_str(parsed->tmp_buffer),
+                                      comps_num(parser_line),
+                                      comps_num(parser_col));
                 } else if (parent == COMPS_ELEM_GROUPLIST &&
                           list_last_cat->group_ids){
                     comps_docgroupid_set_name(
@@ -644,13 +672,15 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                      (COMPS_DocGroupId*)list_last_env->option_list->last->comps_obj,
                             parsed->tmp_buffer, 2);
                 } else if (parent == COMPS_ELEM_GROUPLIST) {
-                    comps_log_warning(parsed->log, parsed->tmp_buffer,
-                                      COMPS_ERR_GROUPLIST_NOTSET,
-                                      parser_line, parser_col, 0);
+                    comps_log_warning_x(parsed->log, COMPS_ERR_GROUPLIST_NOTSET,
+                                        3, comps_str(parsed->tmp_buffer),
+                                        comps_num(parser_line),
+                                        comps_num(parser_col));
                 } else if (parent == COMPS_ELEM_OPTLIST) {
-                    comps_log_warning(parsed->log, parsed->tmp_buffer,
-                                      COMPS_ERR_OPTIONLIST_NOTSET,
-                                      parser_line, parser_col, 0);
+                    comps_log_warning_x(parsed->log, COMPS_ERR_OPTIONLIST_NOTSET,
+                                        3, comps_str(parsed->tmp_buffer),
+                                        comps_num(parser_line),
+                                        comps_num(parser_col));
                 }
             }
             COMPS_OBJECT_DESTROY(list);
@@ -675,8 +705,9 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             }
             COMPS_OBJECT_DESTROY(list);
             if (prop) {
-                comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
-                                  parser_line, parser_col, 0);
+                comps_log_warning_x(parsed->log, COMPS_ERR_ELEM_ALREADYSET, 3,
+                                    comps_str(s), comps_num(parser_line),
+                                    comps_num(parser_col));
             } else if (objdict) {
                 prop = (COMPS_Object*)comps_num(0);
                 comps_objdict_set_x(objdict, "display_order", prop);
@@ -696,8 +727,9 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             list = comps_doc_groups(parsed->comps_doc);
             prop = comps_objdict_get_x(list_last_cat->properties, "langonly");
             if (prop) {
-                comps_log_warning(parsed->log, s, COMPS_ERR_ELEM_ALREADYSET,
-                                  parser_line, parser_col, 0);
+                comps_log_warning_x(parsed->log, COMPS_ERR_ELEM_ALREADYSET, 3,
+                                    comps_str(s), comps_num(parser_line),
+                                    comps_num(parser_col));
                 comps_str_set((COMPS_Str*)prop, parsed->tmp_buffer);
                 free(parsed->tmp_buffer);
             } else {
@@ -748,8 +780,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
 
     if (elem->type != COMPS_ELEM_DOC){
         if (!parent_o) {
-            comps_log_error(parsed->log, elem->name, COMPS_ERR_NOPARENT,
-                            parser_line, parser_col, 0);
+            comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                            comps_str(elem->name), comps_num(parser_line),
+                            comps_num(parser_col));
             free(parsed->tmp_buffer);
             parsed->tmp_buffer = NULL;
             return;
@@ -758,8 +791,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
     if (elem->type == COMPS_ELEM_GROUPID
         || elem->type == COMPS_ELEM_PACKAGEREQ){
         if (!parent_o || !grandparent_o) {
-            comps_log_error(parsed->log, elem->name, COMPS_ERR_NOPARENT,
-                            parser_line, parser_col, 0);
+            comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                            comps_str(elem->name), comps_num(parser_line),
+                            comps_num(parser_col));
             free(parsed->tmp_buffer);
             parsed->tmp_buffer = NULL;
             return;
@@ -781,8 +815,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_GROUP:
             if (parent != COMPS_ELEM_DOC) {
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                comps_str(comps_elem_get_name(elem->type)),
+                                comps_num(parser_line), comps_num(parser_col));
                 break;
             }
             group = (COMPS_DocGroup*)
@@ -793,8 +828,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_GROUPLIST:
             if (parent != COMPS_ELEM_CATEGORY && parent != COMPS_ELEM_ENV) {
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col, 0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                comps_str(comps_elem_get_name(elem->type)),
+                                comps_num(parser_line), comps_num(parser_col));
                 break;
             }
             /*if (category) {
@@ -823,9 +859,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_OPTLIST:
             if (parent != COMPS_ELEM_ENV) {
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                comps_str(comps_elem_get_name(elem->type)),
+                                comps_num(parser_line), comps_num(parser_col));
                 break;
             }
             /*if (env->option_list != NULL) {
@@ -842,9 +878,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_CATEGORY:
             if (parent != COMPS_ELEM_DOC) {
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                comps_str(comps_elem_get_name(elem->type)),
+                                comps_num(parser_line), comps_num(parser_col));
                 break;
             }
             category = (COMPS_DocCategory*)
@@ -855,9 +891,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_ENV:
             if (parent != COMPS_ELEM_DOC) {
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                comps_str(comps_elem_get_name(elem->type)),
+                                comps_num(parser_line), comps_num(parser_col));
                 break;
             }
             env = (COMPS_DocEnv*)
@@ -874,9 +910,9 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
             parsed->text_buffer_pt = &parsed->tmp_buffer;
             if (parent != COMPS_ELEM_CATEGORY && parent != COMPS_ELEM_ENV
                 && parent != COMPS_ELEM_GROUP) {
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                comps_str(comps_elem_get_name(elem->type)),
+                                comps_num(parser_line), comps_num(parser_col));
                 break;
             }
         break;
@@ -885,26 +921,26 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         case COMPS_ELEM_USERVISIBLE:
             parsed->text_buffer_pt = &parsed->tmp_buffer;
             if (parent != COMPS_ELEM_GROUP) {
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                comps_str(comps_elem_get_name(elem->type)),
+                                comps_num(parser_line), comps_num(parser_col));
                 break;
             }
         break;
         case COMPS_ELEM_PACKAGELIST:
             if (parent != COMPS_ELEM_GROUP) {
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                comps_str(comps_elem_get_name(elem->type)),
+                                comps_num(parser_line), comps_num(parser_col));
                 break;
             }
         break;
         case COMPS_ELEM_PACKAGEREQ:
             parsed->text_buffer_pt = &parsed->tmp_buffer;
             if (grandparent != COMPS_ELEM_GROUP || parent != COMPS_ELEM_PACKAGELIST){
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                comps_str(comps_elem_get_name(elem->type)),
+                                comps_num(parser_line), comps_num(parser_col));
                 break;
             }
             package = (COMPS_DocGroupPackage*)
@@ -919,17 +955,19 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                 package->requires = comps_str(tmp);
 
             if (package->type == COMPS_PACKAGE_UNKNOWN)
-                comps_log_warning(parsed->log,
-                          comps_dict_get(elem->attrs, "type"),
-                          COMPS_ERR_PACKAGE_UNKNOWN, parser_line, parser_col, 0);
+                comps_log_warning_x(parsed->log, COMPS_ERR_PACKAGE_UNKNOWN, 3,
+                                    comps_str(comps_dict_get(elem->attrs, "type")),
+                                    comps_num(parser_line),
+                                    comps_num(parser_col));
         break;
         case COMPS_ELEM_DISPLAYORDER:
             parsed->text_buffer_pt = &parsed->tmp_buffer;
             if (parent != COMPS_ELEM_CATEGORY && parent != COMPS_ELEM_ENV &&
                 parent != COMPS_ELEM_GROUP){
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                  comps_str(comps_elem_get_name(elem->type)),
+                                  comps_num(parser_line),
+                                  comps_num(parser_col));
                 break;
             }
         break;
@@ -946,32 +984,36 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
                 } else if (grandparent == COMPS_ELEM_ENV) {
                     comps_docenv_add_groupid(env, groupid);
                 } else {
-                    comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                    COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                    0);
+                    comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                      comps_str(comps_elem_get_name(elem->type)),
+                                      comps_num(parser_line),
+                                      comps_num(parser_col));
                     COMPS_OBJECT_DESTROY(groupid);
                 }
             } else if (parent == COMPS_ELEM_OPTLIST) {
                 if (grandparent == COMPS_ELEM_ENV) {
                     comps_docenv_add_optionid(env, groupid);
                 } else {
-                    comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                    COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                    0);
+                    comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                      comps_str(comps_elem_get_name(elem->type)),
+                                      comps_num(parser_line),
+                                      comps_num(parser_col));
                     COMPS_OBJECT_DESTROY(groupid);
                 }
             } else {
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
-                    COMPS_OBJECT_DESTROY(groupid);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                  comps_str(comps_elem_get_name(elem->type)),
+                                  comps_num(parser_line),
+                                  comps_num(parser_col));
+                COMPS_OBJECT_DESTROY(groupid);
             }
         break;
         case COMPS_ELEM_MATCH:
             if (parent != COMPS_ELEM_LANGPACKS){
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                  comps_str(comps_elem_get_name(elem->type)),
+                                  comps_num(parser_line),
+                                  comps_num(parser_col));
                 break;
             }
             
@@ -981,9 +1023,10 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_PACKAGE:
             if (parent != COMPS_ELEM_BLACKLIST){
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                  comps_str(comps_elem_get_name(elem->type)),
+                                  comps_num(parser_line),
+                                  comps_num(parser_col));
                 break;
             }
             comps_doc_add_blacklist(parsed->comps_doc,
@@ -992,9 +1035,10 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_IGNOREDEP:
             if (parent != COMPS_ELEM_WHITEOUT){
-                comps_log_error(parsed->log, comps_elem_get_name(elem->type),
-                                COMPS_ERR_NOPARENT, parser_line, parser_col,
-                                0);
+                comps_log_error_x(parsed->log, COMPS_ERR_NOPARENT, 3,
+                                  comps_str(comps_elem_get_name(elem->type)),
+                                  comps_num(parser_line),
+                                  comps_num(parser_col));
                 break;
             }
             comps_doc_add_whiteout(parsed->comps_doc,
@@ -1004,9 +1048,10 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
         break;
         case COMPS_ELEM_UNKNOWN:
             //parsed->text_buffer_pt = &parsed->tmp_buffer;
-            comps_log_warning(parsed->log, elem->name, COMPS_ERR_ELEM_UNKNOWN,
-                           XML_GetCurrentLineNumber(parsed->parser),
-                           XML_GetCurrentColumnNumber(parsed->parser), 0);
+            comps_log_warning_x(parsed->log, COMPS_ERR_ELEM_UNKNOWN, 3,
+                                comps_str(elem->name),
+                                comps_num(parser_line),
+                                comps_num(parser_col));
         break;
     }
 
@@ -1033,16 +1078,17 @@ void comps_parse_start_elem_handler(void *userData,
     type = comps_elem_get_type(s);
     elem = comps_elem_create(s, attrs, type);
     if (elem == NULL) {
-        comps_log_error(((COMPS_Parsed*)userData)->log, NULL,
-                        COMPS_ERR_MALLOC, 0, 0, 0);
+        comps_log_error_x(((COMPS_Parsed*)userData)->log, COMPS_ERR_MALLOC, 0);
         raise(SIGABRT);
         return;
     }
     item = comps_list_item_create(elem, NULL, &comps_elem_destroy);
     if (((COMPS_Parsed*)userData)->text_buffer->first) {
-            comps_log_error(((COMPS_Parsed*)userData)->log,
-                     (char*)((COMPS_Parsed*)userData)->text_buffer->first->data,
-                            COMPS_ERR_TEXT_BETWEEN, parser_line, parser_col, 0);
+            comps_log_error_x(((COMPS_Parsed*)userData)->log,
+                              COMPS_ERR_TEXT_BETWEEN, 3,
+                              comps_str((char*)((COMPS_Parsed*)userData)
+                                             ->text_buffer->first->data),
+                              comps_num(parser_line), comps_num(parser_col));
         comps_list_clear(((COMPS_Parsed*)userData)->text_buffer);
         ((COMPS_Parsed*)userData)->text_buffer_len = 0;
     }
@@ -1069,8 +1115,7 @@ void comps_parse_char_data_handler(void *userData,
         return;
     }
     if ((c = malloc(sizeof(char) * (len+1))) == NULL) {
-        comps_log_error(((COMPS_Parsed*)userData)->log, NULL,
-                        COMPS_ERR_MALLOC, 0, 0, 0);
+        comps_log_error(((COMPS_Parsed*)userData)->log, COMPS_ERR_MALLOC, 0);
         raise(SIGABRT);
         return;
     }

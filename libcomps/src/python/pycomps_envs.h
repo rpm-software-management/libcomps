@@ -32,7 +32,6 @@
 #include "pycomps_23macros.h"
 #include "pycomps_dict.h"
 #include "pycomps_sequence.h"
-#include "pycomps_lang.h"
 
 /*typedef struct {
     PyObject_HEAD

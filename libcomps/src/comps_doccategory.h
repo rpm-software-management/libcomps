@@ -25,6 +25,7 @@
 #include "comps_objlist.h"
 #include "comps_utils.h"
 #include "comps_docgroupid.h"
+#include "comps_radix.h"
 
 #include <stddef.h>
 #include <assert.h>
@@ -65,7 +66,7 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
                                                COMPS_DocCategory *c2);
 
 void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
-                        COMPS_Logger *log);
+                        COMPS_Log *log);
 
 extern COMPS_ObjectInfo COMPS_DocCategory_ObjInfo;
 

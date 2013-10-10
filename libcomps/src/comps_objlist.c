@@ -277,7 +277,7 @@ int comps_objlist_remove_at(COMPS_ObjList *objlist, unsigned int atpos) {
 }
 
 int comps_objlist_remove(COMPS_ObjList *objlist, COMPS_Object *obj) {
-    int pos;
+    //int pos;
     COMPS_ObjListIt *it, *itprev = NULL;
     if (!objlist) return 0;
 

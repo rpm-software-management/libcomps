@@ -259,7 +259,7 @@ COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,
 
 
 void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
-                        COMPS_Logger *log) {
+                        COMPS_Log *log) {
     COMPS_ObjListIt *it;
     COMPS_Object *obj;
     COMPS_HSList *pairlist;
@@ -330,4 +330,20 @@ COMPS_ObjectInfo COMPS_DocGroup_ObjInfo = {
     .destructor = &comps_docgroup_destroy_u,
     .copy = &comps_docgroup_copy_u,
     .obj_cmp = &comps_docgroup_cmp_u
+};
+
+signed char comps_id_check(COMPS_Object *obj, COMPS_Object *prop) {
+    (void)obj;
+    (void)prop;
+    if (!prop)
+        return 0;
+    if (strcmp("", ((COMPS_Str*)prop)->val) == 0) return 0;
+    return 1;
+}
+
+COMPS_ValRuleGeneric* COMPS_DocGroup_ValidateRules[] = {
+    &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
+                         .get_f = &comps_docgroup_get_id,
+                         .check_f = &comps_id_check},
+    NULL
 };

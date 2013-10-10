@@ -107,10 +107,12 @@ inline char comps_docpackage_cmp_set(void *pkg1, void *pkg2) {
 
 void comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
                           xmlTextWriterPtr writer,
-                          COMPS_Logger *log) {
+                          COMPS_Log *log) {
     char *str;
+    int ret;
 
-    xmlTextWriterStartElement(writer, BAD_CAST "packagereq");
+    ret = xmlTextWriterStartElement(writer, BAD_CAST "packagereq");
+    COMPS_XMLRET_CHECK
     if (pkg->type == COMPS_PACKAGE_OPTIONAL)
         str = "optional";
     else if (pkg->type == COMPS_PACKAGE_MANDATORY)
@@ -120,31 +122,35 @@ void comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
     else
         str = "default";
     if (pkg->type != COMPS_PACKAGE_MANDATORY)
-        xmlTextWriterWriteAttribute(writer, BAD_CAST "type", BAD_CAST str);
+        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "type", BAD_CAST str);
     if (pkg->requires) {
         str = comps_object_tostr((COMPS_Object*)pkg->requires);
-        xmlTextWriterWriteAttribute(writer, (xmlChar*) "requires",
+        ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "requires",
                                             BAD_CAST str);
         free(str);
     }
+    COMPS_XMLRET_CHECK
+
     str = comps_object_tostr((COMPS_Object*)pkg->name);
-    xmlTextWriterWriteString(writer, (xmlChar*)str);
+    ret = xmlTextWriterWriteString(writer, (xmlChar*)str);
+    COMPS_XMLRET_CHECK
     free(str);
-    xmlTextWriterEndElement(writer);
+    ret = xmlTextWriterEndElement(writer);
+    COMPS_XMLRET_CHECK
 }
 
 static char* comps_docpackage_str_u(COMPS_Object* docpackage) {
-    const int len = strlen("<COMPS_DocGroupPackage name='' type='' requires=''>");
+    const size_t len = strlen("<COMPS_DocGroupPackage name='' type='' requires=''>");
     char *name = comps_object_tostr((COMPS_Object*)
                                     ((COMPS_DocGroupPackage*)docpackage)->name);
     const char *type = comps_docpackage_type_str(((COMPS_DocGroupPackage*)
                                             docpackage)->type);
     char *requires = comps_object_tostr((COMPS_Object*)
                                 ((COMPS_DocGroupPackage*)docpackage)->requires);
-    char *ret = malloc(sizeof(char)*(len + strlen(name) +
-                                           strlen(type)+
-                                           strlen(requires)+1));
-    sprintf(ret, "<COMPS_DocGroupPackage name='%s' type='%s' requires='%s'>",
+    size_t total_len = len + strlen(name) + strlen(type) + strlen(requires) + 1;
+    char *ret = malloc(sizeof(char)*(total_len));
+    
+    snprintf(ret, total_len, "<COMPS_DocGroupPackage name='%s' type='%s' requires='%s'>",
                  name, type, requires);
     free(name);
     free(requires);

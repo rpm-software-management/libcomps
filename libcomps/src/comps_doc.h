@@ -24,7 +24,7 @@
 #include "comps_objdict.h"
 #include "comps_objlist.h"
 #include "comps_utils.h"
-#include "comps_logger.h"
+#include "comps_log.h"
 #include "comps_types.h"
 #include "comps_docgroup.h"
 #include "comps_doccategory.h"
@@ -163,7 +163,7 @@
 typedef struct {
     COMPS_Object_HEAD
     COMPS_ObjDict *objects;
-    COMPS_Logger *log;
+    COMPS_Log *log;
     COMPS_Str *encoding;
     } COMPS_Doc;
 
@@ -201,9 +201,9 @@ HEAD_COMPS_DOC_ADDOBJMDICT(whiteout) /*comps_doc.h macro*/
 COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
                                                  char *desc, char *lang);
 
-void comps_doc_xml_f(COMPS_Doc* doc,  char *filename, char *enc, COMPS_Logger *log);
-char* comps_doc_xml_str(COMPS_Doc* doc, char *enc, COMPS_Logger *log);
-void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer, COMPS_Logger *log);
+void comps_doc_xml_f(COMPS_Doc* doc,  char *filename, char *enc, COMPS_Log *log);
+char* comps_doc_xml_str(COMPS_Doc* doc, char *enc, COMPS_Log *log);
+void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer);
 
 void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect);
 char* comps2xml_str(COMPS_Doc *doc);

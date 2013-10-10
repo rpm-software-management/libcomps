@@ -38,20 +38,22 @@ PyObject* PyCOMPS_toxml_f(PyObject *self, PyObject *other) {
     const char *errors = NULL;
     char *tmps;
     int i;
-    COMPS_ListItem *it;
+    COMPS_HSListItem *it;
     PyObject *ret, *tmp;
     PyCOMPS *self_comps = (PyCOMPS*)self;
 
     if (__pycomps_arg_to_char(other, &tmps)) return NULL;
     if (!self_comps->comps_doc->encoding)
        self_comps->comps_doc->encoding = comps_str("UTF-8");
-    comps_list_clear(self_comps->comps_doc->log->logger_data);
+    comps_hslist_clear(self_comps->comps_doc->log->entries);
  
     comps2xml_f(self_comps->comps_doc, tmps, 0);
     free(tmps);
 
-    ret = PyList_New(self_comps->comps_doc->log->logger_data->len);
-    for (i = 0, it = self_comps->comps_doc->log->logger_data->first;
+    for (i = 0, it = self_comps->comps_doc->log->entries->first;
+         it != NULL; it = it->next, i++);
+    ret = PyList_New(i);
+    for (i = 0, it = self_comps->comps_doc->log->entries->first;
          it != NULL; it = it->next, i++) {
         tmps = comps_log_entry_str(it->data);
         tmp = PyUnicode_DecodeUTF8(tmps, strlen(tmps), errors);
@@ -122,7 +124,7 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
                         (COMPS_Object*[]){tmpstr});
         COMPS_OBJECT_DESTROY(tmpstr);
     }
-    comps_log_destroy(self_comps->comps_doc->log);
+    COMPS_OBJECT_DESTROY(self_comps->comps_doc->log);
     self_comps->comps_doc->log = parsed->log;
     parsed->log = NULL;
 
@@ -136,7 +138,7 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
 PyObject* PyCOMPS_get_last_errors(PyObject *self, void *closure)
 {
     PyObject *ret;
-    COMPS_ListItem *it;
+    COMPS_HSListItem *it;
     char *tmps;
     PyObject *tmp;
     const char *errors = NULL;
@@ -144,9 +146,9 @@ PyObject* PyCOMPS_get_last_errors(PyObject *self, void *closure)
     (void)closure;
 
     ret = PyList_New(0);
-    for (it = ((PyCOMPS*)self)->comps_doc->log->logger_data->first;
+    for (it = ((PyCOMPS*)self)->comps_doc->log->entries->first;
          it != NULL; it = it->next) {
-        if (((COMPS_LoggerEntry*)it->data)->type == COMPS_LOG_ERROR) {
+        if (((COMPS_LogEntry*)it->data)->type == COMPS_LOG_ENTRY_ERR) {
             tmps = comps_log_entry_str(it->data);
             tmp = PyUnicode_DecodeUTF8(tmps, strlen(tmps), errors);
             PyList_Append(ret, tmp);
@@ -159,7 +161,7 @@ PyObject* PyCOMPS_get_last_errors(PyObject *self, void *closure)
 PyObject* PyCOMPS_get_last_log(PyObject *self, void *closure)
 {
     PyObject *ret;
-    COMPS_ListItem *it;
+    COMPS_HSListItem *it;
     char *tmps;
     PyObject *tmp;
     const char *errors = NULL;
@@ -167,7 +169,7 @@ PyObject* PyCOMPS_get_last_log(PyObject *self, void *closure)
     (void)closure;
 
     ret = PyList_New(0);
-    for (it = ((PyCOMPS*)self)->comps_doc->log->logger_data->first;
+    for (it = ((PyCOMPS*)self)->comps_doc->log->entries->first;
          it != NULL; it = it->next) {
         tmps = comps_log_entry_str(it->data);
         tmp = PyUnicode_DecodeUTF8(tmps, strlen(tmps), errors);
@@ -195,7 +197,7 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
     //pycomps_doc_destroy((void*)self_comps->comps);
     COMPS_OBJECT_DESTROY(self_comps->comps_doc);
     self_comps->comps_doc = parsed->comps_doc;
-    comps_log_destroy(self_comps->comps_doc->log);
+    COMPS_OBJECT_DESTROY(self_comps->comps_doc->log);
     self_comps->comps_doc->log = parsed->log;
     parsed->log = NULL;
     parsed->comps_doc = NULL;

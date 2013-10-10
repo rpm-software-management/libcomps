@@ -9,6 +9,7 @@
 #include "comps_objdict.h"
 #include "comps_objlist.h"
 #include "comps_docgroupid.h"
+#include "comps_radix.h"
 
 typedef struct {
     COMPS_Object_HEAD
@@ -49,7 +50,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
 COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
 
 void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
-                        COMPS_Logger *log);
+                        COMPS_Log *log);
 
 extern COMPS_ObjectInfo COMPS_DocEnv_ObjInfo;
 

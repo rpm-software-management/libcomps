@@ -26,7 +26,7 @@
 #include "comps_obj.h"
 #include "comps_doc.h"
 #include "comps_types.h"
-#include "comps_logger.h"
+#include "comps_log.h"
 #include "comps_elem.h"
 
 #include <expat.h>
@@ -39,7 +39,7 @@ typedef struct {
     unsigned int text_buffer_len;
     char **text_buffer_pt;
     char *tmp_buffer;
-    COMPS_Logger *log;
+    COMPS_Log *log;
     char fatal_error;
     XML_Parser parser;
     const char *enc;

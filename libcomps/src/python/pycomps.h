@@ -25,6 +25,7 @@
 #include "libcomps/comps_doc.h"
 #include "libcomps/comps_parse.h"
 #include "libcomps/comps_dict.h"
+#include "libcomps/comps_log.h"
 
 #include "pycomps_categories.h"
 #include "pycomps_groups.h"
@@ -32,6 +33,7 @@
 #include "pycomps_utils.h"
 #include "pycomps_dict.h"
 #include "pycomps_gids.h"
+
 
 #include <Python.h>
 #include "structmember.h"

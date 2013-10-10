@@ -28,7 +28,7 @@ typedef COMPS_ObjRTree COMPS_ObjDict;
 typedef COMPS_ObjMRTree COMPS_ObjMDict;
 
 COMPS_ObjDict* comps_objdict_create();
-COMPS_MDict* comps_mdict_create();
+COMPS_ObjMDict* comps_objmdict_create();
 
 
 void comps_objdict_destroy(COMPS_ObjDict *rt);
