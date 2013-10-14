@@ -212,7 +212,7 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
     return res;
 }
 
-void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
+signed char comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
                         COMPS_Log *log) {
     COMPS_ObjListIt *it;
     COMPS_Object *obj;
@@ -226,8 +226,12 @@ void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
     char *str;
     int ret;
 
-    if (category->group_ids->len == 0)
-        return;
+    if (category->group_ids->len == 0) {
+        obj = comps_doccategory_get_id(category);
+        comps_log_error(log, COMPS_ERR_PKGLIST_EMPTY, 1, obj);
+        COMPS_OBJECT_DESTROY(obj);
+        return 1;
+    }
     ret = xmlTextWriterStartElement(writer, BAD_CAST "category");
     COMPS_XMLRET_CHECK
     for (int i=0; i<6; i++) {
@@ -284,6 +288,7 @@ void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
     COMPS_XMLRET_CHECK
     ret = xmlTextWriterEndElement(writer);
     COMPS_XMLRET_CHECK
+    return 0;
 }
 
 char* comps_doccategory_tostr_u(COMPS_Object* cat) {

@@ -52,9 +52,9 @@ void comps_docpackage_set_type(COMPS_DocGroupPackage *pkg,
 void comps_docpackage_set_type_i(COMPS_DocGroupPackage *pkg, int type);
 const char* comps_docpackage_type_str(COMPS_PackageType type);
 
-void comps_docpackage_xml(COMPS_DocGroupPackage *package,
-                          xmlTextWriterPtr writer,
-                          COMPS_Log *log);
+signed char comps_docpackage_xml(COMPS_DocGroupPackage *package,
+                                 xmlTextWriterPtr writer,
+                                 COMPS_Log *log);
 
 
 extern COMPS_ObjectInfo COMPS_DocGroupPackage_ObjInfo;

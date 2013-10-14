@@ -33,6 +33,7 @@
 #include "pycomps_utils.h"
 #include "pycomps_dict.h"
 #include "pycomps_gids.h"
+#include "pycomps_exc.h"
 
 
 #include <Python.h>

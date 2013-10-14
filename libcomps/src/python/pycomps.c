@@ -38,6 +38,7 @@ PyObject* PyCOMPS_toxml_f(PyObject *self, PyObject *other) {
     const char *errors = NULL;
     char *tmps;
     int i;
+    signed char genret;
     COMPS_HSListItem *it;
     PyObject *ret, *tmp;
     PyCOMPS *self_comps = (PyCOMPS*)self;
@@ -47,7 +48,10 @@ PyObject* PyCOMPS_toxml_f(PyObject *self, PyObject *other) {
        self_comps->comps_doc->encoding = comps_str("UTF-8");
     comps_hslist_clear(self_comps->comps_doc->log->entries);
  
-    comps2xml_f(self_comps->comps_doc, tmps, 0);
+    genret = comps2xml_f(self_comps->comps_doc, tmps, 0);
+    if (genret == -1) {
+        PyErr_SetString(PyCOMPSExc_XMLGenError, "Error during generating xml");
+    }
     free(tmps);
 
     for (i = 0, it = self_comps->comps_doc->log->entries->first;
@@ -113,12 +117,7 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
     COMPS_OBJECT_DESTROY(self_comps->comps_doc);
     if (parsed->comps_doc) {
         self_comps->comps_doc = parsed->comps_doc;
-        //self_comps->comps_doc->encoding = parsed->comps_doc->encoding;
-        //parsed->comps_doc->encoding = NULL;
     } else {
-        //printf("comps error\n");
-        //self_comps->comps_doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
-        //                                                        NULL);
         tmpstr = (COMPS_Object*)comps_str("UTF-8");
         self_comps->comps_doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
                         (COMPS_Object*[]){tmpstr});
@@ -132,6 +131,10 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
     parsed->comps_doc = NULL;
     comps_parse_parsed_destroy(parsed);
 
+    if (parsed_ret == -1) {
+        PyErr_SetString(PyCOMPSExc_ParserError, "Fatal parser error");
+        return NULL;
+    }
     return PyINT_FROM_LONG((long)parsed_ret);
 }
 
@@ -202,6 +205,10 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
     parsed->log = NULL;
     parsed->comps_doc = NULL;
     comps_parse_parsed_destroy(parsed);
+    if (parsed_ret == -1) {
+        PyErr_SetString(PyCOMPSExc_ParserError, "Fatal parser error");
+        return NULL;
+    }
 
     return PyINT_FROM_LONG((long)parsed_ret);
 }
@@ -508,6 +515,13 @@ PYINIT_FUNC(void) {
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_CONDITIONAL", COMPS_PACKAGE_CONDITIONAL);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_MANDATORY", COMPS_PACKAGE_MANDATORY);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_UNKNOWN", COMPS_PACKAGE_UNKNOWN);
+
+    PyCOMPSExc_ParserError = PyErr_NewException("_libpycomps.ParserError", NULL, NULL);
+    Py_INCREF(PyCOMPSExc_ParserError);
+    PyModule_AddObject(m, "ParserError", PyCOMPSExc_ParserError);
+    PyCOMPSExc_XMLGenError = PyErr_NewException("_libpycomps.XMLGenError", NULL, NULL);
+    Py_INCREF(PyCOMPSExc_XMLGenError);
+    PyModule_AddObject(m, "XMLGenError", PyCOMPSExc_XMLGenError);
     #if PY_MAJOR_VERSION >= 3
         return m;
     #endif

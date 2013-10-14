@@ -274,7 +274,7 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     return res;
 }
 
-void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
+signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
                         COMPS_Log *log) {
     COMPS_ObjListIt *it;
     COMPS_Object *obj;
@@ -290,8 +290,12 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     char *str;
     int ret;
 
-    if (env->group_list->len == 0 && env->group_list->len == 0)
-        return;
+    if (env->group_list->len == 0 && env->group_list->len == 0) {
+        obj = comps_docenv_get_id(env);
+        comps_log_error(log, COMPS_ERR_PKGLIST_EMPTY, 1, obj);
+        COMPS_OBJECT_DESTROY(obj);
+        return 1;
+    }
     ret = xmlTextWriterStartElement(writer, BAD_CAST "environment");
     COMPS_XMLRET_CHECK
     for (int i=0; i<6; i++) {
@@ -371,6 +375,7 @@ void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     }
     ret = xmlTextWriterEndElement(writer);
     COMPS_XMLRET_CHECK
+    return 0;
 }
 
 char* comps_docenv_tostr_u(COMPS_Object* env) {

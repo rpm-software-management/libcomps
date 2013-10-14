@@ -49,8 +49,8 @@ void comps_docenv_add_optionid(COMPS_DocEnv *env,
 COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
 COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
 
-void comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
-                        COMPS_Log *log);
+signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
+                             COMPS_Log *log);
 
 extern COMPS_ObjectInfo COMPS_DocEnv_ObjInfo;
 

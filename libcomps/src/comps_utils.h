@@ -146,7 +146,7 @@ void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
 
 #define COMPS_XMLRET_CHECK if (ret == -1) {\
     comps_log_error(log, COMPS_ERR_XMLGEN, 0);\
-    return;\
+    return -1;\
 }
 
 char __comps_strcmp(void *s1, void *s2);

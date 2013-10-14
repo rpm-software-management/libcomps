@@ -26,7 +26,6 @@ const char* COMPS_LogCodeFormat[] = {
                                   " not parsed and groupid found at line:%s col:%s\n",
       [COMPS_ERR_OPTIONLIST_NOTSET] = "WARNING: '<optionlist>' subelement"
                                   " not parsed and groupid found at line:%s col:%s\n",
-      [COMPS_ERR_GROUPIDS_EMPTY] = "ERROR: Missing <groupid> elements\n",
       [COMPS_ERR_NOPARENT] = "ERROR: <%s> found with no suitable parent"
                                       " at line:%s col:%s\n",
       [COMPS_ERR_MALLOC] = "Malloc failed. Cannot continue\n",
@@ -40,6 +39,12 @@ const char* COMPS_LogCodeFormat[] = {
                                   "%s column :%s\n",
       [COMPS_ERR_NOCONTENT] = "<%s> content missing at line:%s "
                                "column:%s\n",
+      [COMPS_ERR_PKGLIST_EMPTY] = "Group with id %s has no packages."
+                                  "skipping xml output\n",
+      [COMPS_ERR_GROUPIDS_EMPTY] = "Category with id %s has no group ids."
+                                  "skipping xml output\n",
+      [COMPS_ERR_IDS_EMPTY] = "Environment with id %s has no group ids and no ."
+                                  "option ids. Skipping xml output\n"
 };
 
 void comps_log_create(COMPS_Log *log, COMPS_Object **args){

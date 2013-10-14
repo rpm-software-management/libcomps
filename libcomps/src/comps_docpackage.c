@@ -105,7 +105,7 @@ inline char comps_docpackage_cmp_set(void *pkg1, void *pkg2) {
     return comps_docpackage_cmp_u((COMPS_Object*) pkg1, (COMPS_Object*)pkg2);
 }
 
-void comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
+signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
                           xmlTextWriterPtr writer,
                           COMPS_Log *log) {
     char *str;
@@ -137,6 +137,7 @@ void comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
     free(str);
     ret = xmlTextWriterEndElement(writer);
     COMPS_XMLRET_CHECK
+    return 0;
 }
 
 static char* comps_docpackage_str_u(COMPS_Object* docpackage) {

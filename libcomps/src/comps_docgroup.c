@@ -258,7 +258,7 @@ COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,
 
 
 
-void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
+signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                         COMPS_Log *log) {
     COMPS_ObjListIt *it;
     COMPS_Object *obj;
@@ -283,9 +283,14 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                                                &comps_object_tostr,
                                                &comps_object_tostr};
     char *str;
+    int ret;
 
-    if (group->packages->len == 0)
-        return;
+    if (group->packages->len == 0) {
+        obj = comps_docgroup_get_id(group);
+        comps_log_error(log, COMPS_ERR_PKGLIST_EMPTY, 1, obj);
+        COMPS_OBJECT_DESTROY(obj);
+        return 1;
+    }
     xmlTextWriterStartElement(writer, BAD_CAST "group");
     for (int i=0; i<9; i++) {
         //printf("%s\n", props[i]);
@@ -302,26 +307,34 @@ void comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
             pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)
                                            (((char*)group)+type[i]));
             for (hsit = pairlist->first; hsit != NULL; hsit = hsit->next) {
-                xmlTextWriterStartElement(writer,
+                ret = xmlTextWriterStartElement(writer,
                             (const xmlChar*)((aliases[i])?aliases[i]:props[i]));
-                xmlTextWriterWriteAttribute(writer, (xmlChar*) BAD_CAST "xml:lang",
-                        (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
+                COMPS_XMLRET_CHECK
+
+                ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "xml:lang",
+                            (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
+                COMPS_XMLRET_CHECK
                 str = tostrf[i](((COMPS_ObjRTreePair*)hsit->data)->data);
-                xmlTextWriterWriteString(writer, (xmlChar*)str);
+                ret = xmlTextWriterWriteString(writer, (xmlChar*)str);
+                COMPS_XMLRET_CHECK
                 free(str);
-                xmlTextWriterEndElement(writer);
+                ret = xmlTextWriterEndElement(writer);
+                COMPS_XMLRET_CHECK
             }
             comps_hslist_destroy(&pairlist);
         }
     }
     //if (group->packages->len) {
-    xmlTextWriterStartElement(writer, (xmlChar*)"packagelist");
+    ret = xmlTextWriterStartElement(writer, (xmlChar*)"packagelist");
+    COMPS_XMLRET_CHECK
     for (it = group->packages->first; it != NULL; it = it->next) {
         comps_docpackage_xml((COMPS_DocGroupPackage*)it->comps_obj, writer, log);
     }
-    xmlTextWriterEndElement(writer);
-    //}
-    xmlTextWriterEndElement(writer);
+    ret = xmlTextWriterEndElement(writer);
+    COMPS_XMLRET_CHECK
+    ret = xmlTextWriterEndElement(writer);
+    COMPS_XMLRET_CHECK
+    return 0;
 }
 
 COMPS_ObjectInfo COMPS_DocGroup_ObjInfo = {

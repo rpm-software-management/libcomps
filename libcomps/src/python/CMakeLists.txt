@@ -7,12 +7,13 @@ endmacro(LIST_REPLACE)
 set (pycomps_SRC pycomps.c pycomps_sequence.c
      pycomps_envs.c pycomps_categories.c pycomps_groups.c
      pycomps_gids.c pycomps_utils.c pycomps_dict.c
-     pycomps_hash.c)
+     pycomps_hash.c pycomps_exc.c)
 
 set (pycomps_HEADERS pycomps_23macros.h pycomps_sequence.h
      pycomps_envs.h pycomps_categories.h pycomps_groups.h
      pycomps_gids.h pycomps_utils.h pycomps_dict.h
-     pycomps_hash.h pycomps_types.h)
+     pycomps_hash.h pycomps_exc.h
+     pycomps_types.h)
 
 list (LENGTH pycomps_SRC pycomps_SRCLEN)
 math (EXPR pycomps_SRCLEN "${pycomps_SRCLEN} - 1")

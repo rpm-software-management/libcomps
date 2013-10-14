@@ -203,9 +203,9 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
 
 void comps_doc_xml_f(COMPS_Doc* doc,  char *filename, char *enc, COMPS_Log *log);
 char* comps_doc_xml_str(COMPS_Doc* doc, char *enc, COMPS_Log *log);
-void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer);
+signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer);
 
-void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect);
+signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect);
 char* comps2xml_str(COMPS_Doc *doc);
 
 COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2);

@@ -148,21 +148,22 @@ COMPS_DOC_SETOBJMDICT(whiteout) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJMDICT(whiteout,  whiteout) /*comps_doc.h macro*/
 
 
-void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
+signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
     xmlDocPtr xmldoc;
     int retc;
     char *str;
+    signed char genret;
 
     //doc->log->redirect2output = stdoutredirect;
     xmlTextWriterPtr writer = xmlNewTextWriterDoc(&xmldoc, 0);
-    
+
     str = comps_object_tostr((COMPS_Object*)doc->encoding);
     retc = xmlTextWriterStartDocument(writer, NULL, str, NULL);
     free(str);
     doc->log->std_out = stdoutredirect;
     if (retc<0)
         comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
-    comps_doc_xml(doc, writer);
+    genret = comps_doc_xml(doc, writer);
     retc = xmlTextWriterEndDocument(writer);
     if (retc<0)
         comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
@@ -176,11 +177,13 @@ void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
     xmlFreeDoc(xmldoc);
     xmlCleanupParser();
     xmlMemoryDump();
+    return genret;
 }
 
 char* comps2xml_str(COMPS_Doc *doc) {
     xmlDocPtr xmldoc;
     const char *xmlstr;
+    signed char genret;
     char *str;
     char *ret;
     int retc;
@@ -194,7 +197,7 @@ char* comps2xml_str(COMPS_Doc *doc) {
     free(str);
 
     if (retc<0) comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
-    comps_doc_xml(doc, writer);
+    genret = comps_doc_xml(doc, writer);
     retc = xmlTextWriterEndDocument(writer);
     if (retc<0) comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
     xmlSaveFormatFileTo(xmlobuff, xmldoc, NULL, 1);
@@ -472,12 +475,14 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
     #undef group
 }
 
-inline void __comps_check_xml_get(int retcode, COMPS_Log * log) {
-    if (retcode<0)
+inline int __comps_check_xml_get(int retcode, COMPS_Log * log) {
+    if (retcode<0) {
         comps_log_error(log, COMPS_ERR_XMLGEN, 0);
+        return -1;
+    } return 0;
 }
 
-void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
+signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
     COMPS_ObjListIt *it;
     COMPS_ObjList *list;
     COMPS_ObjDict *dict;
@@ -486,33 +491,43 @@ void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
     COMPS_HSListItem *hsit;
     char *tmp;
     int retc;
+    signed char ret = 0, tmpret;
 
     retc = xmlTextWriterWriteDTD(writer, BAD_CAST "comps",
                                          BAD_CAST "-//Red Hat, Inc.//DTD Comps"
                                                   " info//EN",
                                          BAD_CAST "comps.dtd", NULL);
-    __comps_check_xml_get(retc, doc->log);
+    if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
 
     retc = xmlTextWriterStartElement(writer, BAD_CAST "comps");
-    __comps_check_xml_get(retc, doc->log);
+    if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
     list = comps_doc_groups(doc);
     if (list) {
         for (it = list->first; it != NULL; it = it->next) {
-            comps_docgroup_xml((COMPS_DocGroup*)it->comps_obj, writer, doc->log);
+            tmpret = comps_docgroup_xml((COMPS_DocGroup*)it->comps_obj,
+                                        writer, doc->log);
+            if (tmpret == -1) return -1;
+            else ret += tmpret;
         }
     }
     COMPS_OBJECT_DESTROY(list);
     list = comps_doc_categories(doc);
     if (list) {
         for (it = list->first; it != NULL; it = it->next) {
-            comps_doccategory_xml((COMPS_DocCategory*)it->comps_obj, writer, doc->log);
+            tmpret = comps_doccategory_xml((COMPS_DocCategory*)it->comps_obj,
+                                           writer, doc->log);
+            if (tmpret == -1) return -1;
+            else ret += tmpret;
         }
     }
     COMPS_OBJECT_DESTROY(list);
     list = comps_doc_environments(doc);
     if (list) {
         for (it = list->first; it != NULL; it = it->next) {
-            comps_docenv_xml((COMPS_DocEnv*)it->comps_obj, writer, doc->log);
+            tmpret = comps_docenv_xml((COMPS_DocEnv*)it->comps_obj,
+                                      writer, doc->log);
+            if (tmpret == -1) return -1;
+            else ret += tmpret;
         }
     }
     COMPS_OBJECT_DESTROY(list);
@@ -524,7 +539,7 @@ void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
 
         for (hsit = hslist->first; hsit != NULL; hsit = hsit->next) {
             retc = xmlTextWriterStartElement(writer, BAD_CAST "match");
-            __comps_check_xml_get(retc, doc->log);
+            if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
 
             xmlTextWriterWriteAttribute(writer, BAD_CAST "name",
                     (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
@@ -534,26 +549,26 @@ void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
             free(tmp);
 
             retc = xmlTextWriterEndElement(writer);
-            __comps_check_xml_get(retc, doc->log);
+            if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
         }
         comps_hslist_destroy(&hslist);
 
         retc = xmlTextWriterEndElement(writer);
-        __comps_check_xml_get(retc, doc->log);
+        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
     }
     COMPS_OBJECT_DESTROY(dict);
 
     mdict = comps_doc_blacklist(doc);
     if (mdict && mdict->len) {
         retc = xmlTextWriterStartElement(writer, BAD_CAST "blacklist");
-        __comps_check_xml_get(retc, doc->log);
+        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
         hslist = comps_objmrtree_pairs(mdict);
 
         for (hsit = hslist->first; hsit != NULL; hsit = hsit->next) {
             for (it = ((COMPS_ObjMRTreePair*)hsit->data)->data->first;
                  it != NULL; it = it->next) {
                 retc = xmlTextWriterStartElement(writer, BAD_CAST "package");
-                __comps_check_xml_get(retc, doc->log);
+                if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
 
                 xmlTextWriterWriteAttribute(writer, BAD_CAST "name",
                         (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
@@ -563,13 +578,13 @@ void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
                 free(tmp);
 
                 retc = xmlTextWriterEndElement(writer);
-                __comps_check_xml_get(retc, doc->log);
+                if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
             }
         }
         comps_hslist_destroy(&hslist);
 
         retc = xmlTextWriterEndElement(writer);
-        __comps_check_xml_get(retc, doc->log);
+        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
     }
     COMPS_OBJECT_DESTROY(mdict);
     mdict = comps_doc_whiteout(doc);
@@ -582,7 +597,7 @@ void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
             for (it = ((COMPS_ObjMRTreePair*)hsit->data)->data->first;
                  it != NULL; it = it->next) {
                 retc = xmlTextWriterStartElement(writer, BAD_CAST "ignoredep");
-                __comps_check_xml_get(retc, doc->log);
+                if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
 
                 xmlTextWriterWriteAttribute(writer, BAD_CAST "requires",
                         (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
@@ -592,17 +607,18 @@ void comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
                 free(tmp);
 
                 retc = xmlTextWriterEndElement(writer);
-                __comps_check_xml_get(retc, doc->log);
+                if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
             }
         }
         comps_hslist_destroy(&hslist);
 
         retc = xmlTextWriterEndElement(writer);
-        __comps_check_xml_get(retc, doc->log);
+        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
     }
     COMPS_OBJECT_DESTROY(mdict);
     retc = xmlTextWriterEndElement(writer);
-    __comps_check_xml_get(retc, doc->log);
+    if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+    return ret;
 }
 
 COMPS_ObjectInfo COMPS_Doc_ObjInfo = {

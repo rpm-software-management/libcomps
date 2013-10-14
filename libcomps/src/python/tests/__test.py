@@ -708,10 +708,10 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(len(comps2.environments) == 0)
 
         comps3 = libcomps.Comps()
-        ret = comps3.fromxml_str(compsdoc)
-        #print comps3.get_last_parse_log()
-        self.assertTrue(ret ==  -1, "%d %s" %(ret,
-                                              comps3.get_last_errors()))
+        with self.assertRaises(libcomps.ParserError):
+            ret = comps3.fromxml_str(compsdoc)
+            self.assertTrue(ret ==  -1, "%d %s" %(ret,
+                                                  comps3.get_last_errors()))
         self.assertTrue(len(comps3.groups) == 3)
         self.assertTrue(len(comps3.categories) == 2)
         self.assertTrue(len(comps3.environments) == 0)
@@ -851,8 +851,9 @@ class COMPSTest(unittest.TestCase):
     #@unittest.skip("")
     def test_gz(self):
         comps = libcomps.Comps()
-        ret = comps.fromxml_f("sample_comps2.xml.gz")
-        self.assertTrue(ret == -1)
+        with self.assertRaises(IOError):
+            ret = comps.fromxml_f("sample_comp2.xml.gz")
+            self.assertTrue(ret == -1)
 
     #@unittest.skip("")
     def test_a_inoptid(self):

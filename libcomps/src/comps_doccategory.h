@@ -65,8 +65,9 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
 COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
                                                COMPS_DocCategory *c2);
 
-void comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
-                        COMPS_Log *log);
+signed char comps_doccategory_xml(COMPS_DocCategory *category,
+                                  xmlTextWriterPtr writer,
+                                  COMPS_Log *log);
 
 extern COMPS_ObjectInfo COMPS_DocCategory_ObjInfo;
 
