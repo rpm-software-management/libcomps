@@ -47,11 +47,19 @@ typedef struct {
 } PyCOMPS_GetSetClosure;
 
 typedef struct {
+    PyTypeObject * type;
+    size_t pobj_offset;
+    COMPS_ObjDict *(*get_f)(COMPS_Doc*);
+    void (*set_f)(COMPS_Doc*, COMPS_ObjDict*);
+} PyCOMPS_DGetSetClosure;
+
+typedef struct {
     PyObject_HEAD
     COMPS_Doc * comps_doc;
     PyObject *p_groups;
     PyObject *p_categories;
     PyObject *p_environments;
+    PyObject *p_langpacks;
 } PyCOMPS;
 
 PyCOMPS_GetSetClosure * get_closure(void * closure);

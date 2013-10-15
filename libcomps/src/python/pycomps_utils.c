@@ -219,9 +219,9 @@ PyObject* __PyCOMPS_get_dict(PyObject *self, void *closure) {
     COMPS_ObjDict * dict;
 
     if (!ret) {
-        ret = (PyCOMPS_Dict*)PyCOMPS_DictType.tp_new(&PyCOMPS_DictType,
-                                                          NULL, NULL);
-        PyCOMPS_DictType.tp_init((PyObject*)ret, NULL, NULL);
+        ret = (PyCOMPS_Dict*)PyCOMPSDict_new(_closure_->dict_type, NULL, NULL);
+        ret->it_info = _closure_->dict_info;
+        //_closure_->dict_type->tp_init((PyObject*)ret, NULL, NULL);
         COMPS_OBJECT_DESTROY(ret->dict);
         c_obj = (COMPS_Object*) GET_FROM(self, _closure_->c_offset);
         dict = (COMPS_ObjDict*) GET_FROM(c_obj, _closure_->dict_offset);
@@ -242,10 +242,19 @@ int __PyCOMPS_set_dict(PyObject *self, PyObject *value, void *closure) {
         PyErr_SetString(PyExc_TypeError, "Cannot delete attribute option_ids");
         return -1;
     }
-    if (Py_TYPE(value) != &PyCOMPS_DictType) {
-        PyErr_Format(PyExc_TypeError, "Not %s instance", PyCOMPS_DictType.tp_name);
+    if (Py_TYPE(value) != _closure_->dict_type) {
+        PyErr_Format(PyExc_TypeError, "%s not %s instance",
+                                  Py_TYPE(value)->tp_name,
+                                  _closure_->dict_type->tp_name);
         return -1;
     }
+    /*} else {
+        PyErr_Format(PyExc_TypeError, "1 %s not %s instance",
+                                  Py_TYPE(value)->tp_name,
+                                  _closure_->dict_type->tp_name);
+        return -1;
+    }*/
+
     c_obj = (COMPS_Object*) GET_FROM(self, _closure_->c_offset);
     dict = (COMPS_ObjDict*) GET_FROM(c_obj, _closure_->dict_offset);
     COMPS_OBJECT_DESTROY(dict);

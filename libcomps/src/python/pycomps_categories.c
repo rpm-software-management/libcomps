@@ -264,13 +264,17 @@ __COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocCategory) DocCategory_DispOrdClosure = {
 __COMPS_DICT_GETSET_CLOSURE(COMPS_DocCategory) DocCategory_NameByLangClosure = {
     .c_offset = offsetof(PyCOMPS_Category, cat),
     .p_offset = offsetof(PyCOMPS_Category, p_name_by_lang),
-    .dict_offset = offsetof(COMPS_DocCategory, name_by_lang)
+    .dict_offset = offsetof(COMPS_DocCategory, name_by_lang),
+    .dict_info = &PyCOMPS_StrDictInfo,
+    .dict_type = &PyCOMPS_StrDictType
 };
 
 __COMPS_DICT_GETSET_CLOSURE(COMPS_DocCategory) DocCategory_DescByLangClosure = {
     .c_offset = offsetof(PyCOMPS_Category, cat),
     .p_offset = offsetof(PyCOMPS_Category, p_desc_by_lang),
-    .dict_offset = offsetof(COMPS_DocCategory, desc_by_lang)
+    .dict_offset = offsetof(COMPS_DocCategory, desc_by_lang),
+    .dict_info = &PyCOMPS_StrDictInfo,
+    .dict_type = &PyCOMPS_StrDictType
 };
 
 PyMemberDef PyCOMPSCat_members[] = {
@@ -364,9 +368,9 @@ PyObject* comps_cats_out(COMPS_Object *cobj) {
     return (PyObject*)ret;
 }
 
-PyCOMPS_SeqInfo PyCOMPS_CatsInfo = {
+PyCOMPS_ItemInfo PyCOMPS_CatsInfo = {
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_CatType},
-    .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
+    .in_convert_funcs = (PyCOMPS_in_itemconvert[])
                         {&comps_cats_in},
     .out_convert_func = &comps_cats_out,
     .item_types_len = 1,

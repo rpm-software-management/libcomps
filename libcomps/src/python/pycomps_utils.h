@@ -25,6 +25,7 @@
 
 #include "pycomps_types.h"
 #include "pycomps_23macros.h"
+#include "pycomps_dict.h"
 
 #include "libcomps/comps_objdict.h"
 #include "libcomps/comps_objlist.h"
@@ -56,6 +57,8 @@ typedef struct {
     size_t p_offset;
     size_t c_offset;
     size_t dict_offset;
+    PyCOMPS_ItemInfo *dict_info;
+    PyTypeObject *dict_type;
 } __PyCOMPS_DictGetSetClosure;
 
 #define __H_COMPS_NUMPROP_GETSET_CLOSURE(C_TYPE)\
@@ -97,6 +100,8 @@ typedef struct {\
     size_t p_offset;\
     size_t c_offset;\
     size_t dict_offset;\
+    PyCOMPS_ItemInfo *dict_info;\
+    PyTypeObject *dict_type;\
 } CONCAT(CONCAT(PyCOMPS_, C_TYPE), _DictGetSetClosure);
 
 #define __COMPS_DICT_GETSET_CLOSURE(C_TYPE)\

@@ -23,21 +23,21 @@
 #include "libcomps/comps_objlist.h"
 #include "libcomps/comps_objdict.h"
 
-typedef COMPS_Object* (*PyCOMPSSeq_in_itemconvert)(PyObject*);
-typedef PyObject* (*PyCOMPSSeq_out_itemconvert)(COMPS_Object*);
+typedef COMPS_Object* (*PyCOMPS_in_itemconvert)(PyObject*);
+typedef PyObject* (*PyCOMPS_out_itemconvert)(COMPS_Object*);
 
-typedef struct PyCOMPS_SeqInfo {
+typedef struct PyCOMPS_ItemInfo {
     PyTypeObject ** itemtypes;
-    PyCOMPSSeq_in_itemconvert *in_convert_funcs;
-    PyCOMPSSeq_out_itemconvert out_convert_func;
+    PyCOMPS_in_itemconvert *in_convert_funcs;
+    PyCOMPS_out_itemconvert out_convert_func;
     unsigned item_types_len;
     size_t props_offset;
-} PyCOMPS_SeqInfo;
+} PyCOMPS_ItemInfo;
 
 typedef struct PyCOMPS_Sequence {
     PyObject_HEAD
     COMPS_ObjList *list;
-    PyCOMPS_SeqInfo *it_info;
+    PyCOMPS_ItemInfo *it_info;
 } PyCOMPS_Sequence;
 
 typedef struct PyCOMPS_SeqIter{
@@ -49,6 +49,7 @@ typedef struct PyCOMPS_SeqIter{
 typedef struct PyCOMPS_Dict {
     PyObject_HEAD
     COMPS_ObjDict *dict;
+    PyCOMPS_ItemInfo *it_info;
 } PyCOMPS_Dict;
 
 typedef struct PyCOMPS_DictIter{

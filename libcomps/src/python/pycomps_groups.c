@@ -310,13 +310,17 @@ __COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_DispOrdClosure = {
 __COMPS_DICT_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_NameByLangClosure = {
     .c_offset = offsetof(PyCOMPS_Group, group),
     .p_offset = offsetof(PyCOMPS_Group, p_name_by_lang),
-    .dict_offset = offsetof(COMPS_DocGroup, name_by_lang)
+    .dict_offset = offsetof(COMPS_DocGroup, name_by_lang),
+    .dict_info = &PyCOMPS_StrDictInfo,
+    .dict_type = &PyCOMPS_StrDictType
 };
 
 __COMPS_DICT_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_DescByLangClosure = {
     .c_offset = offsetof(PyCOMPS_Group, group),
     .p_offset = offsetof(PyCOMPS_Group, p_desc_by_lang),
-    .dict_offset = offsetof(COMPS_DocGroup, desc_by_lang)
+    .dict_offset = offsetof(COMPS_DocGroup, desc_by_lang),
+    .dict_info = &PyCOMPS_StrDictInfo,
+    .dict_type = &PyCOMPS_StrDictType
 };
 
 __COMPS_LIST_GETSET_CLOSURE(COMPS_DocGroup) DocGroup_Packages = {
@@ -358,7 +362,7 @@ PyGetSetDef PyCOMPSGroup_getset[] = {
      "Group name locales", &DocGroup_NameByLangClosure},
     {"desc_by_lang",
     (getter)__PyCOMPS_get_dict, (setter)__PyCOMPS_set_dict,
-     "Group name locales", &DocGroup_DescByLangClosure},
+     "Group description locales", &DocGroup_DescByLangClosure},
     {NULL}  /* Sentinel */
 };
 
@@ -420,9 +424,9 @@ PyObject* comps_groups_out(COMPS_Object *cobj) {
     return (PyObject*)ret;
 }
 
-PyCOMPS_SeqInfo PyCOMPS_GroupsInfo = {
+PyCOMPS_ItemInfo PyCOMPS_GroupsInfo = {
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_GroupType},
-    .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
+    .in_convert_funcs = (PyCOMPS_in_itemconvert[])
                         {&comps_groups_in},
     .out_convert_func = &comps_groups_out,
     .item_types_len = 1,
@@ -575,9 +579,9 @@ PyObject* comps_pkgs_out(COMPS_Object *cobj) {
     return (PyObject*)ret;
 }
 
-PyCOMPS_SeqInfo PyCOMPS_PkgsInfo = {
+PyCOMPS_ItemInfo PyCOMPS_PkgsInfo = {
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_PackType},
-    .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
+    .in_convert_funcs = (PyCOMPS_in_itemconvert[])
                         {&comps_pkgs_in},
     .out_convert_func = &comps_pkgs_out,
     .item_types_len = 1

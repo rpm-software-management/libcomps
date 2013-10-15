@@ -23,10 +23,10 @@
 #include "libcomps/comps_doc.h"
 #include "libcomps/comps_objdict.h"
 
+//#include "pycomps_types.h"
 #include "pycomps_utils.h"
-#include "pycomps_ctopy.h"
 
-#include "Python.h"
+#include <Python.h>
 #include "structmember.h"
 
 
@@ -43,6 +43,11 @@ int PyCOMPSDictIter_init(PyCOMPS_DictIter *self, PyObject *args, PyObject *kwds)
 void PyCOMPSDictIter_dealloc(PyCOMPS_DictIter *self);
 PyObject* PyCOMPSDict_iternext(PyObject *iter_o);
 
+COMPS_Object* __pycomps_unicode_in(PyObject *obj);
+COMPS_Object* __pycomps_bytes_in(PyObject *pobj);
+PyObject* __pycomps_str_out(COMPS_Object *obj);
 
+extern PyTypeObject PyCOMPS_StrDictType;
+extern PyCOMPS_ItemInfo PyCOMPS_StrDictInfo;
 
 #endif

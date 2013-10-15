@@ -267,13 +267,17 @@ __COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_DispOrdClosure = {
 __COMPS_DICT_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_NameByLangClosure = {
     .c_offset = offsetof(PyCOMPS_Env, env),
     .p_offset = offsetof(PyCOMPS_Env, p_name_by_lang),
-    .dict_offset = offsetof(COMPS_DocEnv, name_by_lang)
+    .dict_offset = offsetof(COMPS_DocEnv, name_by_lang),
+    .dict_info = &PyCOMPS_StrDictInfo,
+    .dict_type = &PyCOMPS_StrDictType
 };
 
 __COMPS_DICT_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_DescByLangClosure = {
     .c_offset = offsetof(PyCOMPS_Env, env),
     .p_offset = offsetof(PyCOMPS_Env, p_desc_by_lang),
-    .dict_offset = offsetof(COMPS_DocEnv, desc_by_lang)
+    .dict_offset = offsetof(COMPS_DocEnv, desc_by_lang),
+    .dict_info = &PyCOMPS_StrDictInfo,
+    .dict_type = &PyCOMPS_StrDictType
 };
 
 __COMPS_LIST_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_GroupIdsClosure = {
@@ -380,9 +384,9 @@ PyObject* comps_envs_out(COMPS_Object *cobj) {
     return (PyObject*)ret;
 }
 
-PyCOMPS_SeqInfo PyCOMPS_EnvsInfo = {
+PyCOMPS_ItemInfo PyCOMPS_EnvsInfo = {
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_EnvType},
-    .in_convert_funcs = (PyCOMPSSeq_in_itemconvert[])
+    .in_convert_funcs = (PyCOMPS_in_itemconvert[])
                         {&comps_envs_in},
     .out_convert_func = &comps_envs_out,
     .item_types_len = 1,

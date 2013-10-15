@@ -33,6 +33,9 @@
 inline PyCOMPS_GetSetClosure * get_closure(void * closure) {
     return ((PyCOMPS_GetSetClosure*)closure);
 }
+inline PyCOMPS_DGetSetClosure * get_dclosure(void * closure) {
+    return ((PyCOMPS_DGetSetClosure*)closure);
+}
 
 PyObject* PyCOMPS_toxml_f(PyObject *self, PyObject *other) {
     const char *errors = NULL;
@@ -161,6 +164,7 @@ PyObject* PyCOMPS_get_last_errors(PyObject *self, void *closure)
     }
     return ret;
 }
+
 PyObject* PyCOMPS_get_last_log(PyObject *self, void *closure)
 {
     PyObject *ret;
@@ -231,6 +235,24 @@ PyObject* PyCOMPS_get_(PyCOMPS *self, void *closure) {
     return ret;
 }
 
+PyObject* PyCOMPS_dget_(PyCOMPS *self, void *closure) {
+    PyObject *ret;
+    COMPS_ObjDict *dict;
+
+    if (!(PyObject*)GET_FROM(self, get_dclosure(closure)->pobj_offset)) {
+        ret = PyCOMPSDict_new(get_dclosure(closure)->type, NULL, NULL);
+        Py_TYPE(ret)->tp_init(ret, NULL, NULL);
+        dict = get_dclosure(closure)->get_f(self->comps_doc);
+        COMPS_OBJECT_DESTROY(((PyCOMPS_Dict*)ret)->dict);
+        ((PyCOMPS_Dict*)ret)->dict = dict;
+        SET_TO(self, get_dclosure(closure)->pobj_offset, ret)
+    } else {
+        ret = (PyObject*)GET_FROM(self, get_dclosure(closure)->pobj_offset);
+    }
+    Py_INCREF(ret);
+    return ret;
+}
+
 int PyCOMPS_set_(PyCOMPS *self, PyObject *val, void *closure) {
     //COMPS_ObjList *list;
 
@@ -249,6 +271,24 @@ int PyCOMPS_set_(PyCOMPS *self, PyObject *val, void *closure) {
     return 0;
 }
 
+int PyCOMPS_dset_(PyCOMPS *self, PyObject *val, void *closure) {
+    //COMPS_ObjList *list;
+
+    if (Py_TYPE(val) != get_dclosure(closure)->type) {
+        PyErr_Format(PyExc_TypeError, "Not %s instance",
+                     get_dclosure(closure)->type->tp_name);
+        return -1;
+    }
+    if ((PyObject*)GET_FROM(self, get_dclosure(closure)->pobj_offset)){
+        Py_DECREF((PyObject*)GET_FROM(self, get_dclosure(closure)->pobj_offset));
+        SET_TO(self, get_dclosure(closure)->pobj_offset, NULL);
+    }
+    get_dclosure(closure)->set_f(self->comps_doc, ((PyCOMPS_Dict*)val)->dict);
+    SET_TO(self, get_dclosure(closure)->pobj_offset, val);
+    Py_INCREF(val);
+    return 0;
+}
+
 PyCOMPS_GetSetClosure envs_closure = {&PyCOMPS_EnvsType,
                                       offsetof(PyCOMPS, p_environments),
                                       &comps_doc_environments,
@@ -261,6 +301,11 @@ PyCOMPS_GetSetClosure cats_closure = {&PyCOMPS_CatsType,
                                       offsetof(PyCOMPS, p_categories),
                                       &comps_doc_categories,
                                       &comps_doc_set_categories};
+PyCOMPS_DGetSetClosure langpacks_closure = {&PyCOMPS_StrDictType,
+                                      offsetof(PyCOMPS, p_langpacks),
+                                      &comps_doc_langpacks,
+                                      &comps_doc_set_langpacks};
+
 PyGetSetDef PyCOMPS_getset[] = {
     {"categories",
      (getter)PyCOMPS_get_, (setter)PyCOMPS_set_,
@@ -271,6 +316,9 @@ PyGetSetDef PyCOMPS_getset[] = {
     {"environments",
      (getter)PyCOMPS_get_, (setter)PyCOMPS_set_,
      "COMPS list of environments", &envs_closure},
+    {"langpacks",
+     (getter)PyCOMPS_get_, (setter)PyCOMPS_set_,
+     "COMPS list of langpacks", &langpacks_closure},
     {NULL}  /* Sentinel */
 };
 
@@ -471,7 +519,7 @@ PYINIT_FUNC(void) {
     if (PyType_Ready(&PyCOMPS_PackType) < 0 ) {
         MODINIT_RET_NONE;
     }
-    if (PyType_Ready(&PyCOMPS_DictType) < 0 ) {
+    if (PyType_Ready(&PyCOMPS_StrDictType) < 0 ) {
         MODINIT_RET_NONE;
     }
     if (PyType_Ready(&PyCOMPS_SeqIterType) < 0 ) {
@@ -507,8 +555,8 @@ PYINIT_FUNC(void) {
     PyModule_AddObject(m, "Environment", (PyObject*) &PyCOMPS_EnvType);
     Py_INCREF(&PyCOMPS_EnvsType);
     PyModule_AddObject(m, "EnvList", (PyObject*) &PyCOMPS_EnvsType);
-    Py_INCREF(&PyCOMPS_DictType);
-    PyModule_AddObject(m, "Dict", (PyObject*) &PyCOMPS_DictType);
+    Py_INCREF(&PyCOMPS_StrDictType);
+    PyModule_AddObject(m, "StrDict", (PyObject*) &PyCOMPS_StrDictType);
 
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_DEFAULT", COMPS_PACKAGE_DEFAULT);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_OPTIONAL", COMPS_PACKAGE_OPTIONAL);

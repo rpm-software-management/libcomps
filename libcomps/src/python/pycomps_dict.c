@@ -92,9 +92,7 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
             return NULL;
         }
         tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
-        printf("Dict_str val:%s\n", tmpstr);
         tmpval = __pycomps_lang_decode(tmpstr);
-        printf("after decode\n");
         free(tmpstr);
         if (!tmpval) {
             PyErr_SetString(PyExc_TypeError, "val convert error");
@@ -114,9 +112,9 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
         return NULL;
     }
     tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
-    printf("Dict_str val:%s\n", tmpstr);
+    //printf("Dict_str val:%s\n", tmpstr);
     tmpval = __pycomps_lang_decode(tmpstr);
-    printf("after decode\n");
+    //printf("after decode\n");
     free(tmpstr);
     if (!tmpval) {
         //PyErr_SetString(PyExc_TypeError, "val convert error");
@@ -184,8 +182,8 @@ PyObject* PyCOMPSDict_cmp(PyObject *self, PyObject *other, int op) {
                                           hsit2 = hsit2->next) {
         if (strcmp(((COMPS_ObjRTreePair*)hsit->data)->key,
                     ((COMPS_ObjRTreePair*)hsit2->data)->key) ||
-            strcmp((char*)((COMPS_RTreePair*)hsit->data)->data,
-                   (char*)((COMPS_RTreePair*)hsit->data)->data)) {
+            !comps_object_cmp(((COMPS_ObjRTreePair*)hsit->data)->data,
+                             ((COMPS_ObjRTreePair*)hsit->data)->data)) {
             comps_hslist_destroy(&pairlist);
             comps_hslist_destroy(&pairlist2);
             if (op == Py_EQ)
@@ -233,40 +231,43 @@ PyObject* PyCOMPSDict_get(PyObject *self, PyObject *key) {
     }
     else {
         free(ckey);
-        ckey = comps_object_tostr(val);
+        ret = ((PyCOMPS_Dict*)self)->it_info->out_convert_func(val);
         COMPS_OBJECT_DESTROY(val);
-        ret = PyUnicode_FromString(ckey);
-        free(ckey);
         return ret;
     }
 }
 
 int PyCOMPSDict_set(PyObject *self, PyObject *key, PyObject *val) {
-    char *ckey, *cval;
-
+    #define _dict_ ((PyCOMPS_Dict*)self)
+    char *ckey;
+    COMPS_Object *ret = NULL;
+    for (unsigned i = 0; i < _dict_->it_info->item_types_len; i++) {
+        if (Py_TYPE(val) != _dict_->it_info->itemtypes[i])
+            continue;
+        if (_dict_->it_info->in_convert_funcs[i]) {
+            ret = _dict_->it_info->in_convert_funcs[i](val);
+            break;
+        }
+    }
     if (__pycomps_stringable_to_char(key, &ckey)) {
         return -1;
     }
 
-    if (val != NULL) {
-        if (__pycomps_stringable_to_char(val, &cval)) {
-            return -1;
-        }
-        if (!ckey) {
-            return -1;
-        }
-        if (!cval) {
-            return -1;
-        }
-        //printf("dict set %s %s");
-        comps_objdict_set_x(((PyCOMPS_Dict*)self)->dict, ckey,
-                          (COMPS_Object*)comps_str_x(cval));
-    } else {
+    if (!ret && val) {
+        PyErr_Format(PyExc_TypeError, "Cannot set %s to %s",
+                     Py_TYPE(val)->tp_name,
+                     Py_TYPE(self)->tp_name);
+        free(ckey);
+        return -1;
+    } else if (val) {
+        comps_objdict_set_x(((PyCOMPS_Dict*)self)->dict, ckey, ret);
+    } else if (!val){
         comps_objdict_unset(((PyCOMPS_Dict*)self)->dict, ckey);
     }
     free(ckey);
 
     return 0;
+    #undef _dict_
 }
 
 PyObject* PyCOMPSDict_has_key(PyObject * self, PyObject *key) {
@@ -465,3 +466,88 @@ PyTypeObject PyCOMPS_DictIterType = {
     (initproc)PyCOMPSDictIter_init,  /* tp_init */
     0,                              /* tp_alloc */
     PyCOMPSDictIter_new,             /* tp_new */};
+
+
+PyMemberDef PyCOMPSStrDict_members[] = {
+    {NULL}};
+
+PyMethodDef PyCOMPSStrDict_methods[] = {
+    {NULL}  /* Sentinel */
+};
+
+COMPS_Object* __pycomps_unicode_in(PyObject *obj) {
+    char *tmp;
+    __pycomps_PyUnicode_AsString(obj, &tmp);
+    return (COMPS_Object*)comps_str_x(tmp);
+}
+
+COMPS_Object* __pycomps_bytes_in(PyObject *pobj) {
+    COMPS_Object *cobj;
+    cobj = (COMPS_Object*)comps_str(PyBytes_AsString(pobj));
+    return cobj;
+}
+
+PyObject* __pycomps_str_out(COMPS_Object *obj) {
+    char *tmp;
+    PyObject *ret;
+    tmp = comps_object_tostr(obj);
+    ret = PyUnicode_FromString(tmp);
+    free(tmp);
+    return ret;
+}
+
+PyCOMPS_ItemInfo PyCOMPS_StrDictInfo = {
+    .itemtypes = (PyTypeObject*[]){&PyUnicode_Type, &PyBytes_Type},
+    .in_convert_funcs = (PyCOMPS_in_itemconvert[])
+                        {&__pycomps_unicode_in, &__pycomps_bytes_in},
+    .out_convert_func = &__pycomps_str_out,
+    .item_types_len = 2
+};
+
+int PyCOMPSStrDict_init(PyCOMPS_Dict *self, PyObject *args, PyObject *kwds)
+{
+    (void)args;
+    (void)kwds;
+    self->it_info = &PyCOMPS_StrDictInfo;
+    return 0;
+}
+
+PyTypeObject PyCOMPS_StrDictType = {
+    PY_OBJ_HEAD_INIT
+    "libcomps.StrDict",            /*tp_name*/
+    sizeof(PyCOMPS_Dict),       /*tp_basicsize*/
+    0,                          /*tp_itemsize*/
+    0,                          /*tp_dealloc*/
+    0,                          /*tp_print*/
+    0,                          /*tp_getattr*/
+    0,                          /*tp_setattr*/
+    0,                          /*tp_compare*/
+    0,                          /*tp_repr*/
+    0,                          /*tp_as_number*/
+    0,                          /*tp_as_sequence*/
+    0,                          /*tp_as_mapping*/
+    0,                          /*tp_hash */
+    0,                          /*tp_call*/
+    0,                          /*tp_str*/
+    0,                          /*tp_getattro*/
+    0,                          /*tp_setattro*/
+    0,                          /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_TYPE_SUBCLASS,        /*tp_flags*/
+    "Comps Str Dict",               /* tp_doc */
+    0,                          /* tp_traverse */
+    0,                          /* tp_clear */
+    0,                          /* tp_richcompare */
+    0,                          /* tp_weaklistoffset */
+    0,                          /* tp_iter */
+    0,                          /* tp_iternext */
+    PyCOMPSStrDict_methods,        /* tp_methods */
+    PyCOMPSStrDict_members,        /* tp_members */
+    0,                          /* tp_getset */
+    &PyCOMPS_DictType,           /* tp_base */
+    0,                          /* tp_dict */
+    0,                          /* tp_descr_get */
+    0,                          /* tp_descr_set */
+    0,                          /* tp_dictoffset */
+    (initproc)PyCOMPSStrDict_init,      /* tp_init */
+    0,                               /* tp_alloc */
+    PyCOMPSDict_new,                 /* tp_new */};
