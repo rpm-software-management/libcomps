@@ -971,15 +971,21 @@ class COMPSTest(unittest.TestCase):
                      "hardware-support", "printing", "firefox",
                      "guest-desktop-agents", "gnome-desktop")
 
-        self.assertItemsEqual((id_.name for id_ in env.group_ids),
+        if hasattr(self, "assertItemsEqual"):
+            _f = self.assertItemsEqual
+        else:
+            _f = self.assertSequenceEqual
+
+
+        _f([id_.name for id_ in env.group_ids],
                               group_ids)
-        self.assertItemsEqual((id_.default for id_ in env.group_ids),
+        _f([id_.default for id_ in env.group_ids],
                               (False, False, False, False,
                               False, False, False, False,
                               False, False, False, False))
         option_ids = ("libreoffice", "gnome-games", "epiphany", "3d-printing")
 
-        self.assertItemsEqual((x.name for x in env.option_ids), option_ids)
+        _f([x.name for x in env.option_ids], option_ids)
 
 if __name__ == "__main__":
     unittest.main(testRunner = MyRunner)

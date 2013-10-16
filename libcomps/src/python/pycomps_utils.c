@@ -296,7 +296,7 @@ int __PyCOMPS_set_dict(PyObject *self, PyObject *value, void *closure) {
 
 int __PyCOMPS_set_strattr(PyObject *self, PyObject *val, void *closure) {
     #define _closure_ ((__PyCOMPS_StrPropGetSetClosure*)closure)
-    char *tmp;
+    char *tmp = NULL;
     COMPS_Object *obj;
     if (__pycomps_stringable_to_char(val, &tmp) < 0) {
         return -1;

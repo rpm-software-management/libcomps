@@ -57,7 +57,8 @@ inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
     COMPS_Object *tmpstr;
 
     if (PyUnicode_Check(id)) {
-        if (!__pycomps_stringable_to_char(id, &strid)) {
+        if (__pycomps_stringable_to_char(id, &strid)) {
+            printf("stringable to char fail\n");
             return NULL;
         }
     } else if (PyBytes_Check(id)){
