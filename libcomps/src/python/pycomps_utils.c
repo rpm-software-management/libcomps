@@ -24,7 +24,7 @@ PyObject* __pycomps_dict_key_out(COMPS_HSListItem *hsit) {
 }
 
 COMPS_Object* __pycomps_unicode_in(PyObject *obj) {
-    char *tmp;
+    char *tmp = NULL;
     __pycomps_PyUnicode_AsString(obj, &tmp);
     return (COMPS_Object*)comps_str_x(tmp);
 }

@@ -80,7 +80,13 @@ popd
 
 
 %check devel
-    make test
+    make ctest
+
+%check python-libcomps
+    make pytest
+
+%check python3-libcomps
+    make pytest
 
 %install
 make install DESTDIR=%{buildroot}
