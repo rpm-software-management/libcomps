@@ -79,14 +79,11 @@ make %{?_smp_mflags} docs
 popd
 
 
-%check devel
-    make ctest
-
-%check python-libcomps
-    make pytest
-
-%check python3-libcomps
-    make pytest
+%check
+make test
+pushd py3
+make pytest
+popd
 
 %install
 make install DESTDIR=%{buildroot}

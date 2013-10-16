@@ -745,14 +745,12 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(x == y)
         os.remove(fname)
 
-    #@unittest.skip("")
+    @unittest.skip("")
     def test_fedora(self):
         comps = libcomps.Comps()
         ret = comps.fromxml_f("fedora_comps.xml")
         #for x in comps.get_last_parse_log():
         #    print x
-        print comps.blacklist
-        return
         self.assertTrue(ret != -1)
         comps.xml_f("fed2.xml")
         comps2 = libcomps.Comps()
