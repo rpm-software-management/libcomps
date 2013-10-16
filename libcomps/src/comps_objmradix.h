@@ -69,6 +69,7 @@ COMPS_ObjList * comps_objmrtree_get(COMPS_ObjMRTree * rt, const char * key);
 void comps_objmrtree_unset(COMPS_ObjMRTree *rt, const char *key);
 void comps_objmrtree_clear(COMPS_ObjMRTree *rt);
 
+COMPS_HSList * comps_objmrtree_values(COMPS_ObjMRTree * rt);
 void comps_objmrtree_values_walk(COMPS_ObjMRTree *rt, void *udata,
                               void (*walk_f)(void*, void*));
 COMPS_ObjMRTree * comps_objmrtree_clone(COMPS_ObjMRTree *rt);

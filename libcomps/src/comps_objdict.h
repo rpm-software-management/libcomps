@@ -56,6 +56,7 @@ void comps_objdict_clear(COMPS_ObjDict * rt);
 void comps_objmdict_clear(COMPS_ObjMDict * rt);
 
 COMPS_HSList * comps_objdict_values(COMPS_ObjDict * rt);
+COMPS_HSList * comps_objmdict_values(COMPS_ObjMDict * rt);
 
 void comps_objdict_values_walk(COMPS_ObjRTree * rt, void* udata,
                               void (*walk_f)(void*, COMPS_Object*));
@@ -71,6 +72,7 @@ void* comps_objmdict_clone_v(void *rt);
 COMPS_HSList* comps_objmdict_keys(COMPS_ObjMDict *rt);
 COMPS_HSList* comps_objdict_keys(COMPS_ObjDict *rt);
 COMPS_HSList* comps_objdict_pairs(COMPS_ObjDict *rt);
+COMPS_HSList* comps_objmdict_pairs(COMPS_ObjMDict *rt);
 //void comps_mdict_unite(COMPS_MDict *d1, COMPS_MDict *d2);
 COMPS_ObjDict* comps_objdict_union(COMPS_ObjDict *d1, COMPS_ObjDict *d2);
 

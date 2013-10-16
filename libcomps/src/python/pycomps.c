@@ -30,13 +30,6 @@
                              0,
 #endif
 
-inline PyCOMPS_GetSetClosure * get_closure(void * closure) {
-    return ((PyCOMPS_GetSetClosure*)closure);
-}
-inline PyCOMPS_DGetSetClosure * get_dclosure(void * closure) {
-    return ((PyCOMPS_DGetSetClosure*)closure);
-}
-
 PyObject* PyCOMPS_toxml_f(PyObject *self, PyObject *other) {
     const char *errors = NULL;
     char *tmps;
@@ -218,75 +211,128 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
 }
 
 PyObject* PyCOMPS_get_(PyCOMPS *self, void *closure) {
+    #define _closure_ ((PyCOMPS_GetSetClosure*)closure)
+
     PyObject *ret;
     COMPS_ObjList *list;
 
-    if (!(PyObject*)GET_FROM(self, get_closure(closure)->pobj_offset)) {
-        ret = PyCOMPSSeq_new(get_closure(closure)->type, NULL, NULL);
+    if (!(PyObject*)GET_FROM(self, _closure_->pobj_offset)) {
+        ret = PyCOMPSSeq_new(_closure_->type, NULL, NULL);
         Py_TYPE(ret)->tp_init(ret, NULL, NULL);
-        list = get_closure(closure)->get_f(self->comps_doc);
+        list = _closure_->get_f(self->comps_doc);
         COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)ret)->list);
         ((PyCOMPS_Sequence*)ret)->list = list;
-        SET_TO(self, get_closure(closure)->pobj_offset, ret)
+        SET_TO(self, _closure_->pobj_offset, ret)
     } else {
-        ret = (PyObject*)GET_FROM(self, get_closure(closure)->pobj_offset);
+        ret = (PyObject*)GET_FROM(self, _closure_->pobj_offset);
     }
     Py_INCREF(ret);
     return ret;
+
+    #undef _closure_
 }
 
 PyObject* PyCOMPS_dget_(PyCOMPS *self, void *closure) {
+    #define _closure_ ((PyCOMPS_DGetSetClosure*)closure)
+
     PyObject *ret;
     COMPS_ObjDict *dict;
 
-    if (!(PyObject*)GET_FROM(self, get_dclosure(closure)->pobj_offset)) {
-        ret = PyCOMPSDict_new(get_dclosure(closure)->type, NULL, NULL);
+    if (!(PyObject*)GET_FROM(self, _closure_->pobj_offset)) {
+        ret = PyCOMPSDict_new(_closure_->type, NULL, NULL);
         Py_TYPE(ret)->tp_init(ret, NULL, NULL);
-        dict = get_dclosure(closure)->get_f(self->comps_doc);
+        dict = _closure_->get_f(self->comps_doc);
         COMPS_OBJECT_DESTROY(((PyCOMPS_Dict*)ret)->dict);
         ((PyCOMPS_Dict*)ret)->dict = dict;
-        SET_TO(self, get_dclosure(closure)->pobj_offset, ret)
+        SET_TO(self, _closure_->pobj_offset, ret)
     } else {
-        ret = (PyObject*)GET_FROM(self, get_dclosure(closure)->pobj_offset);
+        ret = (PyObject*)GET_FROM(self, _closure_->pobj_offset);
     }
     Py_INCREF(ret);
     return ret;
+
+    #undef _closure_
+}
+
+PyObject* PyCOMPS_mdget_(PyCOMPS *self, void *closure) {
+    #define _closure_ ((PyCOMPS_MDGetSetClosure*)closure)
+    PyObject *ret;
+    COMPS_ObjMDict *dict;
+
+    if (!(PyObject*)GET_FROM(self, _closure_->pobj_offset)) {
+        ret = PyCOMPSMDict_new(_closure_->type, NULL, NULL);
+        Py_TYPE(ret)->tp_init(ret, NULL, NULL);
+        dict = _closure_->get_f(self->comps_doc);
+        COMPS_OBJECT_DESTROY(((PyCOMPS_MDict*)ret)->dict);
+        ((PyCOMPS_MDict*)ret)->dict = dict;
+        SET_TO(self, _closure_->pobj_offset, ret)
+    } else {
+        ret = (PyObject*)GET_FROM(self, _closure_->pobj_offset);
+    }
+    Py_INCREF(ret);
+    return ret;
+
+    #undef _closure_
 }
 
 int PyCOMPS_set_(PyCOMPS *self, PyObject *val, void *closure) {
-    //COMPS_ObjList *list;
+    #define _closure_ ((PyCOMPS_GetSetClosure*)closure)
 
-    if (Py_TYPE(val) != get_closure(closure)->type) {
+    if (Py_TYPE(val) != _closure_->type) {
         PyErr_Format(PyExc_TypeError, "Not %s instance",
-                     get_closure(closure)->type->tp_name);
+                     _closure_->type->tp_name);
         return -1;
     }
-    if ((PyObject*)GET_FROM(self, get_closure(closure)->pobj_offset)){
-        Py_DECREF((PyObject*)GET_FROM(self, get_closure(closure)->pobj_offset));
-        SET_TO(self, get_closure(closure)->pobj_offset, NULL);
+    if ((PyObject*)GET_FROM(self, _closure_->pobj_offset)){
+        Py_DECREF((PyObject*)GET_FROM(self, _closure_->pobj_offset));
+        SET_TO(self, _closure_->pobj_offset, NULL);
     }
-    get_closure(closure)->set_f(self->comps_doc, ((PyCOMPS_Sequence*)val)->list);
-    SET_TO(self, get_closure(closure)->pobj_offset, val);
+    _closure_->set_f(self->comps_doc, ((PyCOMPS_Sequence*)val)->list);
+    SET_TO(self, _closure_->pobj_offset, val);
     Py_INCREF(val);
     return 0;
+
+    #undef _closure_
 }
 
 int PyCOMPS_dset_(PyCOMPS *self, PyObject *val, void *closure) {
-    //COMPS_ObjList *list;
+    #define _closure_ ((PyCOMPS_DGetSetClosure*)closure)
 
-    if (Py_TYPE(val) != get_dclosure(closure)->type) {
+    if (Py_TYPE(val) != _closure_->type) {
         PyErr_Format(PyExc_TypeError, "Not %s instance",
-                     get_dclosure(closure)->type->tp_name);
+                     _closure_->type->tp_name);
         return -1;
     }
-    if ((PyObject*)GET_FROM(self, get_dclosure(closure)->pobj_offset)){
-        Py_DECREF((PyObject*)GET_FROM(self, get_dclosure(closure)->pobj_offset));
-        SET_TO(self, get_dclosure(closure)->pobj_offset, NULL);
+    if ((PyObject*)GET_FROM(self, _closure_->pobj_offset)){
+        Py_DECREF((PyObject*)GET_FROM(self, _closure_->pobj_offset));
+        SET_TO(self, _closure_->pobj_offset, NULL);
     }
-    get_dclosure(closure)->set_f(self->comps_doc, ((PyCOMPS_Dict*)val)->dict);
-    SET_TO(self, get_dclosure(closure)->pobj_offset, val);
+    _closure_->set_f(self->comps_doc, ((PyCOMPS_Dict*)val)->dict);
+    SET_TO(self, _closure_->pobj_offset, val);
     Py_INCREF(val);
     return 0;
+
+    #undef _closure_
+}
+
+int PyCOMPS_mdset_(PyCOMPS *self, PyObject *val, void *closure) {
+    #define _closure_ ((PyCOMPS_MDGetSetClosure*)closure)
+
+    if (Py_TYPE(val) != _closure_->type) {
+        PyErr_Format(PyExc_TypeError, "Not %s instance",
+                     _closure_->type->tp_name);
+        return -1;
+    }
+    if ((PyObject*)GET_FROM(self, _closure_->pobj_offset)){
+        Py_DECREF((PyObject*)GET_FROM(self, _closure_->pobj_offset));
+        SET_TO(self, _closure_->pobj_offset, NULL);
+    }
+    _closure_->set_f(self->comps_doc, ((PyCOMPS_MDict*)val)->dict);
+    SET_TO(self, _closure_->pobj_offset, val);
+    Py_INCREF(val);
+    return 0;
+
+    #undef _closure_
 }
 
 PyCOMPS_GetSetClosure envs_closure = {&PyCOMPS_EnvsType,
@@ -301,10 +347,19 @@ PyCOMPS_GetSetClosure cats_closure = {&PyCOMPS_CatsType,
                                       offsetof(PyCOMPS, p_categories),
                                       &comps_doc_categories,
                                       &comps_doc_set_categories};
+
 PyCOMPS_DGetSetClosure langpacks_closure = {&PyCOMPS_StrDictType,
                                       offsetof(PyCOMPS, p_langpacks),
                                       &comps_doc_langpacks,
                                       &comps_doc_set_langpacks};
+PyCOMPS_MDGetSetClosure blacklist_closure = {&PyCOMPS_MDictType,
+                                      offsetof(PyCOMPS, p_blacklist),
+                                      &comps_doc_blacklist,
+                                      &comps_doc_set_blacklist};
+PyCOMPS_MDGetSetClosure whiteout_closure = {&PyCOMPS_MDictType,
+                                      offsetof(PyCOMPS, p_whiteout),
+                                      &comps_doc_whiteout,
+                                      &comps_doc_set_whiteout};
 
 PyGetSetDef PyCOMPS_getset[] = {
     {"categories",
@@ -319,6 +374,12 @@ PyGetSetDef PyCOMPS_getset[] = {
     {"langpacks",
      (getter)PyCOMPS_get_, (setter)PyCOMPS_set_,
      "COMPS list of langpacks", &langpacks_closure},
+    {"blacklist",
+     (getter)PyCOMPS_get_, (setter)PyCOMPS_set_,
+     "COMPS list of langpacks", &blacklist_closure},
+    {"whiteout",
+     (getter)PyCOMPS_get_, (setter)PyCOMPS_set_,
+     "COMPS list of langpacks", &whiteout_closure},
     {NULL}  /* Sentinel */
 };
 
@@ -528,6 +589,21 @@ PYINIT_FUNC(void) {
     if (PyType_Ready(&PyCOMPS_DictIterType) < 0 ) {
         MODINIT_RET_NONE;
     }
+    if (PyType_Ready(&PyCOMPS_MDictType) < 0 ) {
+        MODINIT_RET_NONE;
+    }
+    if (PyType_Ready(&PyCOMPS_LangPacksType) < 0 ) {
+        MODINIT_RET_NONE;
+    }
+    if (PyType_Ready(&PyCOMPS_BlacklistType) < 0 ) {
+        MODINIT_RET_NONE;
+    }
+    if (PyType_Ready(&PyCOMPS_WhiteoutType) < 0 ) {
+        MODINIT_RET_NONE;
+    }
+    if (PyType_Ready(&PyCOMPS_StrSeqType) < 0 ) {
+        MODINIT_RET_NONE;
+    }
     #if PY_MAJOR_VERSION >= 3
         m = PyModule_Create(&moduledef);
     #else
@@ -557,6 +633,14 @@ PYINIT_FUNC(void) {
     PyModule_AddObject(m, "EnvList", (PyObject*) &PyCOMPS_EnvsType);
     Py_INCREF(&PyCOMPS_StrDictType);
     PyModule_AddObject(m, "StrDict", (PyObject*) &PyCOMPS_StrDictType);
+    Py_INCREF(&PyCOMPS_BlacklistType);
+    PyModule_AddObject(m, "Blacklist", (PyObject*) &PyCOMPS_BlacklistType);
+    Py_INCREF(&PyCOMPS_WhiteoutType);
+    PyModule_AddObject(m, "Whiteout", (PyObject*) &PyCOMPS_WhiteoutType);
+    Py_INCREF(&PyCOMPS_LangPacksType);
+    PyModule_AddObject(m, "Langpacks", (PyObject*) &PyCOMPS_LangPacksType);
+    Py_INCREF(&PyCOMPS_StrSeqType);
+    PyModule_AddObject(m, "StrSeq", (PyObject*) &PyCOMPS_StrSeqType);
 
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_DEFAULT", COMPS_PACKAGE_DEFAULT);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_OPTIONAL", COMPS_PACKAGE_OPTIONAL);

@@ -52,6 +52,12 @@ typedef struct PyCOMPS_Dict {
     PyCOMPS_ItemInfo *it_info;
 } PyCOMPS_Dict;
 
+typedef struct PyCOMPS_MDict {
+    PyObject_HEAD
+    COMPS_ObjMDict *dict;
+    PyCOMPS_ItemInfo *it_info;
+} PyCOMPS_MDict;
+
 typedef struct PyCOMPS_DictIter{
     PyObject_HEAD
     COMPS_ObjListIt *it;
@@ -61,6 +67,15 @@ typedef struct PyCOMPS_DictIter{
     PyObject* (*out_func)(COMPS_HSListItem *hsit);
 } PyCOMPS_DictIter;
 
+typedef struct PyCOMPS_MDictIter{
+    PyObject_HEAD
+    COMPS_ObjListIt *it;
+    COMPS_HSListItem *hsit;
+    COMPS_ObjList *objlist;
+    COMPS_HSList *hslist;
+    PyObject* (*out_func)(COMPS_HSListItem *hsit);
+} PyCOMPS_MDictIter;
+
 extern PyTypeObject PyCOMPS_GIDsType;
 extern PyTypeObject PyCOMPS_GIDType;
 
@@ -69,4 +84,7 @@ extern PyTypeObject PyCOMPS_SeqIterType;
 
 extern PyTypeObject PyCOMPS_DictType;
 extern PyTypeObject PyCOMPS_DictIterType;
+
+extern PyTypeObject PyCOMPS_MDictType;
+extern PyTypeObject PyCOMPS_MDictIterType;
 #endif

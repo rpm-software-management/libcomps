@@ -34,6 +34,8 @@
 #include "pycomps_dict.h"
 #include "pycomps_gids.h"
 #include "pycomps_exc.h"
+#include "pycomps_lbw.h"
+#include "pycomps_mdict.h"
 
 
 #include <Python.h>
@@ -54,12 +56,21 @@ typedef struct {
 } PyCOMPS_DGetSetClosure;
 
 typedef struct {
+    PyTypeObject * type;
+    size_t pobj_offset;
+    COMPS_ObjMDict *(*get_f)(COMPS_Doc*);
+    void (*set_f)(COMPS_Doc*, COMPS_ObjMDict*);
+} PyCOMPS_MDGetSetClosure;
+
+typedef struct {
     PyObject_HEAD
     COMPS_Doc * comps_doc;
     PyObject *p_groups;
     PyObject *p_categories;
     PyObject *p_environments;
     PyObject *p_langpacks;
+    PyObject *p_blacklist;
+    PyObject *p_whiteout;
 } PyCOMPS;
 
 PyCOMPS_GetSetClosure * get_closure(void * closure);

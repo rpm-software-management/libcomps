@@ -90,6 +90,36 @@ void comps_objmrtree_destroy_u(COMPS_Object *obj) {
     comps_objmrtree_destroy((COMPS_ObjMRTree*)obj);
 }
 
+COMPS_HSList * comps_objmrtree_values(COMPS_ObjMRTree * rt) {
+    COMPS_HSList *ret;
+    COMPS_HSList *tmplist, *tmp_subnodes;
+    COMPS_HSListItem *it, *firstit;
+    ret = comps_hslist_create();
+    comps_hslist_init(ret, NULL, NULL, NULL);
+    tmplist = comps_hslist_create();
+    comps_hslist_init(tmplist, NULL, NULL, NULL);
+    comps_hslist_append(tmplist, rt->subnodes, 0);
+    while (tmplist->first != NULL) {
+        it = tmplist->first;
+        firstit = it;
+        comps_hslist_remove(tmplist, firstit);
+        tmp_subnodes = (COMPS_HSList*)it->data;
+        for (it = tmp_subnodes->first; it != NULL; it=it->next) {
+            if (((COMPS_ObjMRTreeData*)it->data)->subnodes->first) {
+                comps_hslist_append(tmplist,
+                                    ((COMPS_ObjMRTreeData*)it->data)->subnodes, 0);
+            }
+            if (((COMPS_ObjMRTreeData*)it->data)->data != NULL) {
+                comps_hslist_append(ret,
+                                    ((COMPS_ObjMRTreeData*)it->data)->data, 0);
+            }
+        }
+        free(firstit);
+    }
+    comps_hslist_destroy(&tmplist);
+    return ret;
+}
+
 void comps_objmrtree_values_walk(COMPS_ObjMRTree * rt, void* udata,
                               void (*walk_f)(void*, void*)) {
     COMPS_HSList *tmplist, *tmp_subnodes;
@@ -377,6 +407,7 @@ void __comps_objmrtree_set(COMPS_ObjMRTree *rt, char *key, COMPS_Object *ndata) 
                 rtdata->key[x] = '\0';     /*cut existing item key to common key*/
                 /* create new parent node with common key with no data*/
                 rtd = comps_objmrtree_data_create(rtdata->key, NULL);
+                rtd->is_leaf = 0;
                 /* append to the end of subnodes in current tree level*/
                 comps_hslist_append(subnodes, rtd, 0);
 
@@ -464,6 +495,7 @@ void comps_objmrtree_set_n(COMPS_ObjMRTree *rt, char *key,
                 tmpch = rtdata->key[x];
                 rtdata->key[x] = 0;
                 rtd = comps_objmrtree_data_create(rtdata->key, NULL);
+                rtd->is_leaf = 0;
                 comps_hslist_append(subnodes, rtd, 0);
 
                 rtd = comps_objmrtree_data_create_n(key+offset+x, len-offset-x,
@@ -556,8 +588,10 @@ void comps_objmrtree_unset(COMPS_ObjMRTree * rt, const char * key) {
                 break;
             }
         }
-        if (!found)
+        if (!found) {
+            comps_hslist_destroy(&path);
             return;
+        }
         rtdata = (COMPS_ObjMRTreeData*)it->data;
 
         for (x=1; ;x++) {
@@ -590,7 +624,7 @@ void comps_objmrtree_unset(COMPS_ObjMRTree * rt, const char * key) {
 
             /*remove all predecessor of deleted node (recursive) with no childs*/
             while (rtdata->subnodes->last == NULL) {
-                printf("removing '%s'\n", rtdata->key);
+                //printf("removing '%s'\n", rtdata->key);
                 comps_objmrtree_data_destroy(rtdata);
                 comps_hslist_remove(
                             ((struct Relation*)path->last->data)->parent_nodes,
@@ -680,7 +714,7 @@ inline COMPS_HSList* __comps_objmrtree_all(COMPS_ObjMRTree * rt, char pairorkey)
                        sizeof(char)*(strlen(((COMPS_ObjMRTreeData*)it->data)->key)+1));
             }
             /* current node has data */
-            if (((COMPS_ObjMRTreeData*)it->data)->data != NULL) {
+            if (((COMPS_ObjMRTreeData*)it->data)->is_leaf) {
                 if (pairorkey == 1) {
                     comps_hslist_append(ret, pair->key, 0);
                 } else {

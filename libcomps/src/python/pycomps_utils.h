@@ -130,6 +130,10 @@ signed char __pycomps_stringable_to_char(PyObject *value, char ** ret);
 signed char __pycomps_PyUnicode_AsString(PyObject *val, char **ret);
 void* __pycomps_strcloner(void *str);
 PyObject* __pycomps_lang_decode(char * lang);
+PyObject* __pycomps_dict_key_out(COMPS_HSListItem *hsit);
+COMPS_Object* __pycomps_unicode_in(PyObject *obj);
+COMPS_Object* __pycomps_bytes_in(PyObject *pobj);
+PyObject* __pycomps_str_out(COMPS_Object *obj);
 PyObject *str_to_unicode(void* str);
 
 long PyCOMPS_hash(PyObject *self);

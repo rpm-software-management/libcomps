@@ -105,6 +105,12 @@ inline COMPS_HSList* comps_objmdict_keys(COMPS_ObjMDict * rt) {
 inline void comps_objmdict_unite(COMPS_ObjMDict * d1, COMPS_ObjMDict *d2) {
     comps_objmrtree_unite((COMPS_ObjMRTree*)d1, (COMPS_ObjMRTree*)d2);
 }
+inline COMPS_HSList* comps_objmdict_pairs(COMPS_ObjMDict *rt) {
+    return comps_objmrtree_pairs((COMPS_ObjMRTree*)rt);
+}
+inline COMPS_HSList * comps_objmdict_values(COMPS_ObjMDict * rt) {
+    return comps_objmrtree_values((COMPS_ObjMRTree*)rt);
+}
 
 COMPS_ObjectInfo COMPS_ObjMDict_ObjInfo = {
     .obj_size = sizeof(COMPS_ObjMRTree),

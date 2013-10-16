@@ -19,6 +19,31 @@
 
 #include "pycomps_utils.h"
 
+PyObject* __pycomps_dict_key_out(COMPS_HSListItem *hsit) {
+    return PyUnicode_FromString((char*)hsit->data);
+}
+
+COMPS_Object* __pycomps_unicode_in(PyObject *obj) {
+    char *tmp;
+    __pycomps_PyUnicode_AsString(obj, &tmp);
+    return (COMPS_Object*)comps_str_x(tmp);
+}
+
+COMPS_Object* __pycomps_bytes_in(PyObject *pobj) {
+    COMPS_Object *cobj;
+    cobj = (COMPS_Object*)comps_str(PyBytes_AsString(pobj));
+    return cobj;
+}
+
+PyObject* __pycomps_str_out(COMPS_Object *obj) {
+    char *tmp;
+    PyObject *ret;
+    tmp = comps_object_tostr(obj);
+    ret = PyUnicode_FromString(tmp);
+    free(tmp);
+    return ret;
+}
+
 inline char __pycomps_strcmp(const char *s1, const char *s2){
     if (s1 == NULL && s2 == NULL)
         return 0;
