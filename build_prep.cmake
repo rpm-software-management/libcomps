@@ -79,7 +79,11 @@ SET(changelog_commits 946584c5a01d83bf9ec4c26d3f9d73e37bfb5456;
                       36fd42e21c7a4aaf605d8bd9407ae9023c1b95e3;
                       706260866c0d2d5f48992d2140b96bf9f2b2a988;
                       bba023bbfe75c628296cca40ffd96b2307a3c969;
-                      9c5895fd7e79884fe4e1e9d4aa7baa7d7207669d
+                      9c5895fd7e79884fe4e1e9d4aa7baa7d7207669d;
+                      e712e7584701de6ef05a160fc4e13d5cbff14192;
+                      06da994e7cfee729475e0bb134b1687fee45da5b;
+                      0a15705507075e32e929941b290ee8f2efeeb1f0;
+                      941627d53245ec695533520835ed1d2d3cc325d0
 )
 
 set(CHANGELOG "")
