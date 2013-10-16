@@ -592,6 +592,9 @@ PYINIT_FUNC(void) {
     if (PyType_Ready(&PyCOMPS_MDictType) < 0 ) {
         MODINIT_RET_NONE;
     }
+    if (PyType_Ready(&PyCOMPS_MDictIterType) < 0 ) {
+        MODINIT_RET_NONE;
+    }
     if (PyType_Ready(&PyCOMPS_LangPacksType) < 0 ) {
         MODINIT_RET_NONE;
     }

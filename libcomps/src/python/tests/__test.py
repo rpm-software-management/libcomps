@@ -128,7 +128,7 @@ class BaseObjTestClass(object):
     obj_getset = {}
     obj_type = None
 
-    dict1 = libcomps.Dict()
+    dict1 = libcomps.StrDict()
     dict1["foo"] = "bar"
     dict1["Tom"] = "Jerry"
     dict1["linux"] = "rolls!"
@@ -142,7 +142,7 @@ class BaseObjTestClass(object):
                        "short string", "ss", "long string string string",
                        "ls"],
                  int: [-1000,2,0,1000],
-                 libcomps.Dict: [dict1],
+                 libcomps.StrDict: [dict1],
                  libcomps.IdList: [idlist1],
                  bool: [True, False]}
     def obj_constructor(self, *args, **kwargs):
@@ -307,8 +307,8 @@ class Category_Test(BaseObjTestClass, unittest.TestCase):
                   "desc": [str],
                   "display_order": [int, bool],
                   "group_ids": [libcomps.IdList],
-                  "name_by_lang": [libcomps.Dict],
-                  "desc_by_lang": [libcomps.Dict]}
+                  "name_by_lang": [libcomps.StrDict],
+                  "desc_by_lang": [libcomps.StrDict]}
     obj_dict_members = {"name_by_lang":{"cs": "administrace",
                                         "en": "administration",
                                         "de": "Verwaltung",
@@ -351,8 +351,8 @@ class Group_Test(BaseObjTestClass, unittest.TestCase):
                   "lang_only": [str],
                   "display_order": [int, bool],
                   "packages": [libcomps.PackageList],
-                  "name_by_lang": [libcomps.Dict],
-                  "desc_by_lang": [libcomps.Dict]
+                  "name_by_lang": [libcomps.StrDict],
+                  "desc_by_lang": [libcomps.StrDict]
                   }
     obj_dict_members = {"name_by_lang":{"cs": "administrace",
                                         "en": "administration",
@@ -396,8 +396,8 @@ class Env_Test(BaseObjTestClass, unittest.TestCase):
                   "display_order": [int, bool],
                   "option_ids": [libcomps.IdList],
                   "group_ids": [libcomps.IdList],
-                  "name_by_lang": [libcomps.Dict],
-                  "desc_by_lang": [libcomps.Dict]
+                  "name_by_lang": [libcomps.StrDict],
+                  "desc_by_lang": [libcomps.StrDict]
                   }
     obj_dict_members = {"name_by_lang":{"cs": "administrace",
                                         "en": "administration",
@@ -425,12 +425,12 @@ class BaseListTestClass(object):
     items_data = []
     items_extra_data = []
 
-    dict1 = libcomps.Dict()
+    dict1 = libcomps.StrDict()
     dict1["foo"] = "bar"
     dict1["Tom"] = "Jerry"
     dict1["linux"] = "rolls!"
 
-    dict2 = libcomps.Dict()
+    dict2 = libcomps.StrDict()
     dict2["red"] = "black"
     dict2["proton"] = "electron"
     dict2["fire"] = "water"
@@ -643,7 +643,7 @@ class PackageTest(unittest.TestCase):
 #@unittest.skip("skip")
 class DictTest(unittest.TestCase):
     def test_dict(self):
-        _dict = libcomps.Dict()
+        _dict = libcomps.StrDict()
         _dict["cs"] = "Ahoj svete"
         _dict["en"] = "Hello world"
         self.assertTrue(_dict["cs"] == "Ahoj svete")
@@ -656,7 +656,7 @@ class DictTest(unittest.TestCase):
             _keys.append(x)
         self.assertTrue(set(_keys) == set(_keys2))
 
-        _dict2 = libcomps.Dict()
+        _dict2 = libcomps.StrDict()
         for (k,w) in _iteritems(_dict):
             _dict2[k] = w
         self.assertTrue(_dict == _dict2)
@@ -666,6 +666,30 @@ class DictTest(unittest.TestCase):
         for v in _dict.itervalues():
             _values.append(v)
         self.assertTrue(set(_values) == set(_values2))
+
+class MDictTest(unittest.TestCase):
+    def test_blacklist(self):
+        bl1 = libcomps.Blacklist()
+        bl2 = libcomps.Blacklist()
+        self.__test(bl1, bl2)
+
+    def test_whiteout(self):
+        wo1 = libcomps.Whiteout()
+        wo2 = libcomps.Whiteout()
+        self.__test(wo1, wo2)
+    
+    def __test(self, obj1, obj2):
+        obj1["key"] = []
+        self.assertTrue(obj1["key"] == libcomps.StrSeq())
+        obj1["key"].append("val1")
+        obj1["key"].append("val2")
+        obj2["key"] = ["val1", "val2"]
+        self.assertTrue(obj1["key"] == obj2["key"])
+        del obj1["key"]
+        self.assertTrue("key" not in obj1)
+        with self.assertRaises(KeyError):
+            x = obj1["key"]
+        self.assertFalse(obj1 == obj2)
 
 #@unittest.skip("skip")
 class COMPSTest(unittest.TestCase):
@@ -721,17 +745,20 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(x == y)
         os.remove(fname)
 
-    @unittest.skip("")
+    #@unittest.skip("")
     def test_fedora(self):
         comps = libcomps.Comps()
         ret = comps.fromxml_f("fedora_comps.xml")
         #for x in comps.get_last_parse_log():
         #    print x
+        print comps.blacklist
+        return
         self.assertTrue(ret != -1)
         comps.xml_f("fed2.xml")
         comps2 = libcomps.Comps()
         comps2.fromxml_f("fed2.xml")
         self.assertTrue(comps == comps2)
+        
 
     @unittest.skip("skip")
     def test_sample(self):

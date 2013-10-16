@@ -164,8 +164,11 @@ PyObject* PyCOMPSMDict_cmp(PyObject *self, PyObject *other, int op) {
     COMPS_HSList *pairlist, *pairlist2;
     COMPS_HSListItem *hsit, *hsit2;
 
-    if (other == NULL || !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self))) {
-        PyErr_Format(PyExc_TypeError, "Not Dict subclass, %s", Py_TYPE(other)->tp_name);
+    if (other == NULL || (Py_TYPE(self) != Py_TYPE(other) &&
+                          !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self)))) {
+        PyErr_Format(PyExc_TypeError, "%s subclass, %s",
+                                      Py_TYPE(self)->tp_name,
+                                      Py_TYPE(other)->tp_name);
         return NULL;
     }
     if (op != Py_EQ && op != Py_NE) {
@@ -240,12 +243,14 @@ int PyCOMPSMDict_set(PyObject *self, PyObject *key, PyObject *val) {
     #define _dict_ ((PyCOMPS_MDict*)self)
     char *ckey;
     COMPS_Object *ret = NULL;
-    for (unsigned i = 0; i < _dict_->it_info->item_types_len; i++) {
-        if (Py_TYPE(val) != _dict_->it_info->itemtypes[i])
-            continue;
-        if (_dict_->it_info->in_convert_funcs[i]) {
-            ret = _dict_->it_info->in_convert_funcs[i](val);
-            break;
+    if (val) {
+        for (unsigned i = 0; i < _dict_->it_info->item_types_len; i++) {
+            if (Py_TYPE(val) != _dict_->it_info->itemtypes[i])
+                continue;
+            if (_dict_->it_info->in_convert_funcs[i]) {
+                ret = _dict_->it_info->in_convert_funcs[i](val);
+                break;
+            }
         }
     }
     if (__pycomps_stringable_to_char(key, &ckey)) {
@@ -265,7 +270,17 @@ int PyCOMPSMDict_set(PyObject *self, PyObject *key, PyObject *val) {
             comps_objmdict_set(((PyCOMPS_MDict*)self)->dict, ckey,
                                  it->comps_obj);
         }
-        COMPS_OBJECT_DESTROY(ret);
+        if (!((COMPS_ObjList*)ret)->first) {
+            COMPS_OBJECT_DESTROY(ret);
+            comps_objmdict_set(((PyCOMPS_MDict*)self)->dict, ckey, NULL);
+            ret = (COMPS_Object*)comps_objmdict_get(
+                                        ((PyCOMPS_MDict*)self)->dict,
+                                        ckey);
+            comps_objlist_remove(((COMPS_ObjList*)ret), NULL);
+            COMPS_OBJECT_DESTROY(ret);
+        } else {
+            COMPS_OBJECT_DESTROY(ret);
+        }
     } else if (!val){
         comps_objmdict_unset(((PyCOMPS_MDict*)self)->dict, ckey);
     }
