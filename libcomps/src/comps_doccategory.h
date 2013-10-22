@@ -25,6 +25,7 @@
 #include "comps_objlist.h"
 #include "comps_utils.h"
 #include "comps_docgroupid.h"
+#include "comps_validate.h"
 #include "comps_radix.h"
 
 #include <stddef.h>
@@ -47,6 +48,7 @@ HEAD_COMPS_STRPROP_SETTER(category, COMPS_DocCategory, name) /*comps_utils.h mac
 HEAD_COMPS_STRPROP_SETTER(category, COMPS_DocCategory, desc) /*comps_utils.h macro*/
 HEAD_COMPS_NUMPROP_SETTER(category, COMPS_DocCategory, display_order) /*comps_utils.h macro*/
 HEAD_COMPS_PROP_GETTER(category, COMPS_DocCategory, id) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER_OBJ(category, id) /*comps_utils.h macro*/
 HEAD_COMPS_PROP_GETTER(category, COMPS_DocCategory, name) /*comps_utils.h macro*/
 HEAD_COMPS_PROP_GETTER(category, COMPS_DocCategory, desc) /*comps_utils.h macro*/
 HEAD_COMPS_PROP_GETTER(category, COMPS_DocCategory, display_order) /*comps_utils.h macro*/

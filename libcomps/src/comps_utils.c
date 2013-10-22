@@ -68,3 +68,12 @@ unsigned int digits_count(unsigned int x) {
     if (x >= 10) return 2;
     return 1;
 }
+
+signed char comps_id_check(COMPS_Object *obj, COMPS_Object *prop) {
+    (void)obj;
+    if (!prop)
+        return 0;
+    if (strcmp("", ((COMPS_Str*)prop)->val) == 0) return 0;
+    return 1;
+}
+

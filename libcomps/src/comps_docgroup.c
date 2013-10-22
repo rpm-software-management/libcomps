@@ -63,6 +63,7 @@ COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, display_order) /*comps_utils.h macro
 COMPS_STRPROP_SETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
 
 COMPS_PROP_GETTER(group, COMPS_DocGroup, id) /*comps_utils.h macro*/
+COMPS_PROP_GETTER_OBJ(group, COMPS_DocGroup, id) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(group, COMPS_DocGroup, name) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(group, COMPS_DocGroup, desc) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(group, COMPS_DocGroup, def) /*comps_utils.h macro*/
@@ -345,18 +346,9 @@ COMPS_ObjectInfo COMPS_DocGroup_ObjInfo = {
     .obj_cmp = &comps_docgroup_cmp_u
 };
 
-signed char comps_id_check(COMPS_Object *obj, COMPS_Object *prop) {
-    (void)obj;
-    (void)prop;
-    if (!prop)
-        return 0;
-    if (strcmp("", ((COMPS_Str*)prop)->val) == 0) return 0;
-    return 1;
-}
-
 COMPS_ValRuleGeneric* COMPS_DocGroup_ValidateRules[] = {
     &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
-                         .get_f = &comps_docgroup_get_id,
+                         .get_f = &comps_docgroup_get_id_obj,
                          .check_f = &comps_id_check},
     NULL
 };

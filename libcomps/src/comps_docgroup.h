@@ -52,6 +52,7 @@ HEAD_COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, display_order) /*comps_utils.h 
 HEAD_COMPS_STRPROP_SETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
 
 HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, id) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER_OBJ(group, id) /*comps_utils.h macro*/
 HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, name) /*comps_utils.h macro*/
 HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, desc) /*comps_utils.h macro*/
 HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, def) /*comps_utils.h macro*/

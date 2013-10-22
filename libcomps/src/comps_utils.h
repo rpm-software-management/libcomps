@@ -90,6 +90,17 @@ inline COMPS_Object* CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _get_), PROPNAME)
 #define HEAD_COMPS_PROP_GETTER(OBJNAME, OBJTYPE, PROPNAME)\
 COMPS_Object* CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _get_), PROPNAME)\
                                                             (OBJTYPE *OBJNAME);
+#define COMPS_PROP_GETTER_OBJ(OBJNAME, OBJTYPE, PROPNAME)\
+inline COMPS_Object* CONCAT(CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME),\
+                                           _get_), PROPNAME), _obj)\
+                                                      (COMPS_Object *OBJNAME){\
+    return CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _get_), PROPNAME)\
+                                                        ((OBJTYPE*)OBJNAME);\
+}
+#define HEAD_COMPS_PROP_GETTER_OBJ(OBJNAME, PROPNAME)\
+COMPS_Object* CONCAT(CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME),\
+                                   _get_), PROPNAME), _obj)\
+                                                        (COMPS_Object *OBJNAME);
 
 
 #define COMPS_CREATE_u(NAME, TYPE) void CONCAT(CONCAT(comps_, NAME), _create_u)\
@@ -153,4 +164,5 @@ char __comps_strcmp(void *s1, void *s2);
 void* __comps_str_clone(void *str);
 void __comps_xml_prop(char *key, char *val, xmlTextWriterPtr writer);
 char* __comps_num2boolstr(COMPS_Object* obj);
+signed char comps_id_check(COMPS_Object *obj, COMPS_Object *prop);
 #endif

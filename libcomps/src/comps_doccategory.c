@@ -59,6 +59,7 @@ COMPS_STRPROP_SETTER(category, COMPS_DocCategory, desc) /*comps_utils.h macro*/
 COMPS_NUMPROP_SETTER(category, COMPS_DocCategory, display_order) /*comps_utils.h macro*/
 
 COMPS_PROP_GETTER(category, COMPS_DocCategory, id) /*comps_utils.h macro*/
+COMPS_PROP_GETTER_OBJ(category, COMPS_DocCategory, id) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(category, COMPS_DocCategory, name) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(category, COMPS_DocCategory, desc) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(category, COMPS_DocCategory, display_order) /*comps_utils.h macro*/
@@ -343,4 +344,11 @@ COMPS_ObjectInfo COMPS_DocCategory_ObjInfo = {
     .copy = &comps_doccategory_copy_u,
     .obj_cmp = &comps_doccategory_cmp_u,
     .to_str = &comps_doccategory_tostr_u
+};
+
+COMPS_ValRuleGeneric* COMPS_DocCategory_ValidateRules[] = {
+    &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
+                         .get_f = &comps_doccategory_get_id_obj,
+                         .check_f = &comps_id_check},
+    NULL
 };

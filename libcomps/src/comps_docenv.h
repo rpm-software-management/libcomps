@@ -9,6 +9,7 @@
 #include "comps_objdict.h"
 #include "comps_objlist.h"
 #include "comps_docgroupid.h"
+#include "comps_validate.h"
 #include "comps_radix.h"
 
 typedef struct {
@@ -30,6 +31,7 @@ HEAD_COMPS_PROP_GETTER(env, COMPS_DocEnv, desc) /*comps_utils.h macro*/
 HEAD_COMPS_PROP_GETTER(env, COMPS_DocEnv, display_order) /*comps_utils.h macro*/
 
 HEAD_COMPS_STRPROP_SETTER(env, COMPS_DocEnv, id) /*comps_utils.h macro*/
+HEAD_COMPS_PROP_GETTER_OBJ(env, id) /*comps_utils.h macro*/
 HEAD_COMPS_STRPROP_SETTER(env, COMPS_DocEnv, name) /*comps_utils.h macro*/
 HEAD_COMPS_STRPROP_SETTER(env, COMPS_DocEnv, desc) /*comps_utils.h macro*/
 HEAD_COMPS_NUMPROP_SETTER(env, COMPS_DocEnv, display_order) /*comps_utils.h macro*/

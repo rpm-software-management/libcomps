@@ -58,6 +58,7 @@ static void comps_docenv_destroy(COMPS_DocEnv *env) {
 COMPS_DESTROY_u(docenv, COMPS_DocEnv) /*comps_utils.h macro*/
 
 COMPS_PROP_GETTER(env, COMPS_DocEnv, id) /*comps_utils.h macro*/
+COMPS_PROP_GETTER_OBJ(env, COMPS_DocEnv, id) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(env, COMPS_DocEnv, name) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(env, COMPS_DocEnv, desc) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(env, COMPS_DocEnv, display_order) /*comps_utils.h macro*/
@@ -435,4 +436,11 @@ COMPS_ObjectInfo COMPS_DocEnv_ObjInfo = {
     .copy = &comps_docenv_copy_u,
     .obj_cmp = &comps_docenv_cmp_u,
     .to_str = &comps_docenv_tostr_u
+};
+
+COMPS_ValRuleGeneric* COMPS_DocEnv_ValidateRules[] = {
+    &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
+                         .get_f = &comps_docenv_get_id_obj,
+                         .check_f = &comps_id_check},
+    NULL
 };
