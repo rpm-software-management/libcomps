@@ -161,7 +161,7 @@
                                                             COMPS_Str *obj);
 
 typedef struct {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     COMPS_ObjDict *objects;
     COMPS_Log *log;
     COMPS_Str *encoding;

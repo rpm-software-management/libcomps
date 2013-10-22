@@ -23,7 +23,7 @@
 #include "comps_utils.h"
 
 typedef struct {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     COMPS_Str *name;
     char def;
 } COMPS_DocGroupId;

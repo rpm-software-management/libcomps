@@ -232,6 +232,29 @@ PyObject* PyCOMPSDict_get(PyObject *self, PyObject *key) {
     }
 }
 
+PyObject* PyCOMPSDict_get_(PyObject *self, PyObject *key) {
+    char *ckey;
+    COMPS_Object* val;
+    PyObject *ret;
+
+    if (__pycomps_stringable_to_char(key, &ckey)) {
+        return NULL;
+    }
+    val = comps_objdict_get(((PyCOMPS_Dict*)self)->dict, ckey);
+    if (!val) {
+        free(ckey);
+        Py_RETURN_NONE;
+    }
+    else {
+        free(ckey);
+        ckey = comps_object_tostr(val);
+        COMPS_OBJECT_DESTROY(val);
+        ret = PyUnicode_FromString(ckey);
+        free(ckey);
+        return ret;
+    }
+}
+
 int PyCOMPSDict_set(PyObject *self, PyObject *key, PyObject *val) {
     #define _dict_ ((PyCOMPS_Dict*)self)
     char *ckey;
@@ -321,7 +344,7 @@ PyMemberDef PyCOMPSDict_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSDict_methods[] = {
-     {"get", (PyCFunction)PyCOMPSDict_get, METH_O,
+     {"get", (PyCFunction)PyCOMPSDict_get_, METH_O,
      "alias for libcomps.Dict[key]"},
      {"has_key", (PyCFunction)PyCOMPSDict_has_key, METH_O,
      "alias for key in dict"},

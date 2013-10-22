@@ -53,7 +53,7 @@
  * @see comps2xml_str
  */
 typedef struct {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     COMPS_ObjDict *objects;
     COMPS_Logger *log;
     COMPS_Str *encoding;
@@ -78,7 +78,7 @@ typedef struct {
  * @see comps_doccategory_intersect
  */
 typedef struct {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     COMPS_ObjDict *properties;
     COMPS_ObjDict *name_by_lang;
     COMPS_ObjDict *desc_by_lang;
@@ -108,7 +108,7 @@ typedef struct {
  * @see comps_docgroup_intersect
  */
 typedef struct {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     COMPS_ObjDict *properties;
     COMPS_ObjDict *name_by_lang;
     COMPS_ObjDict *desc_by_lang;
@@ -135,7 +135,7 @@ typedef struct {
  * @see comps_docenv_intersect
  */
 typedef struct {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     COMPS_Dict *properties;
     COMPS_Dict *name_by_lang;
     COMPS_Dict *desc_by_lang;
@@ -146,7 +146,7 @@ typedef struct {
 
 
 typedef struct {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     char *name;
     char def;
     void *reserved;
@@ -168,7 +168,7 @@ typedef enum {COMPS_PACKAGE_DEFAULT, COMPS_PACKAGE_OPTIONAL,
  * @see comps_docpackage_set_type
  */
 typedef struct {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     //COMPS_Dict *properties;
     COMPS_PackageType type;
     UNFO_Str *name;

@@ -667,6 +667,12 @@ class DictTest(unittest.TestCase):
             _values.append(v)
         self.assertTrue(set(_values) == set(_values2))
 
+    def test_keyerror(self):
+        _dict = libcomps.StrDict()
+        self.assertTrue(_dict.get("notindict") == None)
+        with self.assertRaises(KeyError):
+            x = _dict["notindict"]
+
 class MDictTest(unittest.TestCase):
     def test_blacklist(self):
         bl1 = libcomps.Blacklist()

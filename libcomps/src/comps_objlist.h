@@ -38,7 +38,7 @@ struct COMPS_ObjListIt {
 } UnfoObjListIt;
 
 typedef struct COMPS_ObjList {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     COMPS_ObjListIt *first;
     COMPS_ObjListIt *last;
     size_t len;

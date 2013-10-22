@@ -57,7 +57,7 @@
  * behaviour
  */
 #define COMPS_Object_HEAD COMPS_RefC *refc;\
-                         COMPS_ObjectInfo *obj_info;
+                         COMPS_ObjectInfo *obj_info
 
 typedef struct COMPS_Object COMPS_Object;
 typedef struct COMPS_ObjectInfo COMPS_ObjectInfo;

@@ -32,7 +32,7 @@
 #include <assert.h>
 
 typedef struct {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     COMPS_ObjDict *properties;
     COMPS_ObjDict *name_by_lang;
     COMPS_ObjDict *desc_by_lang;

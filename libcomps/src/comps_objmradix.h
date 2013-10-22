@@ -36,7 +36,7 @@ typedef struct {
 } COMPS_ObjMRTreeData;
 
 typedef struct {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     COMPS_HSList *  subnodes;
     unsigned int len;
 } COMPS_ObjMRTree;

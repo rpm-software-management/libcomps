@@ -15,7 +15,7 @@ struct COMPS_LogEntry {
 };
 
 struct COMPS_Log {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     COMPS_HSList *entries;
     char std_out;
 };

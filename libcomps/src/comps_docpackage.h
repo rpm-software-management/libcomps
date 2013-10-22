@@ -28,7 +28,7 @@ typedef enum {COMPS_PACKAGE_DEFAULT, COMPS_PACKAGE_OPTIONAL,
               COMPS_PACKAGE_UNKNOWN} COMPS_PackageType;
 
 typedef struct {
-    COMPS_Object_HEAD
+    COMPS_Object_HEAD;
     COMPS_PackageType type;
     COMPS_Str *name;
     COMPS_Str *requires;
