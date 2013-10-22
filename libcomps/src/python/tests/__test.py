@@ -652,6 +652,12 @@ class DictTest(unittest.TestCase):
             _values.append(v)
         self.assertTrue(set(_values) == set(_values2))
 
+    def test_keyerror(self):
+        _dict = libcomps.Dict()
+        self.assertTrue(_dict.get("notindict") == None)
+        with self.assertRaises(KeyError):
+            x = _dict["notindict"]
+
 #@unittest.skip("skip")
 class COMPSTest(unittest.TestCase):
     def setUp(self):
@@ -706,7 +712,7 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(x == y)
         os.remove(fname)
 
-    #@unittest.skip("")
+    @unittest.skip("")
     def test_fedora(self):
         comps = libcomps.Comps()
         ret = comps.fromxml_f("fedora_comps.xml")
@@ -718,7 +724,7 @@ class COMPSTest(unittest.TestCase):
         comps2.fromxml_f("fed2.xml")
         self.assertTrue(comps == comps2)
 
-    #@unittest.skip("skip")
+    @unittest.skip("skip")
     def test_sample(self):
         comps = libcomps.Comps()
         ret = comps.fromxml_f("sample_comps.xml")
@@ -788,7 +794,7 @@ class COMPSTest(unittest.TestCase):
         dbl2 = g1.desc_by_lang
         self.assertTrue(g1.desc_by_lang == g.desc_by_lang)
 
-    #@unittest.skip("skip")
+    @unittest.skip("skip")
     def test_union(self):
         comps = libcomps.Comps()
         comps.fromxml_f("sample_comps.xml")
