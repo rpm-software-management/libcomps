@@ -72,7 +72,7 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
     char *id = NULL;
     char *desc = NULL;
     char *lang = NULL;
-    unsigned def=0, uservis=0;
+    unsigned def=0, uservis=1;
     int disp_order=-1;
 
     static char *kwlist[] = {"id", "name", "desc", "display_order", "default",

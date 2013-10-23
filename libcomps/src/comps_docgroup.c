@@ -293,6 +293,11 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
         return 1;
     }
     xmlTextWriterStartElement(writer, BAD_CAST "group");
+    if (!comps_objdict_get_x(group->properties, "uservisible")) {
+        comps_objdict_set_x(group->properties, "uservisible",
+                            (COMPS_Object*)comps_num(1));
+    }
+
     for (int i=0; i<9; i++) {
         //printf("%s\n", props[i]);
         if (!type[i]) {

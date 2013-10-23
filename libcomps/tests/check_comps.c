@@ -632,16 +632,58 @@ START_TEST(test_comps_validate) {
 
 }END_TEST
 
+START_TEST(test_doc_defaults) {
+    COMPS_DocGroup *g;
+    COMPS_Doc * doc, *doc2;
+    COMPS_Parsed *parsed;
+    COMPS_ObjList *groups;
+    COMPS_Object *tmpobj, *enc;
+    COMPS_DocGroupPackage *p;
+    char *tmp;
+
+    printf("### start test_comps_default\n");
+    
+    enc = comps_str("UTF-8");
+    doc = comps_object_create(&COMPS_Doc_ObjInfo, (COMPS_Object*[]){enc});
+    COMPS_OBJECT_DESTROY(enc);
+    g = (COMPS_DocGroup*)
+        comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
+    comps_docgroup_set_id(g, "group1", 0);
+
+    p = (COMPS_DocGroupPackage*)
+        comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
+    comps_docpackage_set_name(p, "package1", 0);
+    comps_docgroup_add_package(g, p);
+
+    comps_doc_add_group(doc, g);
+    tmp = comps2xml_str(doc);
+    parsed = comps_parse_parsed_create();
+    comps_parse_parsed_init(parsed, "UTF-8", 1);
+    comps_parse_str(parsed, tmp);
+    doc2 = parsed->comps_doc;
+    groups = comps_doc_groups(doc2);
+    g = groups->first->comps_obj;
+    tmpobj = comps_docgroup_get_uservisible(g);
+    ck_assert(((COMPS_Num*)tmpobj)->val == 1);
+
+    COMPS_OBJECT_DESTROY(groups);
+    COMPS_OBJECT_DESTROY(tmpobj);
+    COMPS_OBJECT_DESTROY(doc);
+    free(tmp);
+    comps_parse_parsed_destroy(parsed);
+
+}END_TEST
 
 Suite* basic_suite (void)
 {
     Suite *s = suite_create ("Basic Tests");
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
-    //tcase_add_test (tc_core, test_comps_doc_basic);
-    //tcase_add_test (tc_core, test_comps_doc_xml);
-    //tcase_add_test (tc_core, test_comps_doc_setfeats);
-    //tcase_add_test (tc_core, test_comps_doc_union);
+    tcase_add_test (tc_core, test_comps_doc_basic);
+    tcase_add_test (tc_core, test_comps_doc_xml);
+    tcase_add_test (tc_core, test_comps_doc_setfeats);
+    tcase_add_test (tc_core, test_comps_doc_union);
+    tcase_add_test (tc_core, test_doc_defaults);
     tcase_add_test (tc_core, test_comps_validate);
     suite_add_tcase (s, tc_core);
     return s;

@@ -165,4 +165,5 @@ void* __comps_str_clone(void *str);
 void __comps_xml_prop(char *key, char *val, xmlTextWriterPtr writer);
 char* __comps_num2boolstr(COMPS_Object* obj);
 signed char comps_id_check(COMPS_Object *obj, COMPS_Object *prop);
+unsigned int digits_count(unsigned int x);
 #endif
