@@ -359,6 +359,13 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
             if (!list_last_group->packages)
                 comps_log_error(parsed->log, "packagelist", COMPS_ERR_ELEM_REQUIRED,
                                 parser_line, parser_col, 0);
+
+            if (!comps_objdict_get_x(list_last_group->properties,
+                                     "uservisible")) {
+                comps_objdict_set_x(list_last_group->properties,
+                                    "uservisible",
+                                    (COMPS_Object*) comps_num(1));
+            }
             COMPS_OBJECT_DESTROY(list);
         break;
         case COMPS_ELEM_CATEGORY:

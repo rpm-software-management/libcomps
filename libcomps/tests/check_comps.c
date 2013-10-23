@@ -615,6 +615,32 @@ START_TEST(test_comps_doc_union)
     COMPS_OBJECT_DESTROY(c3);
 }END_TEST
 
+START_TEST(test_doc_defaults) {
+    COMPS_DocGroup *g;
+    COMPS_Doc * doc, *doc2;
+    COMPS_Parsed *parsed;
+    COMPS_ObjList *groups;
+    COMPS_Object *tmpobj;
+    char *tmp;
+
+    printf("### start test_comps_default\n");
+    doc = comps_object_create(&COMPS_Doc_ObjInfo, NULL);
+    g = comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
+    comps_docgroup_set_id(g, "group1", 0);
+    comps_doc_add_group(doc, g);
+    tmp = comps2xml_str(doc);
+
+    parsed = comps_parse_parsed_create();
+    comps_parse_parsed_init(parsed, "UTF-8", 1);
+    comps_parse_str(parsed, tmp);
+    doc2 = parsed->comps_doc;
+    groups = comps_doc_groups(doc2);
+    g = groups->first;
+    tmpobj = comps_docgroup_uservisible(g);
+    ck_assert(((COMPS_Num*)tmpobj)->val == 1);
+
+}END_TEST
+
 Suite* basic_suite (void)
 {
     Suite *s = suite_create ("Basic Tests");

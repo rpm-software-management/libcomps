@@ -146,4 +146,5 @@ char __comps_strcmp(void *s1, void *s2);
 void* __comps_str_clone(void *str);
 void __comps_xml_prop(char *key, char *val, xmlTextWriterPtr writer);
 char* __comps_num2boolstr(COMPS_Object* obj);
+unsigned int digits_count(unsigned int x);
 #endif
