@@ -7,14 +7,14 @@ output and creating whole new class-like structure comps representation.
 This documentation meet only for C part of library.
 
 To explore libcomps capabilities and features covering comps files continue
-reading \link objs.dox
+reading @link libcomps_objs
 this
-\endlink
+@endlink
 
 To understatning libcomps object management(creating, destroying, copying and
-binding to python objects) read \link comps_obj.h
+binding to python objects) read @link comps_obj.h
 this
-\endlink
+@endlink
 
 */
 
