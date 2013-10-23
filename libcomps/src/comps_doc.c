@@ -155,9 +155,13 @@ void comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
     doc->log->redirect2output = stdoutredirect;
     xmlTextWriterPtr writer = xmlNewTextWriterDoc(&xmldoc, 0);
     
-    str = comps_object_tostr((COMPS_Object*)doc->encoding);
-    retc = xmlTextWriterStartDocument(writer, NULL, str, NULL);
-    free(str);
+    if ((COMPS_Object*)doc->encoding) {
+        str = comps_object_tostr((COMPS_Object*)doc->encoding);
+        retc = xmlTextWriterStartDocument(writer, NULL, str, NULL);
+        free(str);
+    } else {
+        retc = xmlTextWriterStartDocument(writer, NULL, "UTF-8", NULL);
+    }
     if (retc<0)
         comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
     comps_doc_xml(doc, writer, doc->log);
@@ -186,10 +190,13 @@ char* comps2xml_str(COMPS_Doc *doc) {
     xmlOutputBuffer *xmlobuff = xmlOutputBufferCreateBuffer(xmlbuff, 0);
     xmlTextWriterPtr writer = xmlNewTextWriterDoc(&xmldoc, 0);
 
-    str = comps_object_tostr((COMPS_Object*)doc->encoding);
-    retc = xmlTextWriterStartDocument(writer, NULL, str, NULL);
-    free(str);
-
+    if ((COMPS_Object*)doc->encoding) {
+        str = comps_object_tostr((COMPS_Object*)doc->encoding);
+        retc = xmlTextWriterStartDocument(writer, NULL, str, NULL);
+        free(str);
+    } else {
+        retc = xmlTextWriterStartDocument(writer, NULL, "UTF-8", NULL);
+    }
     if (retc<0) comps_log_error(doc->log, NULL, COMPS_ERR_XMLGEN, 0, 0, 0);
     comps_doc_xml(doc, writer, doc->log);
     retc = xmlTextWriterEndDocument(writer);
