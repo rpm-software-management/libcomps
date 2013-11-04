@@ -12,7 +12,7 @@ this
 @endlink
 
 To understatning libcomps object management(creating, destroying, copying and
-binding to python objects) read @link comps_obj.h
+binding to python objects) read @link comps_obj
 this
 @endlink
 

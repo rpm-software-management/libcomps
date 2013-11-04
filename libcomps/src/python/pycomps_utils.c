@@ -1,4 +1,8 @@
 /* libcomps - C alternative to yum.comps library
+    {"type",
+     (getter)__PyCOMPS_get_numattr, (setter)__PyCOMPS_set_numattr,
+     "Package type",
+     (void*)&DocGroupPkg_TypeClosure},
  * Copyright (C) 2013 Jindrich Luza
  *
  * This program is free software; you can redistribute it and/or modify
@@ -359,3 +363,38 @@ PyObject* __PyCOMPS_get_numattr(PyObject *self, void *closure) {
     #undef _closure_
 }
 
+int __PyCOMPS_set_boolattr(PyObject *self, PyObject *val, void *closure) {
+    #define _closure_ ((__PyCOMPS_NumPropGetSetClosure*)closure)
+    COMPS_Object *obj;
+    if (!PyBool_Check(val)) {
+        PyErr_SetString(PyExc_TypeError, "Not bool object");
+        return -1;
+    }
+    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    if (val == Py_True) {
+        _closure_->set_f(obj, 1);
+    } else {
+        _closure_->set_f(obj, 0);
+    }
+    #undef _closure_
+    return 0;
+}
+
+PyObject* __PyCOMPS_get_boolattr(PyObject *self, void *closure) {
+    #define _closure_ ((__PyCOMPS_NumPropGetSetClosure*)closure)
+    COMPS_Object* tmp_prop, *obj;
+
+    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    tmp_prop = _closure_->get_f(obj);
+    if (tmp_prop) {
+        if (((COMPS_Num*)tmp_prop)->val) {
+            COMPS_OBJECT_DESTROY(tmp_prop);
+            Py_RETURN_TRUE;
+        } else {
+            COMPS_OBJECT_DESTROY(tmp_prop);
+            Py_RETURN_FALSE;
+        }
+    } else
+        Py_RETURN_NONE;
+    #undef _closure_
+}

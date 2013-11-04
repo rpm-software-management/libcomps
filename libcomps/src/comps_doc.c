@@ -20,6 +20,7 @@
 #include "comps_doc.h"
 #include <stdio.h>
 #include <assert.h>
+static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer);
 
 void comps_doc_create(COMPS_Doc* doc, COMPS_Object **args) {
     doc->objects = (COMPS_ObjDict*) comps_object_create(&COMPS_ObjDict_ObjInfo,
@@ -488,7 +489,7 @@ inline int __comps_check_xml_get(int retcode, COMPS_Log * log) {
     } return 0;
 }
 
-signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
+static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
     COMPS_ObjListIt *it;
     COMPS_ObjList *list;
     COMPS_ObjDict *dict;

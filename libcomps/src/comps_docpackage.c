@@ -19,10 +19,10 @@
 
 #include "comps_docpackage.h"
 static void comps_docpackage_create(COMPS_DocGroupPackage* package, COMPS_Object **args) {
-
     (void)args;
     package->name = NULL;
     package->requires = NULL;
+    package->basearchonly = NULL;
     package->type = COMPS_PACKAGE_UNKNOWN;
 }
 COMPS_CREATE_u(docpackage, COMPS_DocGroupPackage)
@@ -32,6 +32,8 @@ static void comps_docpackage_copy(COMPS_DocGroupPackage *pkg_dst,
     pkg_dst->name = (COMPS_Str*)comps_object_copy((COMPS_Object*)pkg_src->name);
     pkg_dst->requires = (COMPS_Str*)comps_object_copy(
                                             (COMPS_Object*)pkg_src->requires);
+    pkg_dst->basearchonly = (COMPS_Num*)comps_object_copy(
+                                          (COMPS_Object*)pkg_src->basearchonly);
     pkg_dst->type = pkg_src->type;
 }
 COMPS_COPY_u(docpackage, COMPS_DocGroupPackage)    /*comps_utils.h macro*/
@@ -48,25 +50,43 @@ void comps_docpackage_set_name(COMPS_DocGroupPackage *pkg, char *name, char copy
         comps_object_destroy((COMPS_Object*)pkg->name);
     pkg->name = comps_str(name);
 }
+
 COMPS_Object* comps_docpackage_get_name(COMPS_DocGroupPackage *pkg) {
     return comps_object_incref((COMPS_Object*)pkg->name);
 }
+
 void comps_docpackage_set_requires(COMPS_DocGroupPackage *pkg, char *requires, char copy) {
     (void)copy;
     if (pkg->requires)
         comps_object_destroy((COMPS_Object*)pkg->requires);
     pkg->requires = comps_str(requires);
 }
+
 COMPS_Object* comps_docpackage_get_requires(COMPS_DocGroupPackage *pkg) {
     return comps_object_incref((COMPS_Object*)pkg->requires);
 }
+
+void comps_docpackage_set_basearchonly(COMPS_DocGroupPackage *pkg,
+                                       int basearchonly) {
+    if (pkg->basearchonly) {
+        COMPS_OBJECT_DESTROY(pkg->basearchonly);
+    }
+    pkg->basearchonly = comps_num(basearchonly);
+}
+
+COMPS_Object* comps_docpackage_get_basearchonly(COMPS_DocGroupPackage *pkg) {
+    return comps_object_incref((COMPS_Object*)pkg->basearchonly);
+}
+
 void comps_docpackage_set_type_i(COMPS_DocGroupPackage *pkg, int type) {
     pkg->type = type;
 }
+
 void comps_docpackage_set_type(COMPS_DocGroupPackage *pkg,
                                    COMPS_PackageType type) {
     pkg->type = type;
 }
+
 COMPS_Object* comps_docpackage_get_type(COMPS_DocGroupPackage *pkg) {
     return (COMPS_Object*)comps_num(pkg->type);
 }
@@ -130,7 +150,12 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
         free(str);
     }
     COMPS_XMLRET_CHECK
-
+    if (pkg->basearchonly && pkg->basearchonly->val) {
+        str = comps_object_tostr((COMPS_Object*)pkg->requires);
+        ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
+                                            BAD_CAST "true");
+    }
+    COMPS_XMLRET_CHECK
     str = comps_object_tostr((COMPS_Object*)pkg->name);
     ret = xmlTextWriterWriteString(writer, (xmlChar*)str);
     COMPS_XMLRET_CHECK
@@ -141,18 +166,26 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
 }
 
 static char* comps_docpackage_str_u(COMPS_Object* docpackage) {
-    const size_t len = strlen("<COMPS_DocGroupPackage name='' type='' requires=''>");
-    char *name = comps_object_tostr((COMPS_Object*)
-                                    ((COMPS_DocGroupPackage*)docpackage)->name);
-    const char *type = comps_docpackage_type_str(((COMPS_DocGroupPackage*)
-                                            docpackage)->type);
-    char *requires = comps_object_tostr((COMPS_Object*)
-                                ((COMPS_DocGroupPackage*)docpackage)->requires);
-    size_t total_len = len + strlen(name) + strlen(type) + strlen(requires) + 1;
+    #define _package_ ((COMPS_DocGroupPackage*)docpackage)
+    const size_t len = strlen("<COMPS_DocGroupPackage name='' type='' "
+                              "requires='' basearchonly=''>");
+    char *name = comps_object_tostr((COMPS_Object*)_package_->name);
+    const char *type = comps_docpackage_type_str(_package_->type);
+    char *requires = comps_object_tostr((COMPS_Object*)_package_->requires);
+    char *basearchonly;
+    if ((_package_->basearchonly) && (_package_->basearchonly->val))
+        basearchonly = "True";
+    else
+        basearchonly = "False";
+    size_t total_len = len + strlen(name)
+                           + strlen(type)
+                           + strlen(requires) +
+                           + strlen(basearchonly) + 1;
     char *ret = malloc(sizeof(char)*(total_len));
     
-    snprintf(ret, total_len, "<COMPS_DocGroupPackage name='%s' type='%s' requires='%s'>",
-                 name, type, requires);
+    snprintf(ret, total_len, "<COMPS_DocGroupPackage name='%s' type='%s'"
+                             " requires='%s' basearchonly='%s'>",
+                 name, type, requires, basearchonly);
     free(name);
     free(requires);
     return ret;

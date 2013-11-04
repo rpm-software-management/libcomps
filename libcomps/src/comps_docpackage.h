@@ -23,15 +23,23 @@
 #include "comps_utils.h"
 #include "comps_obj.h"
 
+/** \file comps_docpackage.h
+ * \brief COMPS_DocPackage header file
+ */
+
+/** COMPS_DocGroupPackage type
+ */
 typedef enum {COMPS_PACKAGE_DEFAULT, COMPS_PACKAGE_OPTIONAL,
               COMPS_PACKAGE_CONDITIONAL, COMPS_PACKAGE_MANDATORY,
               COMPS_PACKAGE_UNKNOWN} COMPS_PackageType;
 
+/** COMPS_Object derivate representing packagereq element in comps.xml structure*/
 typedef struct {
     COMPS_Object_HEAD;
-    COMPS_PackageType type;
-    COMPS_Str *name;
-    COMPS_Str *requires;
+    COMPS_PackageType type; /**< package type */
+    COMPS_Str *name; /**< name of package */
+    COMPS_Str *requires; /**< packagereq requires attribute */
+    COMPS_Num *basearchonly;
 } COMPS_DocGroupPackage;
 
 
@@ -42,15 +50,78 @@ typedef struct {
 signed char comps_docpackage_cmp_u(COMPS_Object *pkg1, COMPS_Object *pkg2);
 char comps_docpackage_cmp_set(void *pkg1, void *pkg2);
 
+/** COMPS_DocGroupPackage name getter
+ * @param pkg COMPS_DocGroupPackage object
+ * @return COMPS_Str object typed as COMPS_Object representating package's name
+ * with incremented reference counter
+ */
 COMPS_Object* comps_docpackage_get_name(COMPS_DocGroupPackage *pkg);
+
+/** COMPS_DocGroupPackage name setter
+ * @param pkg COMPS_DocGroupPackage object
+ * @param name new name of package
+ * @param copy deprecated argument
+ *
+ * Old name object's reference counter will be decremented
+ */
 void comps_docpackage_set_name(COMPS_DocGroupPackage *pkg, char *name, char copy);
+
+/** COMPS_DocGroupPackage requires getter
+ * @param pkg COMPS_DocGroupPackage object
+ * @return COMPS_Str object typed as COMPS_Object representating package's
+ * requires attribute with incremented reference counter
+ */
 COMPS_Object* comps_docpackage_get_requires(COMPS_DocGroupPackage *pkg);
+
+/** COMPS_DocGroupPackage requires setter
+ * @param pkg COMPS_DocGroupPackage object
+ * @param requires new requries attribute value
+ * @param copy deprecated argument
+ *
+ * Old requires object's reference counter will be decremented
+ */
 void comps_docpackage_set_requires(COMPS_DocGroupPackage *pkg, char *requires, char copy);
+
+/** COMPS_DocGroupPackage type getter
+ * @param pkg COMPS_DocGroupPackage object
+ * @return COMPS_Num object typed as COMPS_Object representating package's
+ * type as number with incremented reference counter
+ */
 COMPS_Object* comps_docpackage_get_type(COMPS_DocGroupPackage *pkg);
+
+/** COMPS_DocGroupPackage type setter
+ * @param pkg COMPS_DocGroupPackage object
+ * @param type package type
+ *
+ * old object with stored type will be decremented
+ */
 void comps_docpackage_set_type(COMPS_DocGroupPackage *pkg,
                                    COMPS_PackageType type);
+
+/** COMPS_DocGroupPackage type setter same as comps_docpackage_set_type
+ * @param pkg COMPS_DocGroupPackage object
+ * @param type package type as integer
+ */
 void comps_docpackage_set_type_i(COMPS_DocGroupPackage *pkg, int type);
+
+/** return package type as string
+ * @param type package type as COMPS_PackageType
+ * @return string representation of type
+ * */
 const char* comps_docpackage_type_str(COMPS_PackageType type);
+
+/** set package basearchonly attribute
+ * @param type package type as COMPS_PckageType
+ * @param basearchonly basearchonly attribute
+ * */
+void comps_docpackage_set_basearchonly(COMPS_DocGroupPackage *pkg,
+                                       int basearchonly);
+
+/** return package basearchonly attrinute
+ * @param type package type as COMPS_PackageType
+ * @return COMPS_Num basearchonly attribute
+ * */
+COMPS_Object* comps_docpackage_get_basearchonly(COMPS_DocGroupPackage *pkg);
 
 signed char comps_docpackage_xml(COMPS_DocGroupPackage *package,
                                  xmlTextWriterPtr writer,

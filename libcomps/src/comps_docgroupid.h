@@ -17,15 +17,22 @@
  * USA
  */
 
+/** \file comps_docgroupid.h
+ * \brief COMPS_DocGroupId header file
+ */
+
 #ifndef COMPS_DOCGROUPID_H
 #define COMPS_DOCGROUPID_H
 
 #include "comps_utils.h"
 
+/** COMPS_Object derivate representing group_id element in comps.xml file */
 typedef struct {
     COMPS_Object_HEAD;
     COMPS_Str *name;
+    /**< name of GroupId */
     char def;
+    /**< GroupId default attribute */
 } COMPS_DocGroupId;
 
 //HEAD_COMPS_CREATE_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
@@ -34,10 +41,34 @@ typedef struct {
 
 char __comps_docgroupid_cmp_set(void *gid1, void *gid2);
 
+/** COMPS_DocGroupId name getter
+ * @param gid COMPS_DocGroupId object
+ * @return COMPS_Str object representing GroupId name with incremented
+ * reference counter
+ */
 COMPS_Object* comps_docgroupid_get_name(COMPS_DocGroupId *gid);
+
+/** COMPS_DocGroupId name setter
+ * @param gid COMPS_DocGroupId object
+ * @param name new name of COMPS_DocGroupId object. Old name object's reference
+ * @param copy deprecated parameter
+ * counter will be decremented
+ */
 void comps_docgroupid_set_name(COMPS_DocGroupId *gid, char *name, char copy);
 
-void comps_docgroupid_set_name(COMPS_DocGroupId *gid, char *name, char copy);
+/** COMPS_DocGroupId default getter
+ * @param gid COMPS_DocGroupId object
+ * @return COMPS_Num object representing GroupId default with incremented
+ * reference counter
+ */
+COMPS_Object* comps_docgroupid_get_default(COMPS_DocGroupId *gid);
+
+/** COMPS_DocGroupId name setter
+ * @param gid COMPS_DocGroupId object
+ * @param def COMPS_DocGroupId default value.
+ *
+ * Old defaut objects reference counter will be decremented
+ */
 void comps_docgroupid_set_default(COMPS_DocGroupId *gid, int def);
 
 extern COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo;

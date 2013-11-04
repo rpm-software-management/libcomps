@@ -118,6 +118,8 @@ PyObject* __PyCOMPS_get_strattr(PyObject *self, void *closure);
 int __PyCOMPS_set_strattr(PyObject *self, PyObject *val, void *closure);
 PyObject* __PyCOMPS_get_numattr(PyObject *self, void *closure);
 int __PyCOMPS_set_numattr(PyObject *self, PyObject *val, void *closure);
+PyObject* __PyCOMPS_get_boolattr(PyObject *self, void *closure);
+int __PyCOMPS_set_boolattr(PyObject *self, PyObject *val, void *closure);
 
 PyObject* __pycomps_str_getter(char * prop);
 char __pycomps_strcmp(const char *s1, const char *s2);

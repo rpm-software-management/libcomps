@@ -655,7 +655,29 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = @PROJECT_SOURCE_DIR@/src/comps_mm.c @PROJECT_SOURCE_DIR@/src/comps_mm.h @PROJECT_SOURCE_DIR@/src/comps_list.c @PROJECT_SOURCE_DIR@/src/comps_list.h @PROJECT_SOURCE_DIR@/src/comps_logger.c @PROJECT_SOURCE_DIR@/src/comps_logger.h @PROJECT_SOURCE_DIR@/src/comps_obj.h @PROJECT_SOURCE_DIR@/src/comps_doc.h @PROJECT_SOURCE_DIR@/docs/mainpage.dox @PROJECT_SOURCE_DIR@/docs/objs.dox
+INPUT                  = @PROJECT_SOURCE_DIR@/src/comps_mm.c \
+                         @PROJECT_SOURCE_DIR@/src/comps_mm.h \
+                         @PROJECT_SOURCE_DIR@/src/comps_list.c \
+                         @PROJECT_SOURCE_DIR@/src/comps_list.h \
+                         @PROJECT_SOURCE_DIR@/src/comps_logger.c \
+                         @PROJECT_SOURCE_DIR@/src/comps_logger.h \
+                         @PROJECT_SOURCE_DIR@/src/comps_obj.h \
+                         @PROJECT_SOURCE_DIR@/src/comps_doc.h \
+                         @PROJECT_SOURCE_DIR@/src/comps_doccategory.h \
+                         @PROJECT_SOURCE_DIR@/src/comps_docgroup.h \
+                         @PROJECT_SOURCE_DIR@/src/comps_docenv.h \
+                         @PROJECT_SOURCE_DIR@/src/comps_docgroupid.h \
+                         @PROJECT_SOURCE_DIR@/src/comps_docpackage.h \
+                         @PROJECT_SOURCE_DIR@/src/comps_objlist.h \
+                         @PROJECT_SOURCE_DIR@/src/comps_objdict.h \
+                         @PROJECT_SOURCE_DIR@/docs/mainpage.dox \
+                         @PROJECT_SOURCE_DIR@/docs/comps_obj.dox \
+                         @PROJECT_SOURCE_DIR@/docs/doc_objs.dox \
+                         @PROJECT_SOURCE_DIR@/docs/doc_group.dox \
+                         @PROJECT_SOURCE_DIR@/docs/doc_cat.dox \
+                         @PROJECT_SOURCE_DIR@/docs/doc_env.dox \
+                         @PROJECT_SOURCE_DIR@/docs/doc_unioning.dox
+"
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is

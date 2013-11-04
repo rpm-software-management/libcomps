@@ -707,6 +707,12 @@ __COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) DocGroupPkg_TypeClosure = 
     .c_offset = offsetof(PyCOMPS_Package, package)
 };
 
+__COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) DocGroupPkg_BAOClosure = {
+    .get_f = &comps_docpackage_get_basearchonly,
+    .set_f = &comps_docpackage_set_basearchonly,
+    .c_offset = offsetof(PyCOMPS_Package, package)
+};
+
 PyGetSetDef pack_getset[] = {
     {"name",
      (getter)__PyCOMPS_get_strattr, (setter)__PyCOMPS_set_strattr,
@@ -720,6 +726,10 @@ PyGetSetDef pack_getset[] = {
      (getter)__PyCOMPS_get_numattr, (setter)__PyCOMPS_set_numattr,
      "Package type",
      (void*)&DocGroupPkg_TypeClosure},
+    {"basearchonly",
+     (getter)__PyCOMPS_get_boolattr, (setter)__PyCOMPS_set_boolattr,
+     "Package basearchonly attribute",
+     (void*)&DocGroupPkg_BAOClosure},
     {NULL}  /* Sentinel */
 };
 

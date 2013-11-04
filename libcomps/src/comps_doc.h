@@ -32,7 +32,11 @@
 
 /** \file comps_doc.h
  * \brief COMPS_Doc header file
- * @see COMPS_Doc_getters @see COMPS_Doc_setters
+ *
+ * COMPS_Doc object support union operation. Read more about
+ * @link doc_unioning Libcomps objects unioning
+ * @endlink
+ * @see COMPS_Doc_getters @see COMPS_Doc_setters @see COMPS_Doc_adders
  */
 
 /** @cond NOTMET */
@@ -374,25 +378,35 @@ HEAD_COMPS_DOC_ADDOBJMDICT(whiteout) /*comps_doc.h macro*/
 COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
                                                  char *desc, char *lang);
 
-/** Parse comps.xml file into COMPS_Doc structure
- * @param doc COMPS_Doc structure where to store
- * @param filename opened filename
- * @param enc file encryption
- * @param log COMPS_Log object where log messages are stored
- */
-void comps_doc_xml_f(COMPS_Doc* doc,  char *filename, char *enc, COMPS_Log *log);
+//char* comps_doc_xml_str(COMPS_Doc* doc, char *enc, COMPS_Log *log);
 
-/** Parse comps from string into COMPS_Doc object
- * @param doc COMPS_Doc structure where to store
- * @param enc file encryption
- * @param log COMPS_Log object where log messages are stored
- */
-char* comps_doc_xml_str(COMPS_Doc* doc, char *enc, COMPS_Log *log);
-signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer);
 
+//static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer);
+
+/** Write XML representation to file
+ * @param doc COMPS_Doc object
+ * @param filename filename where to write
+ * @param stdoutredirect in non-zero all warning and error messages will
+ * be redirected to stdout, otherwise will be stored in doc->log only
+ * @return 0 if there wasn't any errors, 1 if there was non-fatal errors
+ * -1 if fatal error emerge during xml generation
+ */
 signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect);
+
+/** Generate XML string representating COMPS_Doc structure
+ * @param doc COMPS_Doc object
+ * @return XML string
+ */
 char* comps2xml_str(COMPS_Doc *doc);
 
+/** Union two COMPS_Doc structures
+ * COMPS_Doc structures are unioned as unioning it's subparts
+ * (group, categories, environments). Object with same 'id' attribute
+ * are regarded as equal and unioned by with each other
+ *
+ * @param c1 COMPS_Doc object
+ * @param c2 COMPS_Doc object
+ */
 COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2);
 
 extern COMPS_ObjectInfo COMPS_Doc_ObjInfo;
