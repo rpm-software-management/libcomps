@@ -125,5 +125,6 @@ extern const COMPS_ElemAttrInfo COMPS_NAME_ElemAttrInfo;
 extern const COMPS_ElemAttrInfo COMPS_INSTALL_ElemAttrInfo;
 extern const COMPS_ElemAttrInfo COMPS_ARCH_ElemAttrInfo;
 extern const COMPS_ElemAttrInfo COMPS_PACKAGE_ElemAttrInfo;
+extern const COMPS_ElemAttrInfo COMPS_XMLLANG_ElemAttrInfo;
 
 #endif

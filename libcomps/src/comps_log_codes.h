@@ -34,7 +34,8 @@
 #define COMPS_ERR_TEXT_BETWEEN          23
 #define COMPS_ERR_NOCONTENT             24
 #define COMPS_ERR_PKGLIST_EMPTY         25
-#define COMPS_ERR_IDS_EMPTY             27
+#define COMPS_ERR_IDS_EMPTY             26
+#define COMPS_ERR_ATTR_UNKNOWN          27
 
 #define LOG_TEST_CODE1              1001
 #define LOG_TEST_CODE2              1002

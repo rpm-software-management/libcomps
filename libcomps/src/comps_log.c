@@ -3,6 +3,8 @@
 const char* COMPS_LogCodeFormat[] = {
       [COMPS_ERR_NO_ERR] = "",
       [COMPS_ERR_ELEM_UNKNOWN] = "WARNING: Unknown elemenet '%s' at line:%s\n",
+      [COMPS_ERR_ATTR_UNKNOWN] = "WARNING: Unknown attribute '%s' in element "
+                                 "'%s' at line:%s col: %s\n",
       [COMPS_ERR_ELEM_ALREADYSET] = "WARNING: Element <%s> at line:%s "
                                      "col:%s has been already found\n",
       [COMPS_ERR_PARSER] = "ERROR: Parser error at line:%s col:%s\n    %s\n",

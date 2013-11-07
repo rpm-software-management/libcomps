@@ -56,7 +56,7 @@ const COMPS_ElemInfo COMPS_NAME_ElemInfo = {
                                           COMPS_ELEM_CATEGORY,
                                           COMPS_ELEM_ENV,
                                           COMPS_ELEM_SENTINEL},
-    .attributes = (const COMPS_ElemAttrInfo*[]){NULL},
+    .attributes = (const COMPS_ElemAttrInfo*[]){&COMPS_XMLLANG_ElemAttrInfo},
     .preproc = NULL,//&comps_elem_name_preproc,
     .postproc = &comps_elem_idnamedesc_postproc
 };
@@ -66,7 +66,7 @@ const COMPS_ElemInfo COMPS_DESC_ElemInfo = {
                                           COMPS_ELEM_CATEGORY,
                                           COMPS_ELEM_ENV,
                                           COMPS_ELEM_SENTINEL},
-    .attributes = (const COMPS_ElemAttrInfo*[]){NULL},
+    .attributes = (const COMPS_ElemAttrInfo*[]){&COMPS_XMLLANG_ElemAttrInfo},
     .preproc = NULL,//&comps_elem_desc_preproc,
     .postproc = &comps_elem_idnamedesc_postproc
 };
@@ -244,6 +244,9 @@ const COMPS_ElemAttrInfo COMPS_ARCH_ElemAttrInfo = {
 };
 const COMPS_ElemAttrInfo COMPS_PACKAGE_ElemAttrInfo = {
     .name="package"
+};
+const COMPS_ElemAttrInfo COMPS_XMLLANG_ElemAttrInfo = {
+    .name="xml:lang"
 };
 
 const COMPS_ElemInfo *COMPS_ElemInfos[] = {
