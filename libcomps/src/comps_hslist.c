@@ -18,6 +18,7 @@
  */
 
 #include "comps_hslist.h"
+#include "comps_set.h"
 
 #include <stdlib.h>
 COMPS_HSList * comps_hslist_create() {

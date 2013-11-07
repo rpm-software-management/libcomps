@@ -18,6 +18,7 @@
  */
 
 #include "comps_docgroup.h"
+#include "comps_set.h"
 
 void comps_docgroup_create(COMPS_DocGroup* group, COMPS_Object **args) {
     (void)args;
@@ -310,8 +311,11 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                 //printf("missing %s\n", props[i]);
             }
         } else {
-            pairlist = comps_objdict_pairs(*(COMPS_ObjDict**)
-                                           (((char*)group)+type[i]));
+            if (*(void**)(((char*)group)+type[i]) == (void*)group->name_by_lang){
+                pairlist = comps_objdict_pairs(group->name_by_lang);
+            } else {
+                pairlist = comps_objdict_pairs(group->desc_by_lang);
+            }
             for (hsit = pairlist->first; hsit != NULL; hsit = hsit->next) {
                 ret = xmlTextWriterStartElement(writer,
                             (const xmlChar*)((aliases[i])?aliases[i]:props[i]));

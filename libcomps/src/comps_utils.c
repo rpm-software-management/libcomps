@@ -18,6 +18,7 @@
  */
 
 #include "comps_utils.h"
+#include "comps_log.h"
 
 void* __comps_str_clone(void *str) {
     char *ret;

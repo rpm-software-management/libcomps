@@ -100,12 +100,17 @@ static void __comps_log_entry(COMPS_Log *log, int code, int type, int n,
                              va_list va){
     COMPS_LogEntry *entry;
     COMPS_Object *val;
+    char *str;
 
     entry = __comps_log_entry_prep(code, type, n);
-
     for (int i=0; i<n; i++) {
         val = va_arg(va, COMPS_Object*);
         entry->args[i] = comps_object_copy(val);
+    }
+    if (log->std_out) {
+        str = comps_log_entry_str(entry);
+        fprintf(stderr, "%s", str);
+        free(str);
     }
     comps_hslist_append(log->entries, entry, 0);
 }
@@ -114,12 +119,16 @@ static void __comps_log_entry_x(COMPS_Log *log, int code, int type, int n,
                              va_list va){
     COMPS_LogEntry *entry;
     COMPS_Object *val;
-
+    char *str;
     entry = __comps_log_entry_prep(code, type, n);
-
     for (int i=0; i<n; i++) {
         val = va_arg(va, COMPS_Object*);
         entry->args[i] = val;
+    }
+    if (log->std_out) {
+        str = comps_log_entry_str(entry);
+        fprintf(stderr, "%s", str);
+        free(str);
     }
     comps_hslist_append(log->entries, entry, 0);
 }

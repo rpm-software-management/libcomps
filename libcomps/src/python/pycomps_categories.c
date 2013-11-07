@@ -18,6 +18,7 @@
  */
 
 #include "pycomps_categories.h"
+#include "libcomps/comps_set.h"
 
 PyObject* PyCOMPSCat_union(PyObject *self, PyObject *other) {
     COMPS_DocCategory *c;

@@ -18,6 +18,7 @@
  */
 
 #include "pycomps_groups.h"
+#include "libcomps/comps_set.h"
 
 PyObject* PyCOMPSGroup_union(PyObject *self, PyObject *other) {
     COMPS_DocGroup *g;
@@ -758,21 +759,25 @@ PyObject* PyCOMPSPack_repr(PyObject *self) {
 }
 
 int PyCOMPSPack_print(PyObject *self, FILE *f, int flags) {
+    #define _package_ ((PyCOMPS_Package*)self)->package
     (void) flags;
-    char *name, *requires;
+    char *str;
     const char *type;
-    type = comps_docpackage_type_str(((PyCOMPS_Package*)self)->package->type);
-    name = comps_object_tostr((COMPS_Object*)
-                              ((PyCOMPS_Package*)self)->package->name);
-    if (((PyCOMPS_Package*)self)->package->requires) {
-        requires = comps_object_tostr((COMPS_Object*)
-                                  ((PyCOMPS_Package*)self)->package->requires);
-        fprintf(f, "<COPMS_Package name='%s' type='%s' requires='%s'>",
-                name, type, requires);
-        free(requires);
-    } else
-        fprintf(f, "<COPMS_Package name='%s' type='%s'>", name, type);
-    free(name);
+    type = comps_docpackage_type_str(_package_->type);
+    str = comps_object_tostr((COMPS_Object*)_package_->name);
+    fprintf(f, "<COPMS_Package name='%s' type='%s' ", str, type);
+    free(str);
+    if (_package_->requires) {
+        str = comps_object_tostr((COMPS_Object*)_package_->requires);
+        fprintf(f, "requires='%s' ", str);
+        free(str);
+    }
+    if (_package_->basearchonly && _package_->basearchonly->val) {
+        str = comps_object_tostr((COMPS_Object*)_package_->basearchonly);
+        fprintf(f, "basearchonly='%s' ", str);
+        free(str);
+    }
+    fprintf(f, ">");
     return 0;
 }
 

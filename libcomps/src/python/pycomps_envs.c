@@ -19,6 +19,7 @@
 
 #include "pycomps_23macros.h"
 #include "pycomps_envs.h"
+#include "libcomps/comps_set.h"
 
 PyObject* PyCOMPSEnv_union(PyObject *self, PyObject *other) {
     COMPS_DocEnv *e;

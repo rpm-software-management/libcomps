@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "comps_log.h"
 #include "comps_obj.h"
 
 #include <libxml/encoding.h>

@@ -18,6 +18,8 @@
  */
 
 #include "comps_doc.h"
+#include "comps_set.h"
+
 #include <stdio.h>
 #include <assert.h>
 static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer);

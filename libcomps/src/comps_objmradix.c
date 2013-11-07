@@ -18,6 +18,7 @@
  */
 
 #include "comps_objmradix.h"
+#include "comps_set.h"
 #include <stdio.h>
 
 void comps_objmrtree_data_destroy(COMPS_ObjMRTreeData * rtd) {

@@ -18,6 +18,7 @@
  */
 
 #include "comps_docpackage.h"
+
 static void comps_docpackage_create(COMPS_DocGroupPackage* package, COMPS_Object **args) {
     (void)args;
     package->name = NULL;
@@ -41,6 +42,7 @@ COMPS_COPY_u(docpackage, COMPS_DocGroupPackage)    /*comps_utils.h macro*/
 static void comps_docpackage_destroy(COMPS_DocGroupPackage *pkg) {
     comps_object_destroy((COMPS_Object*)pkg->name);
     comps_object_destroy((COMPS_Object*)pkg->requires);
+    comps_object_destroy((COMPS_Object*)pkg->basearchonly);
 }
 COMPS_DESTROY_u(docpackage, COMPS_DocGroupPackage) /*comps_utils.h macro*/
 
@@ -151,7 +153,6 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
     }
     COMPS_XMLRET_CHECK
     if (pkg->basearchonly && pkg->basearchonly->val) {
-        str = comps_object_tostr((COMPS_Object*)pkg->requires);
         ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
                                             BAD_CAST "true");
     }

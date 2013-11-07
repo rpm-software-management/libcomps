@@ -23,6 +23,7 @@
 
 #include "comps_types.h"
 #include "comps_parse.h"
+#include "comps_elem.h"
 
 #define BUFF_SIZE 1024
 
@@ -209,55 +210,50 @@ signed char comps_parse_str(COMPS_Parsed *parsed, char *str) {
 
 void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
     COMPS_ListItem * item;
-    char * all = NULL;
-    int item_len, index=0;
+    char * alltext = NULL;
+    size_t item_len;
+    int index=0;
     #define parser_line XML_GetCurrentLineNumber(((COMPS_Parsed*)userData)->parser)
     #define parser_col XML_GetCurrentColumnNumber(((COMPS_Parsed*)userData)->parser)
     #define parsed ((COMPS_Parsed*)userData)
+    #define last_elem ((COMPS_Elem*)parsed->elem_stack->last->data)
 
     /* check if there's some text in recent element - are we interested in?*/
-    if (parsed->text_buffer_pt) {
-        all = malloc(sizeof(char)*(parsed->text_buffer_len + 1));
-        if (all == NULL) {
+    if (parsed->text_buffer_len) {
+        alltext = malloc(sizeof(char)*(parsed->text_buffer_len + 1));
+        if (alltext == NULL) {
             comps_log_error(parsed->log, COMPS_ERR_MALLOC, 0);
             raise(SIGABRT);
         }
     }
-    /* remove all items of "text_buffer" list and append it into one string,
-       but only if we're interested in text data in current element */
-    if (all == NULL && parsed->text_buffer->first) {
-        comps_log_error_x(parsed->log, COMPS_ERR_TEXT_BETWEEN, 3,
-                         comps_str((char*)parsed->text_buffer->first->data),
-                         comps_num(parser_line), comps_num(parser_col));
-    }
-
     while ((item = comps_list_shift(parsed->text_buffer)) != NULL) {
         item_len = strlen((char*)item->data);
-
-        if (all) memcpy(all + index, item->data, item_len * sizeof(char));
+        memcpy(alltext + index, item->data, item_len * sizeof(char));
         comps_list_item_destroy(item);
         index += item_len;
     }
     /* set zero char at the end of string */
-    if (all) {
-        if (parsed->text_buffer_len == 0)
-            comps_log_error_x(parsed->log, COMPS_ERR_NOCONTENT, 3, comps_str(s),
-                            comps_num(parser_line), comps_num(parser_col));
-        memset(all+parsed->text_buffer_len, 0, sizeof(char));
-        *parsed->text_buffer_pt = all;
-    }
-    parsed->text_buffer_len = 0;
-    parsed->text_buffer_pt = NULL;
+    if (alltext)
+        memset(alltext+parsed->text_buffer_len, 0, sizeof(char));
+    parsed->tmp_buffer = alltext;
 
     /* start postprocess for currently processed elements */
-    if (comps_elem_get_type(s) ==
-        ((COMPS_Elem*)parsed->elem_stack->last->data)->type){
-        comps_parse_el_postprocess(s, userData);
-
+    if (comps_elem_get_type(s) == last_elem->type) {
+        if (last_elem->valid && COMPS_ElemInfos[last_elem->type]->postproc) {
+            COMPS_ElemInfos[last_elem->type]->postproc((COMPS_Parsed*)userData,
+                                                       last_elem);
+        }
+        if (last_elem->valid && parsed->tmp_buffer) {
+            comps_log_error_x(parsed->log, COMPS_ERR_TEXT_BETWEEN, 3,
+                              comps_str(parsed->tmp_buffer), comps_num(parser_line),
+                              comps_num(parser_col));
+        }
         /* finaly, remove element from element stack */
         item = comps_list_pop(parsed->elem_stack);
         comps_list_item_destroy(item);
     }
+    free(alltext);
+    parsed->text_buffer_len = 0;
     #undef parsed
     #undef parser_line
     #undef parser_col
@@ -267,18 +263,6 @@ void comps_parse_def_handler(void *userData, const XML_Char *s, int len) {
     (void) userData;
     (void) s;
     (void) len;
-}
-
-COMPS_PackageType comps_package_get_type(const XML_Char *s)
-{
-    COMPS_ElemType type;
-    if (!s) type = COMPS_PACKAGE_MANDATORY;
-    else if (strcmp(s, "default") == 0) type = COMPS_PACKAGE_DEFAULT;
-    else if (strcmp(s, "optional") == 0) type = COMPS_PACKAGE_OPTIONAL;
-    else if (strcmp(s, "mandatory") == 0) type = COMPS_PACKAGE_MANDATORY;
-    else if (strcmp(s, "conditional") == 0) type = COMPS_PACKAGE_CONDITIONAL;
-    else type = COMPS_PACKAGE_UNKNOWN;
-    return type;
 }
 
 void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
@@ -322,6 +306,7 @@ void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed)
                         comps_num(parser_line), comps_num(parser_col));
     }
     switch (comps_elem_get_type(s)) {
+        case COMPS_ELEM_SENTINEL:
         case COMPS_ELEM_UNKNOWN:
         case COMPS_ELEM_NONE:
             parsed->tmp_buffer = NULL;
@@ -808,6 +793,7 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
 
     switch (elem->type)
     {
+        case COMPS_ELEM_SENTINEL:
         case COMPS_ELEM_WHITEOUT:
         case COMPS_ELEM_BLACKLIST:
         case COMPS_ELEM_LANGPACKS:
@@ -982,7 +968,11 @@ void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed)
             groupid = (COMPS_DocGroupId*)
                       comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
             tmp = comps_dict_get(elem->attrs, "default");
-            comps_docgroupid_set_default(groupid, __comps_strcmp(tmp, "true"));
+            if (tmp)
+                comps_docgroupid_set_default(groupid,
+                                             __comps_strcmp(tmp, "true")?0:1);
+            else
+                comps_docgroupid_set_default(groupid,0);
 
             if (parent == COMPS_ELEM_GROUPLIST) {
                 if (grandparent == COMPS_ELEM_CATEGORY) {
@@ -1075,6 +1065,9 @@ void comps_parse_start_elem_handler(void *userData,
                               const XML_Char **attrs) {
     #define parser_line XML_GetCurrentLineNumber(((COMPS_Parsed*)userData)->parser)
     #define parser_col XML_GetCurrentColumnNumber(((COMPS_Parsed*)userData)->parser)
+    #define ELEMINFO  COMPS_ElemInfos[elem->type]
+    #define LAST ((COMPS_Parsed*)userData)->elem_stack->last
+    #define LASTELEM  ((COMPS_Elem*)((COMPS_Parsed*)userData)->elem_stack->last->data)
 
     COMPS_Elem * elem = NULL;
     COMPS_ElemType type;
@@ -1088,13 +1081,37 @@ void comps_parse_start_elem_handler(void *userData,
         raise(SIGABRT);
         return;
     }
+    elem->valid = 0;
+
+    if (ELEMINFO->ancestors[0] != COMPS_ELEM_NONE) {
+        if (!LAST) {
+
+        } else {
+            elem->ancestor = LASTELEM;
+            for (int x = 0; ELEMINFO->ancestors[x] != COMPS_ELEM_SENTINEL; x++){
+                if (ELEMINFO->ancestors[x] == LASTELEM->type) {
+                    elem->valid = 1;
+                    break;
+                }
+            }
+        }
+    } else {
+        elem->valid = 1;
+    }
+    if (!elem->valid) {
+        comps_log_error_x(((COMPS_Parsed*)userData)->log,
+                          COMPS_ERR_NOPARENT, 3, comps_str(s),
+                          comps_num(parser_line),
+                          comps_num(parser_col));
+    }
+
     item = comps_list_item_create(elem, NULL, &comps_elem_destroy);
     if (((COMPS_Parsed*)userData)->text_buffer->first) {
-            comps_log_error_x(((COMPS_Parsed*)userData)->log,
-                              COMPS_ERR_TEXT_BETWEEN, 3,
-                              comps_str((char*)((COMPS_Parsed*)userData)
-                                             ->text_buffer->first->data),
-                              comps_num(parser_line), comps_num(parser_col));
+        comps_log_error_x(((COMPS_Parsed*)userData)->log,
+                          COMPS_ERR_TEXT_BETWEEN, 3,
+                          comps_str((char*)((COMPS_Parsed*)userData)
+                                         ->text_buffer->first->data),
+                          comps_num(parser_line), comps_num(parser_col));
         comps_list_clear(((COMPS_Parsed*)userData)->text_buffer);
         ((COMPS_Parsed*)userData)->text_buffer_len = 0;
     }
@@ -1102,10 +1119,17 @@ void comps_parse_start_elem_handler(void *userData,
     /* end append it to element stack */
     comps_list_append(((COMPS_Parsed*)userData)->elem_stack, item);
     /* preprocess new element */
-    comps_parse_el_preprocess(elem, (COMPS_Parsed*)userData);
+    if (ELEMINFO->preproc && elem->valid) {
+        ELEMINFO->preproc((COMPS_Parsed*)userData, elem);
+    } else {
+
+    }
 
     #undef parser_line
     #undef parser_col
+    #undef ELEMINFO
+    #undef LAST
+    #undef LASTELEM
 }
 
 

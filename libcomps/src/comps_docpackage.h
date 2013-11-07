@@ -22,6 +22,7 @@
 
 #include "comps_utils.h"
 #include "comps_obj.h"
+#include "comps_log.h"
 
 /** \file comps_docpackage.h
  * \brief COMPS_DocPackage header file

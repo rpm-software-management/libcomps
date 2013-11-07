@@ -18,6 +18,7 @@
  */
 
 #include "comps_doccategory.h"
+#include "comps_set.h"
 
 void comps_doccategory_create(COMPS_DocCategory *category, COMPS_Object **args) {
     (void)args;

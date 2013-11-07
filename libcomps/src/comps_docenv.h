@@ -11,6 +11,7 @@
 #include "comps_docgroupid.h"
 #include "comps_validate.h"
 #include "comps_radix.h"
+#include "comps_log.h"
 
 /** COMPS_Object derivate representing environment element in comps.xml file */
 typedef struct {

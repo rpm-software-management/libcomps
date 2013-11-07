@@ -17,7 +17,6 @@
  * USA
  */
 
-#include "comps_set.h"
 
 #ifndef COMPS_HSLIST_H
 #define COMPS_HSLIST_H

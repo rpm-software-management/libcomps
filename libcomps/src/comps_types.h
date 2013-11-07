@@ -22,5 +22,24 @@
 
 typedef struct COMPS_Log COMPS_Log;
 typedef struct COMPS_LogEntry COMPS_LogEntry;
+//typedef struct COMPS_ElemAttr COMPS_ElemAttr;
+//typedef struct COMPS_Elem COMPS_Elem;
+//typedef struct COMPS_ElemAttrInfo COMPS_ElemAttrInfo;
 
+/*struct COMPS_ElemAttr {
+    char *name;
+    char *val;
+};
+
+struct COMPS_Elem {
+    char *name;
+    COMPS_Dict *attrs;
+    COMPS_ElemType type;
+};
+
+struct COMPS_ElemAttrInfo {
+    char *name;
+    signed char (*val_check)(const char*);
+};
+*/
 #endif

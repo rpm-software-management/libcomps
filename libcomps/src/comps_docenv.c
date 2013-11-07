@@ -18,6 +18,7 @@
  */
 
 #include "comps_docenv.h"
+#include "comps_set.h"
 
 void comps_docenv_create(COMPS_DocEnv* env, COMPS_Object **args) {
     (void)args;

@@ -27,6 +27,7 @@
 #include "comps_docgroupid.h"
 #include "comps_validate.h"
 #include "comps_radix.h"
+#include "comps_log.h"
 
 #include <stddef.h>
 #include <assert.h>
