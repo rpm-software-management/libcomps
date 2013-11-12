@@ -82,6 +82,40 @@ char* comps_docgroupid_str_u(COMPS_Object* docgroupid) {
     return ret;
 }
 
+signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
+                                  xmlTextWriterPtr writer,
+                                  COMPS_Log *log, COMPS_XMLOptions *options) {
+    char *str;
+    bool default_def = false;
+    int ret;
+
+    ret = xmlTextWriterStartElement(writer, BAD_CAST "groupid");
+    COMPS_XMLRET_CHECK
+    if (options->gid_default_explicit) {
+        if (groupid->def)
+            ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                              BAD_CAST "true");
+        else
+            ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                              BAD_CAST "false");
+        COMPS_XMLRET_CHECK
+    } else if (groupid->def != default_def) {
+        if (groupid->def)
+            ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                              BAD_CAST "true");
+        else
+            ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                              BAD_CAST "false");
+    }
+    str = comps_object_tostr((COMPS_Object*)groupid->name);
+    ret = xmlTextWriterWriteString(writer, BAD_CAST str);
+    COMPS_XMLRET_CHECK
+    free(str);
+    ret = xmlTextWriterEndElement(writer);
+    COMPS_XMLRET_CHECK
+    return 0;
+}
+
 COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo = {
     .obj_size = sizeof(COMPS_DocGroupId),
     .constructor = &comps_docgroupid_create_u,

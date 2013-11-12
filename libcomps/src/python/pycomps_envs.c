@@ -89,7 +89,7 @@ int PyCOMPSEnv_init(PyCOMPS_Env *self, PyObject *args, PyObject *kwds)
         comps_docenv_set_id(self->env, id, 1);
         comps_docenv_set_name(self->env, name, 1);
         comps_docenv_set_desc(self->env, desc, 1);
-        if (disp_ord)
+        if (disp_ord != -1)
             comps_docenv_set_display_order(self->env, disp_ord);
         return 0;
     } else {

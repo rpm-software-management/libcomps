@@ -304,7 +304,7 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     for (int i=0; i<6; i++) {
         if (!type[i]) {
             obj = comps_objdict_get_x(env->properties, props[i]);
-            if (obj) {
+            if (obj != NULL) {
                 str = comps_object_tostr(obj);
                 __comps_xml_prop((aliases[i])?aliases[i]:props[i], str, writer);
                 free(str);

@@ -275,6 +275,10 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                               0, 0, 0};
     static char* aliases[] = {NULL, NULL, NULL, "description", "description",
                               "default", NULL, NULL, NULL};
+    static bool explicit[] = {true, true, true, true, true, false, false, true};
+    static char *default_val[] = {NULL, NULL, NULL, NULL, NULL,
+                                  "true", "true", NULL};
+
     static char*(*tostrf[])(COMPS_Object*) = {&comps_object_tostr,
                                                &comps_object_tostr,
                                                &comps_object_tostr,
@@ -286,7 +290,8 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                                                &comps_object_tostr};
     char *str;
     int ret;
-
+    explicit[5] = options->default_explicit;
+    explicit[6] = options->uservisible_explicit;
     if (group->packages->len == 0 && !options->empty_groups) {
         obj = comps_docgroup_get_id(group);
         comps_log_error(log, COMPS_ERR_PKGLIST_EMPTY, 1, obj);
@@ -294,21 +299,33 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
         return 1;
     }
     xmlTextWriterStartElement(writer, BAD_CAST "group");
-    if (!comps_objdict_get_x(group->properties, "uservisible")) {
+    /*if (!comps_objdict_get_x(group->properties, "uservisible")) {
         comps_objdict_set_x(group->properties, "uservisible",
                             (COMPS_Object*)comps_num(1));
-    }
+    }*/
 
     for (int i=0; i<9; i++) {
         //printf("%s\n", props[i]);
         if (!type[i]) {
             obj = comps_objdict_get_x(group->properties, props[i]);
-            if (obj) {
-                str = tostrf[i](obj);
-                __comps_xml_prop((aliases[i])?aliases[i]:props[i], str, writer);
-                free(str);
+            if (explicit[i]) {
+                if (obj) {
+                    str = tostrf[i](obj);
+                    __comps_xml_prop((aliases[i])?aliases[i]:props[i], str, writer);
+                    free(str);
+                } else if (default_val[i]){
+                    __comps_xml_prop((aliases[i])?aliases[i]:props[i],
+                                     default_val[i], writer);
+                }
             } else {
-                //printf("missing %s\n", props[i]);
+                if (obj) {
+                    str = tostrf[i](obj);
+                    if (!default_val[i] || (strcmp(str, default_val[i]) != 0)) {
+                        __comps_xml_prop((aliases[i])?aliases[i]:props[i], str,
+                                         writer);
+                    }
+                    free(str);
+                }
             }
         } else {
             if (*(void**)(((char*)group)+type[i]) == (void*)group->name_by_lang){

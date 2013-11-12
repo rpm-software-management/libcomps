@@ -56,7 +56,7 @@ char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
                       &(*options)->default_explicit,
                       &(*options)->gid_default_explicit,
                       &(*options)->bao_explicit};
-
+    **options = COMPS_XMLDefaultOptions;
 
     if (!PyDict_Check(pobj)) {
         cobj = NULL;
@@ -64,8 +64,8 @@ char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
     } else {
         for (x = 0; keys[x] != NULL; x++) {
             val = PyDict_GetItemString(pobj, keys[x]);
-            if (PyBool_Check(val)) {
-                if (val == Py_True)
+            if (val && PyBool_Check(val)) {
+                if (val && val == Py_True)
                     *props[x] = true;
                 else
                     *props[x] = false;
@@ -121,7 +121,7 @@ PyObject* PyCOMPS_toxml_str(PyObject *self, PyObject *args, PyObject *kwds) {
     PyObject *ret;
     const char *errors = NULL;
     COMPS_XMLOptions *options = NULL;
-    char* keywords[] = {"fname", "options"};
+    char* keywords[] = {"options"};
     if (PyArg_ParseTupleAndKeywords(args, kwds, "|O&", keywords,
                                     __pycomps_dict_to_xml_opts, &options)) {
 
@@ -241,6 +241,7 @@ PyObject* PyCOMPS_get_last_log(PyObject *self, void *closure)
     }
     return ret;
 }
+
 
 PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
     char *tmps;
@@ -453,6 +454,10 @@ static PyMethodDef PyCOMPS_methods[] = {
     "write XML represenstation of COMPS to file"},
     {"xml_str", (PyCFunction)PyCOMPS_toxml_str, METH_KEYWORDS,
     "return XML represenstation of COMPS as string"},
+    {"toxml_f", (PyCFunction)PyCOMPS_toxml_f, METH_KEYWORDS,
+    "write XML represenstation of COMPS to file"},
+    {"toxml_str", (PyCFunction)PyCOMPS_toxml_str, METH_KEYWORDS,
+    "return XML represenstation of COMPS as string"},
     {"fromxml_f", (PyCFunction)PyCOMPS_fromxml_f, METH_O,
     "Load COMPS from xml file"},
     {"fromxml_str", (PyCFunction)PyCOMPS_fromxml_str, METH_O,
@@ -585,13 +590,58 @@ PyTypeObject PyCOMPS_Type = {
     0,                         /* tp_alloc */
     PyCOMPS_new,                /* tp_new */};
 
+PyObject* Libcomps_xml_default(PyObject *self) {
+    const char *keys[] = {"empty_groups", "empty_categories",
+                          "empty_environments", "empty_langpacks",
+                          "empty_blacklist", "empty_whiteout",
+                          "empty_packages", "empty_grouplist",
+                          "empty_optionlist", "uservisible_explicit",
+                          "default_explicit", "gid_default_explicit",
+                          "bao_explicit", NULL};
+    PyObject *ukey, *val;
+    _Bool *props[] = {&COMPS_XMLDefaultOptions.empty_groups,
+                      &COMPS_XMLDefaultOptions.empty_categories,
+                      &COMPS_XMLDefaultOptions.empty_environments,
+                      &COMPS_XMLDefaultOptions.empty_langpacks,
+                      &COMPS_XMLDefaultOptions.empty_blacklist,
+                      &COMPS_XMLDefaultOptions.empty_whiteout,
+                      &COMPS_XMLDefaultOptions.empty_packages,
+                      &COMPS_XMLDefaultOptions.empty_grouplist,
+                      &COMPS_XMLDefaultOptions.empty_optionlist,
+                      &COMPS_XMLDefaultOptions.uservisible_explicit,
+                      &COMPS_XMLDefaultOptions.default_explicit,
+                      &COMPS_XMLDefaultOptions.gid_default_explicit,
+                      &COMPS_XMLDefaultOptions.bao_explicit};
+    PyObject *ret = PyDict_New();
+    (void)self;
+
+    for (int x=0; keys[x] != NULL; x++) {
+        ukey = PyUnicode_FromString(keys[x]);
+        if (props[x]) {
+            val = Py_True;
+            Py_INCREF(val);
+        } else {
+            val = Py_False;
+            Py_INCREF(val);
+        }
+        PyDict_SetItem(ret, ukey, val);
+        Py_DECREF(ukey);
+    }
+    return ret;
+}
+
+static PyMethodDef LibcompsMethods[] = {
+    {"get_xml_default_options", (PyCFunction)Libcomps_xml_default, METH_NOARGS,
+     "Return xml output default options"},
+    {NULL, NULL, 0, NULL}        /* Sentinel */
+};
 #if PY_MAJOR_VERSION >= 3
     static struct PyModuleDef moduledef = {
             PyModuleDef_HEAD_INIT,
             "_libpycomps",
             "libcomps module",
             -1,
-            NULL, //myextension_methods,
+            &LibcompsMethods, //myextension_methods,
             NULL,
             NULL, //myextension_traverse,
             NULL, //myextension_clear,
@@ -672,7 +722,7 @@ PYINIT_FUNC(void) {
     #if PY_MAJOR_VERSION >= 3
         m = PyModule_Create(&moduledef);
     #else
-        m = Py_InitModule("_libpycomps", NULL);
+        m = Py_InitModule("_libpycomps", LibcompsMethods);
     #endif
     Py_INCREF(&PyCOMPS_Type);
     PyModule_AddObject(m, "Comps", (PyObject*) &PyCOMPS_Type);

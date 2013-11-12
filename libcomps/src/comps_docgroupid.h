@@ -24,14 +24,17 @@
 #ifndef COMPS_DOCGROUPID_H
 #define COMPS_DOCGROUPID_H
 
+#include <stdbool.h>
+
 #include "comps_utils.h"
+#include "comps_log.h"
 
 /** COMPS_Object derivate representing group_id element in comps.xml file */
 typedef struct {
     COMPS_Object_HEAD;
     COMPS_Str *name;
     /**< name of GroupId */
-    char def;
+    bool def;
     /**< GroupId default attribute */
 } COMPS_DocGroupId;
 
@@ -70,6 +73,10 @@ COMPS_Object* comps_docgroupid_get_default(COMPS_DocGroupId *gid);
  * Old defaut objects reference counter will be decremented
  */
 void comps_docgroupid_set_default(COMPS_DocGroupId *gid, int def);
+
+signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
+                                  xmlTextWriterPtr writer,
+                                  COMPS_Log *log, COMPS_XMLOptions *options);
 
 extern COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo;
 

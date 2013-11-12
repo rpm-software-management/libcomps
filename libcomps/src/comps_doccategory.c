@@ -272,20 +272,8 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
         COMPS_XMLRET_CHECK
         for (it = category->group_ids->first; it != NULL; it = it->next) {
-            ret = xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
-            COMPS_XMLRET_CHECK
-            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
-                ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
-                                                  BAD_CAST "true");
-                COMPS_XMLRET_CHECK
-            }
-            str = comps_object_tostr((COMPS_Object*)
-                                     ((COMPS_DocGroupId*)it->comps_obj)->name);
-            ret = xmlTextWriterWriteString(writer, BAD_CAST str);
-            COMPS_XMLRET_CHECK
-            free(str);
-            ret = xmlTextWriterEndElement(writer);
-            COMPS_XMLRET_CHECK
+            comps_docgroupid_xml((COMPS_DocGroupId*)(COMPS_DocGroupId*)it->comps_obj,
+                                 writer, log, options);
         }
         ret = xmlTextWriterEndElement(writer);
         COMPS_XMLRET_CHECK
