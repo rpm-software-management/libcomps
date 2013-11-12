@@ -391,13 +391,14 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
  * @return 0 if there wasn't any errors, 1 if there was non-fatal errors
  * -1 if fatal error emerge during xml generation
  */
-signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect);
+signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect,
+                        COMPS_XMLOptions *options);
 
 /** Generate XML string representating COMPS_Doc structure
  * @param doc COMPS_Doc object
  * @return XML string
  */
-char* comps2xml_str(COMPS_Doc *doc);
+char* comps2xml_str(COMPS_Doc *doc, COMPS_XMLOptions *options);
 
 /** Union two COMPS_Doc structures
  * COMPS_Doc structures are unioned as unioning it's subparts

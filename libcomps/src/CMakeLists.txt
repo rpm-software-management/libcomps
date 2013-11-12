@@ -6,7 +6,7 @@ set (libcomps_SOURCES comps_doc.c comps_docgroup.c comps_doccategory.c
      comps_parse.c comps_log.c
      comps_utils.c comps_validate.c 
      comps_log_codes.c
-     #comps_getset.c
+     comps_types.c
      )
 set (libcomps_HEADERS comps_doc.h comps_docgroup.h comps_doccategory.h
                       comps_docenv.h comps_docpackage.h comps_docgroupid.h

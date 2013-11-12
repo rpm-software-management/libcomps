@@ -380,13 +380,12 @@ void comps_parse_check_attributes(COMPS_Parsed *parsed, COMPS_Elem* elem) {
     info = COMPS_ElemInfos[elem->type];
     int attr_count;
     COMPS_HSList *keys;
-    char found, *val;
+    char *val;
     COMPS_HSListItem *it;
 
     for (attr_count = 0; info->attributes[attr_count] != NULL; attr_count++);
     keys = comps_dict_keys(elem->attrs);
     for (int x =0; x<attr_count; x++) {
-        found = 0;
         for (it = keys->first; it != NULL; it = it->next) {
             if (strcmp((char*)it->data, info->attributes[x]->name) == 0) {
                 if (info->attributes[x]->val_check) {

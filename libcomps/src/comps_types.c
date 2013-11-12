@@ -17,31 +17,22 @@
  * USA
  */
 
-#ifndef COMPS_TYPES_H
-#define COMPS_TYPES_H
+#include "comps_types.h"
 
-#include <stdbool.h>
+COMPS_XMLOptions COMPS_XMLDefaultOptions = {
+    .empty_groups = false,
+    .empty_categories = false,
+    .empty_environments = false,
+    .empty_langpacks = false,
+    .empty_blacklist = false,
+    .empty_whiteout = false,
+    .empty_packages = false,
+    .empty_grouplist = false,
+    .empty_optionlist = false,
+    .uservisible_explicit = false,
+    .default_explicit = false,
+    .gid_default_explicit = false,
+    .bao_explicit = false
+};
 
-typedef struct COMPS_Log COMPS_Log;
-typedef struct COMPS_LogEntry COMPS_LogEntry;
-
-typedef struct COMPS_XMLOptions {
-    _Bool empty_groups;
-    _Bool empty_categories;
-    _Bool empty_environments;
-    _Bool empty_langpacks;
-    _Bool empty_blacklist;
-    _Bool empty_whiteout;
-    _Bool empty_packages;
-    _Bool empty_grouplist;
-    _Bool empty_optionlist;
-    _Bool uservisible_explicit;
-    _Bool default_explicit;
-    _Bool gid_default_explicit;
-    _Bool bao_explicit;
-} COMPS_XMLOptions;
-
-extern COMPS_XMLOptions COMPS_XMLDefaultOptions;
-
-#endif
 

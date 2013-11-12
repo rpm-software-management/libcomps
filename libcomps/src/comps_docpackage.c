@@ -128,8 +128,8 @@ inline char comps_docpackage_cmp_set(void *pkg1, void *pkg2) {
 }
 
 signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
-                          xmlTextWriterPtr writer,
-                          COMPS_Log *log) {
+                                 xmlTextWriterPtr writer,
+                                 COMPS_Log *log, COMPS_XMLOptions *options) {
     char *str;
     int ret;
 

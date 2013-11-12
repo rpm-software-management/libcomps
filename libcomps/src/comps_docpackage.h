@@ -124,9 +124,9 @@ void comps_docpackage_set_basearchonly(COMPS_DocGroupPackage *pkg,
  * */
 COMPS_Object* comps_docpackage_get_basearchonly(COMPS_DocGroupPackage *pkg);
 
-signed char comps_docpackage_xml(COMPS_DocGroupPackage *package,
+signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
                                  xmlTextWriterPtr writer,
-                                 COMPS_Log *log);
+                                 COMPS_Log *log, COMPS_XMLOptions *options);
 
 
 extern COMPS_ObjectInfo COMPS_DocGroupPackage_ObjInfo;

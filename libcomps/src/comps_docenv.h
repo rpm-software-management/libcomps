@@ -188,7 +188,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
 COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
 
 signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
-                             COMPS_Log *log);
+                             COMPS_Log *log, COMPS_XMLOptions *options);
 
 extern COMPS_ObjectInfo COMPS_DocEnv_ObjInfo;
 

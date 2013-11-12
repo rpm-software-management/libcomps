@@ -192,7 +192,7 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
 
 signed char comps_doccategory_xml(COMPS_DocCategory *category,
                                   xmlTextWriterPtr writer,
-                                  COMPS_Log *log);
+                                  COMPS_Log *log, COMPS_XMLOptions *options);
 
 extern COMPS_ObjectInfo COMPS_DocCategory_ObjInfo;
 

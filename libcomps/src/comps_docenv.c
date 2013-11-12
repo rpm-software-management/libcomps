@@ -277,7 +277,7 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
 }
 
 signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
-                        COMPS_Log *log) {
+                             COMPS_Log *log, COMPS_XMLOptions *options) {
     COMPS_ObjListIt *it;
     COMPS_Object *obj;
     COMPS_HSList *pairlist;
@@ -292,7 +292,8 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     char *str;
     int ret;
 
-    if (env->group_list->len == 0 && env->group_list->len == 0) {
+    if (env->group_list->len == 0 && env->group_list->len == 0 &&
+        !options->empty_environments) {
         obj = comps_docenv_get_id(env);
         comps_log_error(log, COMPS_ERR_PKGLIST_EMPTY, 1, obj);
         COMPS_OBJECT_DESTROY(obj);
@@ -330,7 +331,7 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
             comps_hslist_destroy(&pairlist);
         }
     }
-    if (env->group_list->len) {
+    if (env->group_list->len || options->empty_grouplist) {
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
         COMPS_XMLRET_CHECK
         for (it = env->group_list->first; it != NULL; it = it->next) {
@@ -353,7 +354,7 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
         COMPS_XMLRET_CHECK
     }
 
-    if (env->option_list->len) {
+    if (env->option_list->len || options->empty_optionlist) {
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"optionlist");
         COMPS_XMLRET_CHECK
         for (it = env->option_list->first; it != NULL; it = it->next) {

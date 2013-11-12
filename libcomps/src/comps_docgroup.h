@@ -236,7 +236,7 @@ COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,
                                          COMPS_DocGroup *g2);
 
 signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
-                        COMPS_Log *log);
+                               COMPS_Log *log, COMPS_XMLOptions *options);
 
 extern COMPS_ObjectInfo COMPS_DocGroup_ObjInfo;
 extern COMPS_ValRuleGeneric* COMPS_DocGroup_ValidateRules[];

@@ -19,10 +19,12 @@
 
 #include "comps_doc.h"
 #include "comps_set.h"
+#include "comps_types.h"
 
 #include <stdio.h>
 #include <assert.h>
-static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer);
+static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
+                                 COMPS_XMLOptions *options);
 
 void comps_doc_create(COMPS_Doc* doc, COMPS_Object **args) {
     doc->objects = (COMPS_ObjDict*) comps_object_create(&COMPS_ObjDict_ObjInfo,
@@ -151,7 +153,8 @@ COMPS_DOC_SETOBJMDICT(whiteout) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJMDICT(whiteout,  whiteout) /*comps_doc.h macro*/
 
 
-signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
+signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect,
+                        COMPS_XMLOptions *options) {
     xmlDocPtr xmldoc;
     int retc;
     char *str;
@@ -169,7 +172,10 @@ signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
     doc->log->std_out = stdoutredirect;
     if (retc<0)
         comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
-    genret = comps_doc_xml(doc, writer);
+    if (options)
+        genret = comps_doc_xml(doc, writer, options);
+    else
+        genret = comps_doc_xml(doc, writer, &COMPS_XMLDefaultOptions);
     retc = xmlTextWriterEndDocument(writer);
     if (retc<0)
         comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
@@ -186,7 +192,7 @@ signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect) {
     return genret;
 }
 
-char* comps2xml_str(COMPS_Doc *doc) {
+char* comps2xml_str(COMPS_Doc *doc, COMPS_XMLOptions *options) {
     xmlDocPtr xmldoc;
     const char *xmlstr;
     signed char genret;
@@ -206,7 +212,7 @@ char* comps2xml_str(COMPS_Doc *doc) {
         retc = xmlTextWriterStartDocument(writer, NULL, "UTF-8", NULL);
     }
     if (retc<0) comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
-    genret = comps_doc_xml(doc, writer);
+    genret = comps_doc_xml(doc, writer, (options)?options:&COMPS_XMLDefaultOptions);
     retc = xmlTextWriterEndDocument(writer);
     if (retc<0) comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
     xmlSaveFormatFileTo(xmlobuff, xmldoc, NULL, 1);
@@ -491,7 +497,8 @@ inline int __comps_check_xml_get(int retcode, COMPS_Log * log) {
     } return 0;
 }
 
-static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
+static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
+                                 COMPS_XMLOptions *options) {
     COMPS_ObjListIt *it;
     COMPS_ObjList *list;
     COMPS_ObjDict *dict;
@@ -514,7 +521,7 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
     if (list) {
         for (it = list->first; it != NULL; it = it->next) {
             tmpret = comps_docgroup_xml((COMPS_DocGroup*)it->comps_obj,
-                                        writer, doc->log);
+                                        writer, doc->log, options);
             if (tmpret == -1) return -1;
             else ret += tmpret;
         }
@@ -524,7 +531,7 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
     if (list) {
         for (it = list->first; it != NULL; it = it->next) {
             tmpret = comps_doccategory_xml((COMPS_DocCategory*)it->comps_obj,
-                                           writer, doc->log);
+                                           writer, doc->log, options);
             if (tmpret == -1) return -1;
             else ret += tmpret;
         }
@@ -534,7 +541,7 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer) {
     if (list) {
         for (it = list->first; it != NULL; it = it->next) {
             tmpret = comps_docenv_xml((COMPS_DocEnv*)it->comps_obj,
-                                      writer, doc->log);
+                                      writer, doc->log, options);
             if (tmpret == -1) return -1;
             else ret += tmpret;
         }

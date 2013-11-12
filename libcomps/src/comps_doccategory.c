@@ -214,8 +214,9 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
     return res;
 }
 
-signed char comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr writer,
-                        COMPS_Log *log) {
+signed char comps_doccategory_xml(COMPS_DocCategory *category,
+                                  xmlTextWriterPtr writer,
+                                  COMPS_Log *log, COMPS_XMLOptions *options) {
     COMPS_ObjListIt *it;
     COMPS_Object *obj;
     COMPS_HSList *pairlist;
@@ -228,7 +229,7 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr 
     char *str;
     int ret;
 
-    if (category->group_ids->len == 0) {
+    if (category->group_ids->len == 0 && !options->empty_categories) {
         obj = comps_doccategory_get_id(category);
         comps_log_error(log, COMPS_ERR_PKGLIST_EMPTY, 1, obj);
         COMPS_OBJECT_DESTROY(obj);
@@ -267,27 +268,28 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category, xmlTextWriterPtr 
             comps_hslist_destroy(&pairlist);
         }
     }
-    //if (category->group_ids->len) {
-    ret = xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
-    COMPS_XMLRET_CHECK
-    for (it = category->group_ids->first; it != NULL; it = it->next) {
-        ret = xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
+    if (category->group_ids->len || options->empty_grouplist) {
+        ret = xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
         COMPS_XMLRET_CHECK
-        if (((COMPS_DocGroupId*)it->comps_obj)->def) {
-            ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
-                                              BAD_CAST "true");
+        for (it = category->group_ids->first; it != NULL; it = it->next) {
+            ret = xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
+            COMPS_XMLRET_CHECK
+            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
+                ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
+                                                  BAD_CAST "true");
+                COMPS_XMLRET_CHECK
+            }
+            str = comps_object_tostr((COMPS_Object*)
+                                     ((COMPS_DocGroupId*)it->comps_obj)->name);
+            ret = xmlTextWriterWriteString(writer, BAD_CAST str);
+            COMPS_XMLRET_CHECK
+            free(str);
+            ret = xmlTextWriterEndElement(writer);
             COMPS_XMLRET_CHECK
         }
-        str = comps_object_tostr((COMPS_Object*)
-                                 ((COMPS_DocGroupId*)it->comps_obj)->name);
-        ret = xmlTextWriterWriteString(writer, BAD_CAST str);
-        COMPS_XMLRET_CHECK
-        free(str);
         ret = xmlTextWriterEndElement(writer);
         COMPS_XMLRET_CHECK
     }
-    ret = xmlTextWriterEndElement(writer);
-    COMPS_XMLRET_CHECK
     ret = xmlTextWriterEndElement(writer);
     COMPS_XMLRET_CHECK
     return 0;
