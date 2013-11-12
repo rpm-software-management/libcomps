@@ -71,12 +71,12 @@ int PyCOMPSCat_init(PyCOMPS_Category *self, PyObject *args, PyObject *kwds)
 {
     #define _cat_ ((PyCOMPS_Category*)self)->cat
     char *name, *id, *desc;
-    unsigned disp_ord;
+    int disp_ord;
     static char *kwlist[] = {"id", "name", "desc", "display_order", NULL};
     id = NULL;
     name = NULL;
     desc = NULL;
-    disp_ord = 0;
+    disp_ord = -1;
     if (!args && !kwds){
         return 0;
     }
@@ -85,7 +85,8 @@ int PyCOMPSCat_init(PyCOMPS_Category *self, PyObject *args, PyObject *kwds)
         comps_doccategory_set_id(_cat_, id, 1);
         comps_doccategory_set_name(_cat_, name, 1);
         comps_doccategory_set_desc(_cat_, desc, 1);
-        comps_doccategory_set_display_order(_cat_, disp_ord);
+        if (disp_ord != -1)
+            comps_doccategory_set_display_order(_cat_, disp_ord);
         return 0;
     }else {
         return -1;

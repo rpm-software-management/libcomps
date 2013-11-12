@@ -277,7 +277,7 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                               "default", NULL, NULL, NULL};
     static bool explicit[] = {true, true, true, true, true, false, false, true};
     static char *default_val[] = {NULL, NULL, NULL, NULL, NULL,
-                                  "true", "true", NULL};
+                                  "false", "true", NULL};
 
     static char*(*tostrf[])(COMPS_Object*) = {&comps_object_tostr,
                                                &comps_object_tostr,

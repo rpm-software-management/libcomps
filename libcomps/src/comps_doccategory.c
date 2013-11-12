@@ -242,7 +242,6 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
             obj = comps_objdict_get_x(category->properties, props[i]);
             if (obj) {
                 str = comps_object_tostr(obj);
-                //printf("%s = %s\n", props[i], str);
                 __comps_xml_prop((aliases[i])?aliases[i]:props[i], str, writer);
                 free(str);
             } else {

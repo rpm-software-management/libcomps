@@ -724,7 +724,7 @@ class COMPSTest(unittest.TestCase):
         c = self.comps.categories[1]
         c.group_ids.append("g2")
         (h, fname) = tempfile.mkstemp()
-        ret = self.comps.xml_f(fname)
+        ret = self.comps.xml_f(fname, options={"default_explicit":True})
         self.assertTrue(not ret)
 
         comps2 = libcomps.Comps()
@@ -745,33 +745,37 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(len(comps3.groups) == 3)
         self.assertTrue(len(comps3.categories) == 2)
         self.assertTrue(len(comps3.environments) == 0)
-        x = self.comps.xml_str()
+        x = self.comps.xml_str(options={""})
         y = comps2.xml_str()
 
         self.assertTrue(x == y)
         os.remove(fname)
 
-    @unittest.skip("")
+    #@unittest.skip("")
     def test_fedora(self):
         comps = libcomps.Comps()
         ret = comps.fromxml_f("fedora_comps.xml")
         #for x in comps.get_last_parse_log():
         #    print x
         self.assertTrue(ret != -1)
-        comps.xml_f("fed2.xml")
+        comps.xml_f("fed2.xml", options={"empty_groups":True,
+                                         "empty_categories":True,
+                                         "empty_environments":True})
         comps2 = libcomps.Comps()
         comps2.fromxml_f("fed2.xml")
         self.assertTrue(comps == comps2)
         
 
-    @unittest.skip("skip")
+    #@unittest.skip("skip")
     def test_sample(self):
         comps = libcomps.Comps()
         ret = comps.fromxml_f("sample_comps.xml")
         #print comps.get_last_parse_log()
         self.assertTrue(ret != -1)
 
-        comps.xml_f("sample2.xml")
+        comps.xml_f("sample2.xml", options={"empty_groups":True,
+                                         "empty_categories":True,
+                                         "empty_environments":True})
         comps2 = libcomps.Comps()
         comps2.fromxml_f("sample2.xml")
         self.assertTrue(comps == comps2)
@@ -834,7 +838,7 @@ class COMPSTest(unittest.TestCase):
         dbl2 = g1.desc_by_lang
         self.assertTrue(g1.desc_by_lang == g.desc_by_lang)
 
-    @unittest.skip("skip")
+    #@unittest.skip("skip")
     def test_union(self):
         comps = libcomps.Comps()
         comps.fromxml_f("sample_comps.xml")
@@ -992,6 +996,50 @@ class COMPSTest(unittest.TestCase):
         option_ids = ("libreoffice", "gnome-games", "epiphany", "3d-printing")
 
         _f([x.name for x in env.option_ids], option_ids)
+
+
+    def test_xml_options(self):
+        comps = libcomps.Comps()
+        g = libcomps.Group()
+        g.id = "g1"
+        comps.groups.append(g)
+        c = libcomps.Category()
+        c.id = "c1"
+        comps.categories.append(c)
+        e = libcomps.Environment()
+        e.id = "e1"
+        comps.environments.append(e)
+        s = comps.toxml_str()
+
+        comps2 = libcomps.Comps()
+        comps2.fromxml_str(s)
+        self.assertEqual(len(comps2.groups), 0)
+        self.assertEqual(len(comps2.categories), 0)
+        self.assertEqual(len(comps2.environments), 0)
+        
+        s = comps.toxml_str(options={"empty_groups": True,
+                                     "empty_categories": True,
+                                     "empty_environments": True})
+        comps2 = libcomps.Comps()
+        comps2.fromxml_str(s)
+        self.assertEqual(len(comps2.groups), 1)
+        self.assertEqual(len(comps2.categories), 1)
+        self.assertEqual(len(comps2.environments), 1)
+
+        s = comps.toxml_str(options={"empty_groups": True,
+                                     "empty_categories": True,
+                                     "empty_environments": True,
+                                     "uservisible_explicit": True,
+                                     "default_explicit":True})
+        self.assertTrue("</default>" in s)
+        self.assertTrue("</uservisible>" in s)
+
+        g.packages.append(libcomps.Package("pkg"))
+        s = comps.toxml_str(options={"empty_groups": True,
+                                     "empty_categories": True,
+                                     "empty_environments": True,
+                                     "bao_explicit": True})
+        self.assertTrue("basearchonly=" in s)
 
 if __name__ == "__main__":
     unittest.main(testRunner = MyRunner)

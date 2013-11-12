@@ -132,6 +132,7 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
                                  COMPS_Log *log, COMPS_XMLOptions *options) {
     char *str;
     int ret;
+    bool bao_def = false;
 
     ret = xmlTextWriterStartElement(writer, BAD_CAST "packagereq");
     COMPS_XMLRET_CHECK
@@ -152,9 +153,24 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
         free(str);
     }
     COMPS_XMLRET_CHECK
-    if (pkg->basearchonly && pkg->basearchonly->val) {
-        ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
-                                            BAD_CAST "true");
+    if (options->bao_explicit) {
+        if (pkg->basearchonly) {
+            ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
+                                                BAD_CAST "true");
+        } else {
+            ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
+                                                BAD_CAST "false");
+        }
+    } else {
+        if (pkg->basearchonly && pkg->basearchonly->val != bao_def) {
+            if (pkg->basearchonly) {
+                ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
+                                                    BAD_CAST "true");
+            } else {
+                ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
+                                                    BAD_CAST "false");
+            }
+        }
     }
     COMPS_XMLRET_CHECK
     str = comps_object_tostr((COMPS_Object*)pkg->name);
