@@ -1042,9 +1042,36 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue("basearchonly=" in s)
 
     def test_arches(self):
-        comps2 = libcomps.Comps()
-        comps2.fromxml_f("main_arches.xml")
+        comps = libcomps.Comps()
+        comps.fromxml_f("main_arches.xml")
+        filtered = comps.arch_filter(["x86"])
+        g1_pkgs = ["pkg3", "pkg4", "pkg5", "pkg6", "pkg7"]
+        c1_gids = ["g1", "g3", "g4", "g6"]
+        e1_gids = ["g1", "g3", "g4"]
+        e1_oids = ["o1", "o3", "o4"]
+        x = 0
+        for pkg in filtered.groups[0].packages:
+            self.assertTrue(g1_pkgs[x] == pkg.name)
+            x +=1
+        x = 0
+        for gid in filtered.categories[0].group_ids:
+            self.assertTrue(c1_gids[x] == gid.name)
+            x +=1
+        x = 0
+        for gid in filtered.environments[0].group_ids:
+            self.assertTrue(e1_gids[x] == gid.name)
+            x +=1
+        x = 0
+        for oid in filtered.environments[0].option_ids:
+            self.assertTrue(e1_oids[x] == oid.name)
+            x +=1
+        empty_comps = libcomps.Comps()
+        comps3 = comps.arch_filter(["unknown"])
+        self.assertTrue(empty_comps == comps3)
 
+        comps4 = comps.arch_filter(["x86", "x86_64", "s390"])
+        self.assertTrue(comps == comps4)
+ 
 if __name__ == "__main__":
     unittest.main(testRunner = MyRunner)
     #unittest.main()
