@@ -40,10 +40,10 @@ COMPS_Object* comps_object_copy(COMPS_Object *comps_obj) {
     return obj;
 }
 
-COMPS_Object* comps_object_copy_deep(COMPS_Object *comps_obj) {
+/*COMPS_Object* comps_object_copy_deep(COMPS_Object *comps_obj) {
    (void) comps_obj;
     return NULL;
-}
+}*/
 
 signed char comps_object_cmp(COMPS_Object *obj1, COMPS_Object *obj2) {
     if (!obj1 && !obj2)

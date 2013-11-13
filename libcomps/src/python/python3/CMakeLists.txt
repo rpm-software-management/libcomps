@@ -9,16 +9,13 @@ include_directories(${LIBCOMPS_INCLUDE_PATH})
 configure_file(${pycomps_SRCDIR}/tests/run_tests.sh.in
                ./libcomps/run_tests.sh)
 
-FILE(COPY ${pycomps_SRCDIR}/__init__.py DESTINATION ./libcomps/)
-FILE(COPY ${pycomps_SRCDIR}/tests/__test.py DESTINATION ./libcomps/)
-FILE(COPY ${pycomps_SRCDIR}/tests/fedora_comps.xml DESTINATION ./libcomps/)
-FILE(COPY ${pycomps_SRCDIR}/tests/sample_comps.xml DESTINATION ./libcomps/)
-FILE(COPY ${pycomps_SRCDIR}/tests/sample_comps2.xml DESTINATION ./libcomps/)
-FILE(COPY ${pycomps_SRCDIR}/tests/sample_comps2.xml.gz DESTINATION ./libcomps/)
-FILE(COPY ${pycomps_SRCDIR}/tests/main_comps.xml DESTINATION ./libcomps/)
-FILE(COPY ${pycomps_SRCDIR}/tests/main_comps2.xml DESTINATION ./libcomps/)
-FILE(COPY ${pycomps_SRCDIR}/tests/f21-rawhide-comps.xml DESTINATION ./libcomps/)
-FILE(COPY ${pycomps_SRCDIR}/tests/comps-f21.xml.in DESTINATION ./libcomps/)
+set(TEST_FILES ../__init__.py __test.py fedora_comps.xml sample_comps.xml
+                sample_comps2.xml sample_comps2.xml.gz main_comps.xml
+                main_comps2.xml main_arches.xml f21-rawhide-comps.xml
+                comps-f21.xml.in)
+foreach(file ${TEST_FILES})
+    file(COPY ${pycomps_SRCDIR}/tests/${file} DESTINATION ./libcomps/)
+endforeach()
 
 add_library(pycomps SHARED ${pycomps_SRC})
 set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")

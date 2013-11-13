@@ -1,4 +1,5 @@
 #include "comps_objlist.h"
+#include "comps_utils.h"
 
 inline const COMPS_ObjListIt *comps_objlist_it_next(const COMPS_ObjListIt *it) {
     return (const COMPS_ObjListIt*)it->next;

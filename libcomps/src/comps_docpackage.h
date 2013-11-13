@@ -41,6 +41,7 @@ typedef struct {
     COMPS_Str *name; /**< name of package */
     COMPS_Str *requires; /**< packagereq requires attribute */
     COMPS_Num *basearchonly;
+    COMPS_ObjList *arches;
 } COMPS_DocGroupPackage;
 
 
@@ -123,6 +124,10 @@ void comps_docpackage_set_basearchonly(COMPS_DocGroupPackage *pkg,
  * @return COMPS_Num basearchonly attribute
  * */
 COMPS_Object* comps_docpackage_get_basearchonly(COMPS_DocGroupPackage *pkg);
+
+COMPS_ObjList* comps_docpackage_arches(COMPS_DocGroupPackage *pkg);
+void comps_docpackage_set_arches(COMPS_DocGroupPackage *pkg,
+                                 COMPS_ObjList *arches);
 
 signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
                                  xmlTextWriterPtr writer,

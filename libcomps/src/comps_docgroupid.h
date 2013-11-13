@@ -36,6 +36,7 @@ typedef struct {
     /**< name of GroupId */
     bool def;
     /**< GroupId default attribute */
+    COMPS_ObjList *arches;
 } COMPS_DocGroupId;
 
 //HEAD_COMPS_CREATE_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
@@ -73,6 +74,10 @@ COMPS_Object* comps_docgroupid_get_default(COMPS_DocGroupId *gid);
  * Old defaut objects reference counter will be decremented
  */
 void comps_docgroupid_set_default(COMPS_DocGroupId *gid, int def);
+
+COMPS_ObjList* comps_docgroupid_arches(COMPS_DocGroupId *gid);
+void comps_docgroupid_set_arches(COMPS_DocGroupId *gid,
+                                 COMPS_ObjList *arches);
 
 signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
                                   xmlTextWriterPtr writer,

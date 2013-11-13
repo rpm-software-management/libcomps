@@ -45,7 +45,8 @@ set_target_properties(test_comps PROPERTIES COMPILE_FLAGS "${CMAKE_C_FLAGS} -g")
 
 set(TEST_FILES fedora_comps.xml sample-comps.xml sample_comps.xml
                sample_comps_bad1.xml sample_comps_bad2.xml sample_comps_bad3.xml
-               sample-bad-elem.xml comps.dtd dict-test.txt)
+               sample-bad-elem.xml comps.dtd dict-test.txt main_comps2.xml
+               main_arches.xml)
 foreach(file ${TEST_FILES})
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${file} DESTINATION ./)
 endforeach()

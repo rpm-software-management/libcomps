@@ -1041,6 +1041,10 @@ class COMPSTest(unittest.TestCase):
                                      "bao_explicit": True})
         self.assertTrue("basearchonly=" in s)
 
+    def test_arches(self):
+        comps2 = libcomps.Comps()
+        comps2.fromxml_f("main_arches.xml")
+
 if __name__ == "__main__":
     unittest.main(testRunner = MyRunner)
     #unittest.main()

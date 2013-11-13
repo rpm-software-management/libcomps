@@ -36,7 +36,8 @@ const COMPS_ElemInfo COMPS_DOC_ElemInfo = {
 const COMPS_ElemInfo COMPS_GROUP_ElemInfo = {
     .name = "group",
     .ancestors = (const COMPS_ElemType[]){COMPS_ELEM_DOC, COMPS_ELEM_SENTINEL},
-    .attributes = (const COMPS_ElemAttrInfo*[]){NULL},
+    .attributes = (const COMPS_ElemAttrInfo*[]){&COMPS_C_ARCH_ElemAttrInfo,
+                                                NULL},
     .preproc = &comps_elem_group_preproc,
     .postproc = &comps_elem_group_postproc
 };
@@ -109,6 +110,7 @@ const COMPS_ElemInfo COMPS_PACKAGEREQ_ElemInfo = {
     .attributes = (const COMPS_ElemAttrInfo*[]){&COMPS_REQUIRES_ElemAttrInfo,
                                                 &COMPS_TYPE_ElemAttrInfo,
                                                 &COMPS_BAO_ElemAttrInfo,
+                                                &COMPS_C_ARCH_ElemAttrInfo,
                                                 NULL},
     .preproc = &comps_elem_packagereq_preproc,
     .postproc = &comps_elem_packagereq_postproc
@@ -117,7 +119,8 @@ const COMPS_ElemInfo COMPS_CATEGORY_ElemInfo = {
     .name = "category",
     .ancestors = (const COMPS_ElemType[]){COMPS_ELEM_DOC,
                                           COMPS_ELEM_SENTINEL},
-    .attributes = (const COMPS_ElemAttrInfo*[]){NULL},
+    .attributes = (const COMPS_ElemAttrInfo*[]){&COMPS_C_ARCH_ElemAttrInfo,
+                                                NULL},
     .preproc = &comps_elem_category_preproc,
     .postproc = &comps_elem_category_postproc
 };
@@ -136,6 +139,7 @@ const COMPS_ElemInfo COMPS_GROUPID_ElemInfo = {
                                           COMPS_ELEM_OPTLIST,
                                           COMPS_ELEM_SENTINEL},
     .attributes = (const COMPS_ElemAttrInfo*[]){&COMPS_DEFAULT_ElemAttrInfo,
+                                                &COMPS_C_ARCH_ElemAttrInfo,
                                                 NULL},
     .preproc = &comps_elem_groupid_preproc,
     .postproc = &comps_elem_groupid_postproc
@@ -154,7 +158,8 @@ const COMPS_ElemInfo COMPS_ENV_ElemInfo = {
     .name = "environment",
     .ancestors = (const COMPS_ElemType[]){COMPS_ELEM_DOC,
                                           COMPS_ELEM_SENTINEL},
-    .attributes = (const COMPS_ElemAttrInfo*[]){NULL},
+    .attributes = (const COMPS_ElemAttrInfo*[]){&COMPS_C_ARCH_ElemAttrInfo,
+                                                NULL},
     .preproc = &comps_elem_env_preproc,
     .postproc = &comps_elem_env_postproc
 };
@@ -241,6 +246,9 @@ const COMPS_ElemAttrInfo COMPS_INSTALL_ElemAttrInfo = {
 };
 const COMPS_ElemAttrInfo COMPS_ARCH_ElemAttrInfo = {
     .name="arch"
+};
+const COMPS_ElemAttrInfo COMPS_C_ARCH_ElemAttrInfo = {
+    .name="_arch"
 };
 const COMPS_ElemAttrInfo COMPS_PACKAGE_ElemAttrInfo = {
     .name="package"
@@ -416,6 +424,18 @@ void __comps_check_allready_set(COMPS_Object *param, char *param_name,
     COMPS_OBJECT_DESTROY(param);
 }
 
+COMPS_ObjList * __comps_split_arches(char *arches) {
+    COMPS_ObjList *list;
+    char *pch;
+    list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    pch = strtok(arches, " ");
+    while (pch != NULL) {
+        comps_objlist_append_x(list, (COMPS_Object*)comps_str(pch));
+        pch = strtok(NULL, " ");
+    }
+    return list;
+}
+
 void comps_elem_doc_preproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
     (void)elem;
     COMPS_Object *prop = (COMPS_Object*)comps_str(parsed->enc);
@@ -424,10 +444,16 @@ void comps_elem_doc_preproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
     comps_object_destroy(prop);
 }
 void comps_elem_group_preproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
-    (void)elem;
+    char *arches;
+    
     COMPS_DocGroup *group = (COMPS_DocGroup*)
                             comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
     comps_doc_add_group(parsed->comps_doc, group);
+    arches = comps_dict_get(elem->attrs, "_arch");
+    if (arches) {
+        COMPS_ObjList *larches = __comps_split_arches(arches);
+        comps_docgroup_set_arches(group, larches);
+    }
 }
 void comps_elem_group_postproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
     COMPS_DocGroup *group;
@@ -454,10 +480,15 @@ void comps_elem_group_postproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
 }
 
 void comps_elem_category_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
-    (void)elem;
+    char *arches;
     COMPS_DocCategory *category = (COMPS_DocCategory*)
                             comps_object_create(&COMPS_DocCategory_ObjInfo, NULL);
     comps_doc_add_category(parsed->comps_doc, category);
+    arches = comps_dict_get(elem->attrs, "_arch");
+    if (arches) {
+        COMPS_ObjList *larches = __comps_split_arches(arches);
+        comps_doccategory_set_arches(category, larches);
+    }
 }
 void comps_elem_category_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     COMPS_DocCategory *category;
@@ -475,10 +506,15 @@ void comps_elem_category_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     COMPS_OBJECT_DESTROY(list);
 }
 void comps_elem_env_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
-    (void)elem;
+    char *arches;
     COMPS_DocEnv *env = (COMPS_DocEnv*)
                             comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
     comps_doc_add_environment(parsed->comps_doc, env);
+    arches = comps_dict_get(elem->attrs, "_arch");
+    if (arches) {
+        COMPS_ObjList *larches = __comps_split_arches(arches);
+        comps_docenv_set_arches(env, larches);
+    }
 }
 void comps_elem_env_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     COMPS_DocEnv *env;
@@ -552,6 +588,11 @@ void comps_elem_packagereq_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     tmp = comps_dict_get(elem->attrs, "basearchonly");
     if (tmp && (strcmp(tmp, "true") == 0))
         package->basearchonly = comps_num(1);
+    char *arches = comps_dict_get(elem->attrs, "_arch");
+    if (arches) {
+        COMPS_ObjList *larches = __comps_split_arches(arches);
+        comps_docpackage_set_arches(package, larches);
+    }
 }
 void comps_elem_packagereq_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     #define last_pkg ((COMPS_DocGroupPackage*)((COMPS_DocGroup*)list->last->comps_obj)->packages->last->comps_obj)
@@ -597,6 +638,11 @@ void comps_elem_groupid_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
             COMPS_OBJECT_DESTROY(list);
             comps_doccategory_add_groupid(cat, groupid);
         }
+    }
+    char *arches = comps_dict_get(elem->attrs, "_arch");
+    if (arches) {
+        COMPS_ObjList *larches = __comps_split_arches(arches);
+        comps_docgroupid_set_arches(groupid, larches);
     }
 }
 void comps_elem_groupid_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {

@@ -157,6 +157,9 @@ HEAD_COMPS_DOCOBJ_GETOBJLIST(doccategory, COMPS_DocCategory, group_ids, group_id
 HEAD_COMPS_DOCOBJ_SETOBJLIST(doccategory, COMPS_DocCategory, group_ids, group_ids)
 /**@}*/
 
+HEAD_COMPS_DOCOBJ_GETARCHES(doccategory, COMPS_DocCategory)
+HEAD_COMPS_DOCOBJ_SETARCHES(doccategory, COMPS_DocCategory)
+
 char __comps_doccategory_idcmp(void *c1, void *c2);
 
 /** COMPS_DocCategory compare callback
@@ -193,6 +196,8 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
 signed char comps_doccategory_xml(COMPS_DocCategory *category,
                                   xmlTextWriterPtr writer,
                                   COMPS_Log *log, COMPS_XMLOptions *options);
+COMPS_DocCategory* comps_doccategory_arch_filter(COMPS_DocCategory *source,
+                                                 COMPS_ObjList *arches);
 
 extern COMPS_ObjectInfo COMPS_DocCategory_ObjInfo;
 

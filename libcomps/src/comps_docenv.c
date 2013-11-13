@@ -75,6 +75,9 @@ COMPS_DOCOBJ_GETOBJLIST(docenv, COMPS_DocEnv, option_list, option_list)
 COMPS_DOCOBJ_SETOBJLIST(docenv, COMPS_DocEnv, group_list, group_list)
 COMPS_DOCOBJ_SETOBJLIST(docenv, COMPS_DocEnv, option_list, option_list)
 
+COMPS_DOCOBJ_GETARCHES(docenv, COMPS_DocEnv)/*comps_utils.h macro*/
+COMPS_DOCOBJ_SETARCHES(docenv, COMPS_DocEnv)/*comps_utils.h macro*/
+
 void comps_docenv_add_groupid(COMPS_DocEnv *env,
                             COMPS_DocGroupId *gid) {
 
@@ -429,6 +432,38 @@ char* comps_docenv_tostr_u(COMPS_Object* env) {
     strcat(ret, ">");
     return ret;
     #undef _env_
+}
+
+COMPS_DocEnv* comps_docenv_arch_filter(COMPS_DocEnv *source,
+                                       COMPS_ObjList *arches) {
+    COMPS_ObjList *arches2;
+    COMPS_DocEnv *ret = (COMPS_DocEnv*)
+                          comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
+    COMPS_OBJECT_DESTROY(ret->properties);
+    ret->properties = (COMPS_ObjDict*)COMPS_OBJECT_COPY(source->properties);
+    COMPS_OBJECT_DESTROY(ret->name_by_lang);
+    ret->name_by_lang = (COMPS_ObjDict*)COMPS_OBJECT_COPY(source->name_by_lang);
+    COMPS_OBJECT_DESTROY(ret->desc_by_lang);
+    ret->desc_by_lang = (COMPS_ObjDict*)COMPS_OBJECT_COPY(source->desc_by_lang);
+    for (COMPS_ObjListIt *it = source->group_list->first;
+         it != NULL; it = it->next) {
+        arches2 = comps_docgroupid_arches((COMPS_DocGroupId*)it->comps_obj);
+        if (__comps_objlist_intersected(arches, arches2)) {
+            comps_docenv_add_groupid(ret, (COMPS_DocGroupId*)
+                                          comps_object_copy(it->comps_obj));
+        }
+        COMPS_OBJECT_DESTROY(arches2);
+    }
+    for (COMPS_ObjListIt *it = source->option_list->first;
+         it != NULL; it = it->next) {
+        arches2 = comps_docgroupid_arches((COMPS_DocGroupId*)it->comps_obj);
+        if (__comps_objlist_intersected(arches, arches2)) {
+            comps_docenv_add_optionid(ret, (COMPS_DocGroupId*)
+                                          comps_object_copy(it->comps_obj));
+        }
+        COMPS_OBJECT_DESTROY(arches2);
+    }
+    return ret;
 }
 
 COMPS_ObjectInfo COMPS_DocEnv_ObjInfo = {

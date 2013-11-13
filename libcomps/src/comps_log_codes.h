@@ -48,6 +48,10 @@
 
 void __expand(char *str, const char *fmt, char out, ...);
 
+inline void expand0(char *str, const char *fmt, char **args, char out) {
+    (void)args;
+    __expand(str, fmt, out);
+}
 inline void expand1(char *str, const char *fmt, char **args, char out) {
     __expand(str, fmt, out, args[0]);
 }

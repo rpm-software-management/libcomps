@@ -24,6 +24,7 @@ static void comps_docpackage_create(COMPS_DocGroupPackage* package, COMPS_Object
     package->name = NULL;
     package->requires = NULL;
     package->basearchonly = NULL;
+    package->arches = NULL;
     package->type = COMPS_PACKAGE_UNKNOWN;
 }
 COMPS_CREATE_u(docpackage, COMPS_DocGroupPackage)
@@ -35,6 +36,8 @@ static void comps_docpackage_copy(COMPS_DocGroupPackage *pkg_dst,
                                             (COMPS_Object*)pkg_src->requires);
     pkg_dst->basearchonly = (COMPS_Num*)comps_object_copy(
                                           (COMPS_Object*)pkg_src->basearchonly);
+    pkg_dst->arches = (COMPS_ObjList*)comps_object_copy(
+                                          (COMPS_Object*)pkg_src->arches);
     pkg_dst->type = pkg_src->type;
 }
 COMPS_COPY_u(docpackage, COMPS_DocGroupPackage)    /*comps_utils.h macro*/
@@ -43,6 +46,7 @@ static void comps_docpackage_destroy(COMPS_DocGroupPackage *pkg) {
     comps_object_destroy((COMPS_Object*)pkg->name);
     comps_object_destroy((COMPS_Object*)pkg->requires);
     comps_object_destroy((COMPS_Object*)pkg->basearchonly);
+    comps_object_destroy((COMPS_Object*)pkg->arches);
 }
 COMPS_DESTROY_u(docpackage, COMPS_DocGroupPackage) /*comps_utils.h macro*/
 
@@ -207,6 +211,16 @@ static char* comps_docpackage_str_u(COMPS_Object* docpackage) {
     free(requires);
     return ret;
 }
+
+COMPS_ObjList* comps_docpackage_arches(COMPS_DocGroupPackage *pkg) {
+    return (COMPS_ObjList*)comps_object_incref((COMPS_Object*)pkg->arches);
+}
+void comps_docpackage_set_arches(COMPS_DocGroupPackage *pkg,
+                                 COMPS_ObjList *arches) {
+    COMPS_OBJECT_DESTROY(pkg->arches);
+    pkg->arches = arches;
+}
+
 
 COMPS_ObjectInfo COMPS_DocGroupPackage_ObjInfo = {
     .obj_size = sizeof(COMPS_DocGroupPackage),

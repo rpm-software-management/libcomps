@@ -75,6 +75,9 @@ COMPS_PROP_GETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
 COMPS_DOCOBJ_GETOBJLIST(docgroup, COMPS_DocGroup, packages, packages)
 COMPS_DOCOBJ_SETOBJLIST(docgroup, COMPS_DocGroup, packages, packages)
 
+COMPS_DOCOBJ_GETARCHES(docgroup, COMPS_DocGroup)/*comps_utils.h macro*/
+COMPS_DOCOBJ_SETARCHES(docgroup, COMPS_DocGroup)/*comps_utils.h macro*/
+
 void comps_docgroup_add_package(COMPS_DocGroup *group,
                                 COMPS_DocGroupPackage *package) {
 
@@ -364,6 +367,29 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
     ret = xmlTextWriterEndElement(writer);
     COMPS_XMLRET_CHECK
     return 0;
+}
+
+COMPS_DocGroup* comps_docgroup_arch_filter(COMPS_DocGroup *source,
+                                           COMPS_ObjList *arches) {
+    COMPS_ObjList *arches2;
+    COMPS_DocGroup *ret = (COMPS_DocGroup*)
+                          comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
+    COMPS_OBJECT_DESTROY(ret->properties);
+    ret->properties = (COMPS_ObjDict*)COMPS_OBJECT_COPY(source->properties);
+    COMPS_OBJECT_DESTROY(ret->name_by_lang);
+    ret->name_by_lang = (COMPS_ObjDict*)COMPS_OBJECT_COPY(source->name_by_lang);
+    COMPS_OBJECT_DESTROY(ret->desc_by_lang);
+    ret->desc_by_lang = (COMPS_ObjDict*)COMPS_OBJECT_COPY(source->desc_by_lang);
+    for (COMPS_ObjListIt *it = source->packages->first;
+         it != NULL; it = it->next) {
+        arches2 = comps_docpackage_arches((COMPS_DocGroupPackage*)it->comps_obj);
+        if (__comps_objlist_intersected(arches, arches2)) {
+            comps_docgroup_add_package(ret, (COMPS_DocGroupPackage*)
+                                            comps_object_copy(it->comps_obj));
+        }
+        COMPS_OBJECT_DESTROY(arches2);
+    }
+    return ret;
 }
 
 COMPS_ObjectInfo COMPS_DocGroup_ObjInfo = {

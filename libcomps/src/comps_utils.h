@@ -22,8 +22,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "comps_obj.h"
+#include "comps_objlist.h"
 
 #include <libxml/encoding.h>
 #include <libxml/xmlwriter.h>
@@ -152,6 +154,21 @@ void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
 void CONCAT(CONCAT(CONCAT(comps_, OBJ), _set_), OBJS) (OBJTYPE *obj,\
                                                    COMPS_ObjList *list);
 
+#define COMPS_DOCOBJ_GETARCHES(OBJ, OBJTYPE)\
+COMPS_ObjList* CONCAT(CONCAT(comps_, OBJ), _arches) (OBJTYPE *obj){\
+    return (COMPS_ObjList*)comps_objdict_get(obj->properties, "arches");\
+}
+#define HEAD_COMPS_DOCOBJ_GETARCHES(OBJ, OBJTYPE)\
+COMPS_ObjList* CONCAT(CONCAT(comps_, OBJ), _arches)(OBJTYPE *obj);
+
+#define COMPS_DOCOBJ_SETARCHES(OBJ, OBJTYPE)\
+void CONCAT(CONCAT(comps_, OBJ), _set_arches)(OBJTYPE *obj,\
+                                              COMPS_ObjList *list){\
+    comps_objdict_set_x(obj->properties, "arches", (COMPS_Object*)list);\
+}
+#define HEAD_COMPS_DOCOBJ_SETARCHES(OBJ, OBJTYPE)\
+void CONCAT(CONCAT(comps_, OBJ), _set_arches)(OBJTYPE *obj,\
+                                              COMPS_ObjList *list);
 
 
 #define COMPS_XMLRET_CHECK if (ret == -1) {\
@@ -165,4 +182,5 @@ void __comps_xml_prop(char *key, char *val, xmlTextWriterPtr writer);
 char* __comps_num2boolstr(COMPS_Object* obj);
 signed char comps_id_check(COMPS_Object *obj, COMPS_Object *prop);
 unsigned int digits_count(unsigned int x);
+bool __comps_objlist_intersected(COMPS_ObjList *list1, COMPS_ObjList *list2);
 #endif

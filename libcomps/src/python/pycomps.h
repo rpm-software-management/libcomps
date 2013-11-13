@@ -32,10 +32,10 @@
 #include "pycomps_envs.h"
 #include "pycomps_utils.h"
 #include "pycomps_dict.h"
+#include "pycomps_mdict.h"
 #include "pycomps_gids.h"
 #include "pycomps_exc.h"
 #include "pycomps_lbw.h"
-#include "pycomps_mdict.h"
 
 
 #include <Python.h>
@@ -79,4 +79,8 @@ extern PyTypeObject PyCOMPS_Type;
 
 const char PYCOMPS_DOCU[] = "Comps class is representating comps.xml file"
 " represented in structure form.";
+
+
+static PyObject* PyCOMPS_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+static int PyCOMPS_init(PyCOMPS *self, PyObject *args, PyObject *kwds);
 #endif

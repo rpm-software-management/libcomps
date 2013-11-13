@@ -22,6 +22,7 @@
 
 #include "../src/comps_doc.h"
 #include "../src/comps_parse.h"
+#include "../src/comps_docpackage.h"
 
 void print_all_str(COMPS_RTree *rt) {
     COMPS_HSList *pairlist;
@@ -468,7 +469,7 @@ START_TEST(test_comps_fedora_parse)
 
     //print_all_str(((COMPS_DocGroup*)comps_doc_groups(parsed->comps_doc)
     //                                ->first->data)->name_by_lang);
-    comps2xml_f(parsed->comps_doc, "fed2.xml", 0);
+    comps2xml_f(parsed->comps_doc, "fed2.xml", 0, NULL);
     //printf("%s\n", tmp);
 
     //free(tmp);
@@ -481,7 +482,7 @@ START_TEST(test_main2)
     COMPS_Parsed *parsed;
     FILE *fp;
     //char *tmp;
-    fprintf(stderr, "## Running test_parse fedora\n");
+    fprintf(stderr, "## Running test_parse main2\n");
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 0);
     fp = fopen("main_comps2.xml", "r");
@@ -492,19 +493,148 @@ START_TEST(test_main2)
 }
 END_TEST
 
+START_TEST(test_arch)
+{
+    COMPS_Parsed *parsed;
+    COMPS_Doc *doc2;
+    COMPS_ObjList *arches, *list, *list2;
+    COMPS_DocGroup *g;
+    COMPS_DocCategory *c;
+    COMPS_DocEnv *e;
+    COMPS_DocGroupPackage *p;
+    COMPS_Str *str;
+    int x;
+    COMPS_ObjListIt *it;
+    char *grps[3][4] = {{"group1", "group3", NULL, NULL},
+                       {"group1", "group2", "group3", NULL},
+                       {"group3", NULL, NULL, NULL}};
+    char *g1_pkgs[3][8] = {{"pkg3", "pkg4", "pkg5", "pkg6", "pkg7", NULL, NULL, NULL},
+                        {"pkg3", "pkg4", NULL, NULL, NULL, NULL, NULL, NULL},
+                        {"pkg1", "pkg2", "pkg3", "pkg4", "pkg5", "pkg6", "pkg7",
+                         NULL}};
+
+    char *cats[3][4] = {{"cat1", NULL, NULL, NULL},
+                       {"cat1", "cat2", NULL, NULL},
+                       {"cat3", NULL, NULL, NULL}};
+    char *c1_gids[3][8] = {{"g1", "g3", "g4", "g6", NULL, NULL, NULL, NULL},
+                           {"g1", "g2", "g4", "g5", NULL, NULL, NULL, NULL},
+                           {"g4", "g5", "g6", NULL, NULL, NULL, NULL, NULL}};
+
+    char *envs[3][4] = {{"env1", NULL, NULL, NULL},
+                       {"env1", "env2", "env3", NULL},
+                       {"env1", "env2", NULL, NULL}};
+    char *e1_gids[3][8] = {{"g1", "g3", "g4", NULL, NULL, NULL, NULL, NULL},
+                           {"g1", "g2", "g5", NULL, NULL, NULL, NULL, NULL},
+                           {"g2", "g4", NULL, NULL, NULL,NULL, NULL, NULL}};
+    char *e1_oids[3][8] = {{"o1", "o3", "o4", NULL, NULL, NULL, NULL, NULL},
+                           {"o1", "o2", "o5", NULL, NULL, NULL, NULL, NULL},
+                           {"o2", "o4", NULL, NULL, NULL,NULL, NULL, NULL}};
+
+    FILE *fp;
+    //char *tmp;
+    fprintf(stderr, "## Running test_parse arch\n");
+    parsed = comps_parse_parsed_create();
+    comps_parse_parsed_init(parsed, "UTF-8", 0);
+    fp = fopen("main_arches.xml", "r");
+    comps_parse_file(parsed, fp);
+    //comps_log_print(parsed->log);
+    fail_if(parsed->fatal_error != 0, "Some fatal errors found after parsing");
+    //comps2xml_f(parsed->comps_doc, "fed2.xml", 0);
+    arches = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    comps_objlist_append_x(arches, (COMPS_Object*)comps_str("x86"));
+
+    doc2 = comps_doc_arch_filter(parsed->comps_doc, arches);
+    COMPS_OBJECT_DESTROY(arches);
+
+    list = comps_doc_groups(doc2);
+    ck_assert(list->len == 2);
+    for (it = list->first, x=0; it != NULL; it = it->next, x++) {
+        g = (COMPS_DocGroup*)it->comps_obj;
+        str = (COMPS_Str*)comps_docgroup_get_id(g);
+        ck_assert_msg(strcmp(str->val, grps[0][x]) == 0, "%s != %s",
+                      str->val, grps[0][x]);
+        COMPS_OBJECT_DESTROY(str);
+    }
+    g = (COMPS_DocGroup*)list->first->comps_obj;
+    list2 = g->packages;
+    for (x=0, it = list2->first; it != NULL; it = it->next, x++) {
+        //printf("%s\n", ((COMPS_DocGroupPackage*)it->comps_obj)->name->val);
+        if (g1_pkgs[0][x] == NULL)
+            break;
+        ck_assert(strcmp(((COMPS_DocGroupPackage*)it->comps_obj)->name->val,
+                         g1_pkgs[0][x]) == 0);
+    }
+    COMPS_OBJECT_DESTROY(list);
+
+    list = comps_doc_categories(doc2);
+    ck_assert(list->len == 1);
+    for (it = list->first, x=0; it != NULL; it = it->next, x++) {
+        g = (COMPS_DocCategory*)it->comps_obj;
+        str = (COMPS_Str*)comps_doccategory_get_id(g);
+        ck_assert_msg(strcmp(str->val, cats[0][x]) == 0, "%s != %s",
+                      str->val, cats[0][x]);
+        COMPS_OBJECT_DESTROY(str);
+    }
+    c = (COMPS_DocCategory*)list->first->comps_obj;
+    list2 = c->group_ids;
+    for (x=0, it = list2->first; it != NULL; it = it->next, x++) {
+        //printf("%s\n", ((COMPS_DocGroupId*)it->comps_obj)->name->val);
+        if (c1_gids[0][x] == NULL)
+            break;
+        ck_assert(strcmp(((COMPS_DocGroupId*)it->comps_obj)->name->val,
+                         c1_gids[0][x]) == 0);
+    }
+    COMPS_OBJECT_DESTROY(list);
+
+    list = comps_doc_environments(doc2);
+    ck_assert(list->len == 1);
+    for (it = list->first, x=0; it != NULL; it = it->next, x++) {
+        g = (COMPS_DocEnv*)it->comps_obj;
+        str = (COMPS_Str*)comps_docenv_get_id(g);
+        ck_assert_msg(strcmp(str->val, envs[0][x]) == 0, "%s != %s",
+                      str->val, envs[0][x]);
+        COMPS_OBJECT_DESTROY(str);
+    }
+    e = (COMPS_DocEnv*)list->first->comps_obj;
+    list2 = e->group_list;
+    for (x=0, it = list2->first; it != NULL; it = it->next, x++) {
+        //printf("%s\n", ((COMPS_DocGroupId*)it->comps_obj)->name->val);
+        if (e1_gids[0][x] == NULL)
+            break;
+        ck_assert_msg(strcmp(((COMPS_DocGroupId*)it->comps_obj)->name->val,
+                         e1_gids[0][x]) == 0, "%s != %s",
+                         ((COMPS_DocGroupId*)it->comps_obj)->name->val,
+                         e1_gids[0][x]);
+    }
+    list2 = e->option_list;
+    for (x=0, it = list2->first; it != NULL; it = it->next, x++) {
+        if (e1_oids[0][x] == NULL)
+            break;
+        ck_assert(strcmp(((COMPS_DocGroupId*)it->comps_obj)->name->val,
+                         e1_oids[0][x]) == 0);
+    }
+    COMPS_OBJECT_DESTROY(list);
+
+    COMPS_OBJECT_DESTROY(doc2);
+    comps_parse_parsed_destroy(parsed);
+}
+END_TEST
+
 Suite* basic_suite (void)
 {
     Suite *s = suite_create ("Basic Tests");
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
-    tcase_add_test (tc_core, test_comps_parse1);
-    tcase_add_test (tc_core, test_comps_parse2);
-    tcase_add_test (tc_core, test_comps_parse3);
-    tcase_add_test (tc_core, test_comps_parse4);
-    tcase_add_test (tc_core, test_comps_parse5);
-    tcase_add_test (tc_core, test_comps_fedora_parse);
+    //tcase_add_test (tc_core, test_comps_parse1);
+    //tcase_add_test (tc_core, test_comps_parse2);
+    //tcase_add_test (tc_core, test_comps_parse3);
+    //tcase_add_test (tc_core, test_comps_parse4);
+    //tcase_add_test (tc_core, test_comps_parse5);
+    //tcase_add_test (tc_core, test_comps_fedora_parse);
 
     tcase_add_test (tc_core, test_main2);
+    tcase_add_test (tc_core, test_arch);
+
     tcase_set_timeout(tc_core, 15);
     suite_add_tcase (s, tc_core);
 

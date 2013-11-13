@@ -68,6 +68,9 @@ COMPS_PROP_GETTER(category, COMPS_DocCategory, display_order) /*comps_utils.h ma
 COMPS_DOCOBJ_GETOBJLIST(doccategory, COMPS_DocCategory, group_ids, group_ids)
 COMPS_DOCOBJ_SETOBJLIST(doccategory, COMPS_DocCategory, group_ids, group_ids)
 
+COMPS_DOCOBJ_GETARCHES(doccategory, COMPS_DocCategory)/*comps_utils.h macro*/
+COMPS_DOCOBJ_SETARCHES(doccategory, COMPS_DocCategory)/*comps_utils.h macro*/
+
 void comps_doccategory_add_groupid(COMPS_DocCategory *category,
                                 COMPS_DocGroupId *gid) {
 
@@ -326,6 +329,29 @@ char* comps_doccategory_tostr_u(COMPS_Object* cat) {
     #undef _cat_
 }
 
+COMPS_DocCategory* comps_doccategory_arch_filter(COMPS_DocCategory *source,
+                                                 COMPS_ObjList *arches) {
+    COMPS_ObjList *arches2;
+    COMPS_DocCategory *ret = (COMPS_DocCategory*)
+                             comps_object_create(&COMPS_DocCategory_ObjInfo,
+                                                 NULL);
+    COMPS_OBJECT_DESTROY(ret->properties);
+    ret->properties = (COMPS_ObjDict*)COMPS_OBJECT_COPY(source->properties);
+    COMPS_OBJECT_DESTROY(ret->name_by_lang);
+    ret->name_by_lang = (COMPS_ObjDict*)COMPS_OBJECT_COPY(source->name_by_lang);
+    COMPS_OBJECT_DESTROY(ret->desc_by_lang);
+    ret->desc_by_lang = (COMPS_ObjDict*)COMPS_OBJECT_COPY(source->desc_by_lang);
+    for (COMPS_ObjListIt *it = source->group_ids->first;
+         it != NULL; it = it->next) {
+        arches2 = comps_docgroupid_arches((COMPS_DocGroupId*)it->comps_obj);
+        if (__comps_objlist_intersected(arches, arches2)) {
+            comps_doccategory_add_groupid(ret, (COMPS_DocGroupId*)
+                                          comps_object_copy(it->comps_obj));
+        }
+        COMPS_OBJECT_DESTROY(arches2);
+    }
+    return ret;
+}
 
 COMPS_ObjectInfo COMPS_DocCategory_ObjInfo = {
     .obj_size = sizeof(COMPS_DocCategory),

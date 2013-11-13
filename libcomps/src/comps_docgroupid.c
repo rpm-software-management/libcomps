@@ -23,18 +23,21 @@ void comps_docgroupid_create(COMPS_DocGroupId* groupid, COMPS_Object **args) {
     (void)args;
     groupid->name = NULL;
     groupid->def = 0;
+    groupid->arches = NULL;
 }
 COMPS_CREATE_u(docgroupid, COMPS_DocGroupId)
 
 void comps_docgroupid_copy(COMPS_DocGroupId *gid_dst,
                                          COMPS_DocGroupId *gid_src) {
     gid_dst->name = (COMPS_Str*)comps_object_copy((COMPS_Object*)gid_src->name);
+    gid_dst->arches = (COMPS_ObjList*)comps_object_copy((COMPS_Object*)gid_src->arches);
     gid_dst->def = gid_src->def;
 }
 COMPS_COPY_u(docgroupid, COMPS_DocGroupId)    /*comps_utils.h macro*/
 
 void comps_docgroupid_destroy(COMPS_DocGroupId *gid) {
     COMPS_OBJECT_DESTROY(gid->name);
+    COMPS_OBJECT_DESTROY(gid->arches);
 }
 COMPS_DESTROY_u(docgroupid, COMPS_DocGroupId) /*comps_utils.h macro*/
 
@@ -54,6 +57,15 @@ COMPS_Object* comps_docgroupid_get_default(COMPS_DocGroupId *gid) {
 }
 void comps_docgroupid_set_default(COMPS_DocGroupId *gid, int def) {
     gid->def = (def != 0);
+}
+
+COMPS_ObjList* comps_docgroupid_arches(COMPS_DocGroupId *gid) {
+    return (COMPS_ObjList*)comps_object_incref((COMPS_Object*)gid->arches);
+}
+void comps_docgroupid_set_arches(COMPS_DocGroupId *gid,
+                                 COMPS_ObjList *arches) {
+    COMPS_OBJECT_DESTROY(gid->arches);
+    gid->arches = arches;
 }
 
 signed char comps_docgroupid_cmp_u(COMPS_Object *gid1, COMPS_Object *gid2) {

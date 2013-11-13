@@ -13,6 +13,9 @@ inline void __expand(char *str, const char *fmt, char out, ...) {
 
 void expand(char *str, const char *fmt, char **args, int len, int out) {
     switch(len) {
+        case 0:
+            expand0(str, fmt, args, out);
+        break;
         case 1:
             expand1(str, fmt, args, out);
         break;

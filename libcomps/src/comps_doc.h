@@ -410,6 +410,8 @@ char* comps2xml_str(COMPS_Doc *doc, COMPS_XMLOptions *options);
  */
 COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2);
 
+COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches);
+
 extern COMPS_ObjectInfo COMPS_Doc_ObjInfo;
 
 #endif //COMPS_DOC_H

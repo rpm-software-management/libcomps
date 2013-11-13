@@ -637,6 +637,52 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
     return ret;
 }
 
+
+COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches) {
+    COMPS_ObjList *list, *arches2;
+    COMPS_Doc *ret;
+    COMPS_DocCategory *cat;
+    COMPS_DocGroup *group;
+    COMPS_DocEnv *env;
+
+    ret = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
+                          (COMPS_Object*[]){(COMPS_Object*)source->encoding});
+    list = comps_doc_categories(source);
+    for (COMPS_ObjListIt *it = list->first; it != NULL; it = it->next) {
+        arches2 = comps_doccategory_arches((COMPS_DocCategory*)it->comps_obj);
+        if (__comps_objlist_intersected(arches, arches2)) {
+            cat = comps_doccategory_arch_filter((COMPS_DocCategory*)it->comps_obj,
+                                                arches);
+            comps_doc_add_category(ret, cat);
+        }
+        COMPS_OBJECT_DESTROY(arches2);
+    }
+    COMPS_OBJECT_DESTROY(list);
+    list = comps_doc_groups(source);
+    for (COMPS_ObjListIt *it = list->first; it != NULL; it = it->next) {
+        arches2 = comps_docgroup_arches((COMPS_DocGroup*)it->comps_obj);
+        if (__comps_objlist_intersected(arches, arches2)) {
+            group = comps_docgroup_arch_filter((COMPS_DocGroup*)it->comps_obj,
+                                                arches);
+            comps_doc_add_group(ret, group);
+        }
+        COMPS_OBJECT_DESTROY(arches2);
+    }
+    COMPS_OBJECT_DESTROY(list);
+    list = comps_doc_environments(source);
+    for (COMPS_ObjListIt *it = list->first; it != NULL; it = it->next) {
+        arches2 = comps_docenv_arches((COMPS_DocEnv*)it->comps_obj);
+        if (__comps_objlist_intersected(arches, arches2)) {
+            env = comps_docenv_arch_filter((COMPS_DocEnv*)it->comps_obj,
+                                           arches);
+            comps_doc_add_environment(ret, env);
+        }
+        COMPS_OBJECT_DESTROY(arches2);
+    }
+    COMPS_OBJECT_DESTROY(list);
+    return ret;
+}
+
 COMPS_ObjectInfo COMPS_Doc_ObjInfo = {
     .obj_size = sizeof(COMPS_Doc),
     .constructor = &comps_doc_create_u,

@@ -78,3 +78,13 @@ signed char comps_id_check(COMPS_Object *obj, COMPS_Object *prop) {
     return 1;
 }
 
+bool __comps_objlist_intersected(COMPS_ObjList *list1, COMPS_ObjList *list2) {
+    for (COMPS_ObjListIt *it = list1->first; it != NULL; it = it->next) {
+        for (COMPS_ObjListIt *it2 = list2->first; it2 != NULL; it2 = it2->next){
+            if (comps_object_cmp(it->comps_obj, it2->comps_obj))
+                return true;
+        }
+    }
+    return false;
+}
+

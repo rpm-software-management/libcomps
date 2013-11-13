@@ -155,6 +155,9 @@ HEAD_COMPS_DOCOBJ_SETOBJLIST(docenv, COMPS_DocEnv, group_list, group_list)
 HEAD_COMPS_DOCOBJ_SETOBJLIST(docenv, COMPS_DocEnv, option_list, option_list)
 /**@}*/
 
+HEAD_COMPS_DOCOBJ_GETARCHES(docenv, COMPS_DocEnv)
+HEAD_COMPS_DOCOBJ_SETARCHES(docenv, COMPS_DocEnv)
+
 char __comps_docenv_idcmp(void *e1, void *e2);
 
 /** add group_id to group_ids list in environment
@@ -189,6 +192,8 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
 
 signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
                              COMPS_Log *log, COMPS_XMLOptions *options);
+COMPS_DocEnv* comps_docenv_arch_filter(COMPS_DocEnv *source,
+                                       COMPS_ObjList *arches);
 
 extern COMPS_ObjectInfo COMPS_DocEnv_ObjInfo;
 

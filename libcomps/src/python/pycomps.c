@@ -398,6 +398,43 @@ int PyCOMPS_mdset_(PyCOMPS *self, PyObject *val, void *closure) {
     #undef _closure_
 }
 
+PyObject* PyCOMPS_filter_arches(PyObject *self, PyObject *other) {
+    COMPS_ObjList * arches;
+    PyCOMPS *doc;
+    COMPS_Doc *comps_doc;
+    PyObject *item;
+    char *str;
+    char created = 0;
+    if ((Py_TYPE(other) != &PyCOMPS_StrSeqType) &&
+        (Py_TYPE(other) != &PyList_Type)) {
+        PyErr_Format(PyExc_TypeError, "Not %s or %s instance",
+                     PyCOMPS_StrSeqType.tp_name, PyList_Type.tp_name);
+        return NULL;
+    }
+    if (Py_TYPE(other) == &PyList_Type) {
+        created = 1;
+        arches = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
+                                                    NULL);
+        for (Py_ssize_t x=0; x < PyList_Size(other); x++) {
+            item = PyList_GetItem(other, x);
+            __pycomps_arg_to_char(item, &str);
+            comps_objlist_append_x(arches, (COMPS_Object*)comps_str(str));
+        }
+    } else {
+        arches = ((PyCOMPS_Sequence*)other)->list;
+    }
+    doc = (PyCOMPS*)PyCOMPS_new(&PyCOMPS_Type, NULL, NULL);
+    PyCOMPS_init(doc, NULL, NULL);
+    COMPS_OBJECT_DESTROY(doc->comps_doc);
+
+    comps_doc = comps_doc_arch_filter(((PyCOMPS*)self)->comps_doc, arches);
+    if (created) {
+        COMPS_OBJECT_DESTROY(arches);
+    }
+    doc->comps_doc = comps_doc;
+    return (PyObject*)doc;
+}
+
 PyCOMPS_GetSetClosure envs_closure = {&PyCOMPS_EnvsType,
                                       offsetof(PyCOMPS, p_environments),
                                       &comps_doc_environments,
@@ -469,6 +506,9 @@ static PyMethodDef PyCOMPS_methods[] = {
                  "Containg errors only"},
     {"get_last_log", (PyCFunction)PyCOMPS_get_last_log,
      METH_NOARGS,"return list of messages from log of last parse action."},
+    {"arch_filter", (PyCFunction)PyCOMPS_filter_arches,
+     METH_O,"Return new comps object with only objects matches choosen"
+                 " architectures"},
     {NULL}  /* Sentinel */
 };
 

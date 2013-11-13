@@ -534,7 +534,7 @@ START_TEST(test_comps_doc_xml)
         }
         comps_doc_add_category(doc, c);
     }
-    comps2xml_f(doc, "testfile.xml", 1);
+    comps2xml_f(doc, "testfile.xml", 1, NULL);
     COMPS_OBJECT_DESTROY(doc);
 }
 END_TEST
@@ -656,7 +656,7 @@ START_TEST(test_doc_defaults) {
     comps_docgroup_add_package(g, p);
 
     comps_doc_add_group(doc, g);
-    tmp = comps2xml_str(doc);
+    tmp = comps2xml_str(doc, NULL);
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
     comps_parse_str(parsed, tmp);

@@ -198,6 +198,9 @@ HEAD_COMPS_DOCOBJ_GETOBJLIST(docgroup, COMPS_DocGroup, packages, packages)
 HEAD_COMPS_DOCOBJ_SETOBJLIST(docgroup, COMPS_DocGroup, packages, packages)
 /**@}*/
 
+HEAD_COMPS_DOCOBJ_GETARCHES(docgroup, COMPS_DocGroup)
+HEAD_COMPS_DOCOBJ_SETARCHES(docgroup, COMPS_DocGroup)
+
 signed char comps_docgroup_cmp_u(COMPS_Object *group1, COMPS_Object *group2);
 char __comps_docgroup_idcmp(void *g1, void *g2);
 
@@ -237,6 +240,9 @@ COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,
 
 signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                                COMPS_Log *log, COMPS_XMLOptions *options);
+
+COMPS_DocGroup* comps_docgroup_arch_filter(COMPS_DocGroup *source,
+                                           COMPS_ObjList *arches);
 
 extern COMPS_ObjectInfo COMPS_DocGroup_ObjInfo;
 extern COMPS_ValRuleGeneric* COMPS_DocGroup_ValidateRules[];
