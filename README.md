@@ -14,7 +14,7 @@ for automatic build system:
 *   cmake ( >= 2.6) http://www.cmake.org/
 *   make http://ftp.gnu.org/gnu/make/
 
-for libcoms library:
+for libcomps library:
 
 *   libxml2 http://www.xmlsoft.org/
 *   expat   http://expat.sourceforge.net/
