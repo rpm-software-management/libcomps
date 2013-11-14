@@ -304,6 +304,15 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     }
     ret = xmlTextWriterStartElement(writer, BAD_CAST "environment");
     COMPS_XMLRET_CHECK
+    if (options->arch_output) {
+        obj = (COMPS_Object*)comps_docenv_arches(env);
+        str = __comps_xml_arch_str(obj);
+        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
+                                          BAD_CAST str);
+        free(str);
+        COMPS_XMLRET_CHECK
+        COMPS_OBJECT_DESTROY(obj);
+    }
     for (int i=0; i<6; i++) {
         if (!type[i]) {
             obj = comps_objdict_get_x(env->properties, props[i]);

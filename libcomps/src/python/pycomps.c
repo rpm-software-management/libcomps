@@ -41,7 +41,7 @@ char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
                           "empty_packages", "empty_grouplist",
                           "empty_optionlist", "uservisible_explicit",
                           "default_explicit", "gid_default_explicit",
-                          "bao_explicit", NULL};
+                          "bao_explicit", "arch_output", NULL};
     *options = malloc(sizeof(COMPS_XMLOptions));
     _Bool *props[] = {&(*options)->empty_groups,
                       &(*options)->empty_categories,
@@ -55,7 +55,8 @@ char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
                       &(*options)->uservisible_explicit,
                       &(*options)->default_explicit,
                       &(*options)->gid_default_explicit,
-                      &(*options)->bao_explicit};
+                      &(*options)->bao_explicit,
+                      &(*options)->arch_output};
     **options = COMPS_XMLDefaultOptions;
 
     if (!PyDict_Check(pobj)) {

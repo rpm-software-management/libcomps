@@ -26,19 +26,20 @@ typedef struct COMPS_Log COMPS_Log;
 typedef struct COMPS_LogEntry COMPS_LogEntry;
 
 typedef struct COMPS_XMLOptions {
-    _Bool empty_groups;
-    _Bool empty_categories;
-    _Bool empty_environments;
-    _Bool empty_langpacks;
-    _Bool empty_blacklist;
-    _Bool empty_whiteout;
-    _Bool empty_packages;
-    _Bool empty_grouplist;
-    _Bool empty_optionlist;
-    _Bool uservisible_explicit;
-    _Bool default_explicit;
-    _Bool gid_default_explicit;
-    _Bool bao_explicit;
+    bool empty_groups;
+    bool empty_categories;
+    bool empty_environments;
+    bool empty_langpacks;
+    bool empty_blacklist;
+    bool empty_whiteout;
+    bool empty_packages;
+    bool empty_grouplist;
+    bool empty_optionlist;
+    bool uservisible_explicit;
+    bool default_explicit;
+    bool gid_default_explicit;
+    bool bao_explicit;
+    bool arch_output;
 } COMPS_XMLOptions;
 
 extern COMPS_XMLOptions COMPS_XMLDefaultOptions;

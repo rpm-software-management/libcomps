@@ -18,7 +18,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
 # USA
 
-import _libpycomps as libcomps
+try:
+    import libcomps
+except:
+    import _libpycomps as libcomps
 
 import sys
 import unittest
@@ -1071,7 +1074,12 @@ class COMPSTest(unittest.TestCase):
 
         comps4 = comps.arch_filter(["x86", "x86_64", "s390"])
         self.assertTrue(comps == comps4)
- 
+
+        s = comps.toxml_str(options = {"arch_output":True})
+        comps5 = libcomps.Comps()
+        comps5.fromxml_str(s)
+        self.assertTrue(comps == comps5)
+
 if __name__ == "__main__":
     unittest.main(testRunner = MyRunner)
     #unittest.main()

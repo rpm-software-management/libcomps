@@ -301,12 +301,17 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
         COMPS_OBJECT_DESTROY(obj);
         return 1;
     }
-    xmlTextWriterStartElement(writer, BAD_CAST "group");
-    /*if (!comps_objdict_get_x(group->properties, "uservisible")) {
-        comps_objdict_set_x(group->properties, "uservisible",
-                            (COMPS_Object*)comps_num(1));
-    }*/
-
+    ret = xmlTextWriterStartElement(writer, BAD_CAST "group");
+    COMPS_XMLRET_CHECK
+    if (options->arch_output) {
+        obj = (COMPS_Object*)comps_docgroup_arches(group);
+        str = __comps_xml_arch_str(obj);
+        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
+                                          BAD_CAST str);
+        free(str);
+        COMPS_XMLRET_CHECK
+        COMPS_OBJECT_DESTROY(obj);
+    }
     for (int i=0; i<9; i++) {
         //printf("%s\n", props[i]);
         if (!type[i]) {

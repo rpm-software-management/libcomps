@@ -87,4 +87,31 @@ bool __comps_objlist_intersected(COMPS_ObjList *list1, COMPS_ObjList *list2) {
     }
     return false;
 }
+char* __comps_xml_arch_str(COMPS_Object *archlist) {
+    size_t x, total_len = 0;
+    COMPS_ObjListIt *it;
+    char *arches_str;
 
+    if (!archlist || !((COMPS_ObjList*)archlist)->len) {
+        arches_str = malloc(sizeof(char));
+        arches_str[0] = 0;
+        return arches_str;
+    }
+
+    char *arches[((COMPS_ObjList*)archlist)->len];
+    for (x=0, it = ((COMPS_ObjList*)archlist)->first; it != NULL; it = it->next, x++) {
+        arches[x] = comps_object_tostr(it->comps_obj);
+        total_len += strlen(arches[x])+1;
+    }
+    arches_str = malloc(sizeof(char) * (total_len));
+    arches_str[0]=0;
+
+    x = 0;
+    for (; x < (size_t)(((COMPS_ObjList*)archlist)->len-1); x++) {
+        strcat(arches_str, arches[x]);
+        free(arches[x]);
+        strcat(arches_str, " ");
+    }
+    strcat(arches_str, arches[x]);
+    return arches_str;
+}

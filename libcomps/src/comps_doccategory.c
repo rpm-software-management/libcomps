@@ -240,6 +240,15 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
     }
     ret = xmlTextWriterStartElement(writer, BAD_CAST "category");
     COMPS_XMLRET_CHECK
+    if (options->arch_output) {
+        obj = (COMPS_Object*)comps_doccategory_arches(category);
+        str = __comps_xml_arch_str(obj);
+        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
+                                          BAD_CAST str);
+        free(str);
+        COMPS_XMLRET_CHECK
+        COMPS_OBJECT_DESTROY(obj);
+    }
     for (int i=0; i<6; i++) {
         if (!type[i]) {
             obj = comps_objdict_get_x(category->properties, props[i]);

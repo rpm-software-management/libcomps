@@ -102,6 +102,14 @@ signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
     int ret;
 
     ret = xmlTextWriterStartElement(writer, BAD_CAST "groupid");
+    if (options->arch_output) {
+        COMPS_Object *obj = (COMPS_Object*)groupid->arches;
+        str = __comps_xml_arch_str(obj);
+        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
+                                          BAD_CAST str);
+        free(str);
+        COMPS_XMLRET_CHECK
+    }
     COMPS_XMLRET_CHECK
     if (options->gid_default_explicit) {
         if (groupid->def)

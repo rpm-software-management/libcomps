@@ -32,7 +32,8 @@ COMPS_XMLOptions COMPS_XMLDefaultOptions = {
     .uservisible_explicit = false,
     .default_explicit = false,
     .gid_default_explicit = false,
-    .bao_explicit = false
+    .bao_explicit = false,
+    .arch_output = false
 };
 
 

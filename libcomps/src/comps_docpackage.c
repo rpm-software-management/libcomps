@@ -140,6 +140,14 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
 
     ret = xmlTextWriterStartElement(writer, BAD_CAST "packagereq");
     COMPS_XMLRET_CHECK
+    if (options->arch_output) {
+        COMPS_Object *obj = (COMPS_Object*)pkg->arches;
+        str = __comps_xml_arch_str(obj);
+        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
+                                          BAD_CAST str);
+        free(str);
+        COMPS_XMLRET_CHECK
+    }
     if (pkg->type == COMPS_PACKAGE_OPTIONAL)
         str = "optional";
     else if (pkg->type == COMPS_PACKAGE_MANDATORY)
