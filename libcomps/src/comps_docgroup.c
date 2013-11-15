@@ -173,7 +173,6 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     COMPS_ObjListIt *it;
     COMPS_HSListItem *hsit;
     COMPS_Set *set;
-    COMPS_DocGroupPackage *newpkg;
     COMPS_HSList *pairs;
 
     res = (COMPS_DocGroup*)comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
@@ -192,17 +191,21 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     it = g1->packages?g1->packages->first:NULL;
     for (; it != NULL; it = it->next) {
         comps_set_add(set, (void*)it->comps_obj);
+        comps_docgroup_add_package(res, (COMPS_DocGroupPackage*)
+                                        comps_object_copy(it->comps_obj));
     }
     it = g2->packages?g2->packages->first:NULL;
+    void *data;
+    int index;
     for (; it != NULL; it = it->next) {
-        comps_set_add(set, (void*)it->comps_obj);
-    }
-    //res->packages = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
-    //comps_list_init(res->packages);
-    for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        newpkg = (COMPS_DocGroupPackage*)comps_object_copy(
-                                            (COMPS_Object*)hsit->data);
-        comps_docgroup_add_package(res, newpkg);
+        if ((data = comps_set_data_at(set, (void*)it->comps_obj)) != NULL) {
+            index = comps_objlist_index(res->packages, (COMPS_Object*)data);
+            comps_objlist_remove(res->packages, (COMPS_Object*)data);
+            comps_objlist_insert_at(res->packages, index, data);
+        } else {
+            comps_docgroup_add_package(res, (COMPS_DocGroupPackage*)
+                                            comps_object_copy(it->comps_obj));
+        }
     }
     comps_set_destroy(&set);
     comps_object_destroy((COMPS_Object*)res->name_by_lang);

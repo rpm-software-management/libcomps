@@ -9,12 +9,19 @@ include_directories(${LIBCOMPS_INCLUDE_PATH})
 configure_file(${pycomps_SRCDIR}/tests/run_tests.sh.in
                ./libcomps/run_tests.sh)
 
-set(TEST_FILES ../__init__.py __test.py fedora_comps.xml sample_comps.xml
-                sample_comps2.xml sample_comps2.xml.gz main_comps.xml
-                main_comps2.xml main_arches.xml f21-rawhide-comps.xml
-                comps-f21.xml.in)
-foreach(file ${TEST_FILES})
-    file(COPY ${pycomps_SRCDIR}/tests/${file} DESTINATION ./libcomps/)
+
+list(LENGTH TESTS_FILES len)
+math (EXPR len "${len} - 1")
+foreach(x RANGE 0 ${len})
+    list(GET TESTS_FILES ${x} val)
+    file(COPY ${pycomps_SRCDIR}/tests/${val} DESTINATION ./libcomps/)
+endforeach()
+
+list(LENGTH COMPS_FILES len)
+math (EXPR len "${len} - 1")
+foreach(x RANGE 0 ${len})
+    list(GET COMPS_FILES ${x} val)
+    file(COPY ${pycomps_SRCDIR}/tests/comps/${val} DESTINATION ./libcomps/comps/)
 endforeach()
 
 add_library(pycomps SHARED ${pycomps_SRC})

@@ -307,6 +307,15 @@ int comps_objlist_remove(COMPS_ObjList *objlist, COMPS_Object *obj) {
     return 1;
 }
 
+int comps_objlist_index(COMPS_ObjList *objlist, COMPS_Object *obj) {
+    int x;
+    COMPS_ObjListIt *it;
+
+    for (it = objlist->first, x=0; it != NULL && it->comps_obj != obj;
+         it = it->next, x++);
+    if (it == NULL) return -1;
+    return x;
+}
 
 COMPS_ObjList* comps_objlist_sublist_it(COMPS_ObjListIt *startit,
                                       COMPS_ObjListIt *end) {

@@ -172,6 +172,9 @@ int comps_objlist_remove_at(COMPS_ObjList *objlist, unsigned int atpos);
  */
 int comps_objlist_remove(COMPS_ObjList *objlist, COMPS_Object *obj);
 
+
+int comps_objlist_index(COMPS_ObjList *objlist, COMPS_Object *obj);
+
 /** Returns new sublist from original list
  *
  * Returns new sublist from original list, starting item startit and ending

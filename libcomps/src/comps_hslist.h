@@ -49,6 +49,9 @@ void comps_hslist_append(COMPS_HSList * hlist, void * data,
                                                         unsigned construct);
 void comps_hslist_remove(COMPS_HSList * hlist, COMPS_HSListItem * it);
 void* comps_hslist_data_at(COMPS_HSList * hlist, unsigned int index);
+void comps_hslist_insert_after(COMPS_HSList * hslist, COMPS_HSListItem *item,
+                               void *data, unsigned construct);
+void comps_hslist_shift(COMPS_HSList * hslist, void *data, unsigned construct);
 
 COMPS_HSList* comps_hslist_clone(COMPS_HSList * hslist);
 void comps_hslist_clear(COMPS_HSList * hslist);

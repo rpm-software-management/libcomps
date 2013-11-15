@@ -68,6 +68,47 @@ void comps_hslist_append(COMPS_HSList * hslist, void * data, unsigned construct)
     }
 }
 
+void comps_hslist_insert_after(COMPS_HSList * hslist, COMPS_HSListItem *item,
+                               void *data, unsigned construct) {
+    COMPS_HSListItem * it;
+    void * ndata;
+
+    if (hslist == NULL && item == NULL)
+        return;
+    if ((it = malloc(sizeof(*it))) == NULL)
+        return;
+    if (construct && hslist->data_constructor) {
+        ndata = hslist->data_constructor(data);
+    } else {
+        ndata = data;
+    }
+    it->data = ndata;
+    it->next = item->next;
+    item->next = it;
+    if (item == hslist->last) {
+        //printf("inserting after last\n");
+        hslist->last = it;
+    }
+}
+
+void comps_hslist_shift(COMPS_HSList * hslist, void *data, unsigned construct) {
+    COMPS_HSListItem * it;
+    void * ndata;
+
+    if (hslist == NULL)
+        return;
+    if ((it = malloc(sizeof(*it))) == NULL)
+        return;
+    if (construct && hslist->data_constructor) {
+        ndata = hslist->data_constructor(data);
+    } else {
+        ndata = data;
+    }
+    it->data = ndata;
+    it->next = hslist->first;
+    hslist->first = it;
+}
+
 inline void comps_hslist_destroy_v(void ** hslist) {
     comps_hslist_destroy((COMPS_HSList**) hslist);
 }

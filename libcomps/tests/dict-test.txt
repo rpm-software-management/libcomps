@@ -87,7 +87,7 @@ GR - Greece
 GS - S. Georgia and S. Sandwich Isls.
 GT - Guatemala
 GU - Guam
-GW - Guinea-Bissau
+GW - Guinea_Bissau
 GY - Guyana
 HK - Hong Kong
 HM - Heard and McDonald Islands

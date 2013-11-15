@@ -215,7 +215,7 @@ void comps_rtree_values_walk(COMPS_RTree * rt, void* udata,
 
 void comps_rtree_set(COMPS_RTree * rt, char * key, void * data)
 {
-    static COMPS_HSListItem *it;
+    COMPS_HSListItem *it, *lesser;
     COMPS_HSList *subnodes;
     COMPS_RTreeData *rtd;
     static COMPS_RTreeData *rtdata;
@@ -239,15 +239,22 @@ void comps_rtree_set(COMPS_RTree * rt, char * key, void * data)
     while (offset != len)
     {
         found = 0;
+        lesser = NULL;
         for (it = subnodes->first; it != NULL; it=it->next) {
             if (((COMPS_RTreeData*)it->data)->key[0] == key[offset]) {
                 found = 1;
                 break;
+            } else if (((COMPS_RTreeData*)it->data)->key[0] < key[offset]) {
+                lesser = it;
             }
         }
         if (!found) { // not found in subnodes; create new subnode
             rtd = comps_rtree_data_create(rt, key+offset, ndata);
-            comps_hslist_append(subnodes, rtd, 0);
+            if (!lesser) {
+                comps_hslist_shift(subnodes, rtd, 0);
+            } else {
+                comps_hslist_insert_after(subnodes, lesser, rtd, 0);
+            }
             return;
         } else {
             rtdata = (COMPS_RTreeData*)it->data;
@@ -280,26 +287,35 @@ void comps_rtree_set(COMPS_RTree * rt, char * key, void * data)
                 subnodes = rtdata->subnodes;
                 offset += x;
             } else {
-                comps_hslist_remove(subnodes, it);  //remove old node
-                tmpch = rtdata->key[x];             // split mutual key
-                rtdata->key[x] = 0;
-                /* insert new parent node with mutual key part */
-                rtd = comps_rtree_data_create(rt, rtdata->key, NULL);
+                //comps_hslist_remove(subnodes, it);  //remove old node
+                void *tmpdata;
+                //tmpch = rtdata->key[x];             // split mutual key
+                tmpdata = ((COMPS_RTreeData*)it->data)->data;
+                int cmpret = strcmp(key+offset+x, rtdata->key+x);
+                rtdata->data = NULL;
 
-                comps_hslist_append(subnodes, rtd, 0);
-
-
-                rtd = comps_rtree_data_create(rt, key+offset+x, ndata);
-                comps_hslist_append(
-                            ((COMPS_RTreeData*)subnodes->last->data)->subnodes,
-                            rtd, 0);
-
-                it->next = NULL;
-                ((COMPS_RTreeData*)subnodes->last->data)->subnodes->last->next = it;
-                ((COMPS_RTreeData*)subnodes->last->data)->subnodes->last = it;
-                rtdata->key[x] = tmpch;
+                if (cmpret > 0) {
+                    rtd = comps_rtree_data_create(rt, rtdata->key+x, tmpdata);
+                    comps_hslist_append(
+                                ((COMPS_RTreeData*)it->data)->subnodes,
+                                rtd, 0);
+                    rtd = comps_rtree_data_create(rt, key+offset+x, ndata);
+                    comps_hslist_append(
+                                ((COMPS_RTreeData*)it->data)->subnodes,
+                                rtd, 0);
+                } else {
+                    rtd = comps_rtree_data_create(rt, key+offset+x, ndata);
+                    comps_hslist_append(
+                                ((COMPS_RTreeData*)it->data)->subnodes,
+                                rtd, 0);
+                    rtd = comps_rtree_data_create(rt, rtdata->key+x, tmpdata);
+                    comps_hslist_append(
+                                ((COMPS_RTreeData*)it->data)->subnodes,
+                                rtd, 0);
+                }
+                rtdata->key[x+1] = 0;
                 len = strlen(rtdata->key+x);
-                memmove(rtdata->key,rtdata->key+x, sizeof(char)*len);
+                //memmove(rtdata->key,rtdata->key+x, sizeof(char)*len);
                 rtdata->key = realloc(rtdata->key, sizeof(char)*(len+1));
                 rtdata->key[len] = 0;
                 return;
@@ -460,8 +476,10 @@ void comps_rtree_unset(COMPS_RTree * rt, const char * key) {
                 break;
             }
         }
-        if (!found)
+        if (!found) {
+            comps_hslist_destroy(&path);
             return;
+        }
         rtdata = (COMPS_RTreeData*)it->data;
 
         for (x=1; ;x++) {
@@ -511,7 +529,10 @@ void comps_rtree_unset(COMPS_RTree * rt, const char * key) {
             return;
         }
         else if (ended == 1) offset+=x;
-        else return;
+        else {
+            comps_hslist_destroy(&path);
+            return;
+        }
         if ((relation = malloc(sizeof(struct Relation))) == NULL) {
             comps_hslist_destroy(&path);
             return;

@@ -8,6 +8,8 @@ import os
 import shutil
 import tempfile
 
+import utest
+
 try:
     import _libpycomps as libcomps
 except ImportError:
@@ -37,7 +39,9 @@ class TestLibcomps(unittest.TestCase):
         group.id = "core"
         self.comps.groups.append(group)
 
-        data = self.comps.xml_str()
+        data = self.comps.xml_str(options = {"empty_groups":True,
+                                             "default_explicit":True,
+                                             "uservisible_explicit":True})
         expected_data_1 = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE comps PUBLIC "-//Red Hat, Inc.//DTD Comps info//EN" "comps.dtd">
 <comps>
@@ -62,7 +66,7 @@ class TestLibcomps(unittest.TestCase):
   </group>
 </comps>
 """
-        data = self.comps.xml_str()
+        data = self.comps.xml_str(options = {"empty_groups":True})
         self.assertEqual(data, expected_data_2)
 
         group.display_order = None
@@ -147,4 +151,4 @@ class TestLibcomps(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(testRunner = utest.MyRunner)

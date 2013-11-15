@@ -128,7 +128,8 @@ const char* comps_docpackage_type_str(COMPS_PackageType type) {
 }
 
 inline char comps_docpackage_cmp_set(void *pkg1, void *pkg2) {
-    return comps_docpackage_cmp_u((COMPS_Object*) pkg1, (COMPS_Object*)pkg2);
+    return COMPS_OBJECT_CMP(((COMPS_DocGroupPackage*)pkg1)->name,
+                            ((COMPS_DocGroupPackage*)pkg2)->name);
 }
 
 signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,

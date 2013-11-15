@@ -103,11 +103,16 @@ COMPS_RTree * load_acrodict(char *filename) {
             return rt;
         buffer[strlen(buffer)-1] =0;
         //printf("buffer:%s\n", buffer);
-        pch = strrchr(buffer, ' ');
+        pch = strrchr(buffer, '-');
         buffer[pch-buffer] = 0;
-        val = str_cloner((void*)buffer);
-        //printf("%s = %s\n", pch+1, (char*)val);
-        comps_rtree_set(rt, pch+1, val);
+        val = str_cloner(pch+1);
+        //printf("%s = %s\n", (char*)val, pch+1);
+        comps_rtree_set(rt, buffer, val);
+        //printf("--------------------\n");
+        /*for (COMPS_HSListItem *it = rt->subnodes->first;
+             it != NULL; it = it->next) {
+            printf("%s\n", ((COMPS_RTreeData*)it->data)->key);
+        }*/
     }
     return rt;
 }
@@ -257,6 +262,10 @@ int main(int argc, char * argv[]) {
     printf("loading acronym dict\n");
     tree = load_acrodict("dict-test.txt");
     print_all_str(tree);
+    /*for (COMPS_HSListItem *it = tree->subnodes->first;
+         it != NULL; it = it->next) {
+        printf("%s\n", ((COMPS_RTreeData*)it->data)->key);
+    }*/
     comps_rtree_destroy(tree);
 
     return 0;

@@ -3,6 +3,7 @@
 
 
 import unittest
+import utest
 
 try:
     import _libpycomps as libcomps
@@ -71,4 +72,4 @@ class TestMergeComps(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(testRunner = utest.MyRunner)
