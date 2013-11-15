@@ -9,11 +9,18 @@ include_directories(${LIBCOMPS_INCLUDE_PATH})
 configure_file(${pycomps_SRCDIR}/tests/run_tests.sh.in
                ./libcomps/run_tests.sh)
 
-foreach(file ${TESTS_FILES})
-    file(COPY ${pycomps_SRCDIR}/tests/${file} DESTINATION ./libcomps/)
+list(LENGTH TESTS_FILES len)
+math (EXPR len "${len} - 1")
+foreach(x RANGE 0 ${len})
+    list(GET TESTS_FILES ${x} val)
+    file(COPY ${pycomps_SRCDIR}/tests/${val} DESTINATION ./libcomps/)
 endforeach()
-foreach(file ${COMPS_FILES})
-    file(COPY ${pycomps_SRCDIR}/tests/${file} DESTINATION ./libcomps/comps/)
+
+list(LENGTH COMPS_FILES len)
+math (EXPR len "${len} - 1")
+foreach(x RANGE 0 ${len})
+    list(GET COMPS_FILES ${x} val)
+    file(COPY ${pycomps_SRCDIR}/tests/comps/${val} DESTINATION ./libcomps/comps/)
 endforeach()
 
 
