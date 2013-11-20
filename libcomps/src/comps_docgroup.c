@@ -174,34 +174,36 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     COMPS_HSListItem *hsit;
     COMPS_Set *set;
     COMPS_HSList *pairs;
+    COMPS_DocGroupPackage *pkg;
 
     res = (COMPS_DocGroup*)comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
     COMPS_OBJECT_DESTROY(res->properties);
 
-    res->properties = comps_objdict_clone(g2->properties);
-    pairs = comps_objdict_pairs(g1->properties);
+    res->properties = comps_objdict_clone(g1->properties);
+    pairs = comps_objdict_pairs(g2->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
         comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
                           ((COMPS_RTreePair*)hsit->data)->data);
     }
     comps_hslist_destroy(&pairs);
-
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &comps_docpackage_cmp_set);
+    comps_set_init(set, NULL, NULL, (void(*)(void*))&comps_object_destroy,
+                                    &comps_docpackage_cmp_set);
     it = g1->packages?g1->packages->first:NULL;
     for (; it != NULL; it = it->next) {
-        comps_set_add(set, (void*)it->comps_obj);
-        comps_docgroup_add_package(res, (COMPS_DocGroupPackage*)
-                                        comps_object_copy(it->comps_obj));
+        pkg = (COMPS_DocGroupPackage*) comps_object_copy(it->comps_obj);
+        comps_set_add(set, (void*)comps_object_incref((COMPS_Object*)pkg));
+        comps_docgroup_add_package(res, pkg);
     }
-    it = g2->packages?g2->packages->first:NULL;
     void *data;
     int index;
+    it = g2->packages?g2->packages->first:NULL;
     for (; it != NULL; it = it->next) {
         if ((data = comps_set_data_at(set, (void*)it->comps_obj)) != NULL) {
             index = comps_objlist_index(res->packages, (COMPS_Object*)data);
-            comps_objlist_remove(res->packages, (COMPS_Object*)data);
-            comps_objlist_insert_at(res->packages, index, data);
+            comps_objlist_remove_at(res->packages, index);
+            comps_objlist_insert_at_x(res->packages, index,
+                                      comps_object_copy(it->comps_obj));
         } else {
             comps_docgroup_add_package(res, (COMPS_DocGroupPackage*)
                                             comps_object_copy(it->comps_obj));
@@ -210,8 +212,8 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     comps_set_destroy(&set);
     comps_object_destroy((COMPS_Object*)res->name_by_lang);
     comps_object_destroy((COMPS_Object*)res->desc_by_lang);
-    res->name_by_lang = comps_objdict_union(g1->name_by_lang, g2->name_by_lang);
-    res->desc_by_lang = comps_objdict_union(g1->desc_by_lang, g2->desc_by_lang);
+    res->name_by_lang = comps_objdict_union(g2->name_by_lang, g1->name_by_lang);
+    res->desc_by_lang = comps_objdict_union(g2->desc_by_lang, g1->desc_by_lang);
     return res;
 }
 
@@ -283,7 +285,7 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                               "default", NULL, NULL, NULL};
     static bool explicit[] = {true, true, true, true, true, false, false, true};
     static char *default_val[] = {NULL, NULL, NULL, NULL, NULL,
-                                  "false", "true", NULL};
+                                  "false", "true", NULL, NULL};
 
     static char*(*tostrf[])(COMPS_Object*) = {&comps_object_tostr,
                                                &comps_object_tostr,

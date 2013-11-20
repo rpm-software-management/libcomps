@@ -73,7 +73,8 @@ COMPS_Object* comps_docpackage_get_requires(COMPS_DocGroupPackage *pkg) {
 }
 
 void comps_docpackage_set_basearchonly(COMPS_DocGroupPackage *pkg,
-                                       int basearchonly) {
+                                       int basearchonly, bool unset) {
+    (void)unset;
     if (pkg->basearchonly) {
         COMPS_OBJECT_DESTROY(pkg->basearchonly);
     }
@@ -84,12 +85,14 @@ COMPS_Object* comps_docpackage_get_basearchonly(COMPS_DocGroupPackage *pkg) {
     return comps_object_incref((COMPS_Object*)pkg->basearchonly);
 }
 
-void comps_docpackage_set_type_i(COMPS_DocGroupPackage *pkg, int type) {
+void comps_docpackage_set_type_i(COMPS_DocGroupPackage *pkg, int type, bool unset) {
+    (void)unset;
     pkg->type = type;
 }
 
 void comps_docpackage_set_type(COMPS_DocGroupPackage *pkg,
-                                   COMPS_PackageType type) {
+                                   COMPS_PackageType type, bool unset) {
+    (void)unset;
     pkg->type = type;
 }
 

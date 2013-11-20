@@ -313,11 +313,8 @@ void comps_rtree_set(COMPS_RTree * rt, char * key, void * data)
                                 ((COMPS_RTreeData*)it->data)->subnodes,
                                 rtd, 0);
                 }
-                rtdata->key[x+1] = 0;
-                len = strlen(rtdata->key+x);
-                //memmove(rtdata->key,rtdata->key+x, sizeof(char)*len);
-                rtdata->key = realloc(rtdata->key, sizeof(char)*(len+1));
-                rtdata->key[len] = 0;
+                rtdata->key = realloc(rtdata->key, sizeof(char)*(x+1));
+                rtdata->key[x] = 0;
                 return;
             }
         }

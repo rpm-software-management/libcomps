@@ -73,14 +73,20 @@ void CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _set_), PROPNAME)(OBJTYPE *OBJNAM
 
 #define COMPS_NUMPROP_SETTER(OBJNAME, OBJTYPE, PROPNAME)\
 inline void CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _set_), PROPNAME)(OBJTYPE *OBJNAME,\
-                                                                        int PROPNAME){\
+                                                                        int PROPNAME,\
+                                                                        bool unset){\
+        if (unset) {\
+            comps_objdict_set_x(OBJNAME->properties, #PROPNAME, NULL);\
+            return;\
+        } \
         COMPS_Object *num;\
         num = (COMPS_Object*)comps_num(PROPNAME);\
         comps_objdict_set_x(OBJNAME->properties, #PROPNAME, num);\
 }
 #define HEAD_COMPS_NUMPROP_SETTER(OBJNAME, OBJTYPE, PROPNAME)\
 void CONCAT(CONCAT(CONCAT(comps_doc, OBJNAME), _set_), PROPNAME)(OBJTYPE *OBJNAME,\
-                                                                        int PROPNAME);
+                                                                 int PROPNAME,\
+                                                                 bool unset);
 
 
 #define COMPS_PROP_GETTER(OBJNAME, OBJTYPE, PROPNAME)\

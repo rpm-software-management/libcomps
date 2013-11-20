@@ -242,7 +242,7 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
     COMPS_Set *set;
     COMPS_Doc *res;
     COMPS_DocGroup *tmpgroup;
-    //COMPS_DocCategory *tmpcat;
+    COMPS_DocCategory *tmpcat;
     COMPS_DocEnv *tmpenv;
     COMPS_HSListItem *hsit;
     COMPS_ObjList *groups = comps_doc_groups(c1);
@@ -276,9 +276,9 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
     for (it = groups ? groups->first : NULL; it != NULL; it = it->next) {
         if (comps_set_in(set, it->comps_obj)) {
             tmpgroup = comps_docgroup_union(
-                                (COMPS_DocGroup*)it->comps_obj,
                                 (COMPS_DocGroup*)comps_set_data_at(set,
-                                                                   it->comps_obj));
+                                                               it->comps_obj),
+                                (COMPS_DocGroup*)it->comps_obj);
             tmpdata = comps_set_data_at(set, it->comps_obj);
             comps_set_remove(set, it->comps_obj);
             COMPS_OBJECT_DESTROY(tmpdata);
@@ -301,14 +301,14 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
     categories = comps_doc_categories(c2);
     for (it = categories ? categories->first : NULL; it != NULL; it = it->next) {
         if (comps_set_in(set, it->comps_obj)) {
-            /*tmpcat = comps_doccategory_union(
-                                (COMPS_DocCategory*)it->comps_obj,
+            tmpcat = comps_doccategory_union(
                                 (COMPS_DocCategory*)comps_set_data_at(set,
-                                                                it->comps_obj));
+                                                                it->comps_obj),
+                                (COMPS_DocCategory*)it->comps_obj);
             tmpdata = comps_set_data_at(set, it->comps_obj);
             comps_set_remove(set, it->comps_obj);
             COMPS_OBJECT_DESTROY(tmpdata);
-            comps_set_add(set, tmpcat);*/
+            comps_set_add(set, tmpcat);
         } else {
             comps_set_add(set, comps_object_copy(it->comps_obj));
         }
@@ -331,9 +331,9 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
         for (it = envs->first; it != NULL; it = it->next) {
             if (comps_set_in(set, it->comps_obj)) {
                 tmpenv = comps_docenv_union(
-                                    (COMPS_DocEnv*)it->comps_obj,
                                     (COMPS_DocEnv*)comps_set_data_at(set,
-                                                                  it->comps_obj));
+                                                              it->comps_obj),
+                                    (COMPS_DocEnv*)it->comps_obj);
                 tmpdata = comps_set_data_at(set, it->comps_obj);
                 comps_set_remove(set, it->comps_obj);
                 comps_object_destroy((COMPS_Object*)tmpdata);

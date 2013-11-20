@@ -302,10 +302,13 @@ int __PyCOMPS_set_strattr(PyObject *self, PyObject *val, void *closure) {
     #define _closure_ ((__PyCOMPS_StrPropGetSetClosure*)closure)
     char *tmp = NULL;
     COMPS_Object *obj;
-    if (__pycomps_stringable_to_char(val, &tmp) < 0) {
+    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    if (val == Py_None) {
+        _closure_->set_f(obj, NULL, 0);
+        return 0;
+    } else if (__pycomps_stringable_to_char(val, &tmp) < 0) {
         return -1;
     }
-    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
     _closure_->set_f(obj, tmp, 0);
     free(tmp);
     #undef _closure_
@@ -336,13 +339,16 @@ int __PyCOMPS_set_numattr(PyObject *self, PyObject *val, void *closure) {
     #define _closure_ ((__PyCOMPS_NumPropGetSetClosure*)closure)
     long tmp;
     COMPS_Object *obj;
-    if (!PyINT_CHECK(val)) {
+    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    if (val == Py_None) {
+        _closure_->set_f(obj, 1, true);
+        return 0;
+    } else if (!PyINT_CHECK(val)) {
         PyErr_SetString(PyExc_TypeError, "Not int object");
         return -1;
     }
     tmp = PyINT_ASLONG(val);
-    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
-    _closure_->set_f(obj, tmp);
+    _closure_->set_f(obj, tmp, false);
     #undef _closure_
     return 0;
 }
@@ -372,9 +378,9 @@ int __PyCOMPS_set_boolattr(PyObject *self, PyObject *val, void *closure) {
     }
     obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
     if (val == Py_True) {
-        _closure_->set_f(obj, 1);
+        _closure_->set_f(obj, 1, false);
     } else {
-        _closure_->set_f(obj, 0);
+        _closure_->set_f(obj, 0, false);
     }
     #undef _closure_
     return 0;

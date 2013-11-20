@@ -204,75 +204,82 @@ int comps_objlist_insert_before(COMPS_ObjList *objlist,
     return 1;
 }
 
+int __comps_objlist_insert_at(COMPS_ObjList *objlist,
+                           unsigned int pos,
+                           COMPS_ObjListIt *newit) {
+    COMPS_ObjListIt *tmpit, *oldit;
+    unsigned int i;
+    if (pos == 0) {
+        newit->next = objlist->first;
+        objlist->first = newit;
+        if (!objlist->last) {
+            objlist->last = newit;
+        }
+        objlist->len++;
+    } else if (pos == objlist->len){
+        newit->next = NULL;
+        objlist->last->next = newit;
+        objlist->last = newit;
+        objlist->len++;
+    } else {
+        i = 0;
+        oldit = NULL;
+        for (tmpit = objlist->first; tmpit != NULL && i != pos;
+             i++, tmpit = tmpit->next) {
+            oldit = tmpit;
+        }
+        newit->next = oldit->next;
+        oldit->next = newit; 
+        objlist->len++;
+    }
+    return 1;
+}
+int comps_objlist_insert_at_x(COMPS_ObjList *objlist,
+                           unsigned int pos,
+                           COMPS_Object *obj) {
+    if (!objlist) return -1;
+    if (pos > objlist->len) return -1;
+    COMPS_ObjListIt *newit = comps_objlist_it_create_x(obj);
+    return __comps_objlist_insert_at(objlist, pos, newit);
+}
 int comps_objlist_insert_at(COMPS_ObjList *objlist,
                            unsigned int pos,
                            COMPS_Object *obj) {
-    COMPS_ObjListIt *tmpit;
-    unsigned int i;
-
     if (!objlist) return -1;
-
-    COMPS_ObjListIt *new_it;
-
-    if (objlist->first) {
-        for (i = 0, tmpit = objlist->first; tmpit->next != NULL && i+1 != pos;
-            tmpit = tmpit->next, i++) {
-        };
-    } else tmpit = NULL;
-        if (tmpit == objlist->last && pos != objlist->len) {
-        return 0;
-    }
-
-    new_it = comps_objlist_it_create(obj);
-
-    if (pos == 0 && tmpit == NULL) {
-        objlist->first = new_it;
-        objlist->last = new_it;
-        objlist->len++;
-        return 1;
-    }
-    if (tmpit == objlist->last && pos == objlist->len) {
-        objlist->last->next = new_it;
-        objlist->last = new_it;
-        objlist->len++;
-        return 1;
-    }
-    new_it->next = tmpit->next;
-    tmpit->next = new_it;
-    if (tmpit == objlist->last) {
-        objlist->last = new_it;
-    }
-    objlist->len++;
-    return 1;
+    if (pos > objlist->len) return -1;
+    COMPS_ObjListIt *newit = comps_objlist_it_create(obj);
+    return __comps_objlist_insert_at(objlist, pos, newit);
 }
 
 int comps_objlist_remove_at(COMPS_ObjList *objlist, unsigned int atpos) {
     int pos;
-    COMPS_ObjListIt *it, *itprev = NULL;
+    COMPS_ObjListIt *it, *itprev=NULL, *removed;
     if (!objlist) return 0;
 
-    for (it = objlist->first, pos=-1;
-         it != NULL && pos != (int)atpos-1;
+    for (it = objlist->first, pos=0;
+         it != NULL && pos != (int)atpos;
          it = it->next, pos++) {
         itprev = it;
     }
-    if (pos != (int)(atpos-1))
-        return 0;
-
-    if (itprev == NULL) {
-        if (objlist->last == objlist->first)
-            objlist->last = NULL;
+    if (atpos == 0 && objlist->first) {
+        removed = objlist->first;
         objlist->first = objlist->first->next;
-        comps_object_destroy(it->comps_obj);
-        free(it);
-    } else {
-        itprev->next = it->next;
-        comps_object_destroy(it->comps_obj);
-        free(it);
-        if (it == objlist->last) {
+        if (objlist->last == removed) {
+            objlist->last = NULL;
+        }
+    } else if (pos != (int)(atpos))
+        return 0;
+    if (itprev) {
+        removed = it;
+        if (itprev->next)
+            itprev->next = itprev->next->next;
+        else
+            itprev->next = NULL;
+        if (removed == objlist->last) {
             objlist->last = itprev;
         }
     }
+    comps_objlist_it_destroy(removed);
     objlist->len--;
     return 1;
 }
@@ -312,7 +319,8 @@ int comps_objlist_index(COMPS_ObjList *objlist, COMPS_Object *obj) {
     COMPS_ObjListIt *it;
 
     for (it = objlist->first, x=0; it != NULL && it->comps_obj != obj;
-         it = it->next, x++);
+         it = it->next, x++) {
+    };
     if (it == NULL) return -1;
     return x;
 }

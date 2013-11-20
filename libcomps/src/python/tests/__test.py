@@ -591,6 +591,7 @@ class DictTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             x = _dict["notindict"]
 
+#@unittest.skip("skip")
 class MDictTest(unittest.TestCase):
     def test_blacklist(self):
         bl1 = libcomps.Blacklist()
@@ -672,7 +673,7 @@ class COMPSTest(unittest.TestCase):
     #@unittest.skip("")
     def test_fedora(self):
         comps = libcomps.Comps()
-        ret = comps.fromxml_f("fedora_comps.xml")
+        ret = comps.fromxml_f("comps/fedora_comps.xml")
         #for x in comps.get_last_parse_log():
         #    print x
         self.assertTrue(ret != -1)
@@ -682,12 +683,11 @@ class COMPSTest(unittest.TestCase):
         comps2 = libcomps.Comps()
         comps2.fromxml_f("fed2.xml")
         self.assertTrue(comps == comps2)
-        
 
     #@unittest.skip("skip")
     def test_sample(self):
         comps = libcomps.Comps()
-        ret = comps.fromxml_f("sample_comps.xml")
+        ret = comps.fromxml_f("comps/sample_comps.xml")
         #print comps.get_last_parse_log()
         self.assertTrue(ret != -1)
 
@@ -701,13 +701,17 @@ class COMPSTest(unittest.TestCase):
     #@unittest.skip("skip")
     def test_main(self):
         comps = libcomps.Comps()
-        ret = comps.fromxml_f("main_comps.xml")
+        ret = comps.fromxml_f("comps/main_comps.xml")
         self.assertTrue(ret != -1)
         comps.xml_f("main2.xml")
         comps2 = libcomps.Comps()
         comps2.fromxml_f("main2.xml")
-        x = comps.xml_str()
-        y = comps2.xml_str()
+        x = comps.xml_str(options={"empty_groups":True,
+                                         "empty_categories":True,
+                                         "empty_environments":True})
+        y = comps2.xml_str(options={"empty_groups":True,
+                                         "empty_categories":True,
+                                         "empty_environments":True})
         self.assertTrue(comps == comps2)
         self.assertTrue(y == x)
         os.remove("main2.xml")
@@ -715,7 +719,7 @@ class COMPSTest(unittest.TestCase):
     #@unittest.skip("skip")
     def test_main2(self):
         comps = libcomps.Comps()
-        ret = comps.fromxml_f("main_comps2.xml")
+        ret = comps.fromxml_f("comps/main_comps2.xml")
         self.assertTrue(ret != -1)
         comps.xml_f("main22.xml")
         self.assertTrue(ret != -1)
@@ -727,14 +731,14 @@ class COMPSTest(unittest.TestCase):
     def test_main_union(self):
         c1 = libcomps.Comps()
         c2 = libcomps.Comps()
-        c2.fromxml_f('main_comps.xml')
+        c2.fromxml_f('comps/main_comps.xml')
         c = c1 + c2
 
         c1 = libcomps.Comps()
-        c1.fromxml_f('main_comps.xml')
+        c1.fromxml_f('comps/main_comps.xml')
 
         c2 = libcomps.Comps()
-        c2.fromxml_f('main_comps.xml')
+        c2.fromxml_f('comps/main_comps.xml')
 
         c = c1 + c2
         x = c.groups[0].packages[0].name
@@ -743,12 +747,12 @@ class COMPSTest(unittest.TestCase):
     #@unittest.skip("skip")
     def test_main_loc(self):
         comps = libcomps.Comps()
-        errors = comps.fromxml_f('main_comps.xml')
+        errors = comps.fromxml_f('comps/main_comps.xml')
         g = comps.groups[0]
         #print(g.desc_by_lang['cs'])
 
         comps = libcomps.Comps()
-        errors = comps.fromxml_f('main_comps.xml')
+        errors = comps.fromxml_f('comps/main_comps.xml')
         g = comps.groups[0]
         g1 = comps.groups[0]
         g.desc_by_lang = g1.desc_by_lang
@@ -759,12 +763,12 @@ class COMPSTest(unittest.TestCase):
     #@unittest.skip("skip")
     def test_union(self):
         comps = libcomps.Comps()
-        comps.fromxml_f("sample_comps.xml")
+        comps.fromxml_f("comps/sample_comps.xml")
         comps2 = libcomps.Comps()
         comps2.fromxml_f("sample2.xml")
         comps3 = comps + comps2
         self.assertTrue(comps == comps3)
-        comps.fromxml_f("fedora_comps.xml")
+        comps.fromxml_f("comps/fedora_comps.xml")
         comps3 = comps + comps2
         self.assertFalse(comps == comps3)
         #print comps3.xml_str()
@@ -805,13 +809,13 @@ class COMPSTest(unittest.TestCase):
     def test_gz(self):
         comps = libcomps.Comps()
         with self.assertRaises(IOError):
-            ret = comps.fromxml_f("sample_comp2.xml.gz")
+            ret = comps.fromxml_f("comps/sample_comp2.xml.gz")
             self.assertTrue(ret == -1)
 
     #@unittest.skip("")
     def test_a_inoptid(self):
         c = libcomps.Comps()
-        ret = c.fromxml_f("sample_comps2.xml")
+        ret = c.fromxml_f("comps/sample_comps2.xml")
         self.assertTrue(ret != -1)
         groups = c.groups
 
@@ -863,16 +867,16 @@ class COMPSTest(unittest.TestCase):
     #@unittest.skip("")
     def test21(self):
         c1 = libcomps.Comps()
-        c1.fromxml_f("f21-rawhide-comps.xml")
+        c1.fromxml_f("comps/f21-rawhide-comps.xml")
         c2 = libcomps.Comps()
-        c2.fromxml_f("sample_comps.xml")
+        c2.fromxml_f("comps/sample_comps.xml")
         c = c1 + c2
         c.xml_f("f21_united.xml")
 
     #@unittest.skip("")
     def test_f21_in(self):
         comps = libcomps.Comps()
-        ret = comps.fromxml_f("comps-f21.xml.in")
+        ret = comps.fromxml_f("comps/comps-f21.xml.in")
 
         for i in comps.groups:
             #print i.id
@@ -887,9 +891,10 @@ class COMPSTest(unittest.TestCase):
         comps2.fromxml_f("f21-2.xml")
         self.assertTrue(comps == comps2)
 
+    #@unittest.skip("")
     def test_envs(self):
         comps = libcomps.Comps()
-        ret = comps.fromxml_f("f21-rawhide-comps.xml")
+        ret = comps.fromxml_f("comps/f21-rawhide-comps.xml")
         env = comps.environments[0]
         self.assertEqual(env.name_by_lang['cs'], u'Pracovní prostředí GNOME')
         self.assertEqual(env.desc_by_lang['de'],
@@ -916,6 +921,7 @@ class COMPSTest(unittest.TestCase):
         _f([x.name for x in env.option_ids], option_ids)
 
 
+    #@unittest.skip("")
     def test_xml_options(self):
         comps = libcomps.Comps()
         g = libcomps.Group()
@@ -959,9 +965,10 @@ class COMPSTest(unittest.TestCase):
                                      "bao_explicit": True})
         self.assertTrue("basearchonly=" in s)
 
+    #@unittest.skip("")
     def test_arches(self):
         comps = libcomps.Comps()
-        comps.fromxml_f("main_arches.xml")
+        comps.fromxml_f("comps/main_arches.xml")
         filtered = comps.arch_filter(["x86"])
         g1_pkgs = ["pkg3", "pkg4", "pkg5", "pkg6", "pkg7"]
         c1_gids = ["g1", "g3", "g4", "g6"]

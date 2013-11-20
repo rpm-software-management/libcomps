@@ -420,6 +420,7 @@ PyObject* PyCOMPS_filter_arches(PyObject *self, PyObject *other) {
             item = PyList_GetItem(other, x);
             __pycomps_arg_to_char(item, &str);
             comps_objlist_append_x(arches, (COMPS_Object*)comps_str(str));
+            free(str);
         }
     } else {
         arches = ((PyCOMPS_Sequence*)other)->list;

@@ -40,7 +40,7 @@ void comps_set_init(COMPS_Set *set,  void* (*data_constructor)(void*),
                                      char (*eqf)(void*, void*));
 
 char comps_set_in(COMPS_Set *set, void *item);
-void comps_set_add(COMPS_Set *set, void *item);
+char comps_set_add(COMPS_Set *set, void *item);
 void* comps_set_remove(COMPS_Set *set, void *item);
 char comps_set_is_empty(COMPS_Set *set);
 char comps_set_cmp(COMPS_Set *set1, COMPS_Set *set2);

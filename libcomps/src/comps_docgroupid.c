@@ -28,9 +28,10 @@ void comps_docgroupid_create(COMPS_DocGroupId* groupid, COMPS_Object **args) {
 COMPS_CREATE_u(docgroupid, COMPS_DocGroupId)
 
 void comps_docgroupid_copy(COMPS_DocGroupId *gid_dst,
-                                         COMPS_DocGroupId *gid_src) {
+                           COMPS_DocGroupId *gid_src) {
     gid_dst->name = (COMPS_Str*)comps_object_copy((COMPS_Object*)gid_src->name);
-    gid_dst->arches = (COMPS_ObjList*)comps_object_copy((COMPS_Object*)gid_src->arches);
+    //gid_dst->arches = (COMPS_ObjList*)comps_object_copy((COMPS_Object*)gid_src->arches);
+    gid_dst->arches = NULL;
     gid_dst->def = gid_src->def;
 }
 COMPS_COPY_u(docgroupid, COMPS_DocGroupId)    /*comps_utils.h macro*/

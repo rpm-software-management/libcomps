@@ -86,7 +86,7 @@ int PyCOMPSCat_init(PyCOMPS_Category *self, PyObject *args, PyObject *kwds)
         comps_doccategory_set_name(_cat_, name, 1);
         comps_doccategory_set_desc(_cat_, desc, 1);
         if (disp_ord != -1)
-            comps_doccategory_set_display_order(_cat_, disp_ord);
+            comps_doccategory_set_display_order(_cat_, disp_ord, false);
         return 0;
     }else {
         return -1;

@@ -48,7 +48,7 @@ class TestLibcomps(unittest.TestCase):
   <group>
     <id>core</id>
     <default>false</default>
-    <uservisible>false</uservisible>
+    <uservisible>true</uservisible>
   </group>
 </comps>
 """
@@ -61,16 +61,20 @@ class TestLibcomps(unittest.TestCase):
   <group>
     <id>core</id>
     <default>false</default>
-    <uservisible>false</uservisible>
+    <uservisible>true</uservisible>
     <display_order>0</display_order>
   </group>
 </comps>
 """
-        data = self.comps.xml_str(options = {"empty_groups":True})
+        data = self.comps.xml_str(options = {"empty_groups":True,
+                                             "default_explicit":True,
+                                             "uservisible_explicit":True})
         self.assertEqual(data, expected_data_2)
 
         group.display_order = None
-        data = self.comps.xml_str()
+        data = self.comps.xml_str(options = {"empty_groups":True,
+                                             "default_explicit":True,
+                                             "uservisible_explicit":True})
         self.assertEqual(data, expected_data_1)
 
     def test_add_package(self):

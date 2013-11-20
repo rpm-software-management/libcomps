@@ -90,7 +90,7 @@ int PyCOMPSEnv_init(PyCOMPS_Env *self, PyObject *args, PyObject *kwds)
         comps_docenv_set_name(self->env, name, 1);
         comps_docenv_set_desc(self->env, desc, 1);
         if (disp_ord != -1)
-            comps_docenv_set_display_order(self->env, disp_ord);
+            comps_docenv_set_display_order(self->env, disp_ord, false);
         return 0;
     } else {
         return -1;
@@ -423,9 +423,9 @@ COMPS_ObjList* comps_envs_union(COMPS_ObjList *envs1, COMPS_ObjList *envs2) {
         for (it = envs2->first; it != NULL; it = it->next) {
             if (comps_set_in(set, it->comps_obj)) {
                 tmpenv = comps_docenv_union(
-                                    (COMPS_DocEnv*)it->comps_obj,
                                     (COMPS_DocEnv*)comps_set_data_at(set,
-                                                                  it->comps_obj));
+                                                                it->comps_obj),
+                                    (COMPS_DocEnv*)it->comps_obj);
                 tmpdata = comps_set_data_at(set, it->comps_obj);
                 comps_set_remove(set, it->comps_obj);
                 comps_object_destroy((COMPS_Object*)tmpdata);

@@ -35,7 +35,7 @@
     <uservisible>false</uservisible>
     <packagelist>
       <packagereq>xorg-x11-server-Xorg</packagereq>
-      <packagereq type="default">mesa-dri-drivers</packagereq>
+      <packagereq>mesa-dri-drivers</packagereq>
     </packagelist>
   </group>
   <environment>

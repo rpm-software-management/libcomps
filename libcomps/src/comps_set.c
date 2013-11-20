@@ -100,18 +100,19 @@ void* comps_set_data_at(COMPS_Set * set, void * item) {
     return NULL;
 }
 
-void comps_set_add(COMPS_Set * set, void *item) {
+char comps_set_add(COMPS_Set * set, void *item) {
     COMPS_HSListItem * it;
 
     for (it = set->data->first; it != NULL; it = it->next) {
         if (set->eqf(it->data, item)) {
-            return;
+            return 0;
         }
     }
     if (set->data_constructor)
         comps_hslist_append(set->data, item, 1);
     else
         comps_hslist_append(set->data, item, 1);
+    return 1;
 }
 
 void* comps_set_remove(COMPS_Set *set, void *item) {

@@ -383,13 +383,20 @@ void __comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *ndata) {
                 offset += x;
             } else {
                 COMPS_Object *tmpdata;
+                COMPS_HSList *tmphslist;
                 //tmpch = rtdata->key[x];             // split mutual key
                 tmpdata = ((COMPS_ObjRTreeData*)it->data)->data;
+                tmphslist = rtdata->subnodes;
+                rtdata->subnodes = comps_hslist_create();
+                comps_hslist_init(rtdata->subnodes, NULL, NULL,
+                                  &comps_objrtree_data_destroy_v);
                 int cmpret = strcmp(key+offset+x, rtdata->key+x);
                 rtdata->data = NULL;
 
                 if (cmpret > 0) {
                     rtd = comps_objrtree_data_create(rtdata->key+x, tmpdata);
+                    comps_hslist_destroy(&rtd->subnodes);
+                    rtd->subnodes = tmphslist;
                     comps_hslist_append(
                                 ((COMPS_ObjRTreeData*)it->data)->subnodes,
                                 rtd, 0);
@@ -397,21 +404,21 @@ void __comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *ndata) {
                     comps_hslist_append(
                                 ((COMPS_ObjRTreeData*)it->data)->subnodes,
                                 rtd, 0);
+
                 } else {
                     rtd = comps_objrtree_data_create(key+offset+x, ndata);
                     comps_hslist_append(
                                 ((COMPS_ObjRTreeData*)it->data)->subnodes,
                                 rtd, 0);
                     rtd = comps_objrtree_data_create(rtdata->key+x, tmpdata);
+                    comps_hslist_destroy(&rtd->subnodes);
+                    rtd->subnodes = tmphslist;
                     comps_hslist_append(
                                 ((COMPS_ObjRTreeData*)it->data)->subnodes,
                                 rtd, 0);
                 }
-                rtdata->key[x+1] = 0;
-                len = strlen(rtdata->key+x);
-                //memmove(rtdata->key,rtdata->key+x, sizeof(char)*len);
-                rtdata->key = realloc(rtdata->key, sizeof(char)*(len+1));
-                rtdata->key[len] = 0;
+                rtdata->key = realloc(rtdata->key, sizeof(char)*(x+1));
+                rtdata->key[x] = 0;
                 return;
             }
         }

@@ -157,11 +157,14 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     COMPS_HSListItem *hsit;
     COMPS_Set *set;
     COMPS_HSList *pairs;
+    COMPS_Object *obj;
+    int index;
+    void *data;
 
     res = (COMPS_DocEnv*)comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
     COMPS_OBJECT_DESTROY(res->properties);
     res->properties = comps_objdict_clone(e2->properties);
-    pairs = comps_objdict_pairs(e1->properties);
+    pairs = comps_objdict_pairs(e2->properties);
     for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
         comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
                          ((COMPS_RTreePair*)hsit->data)->data);
@@ -169,42 +172,61 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     comps_hslist_destroy(&pairs);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_docgroupid_cmp_set);
+    comps_set_init(set, NULL, NULL, (void(*)(void*))&comps_object_destroy,
+                                    &__comps_docgroupid_cmp_set);
     it = e1->group_list?e1->group_list->first:NULL;
     for (; it != NULL; it = it->next) {
-        comps_set_add(set, it->comps_obj);
+        obj = comps_object_copy(it->comps_obj);
+        comps_set_add(set, (void*)comps_object_incref(obj));
+        comps_docenv_add_groupid(res, (COMPS_DocGroupId*)obj);
     }
     it = e2->group_list?e2->group_list->first:NULL;
     for (; it != NULL; it = it->next) {
-        comps_set_add(set, it->comps_obj);
-    }
-    //res->group_list = (COMPS_ObjList*)comps_object_create(
-    //                                              &COMPS_ObjList_ObjInfo, NULL);
-    for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_groupid(res,
-                             (COMPS_DocGroupId*)comps_object_copy(hsit->data));
+        if ((data = comps_set_data_at(set, (void*)it->comps_obj)) != NULL) {
+            index = comps_objlist_index(res->group_list, (COMPS_Object*)data);
+            comps_objlist_remove_at(res->group_list, index);
+            comps_objlist_insert_at_x(res->group_list, index,
+                                      comps_object_copy(it->comps_obj));
+        } else {
+            comps_docenv_add_groupid(res, (COMPS_DocGroupId*)
+                                            comps_object_copy(it->comps_obj));
+        }
     }
     comps_set_destroy(&set);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_docgroupid_cmp_set);
-    if  (e1->option_list)
-        for (it = e1->option_list->first; it != NULL; it = it->next)
-            comps_set_add(set, it->comps_obj);
-    if (e2->option_list)
-        for (it = e2->option_list->first; it != NULL; it = it->next)
-            comps_set_add(set, it->comps_obj);
-    //res->group_list = (COMPS_ObjList*)comps_object_create(
-    //                                              &COMPS_ObjList_ObjInfo, NULL);
-    for (hsit = set->data->first; hsit!= NULL; hsit = hsit->next) {
-        comps_docenv_add_optionid(res,
-                             (COMPS_DocGroupId*)comps_object_copy(hsit->data));
+    comps_set_init(set, NULL, NULL, &comps_object_destroy_v,
+                                    &__comps_docgroupid_cmp_set);
+    it = e1->option_list?e1->option_list->first:NULL;
+    char ret;
+    char *str;
+    for (; it != NULL; it = it->next) {
+        obj = comps_object_copy(it->comps_obj);
+        ret = comps_set_add(set, obj);
+        if (ret) {
+            comps_docenv_add_optionid(res, (COMPS_DocGroupId*)
+                                      comps_object_incref(obj));
+        } else {
+            comps_docenv_add_optionid(res, (COMPS_DocGroupId*)obj);
+        }
+    }
+    it = e2->option_list?e2->option_list->first:NULL;
+    for (; it != NULL; it = it->next) {
+        if ((data = comps_set_data_at(set, (void*)it->comps_obj)) != NULL) {
+            index = comps_objlist_index(res->option_list, (COMPS_Object*)data);
+            comps_objlist_remove_at(res->option_list, index);
+            ret = comps_objlist_insert_at_x(res->option_list, index,
+                                      comps_object_copy(it->comps_obj));
+        } else {
+            comps_docenv_add_optionid(res, (COMPS_DocGroupId*)
+                                            comps_object_copy(it->comps_obj));
+        }
     }
     comps_set_destroy(&set);
     comps_object_destroy((COMPS_Object*)res->name_by_lang);
     comps_object_destroy((COMPS_Object*)res->desc_by_lang);
-    res->name_by_lang = comps_objdict_union(e1->name_by_lang, e2->name_by_lang);
-    res->desc_by_lang = comps_objdict_union(e1->desc_by_lang, e2->desc_by_lang);
+    res->name_by_lang = comps_objdict_union(e2->name_by_lang, e1->name_by_lang);
+    res->desc_by_lang = comps_objdict_union(e2->desc_by_lang, e1->desc_by_lang);
     return res;
 }
 

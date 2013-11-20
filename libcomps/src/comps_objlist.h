@@ -150,6 +150,10 @@ int comps_objlist_insert_at(COMPS_ObjList *objlist,
                            unsigned int pos,
                            COMPS_Object *obj);
 
+int comps_objlist_insert_at_x(COMPS_ObjList *objlist,
+                           unsigned int pos,
+                           COMPS_Object *obj);
+
 /** Remove item on specified position from list
  *
  * If list doesn't have enough items fails. On succes decrements item object's

@@ -98,13 +98,14 @@ COMPS_Object* comps_docpackage_get_type(COMPS_DocGroupPackage *pkg);
  * old object with stored type will be decremented
  */
 void comps_docpackage_set_type(COMPS_DocGroupPackage *pkg,
-                                   COMPS_PackageType type);
+                                   COMPS_PackageType type,
+                                   bool unset);
 
 /** COMPS_DocGroupPackage type setter same as comps_docpackage_set_type
  * @param pkg COMPS_DocGroupPackage object
  * @param type package type as integer
  */
-void comps_docpackage_set_type_i(COMPS_DocGroupPackage *pkg, int type);
+void comps_docpackage_set_type_i(COMPS_DocGroupPackage *pkg, int type, bool unset);
 
 /** return package type as string
  * @param type package type as COMPS_PackageType
@@ -117,7 +118,7 @@ const char* comps_docpackage_type_str(COMPS_PackageType type);
  * @param basearchonly basearchonly attribute
  * */
 void comps_docpackage_set_basearchonly(COMPS_DocGroupPackage *pkg,
-                                       int basearchonly);
+                                       int basearchonly, bool unset);
 
 /** return package basearchonly attrinute
  * @param type package type as COMPS_PackageType

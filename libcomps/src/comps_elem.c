@@ -390,17 +390,14 @@ COMPS_ElemType comps_elem_get_type(const char * name) {
 
 }
 
-COMPS_PackageType comps_package_get_type(char *s)
-{
-    COMPS_ElemType type;
-    if (!s) type = COMPS_PACKAGE_MANDATORY;
-    else if (strcmp(s, "default") == 0) type = COMPS_PACKAGE_DEFAULT;
-    else if (strcmp(s, "optional") == 0) type = COMPS_PACKAGE_OPTIONAL;
-    else if (strcmp(s, "mandatory") == 0) type = COMPS_PACKAGE_MANDATORY;
-    else if (strcmp(s, "conditional") == 0) type = COMPS_PACKAGE_CONDITIONAL;
-    else type = COMPS_PACKAGE_UNKNOWN;
-    return type;
+COMPS_PackageType comps_package_get_type(char * s) {
+    if (__comps_strcmp(s, "default")) return COMPS_PACKAGE_DEFAULT;
+    else if (__comps_strcmp(s, "optional")) return COMPS_PACKAGE_OPTIONAL;
+    else if (__comps_strcmp(s, "conditional")) return COMPS_PACKAGE_CONDITIONAL;
+    else if (__comps_strcmp(s, "mandatory") || !s) return COMPS_PACKAGE_MANDATORY;
+    else return COMPS_PACKAGE_UNKNOWN;
 }
+
 #define parser_line XML_GetCurrentLineNumber(parsed->parser)
 #define parser_col XML_GetCurrentColumnNumber(parsed->parser)
 
@@ -463,17 +460,18 @@ void comps_elem_group_postproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
 
     list = comps_doc_groups(parsed->comps_doc);
     group = (COMPS_DocGroup*)list->last->comps_obj;
+
     __comps_check_required_param(comps_docgroup_get_id(group), "id", parsed);
     __comps_check_required_param(comps_docgroup_get_name(group), "name", parsed);
     __comps_check_required_param(comps_docgroup_get_desc(group), "description", parsed);
     obj = comps_docgroup_get_def(group);
     if (!obj) {
-        comps_docgroup_set_def(group, 1);
+        comps_docgroup_set_def(group, 1, false);
     }
     COMPS_OBJECT_DESTROY(obj);
     obj = comps_docgroup_get_uservisible(group);
     if (!obj) {
-        comps_docgroup_set_uservisible(group, 1);
+        comps_docgroup_set_uservisible(group, 1, false);
     }
     COMPS_OBJECT_DESTROY(obj);
     COMPS_OBJECT_DESTROY(list);
@@ -722,6 +720,7 @@ void comps_elem_idnamedesc_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
         __comps_check_allready_set(comps_objdict_get(props, "id"), "id",parsed);
         comps_objdict_set_x(props, "id",
                             (COMPS_Object*)comps_str(parsed->tmp_buffer));
+        //printf("id set %s\n", parsed->tmp_buffer);
     } else if (elem->type == COMPS_ELEM_NAME) {
         if ((lang = comps_dict_get(elem->attrs, "xml:lang"))) {
             comps_objdict_set_x(name_by_lang, lang,
@@ -729,6 +728,7 @@ void comps_elem_idnamedesc_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
         } else {
             __comps_check_allready_set(comps_objdict_get(props, "name"),
                                        "name", parsed);
+            //printf("name set %s\n", parsed->tmp_buffer);
             comps_objdict_set_x(props, "name",
                                 (COMPS_Object*)comps_str(parsed->tmp_buffer));
         }
@@ -750,9 +750,9 @@ void comps_elem_default_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     #define last_group ((COMPS_DocGroup*)list->last->comps_obj)
     COMPS_ObjList *list = comps_doc_groups(parsed->comps_doc);
     if (__comps_strcmp(parsed->tmp_buffer, "false"))
-        comps_docgroup_set_def(last_group, 0);
+        comps_docgroup_set_def(last_group, 0, false);
     else if (__comps_strcmp(parsed->tmp_buffer, "true"))
-        comps_docgroup_set_def(last_group, 1);
+        comps_docgroup_set_def(last_group, 1, false);
     else {
         comps_log_warning_x(parsed->log, COMPS_ERR_DEFAULT_PARAM, 3,
                             comps_str(parsed->tmp_buffer),
@@ -776,9 +776,9 @@ void comps_elem_uservisible_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     (void)elem;
     COMPS_ObjList *list = comps_doc_groups(parsed->comps_doc);
     if (strcmp(parsed->tmp_buffer, "false") == 0)
-        comps_docgroup_set_uservisible(last_group, 0);
+        comps_docgroup_set_uservisible(last_group, 0, false);
     else if (strcmp(parsed->tmp_buffer, "true") == 0)
-        comps_docgroup_set_uservisible(last_group, 1);
+        comps_docgroup_set_uservisible(last_group, 1, false);
     else {
         comps_log_warning_x(parsed->log, COMPS_ERR_DEFAULT_PARAM, 3,
                             comps_str(parsed->tmp_buffer),

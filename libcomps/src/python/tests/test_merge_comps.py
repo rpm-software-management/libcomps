@@ -68,6 +68,7 @@ class TestMergeComps(unittest.TestCase):
 
         merged_comps = libcomps.Comps()
         merged_comps.fromxml_f("comps/merged_comps_2_1.xml")
+        self.assertEqual(self.comps.xml_str(), merged_comps.xml_str())
         self.assertTrue(self.comps == merged_comps)
 
 

@@ -89,10 +89,10 @@ int PyCOMPSGroup_init(PyCOMPS_Group *self, PyObject *args, PyObject *kwds)
         comps_docgroup_set_id(_group_, id, 1);
         comps_docgroup_set_name(_group_, name, 1);
         comps_docgroup_set_desc(_group_, desc, 1);
-        comps_docgroup_set_def(_group_, def);
-        comps_docgroup_set_uservisible(_group_, uservis);
+        comps_docgroup_set_def(_group_, def, false);
+        comps_docgroup_set_uservisible(_group_, uservis, false);
         if (disp_order > 0)
-            comps_docgroup_set_display_order(_group_, disp_order);
+            comps_docgroup_set_display_order(_group_, disp_order, false);
         comps_docgroup_set_langonly(_group_, lang, 1);
         return 0;
     } else {
@@ -462,9 +462,9 @@ COMPS_ObjList* comps_groups_union(COMPS_ObjList *groups1,
     for (it = groups2 ? groups2->first : NULL; it != NULL; it = it->next) {
         if (comps_set_in(set, it->comps_obj)) {
             tmpgroup = comps_docgroup_union(
-                                (COMPS_DocGroup*)it->comps_obj,
                                 (COMPS_DocGroup*)comps_set_data_at(set,
-                                                                   it->comps_obj));
+                                                               it->comps_obj),
+                                (COMPS_DocGroup*)it->comps_obj);
             tmpdata = comps_set_data_at(set, it->comps_obj);
             comps_set_remove(set, it->comps_obj);
             comps_object_destroy((COMPS_Object*)tmpdata);
@@ -675,7 +675,7 @@ int PyCOMPSPack_init(PyCOMPS_Package *self, PyObject *args, PyObject *kwds)
 
     if (args!=NULL && PyArg_ParseTuple(args, "|si", &name, &type)) {
         comps_docpackage_set_name(((PyCOMPS_Package*)self)->package, name, 1);
-        comps_docpackage_set_type(((PyCOMPS_Package*)self)->package, type);
+        comps_docpackage_set_type(((PyCOMPS_Package*)self)->package, type, false);
         return 0;
     } else {
         ((PyCOMPS_Package*)self)->package->name = NULL;

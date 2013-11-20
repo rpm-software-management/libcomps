@@ -113,5 +113,6 @@ char* __comps_xml_arch_str(COMPS_Object *archlist) {
         strcat(arches_str, " ");
     }
     strcat(arches_str, arches[x]);
+    free(arches[x]);
     return arches_str;
 }

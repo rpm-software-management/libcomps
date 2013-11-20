@@ -33,7 +33,7 @@
 
 typedef struct {
     COMPS_Object* (*get_f)(COMPS_Object*);
-    void (*set_f)(COMPS_Object*, int);
+    void (*set_f)(COMPS_Object*, int, bool);
     size_t c_offset;
     char deleteable;
 } __PyCOMPS_NumPropGetSetClosure;
@@ -64,7 +64,7 @@ typedef struct {
 #define __H_COMPS_NUMPROP_GETSET_CLOSURE(C_TYPE)\
 typedef struct {\
     COMPS_Object* (*get_f)(C_TYPE*);\
-    void (*set_f)(C_TYPE*, int);\
+    void (*set_f)(C_TYPE*, int, bool);\
     size_t c_offset;\
     char deleteable;\
 } CONCAT(CONCAT(PyCOMPS_, C_TYPE), _NumPropGetSetClosure);

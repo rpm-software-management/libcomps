@@ -95,18 +95,25 @@ void print_category(COMPS_Object *obj) {
     COMPS_Object *prop;
 
     prop = comps_doccategory_get_id((COMPS_DocCategory*)obj);
-    id = (prop)?comps_object_tostr(prop):"NULL";
+    id = (prop)?comps_object_tostr(prop):NULL;
+    COMPS_OBJECT_DESTROY(prop);
     prop = comps_doccategory_get_name((COMPS_DocCategory*)obj);
-    name = (prop)?comps_object_tostr(prop):"NULL";
+    name = (prop)?comps_object_tostr(prop):NULL;
+    COMPS_OBJECT_DESTROY(prop);
     prop = comps_doccategory_get_desc((COMPS_DocCategory*)obj);
-    desc = (prop)?comps_object_tostr(prop):"NULL";
+    desc = (prop)?comps_object_tostr(prop):NULL;
+    COMPS_OBJECT_DESTROY(prop);
     prop = comps_doccategory_get_display_order((COMPS_DocCategory*)obj);
     disp_ord = (prop)?((COMPS_Num*)prop)->val:0;
+    COMPS_OBJECT_DESTROY(prop);
     
     printf("id: %s\n", id);
     printf("name: %s\n", name);
     printf("desc: %s\n", desc);
     printf("display_order: %d\n", disp_ord);
+    free(id);
+    free(name);
+    free(desc);
     COMPS_ObjListIt * it = ((COMPS_DocCategory*)obj)->group_ids->first;
     while (comps_objlist_walk(&it, &prop)) {
         print_gid(prop);
@@ -151,12 +158,12 @@ START_TEST(test_comps_doc_basic)
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
             comps_docpackage_set_name(p, (char*)group_mpackages[i][x],1 );
-            comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY);
+            comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY, false);
             comps_docgroup_add_package(g, p);
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
             comps_docpackage_set_name(p, (char*)group_opackages[i][x], 1);
-            comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL);
+            comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL, false);
             comps_docgroup_add_package(g, p);
         }
         comps_doc_add_group(doc, g);
@@ -270,12 +277,12 @@ START_TEST(test_comps_doc_setfeats)
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
             comps_docpackage_set_name(p, (char*)group_mpackages[i][x], 1);
-            comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY);
+            comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY, false);
             comps_docgroup_add_package(g, p);
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
             comps_docpackage_set_name(p, (char*)group_opackages[i][x], 1);
-            comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL);
+            comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL, false);
             comps_docgroup_add_package(g, p);
         }
         comps_doc_add_group(doc, g);
@@ -321,12 +328,12 @@ START_TEST(test_comps_doc_setfeats)
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
             comps_docpackage_set_name(p, (char*)group_mpackages2[i][x], 1);
-            comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY);
+            comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY, false);
             comps_docgroup_add_package(g, p);
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
             comps_docpackage_set_name(p, (char*)group_opackages2[i][x], 1);
-            comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL);
+            comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL, false);
             comps_docgroup_add_package(g, p);
         }
         comps_doc_add_group(doc2, g);
@@ -511,12 +518,12 @@ START_TEST(test_comps_doc_xml)
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
             comps_docpackage_set_name(p, (char*)group_mpackages[i][x], 1);
-            comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY);
+            comps_docpackage_set_type(p, COMPS_PACKAGE_MANDATORY, false);
             comps_docgroup_add_package(g, p);
             p = (COMPS_DocGroupPackage*)
                 comps_object_create(&COMPS_DocGroupPackage_ObjInfo, NULL);
             comps_docpackage_set_name(p, (char*)group_opackages[i][x], 1);
-            comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL);
+            comps_docpackage_set_type(p, COMPS_PACKAGE_OPTIONAL, false);
             comps_docgroup_add_package(g, p);
         }
         comps_doc_add_group(doc, g);
@@ -613,6 +620,53 @@ START_TEST(test_comps_doc_union)
     COMPS_OBJECT_DESTROY(c1);
     COMPS_OBJECT_DESTROY(c2);
     COMPS_OBJECT_DESTROY(c3);
+
+    COMPS_Parsed *parsed;
+    FILE *fp;
+    parsed = comps_parse_parsed_create();
+    comps_parse_parsed_init(parsed, "UTF-8", 0);
+    fp = fopen("sample_comps.xml", "r");
+    comps_parse_file(parsed, fp);
+
+    COMPS_Doc *doc1, *doc2, *doc3;
+    doc1 = parsed->comps_doc;
+    parsed->comps_doc = NULL;
+    fp = fopen("f21-rawhide-comps.xml", "r");
+    comps_parse_file(parsed, fp);
+    doc2 = parsed->comps_doc;
+    parsed->comps_doc = NULL;
+    comps_parse_parsed_destroy(parsed);
+    /*COMPS_ObjList *list= comps_doc_environments(c1);
+    COMPS_DocEnv*e11,*e12,*e21,*e22, *e;
+    e11 = list->first->next->comps_obj;
+    e12 = list->first->next->next->next->comps_obj;
+
+    for (COMPS_ObjListIt* it = list->first; it != NULL; it = it->next) {
+        COMPS_Object *str;
+        str = comps_docenv_get_id(it->comps_obj);
+        COMPS_OBJECT_DESTROY(str);
+    }
+    COMPS_OBJECT_DESTROY(list);
+    list= comps_doc_environments(c2);
+    e22 = (COMPS_DocEnv*)comps_objlist_get(list, 8);
+    e21 = (COMPS_DocEnv*)comps_objlist_get(list, 9);
+    for (COMPS_ObjListIt* it = list->first; it != NULL; it = it->next) {
+        COMPS_Object *str;
+        str = comps_docenv_get_id(it->comps_obj);
+        COMPS_OBJECT_DESTROY(str);
+    }
+    COMPS_OBJECT_DESTROY(list);
+    e = comps_docenv_union(e21, e11);
+    COMPS_OBJECT_DESTROY(e);
+    //e = comps_docenv_union(e12, e22);
+    //COMPS_OBJECT_DESTROY(e);
+    COMPS_OBJECT_DESTROY(e21);
+    COMPS_OBJECT_DESTROY(e22);
+    */
+    doc3 = comps_doc_union(doc2, doc1);
+    COMPS_OBJECT_DESTROY(doc1);
+    COMPS_OBJECT_DESTROY(doc2);
+    COMPS_OBJECT_DESTROY(doc3);
 }END_TEST
 
 START_TEST(test_comps_validate) {
@@ -643,8 +697,8 @@ START_TEST(test_doc_defaults) {
 
     printf("### start test_comps_default\n");
     
-    enc = comps_str("UTF-8");
-    doc = comps_object_create(&COMPS_Doc_ObjInfo, (COMPS_Object*[]){enc});
+    enc = (COMPS_Object*)comps_str("UTF-8");
+    doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo, (COMPS_Object*[]){enc});
     COMPS_OBJECT_DESTROY(enc);
     g = (COMPS_DocGroup*)
         comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
@@ -662,7 +716,7 @@ START_TEST(test_doc_defaults) {
     comps_parse_str(parsed, tmp);
     doc2 = parsed->comps_doc;
     groups = comps_doc_groups(doc2);
-    g = groups->first->comps_obj;
+    g = (COMPS_DocGroup*)groups->first->comps_obj;
     tmpobj = comps_docgroup_get_uservisible(g);
     ck_assert(((COMPS_Num*)tmpobj)->val == 1);
 
