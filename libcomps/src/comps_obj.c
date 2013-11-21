@@ -6,17 +6,16 @@
 COMPS_Object * comps_object_create(COMPS_ObjectInfo *obj_info, COMPS_Object **args){
     COMPS_Object *obj;
     obj = malloc(obj_info->obj_size);
-     
-
     obj->obj_info = obj_info;
     obj->refc = comps_refc_create((void*)obj,
                                  (void (*)(void*)) obj_info->destructor);
-    obj_info->constructor(obj, args);
+    if (obj_info->constructor)
+        obj_info->constructor(obj, args);
     return obj;
 }
 
 void comps_object_destroy(COMPS_Object *comps_obj) {
-    if (!comps_obj) return;
+    if (!comps_obj || !comps_obj->refc) return;
     if (comps_obj->refc->ref_count)
         comps_refc_destroy(comps_obj->refc);
     else {
@@ -56,6 +55,9 @@ signed char comps_object_cmp(COMPS_Object *obj1, COMPS_Object *obj2) {
         return 0;
     }
 }
+char comps_object_cmp_v(void *obj1, void *obj2) {
+    return (char)comps_object_cmp((COMPS_Object*)obj1, (COMPS_Object*)obj2);
+}
 
 char* comps_object_tostr(COMPS_Object *obj1) {
     char *ret;
@@ -69,7 +71,7 @@ char* comps_object_tostr(COMPS_Object *obj1) {
 }
 
 inline COMPS_Object* comps_object_incref(COMPS_Object *obj) {
-    if (obj)
+    if (obj && obj->refc)
         comps_refc_incref(obj->refc);
     return obj;
 }

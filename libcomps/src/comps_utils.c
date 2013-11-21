@@ -70,13 +70,6 @@ unsigned int digits_count(unsigned int x) {
     return 1;
 }
 
-signed char comps_id_check(COMPS_Object *obj, COMPS_Object *prop) {
-    (void)obj;
-    if (!prop)
-        return 0;
-    if (strcmp("", ((COMPS_Str*)prop)->val) == 0) return 0;
-    return 1;
-}
 
 bool __comps_objlist_intersected(COMPS_ObjList *list1, COMPS_ObjList *list2) {
     for (COMPS_ObjListIt *it = list1->first; it != NULL; it = it->next) {
@@ -115,4 +108,10 @@ char* __comps_xml_arch_str(COMPS_Object *archlist) {
     strcat(arches_str, arches[x]);
     free(arches[x]);
     return arches_str;
+}
+
+char* __comps_strcpy(char *str) {
+    char *ret;
+    ret = malloc(sizeof(char)*(strlen(str)+1));
+    return memcpy(ret, str, sizeof(char)*(strlen(str)+1));
 }

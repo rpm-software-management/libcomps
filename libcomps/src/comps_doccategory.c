@@ -147,7 +147,7 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     }
     comps_hslist_destroy(&pairs);
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, (void(*)(void*))&comps_object_destroy,
+    comps_set_init(set, NULL, NULL, &comps_object_destroy_v,
                                     &__comps_docgroupid_cmp_set);
     it = c1->group_ids?c1->group_ids->first:NULL;
     for (; it != NULL; it = it->next) {
@@ -382,7 +382,12 @@ COMPS_ObjectInfo COMPS_DocCategory_ObjInfo = {
 
 COMPS_ValRuleGeneric* COMPS_DocCategory_ValidateRules[] = {
     &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
-                         .get_f = &comps_doccategory_get_id_obj,
+                         .verbose_msg = "Group id check",
+                         .get_f = (COMPS_VAL_GETF) &comps_doccategory_get_id,
                          .check_f = &comps_id_check},
+    &(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
+                         .verbose_msg = "Group unique package list check",
+                         .offset = offsetof(COMPS_DocCategory, group_ids),
+                         .check_f = &comps_objlist_unique_check},
     NULL
 };

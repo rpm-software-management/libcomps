@@ -196,6 +196,7 @@ COMPS_DocEnv* comps_docenv_arch_filter(COMPS_DocEnv *source,
                                        COMPS_ObjList *arches);
 
 extern COMPS_ObjectInfo COMPS_DocEnv_ObjInfo;
+extern COMPS_ValRuleGeneric* COMPS_DocEnv_ValidateRules[];
 
 #endif
 

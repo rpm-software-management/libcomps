@@ -22,6 +22,7 @@
 
 #include "../src/comps_doc.h"
 #include "../src/comps_parse.h"
+#include "../src/comps_validate.h"
 
 char * pkg_type2str(COMPS_PackageType type) {
     switch(type) {
@@ -669,23 +670,6 @@ START_TEST(test_comps_doc_union)
     COMPS_OBJECT_DESTROY(doc3);
 }END_TEST
 
-START_TEST(test_comps_validate) {
-    COMPS_DocGroup *group1;
-    signed char ret;
-
-    group1 = (COMPS_DocGroup*)comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
-    ret = comps_validate_execute(group1, &COMPS_DocGroup_ValidateRules);
-    ck_assert_msg(ret == 0, "Validate fail. Group shouldn't be valid");
-    COMPS_OBJECT_DESTROY(group1);
-
-    group1 = (COMPS_DocGroup*)comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
-    comps_docgroup_set_id(group1, "g1", 1);
-    ret = comps_validate_execute(group1, &COMPS_DocGroup_ValidateRules);
-    ck_assert_msg(ret == 1, "Validate fail. Group should be valid");
-    COMPS_OBJECT_DESTROY(group1);
-
-}END_TEST
-
 START_TEST(test_doc_defaults) {
     COMPS_DocGroup *g;
     COMPS_Doc * doc, *doc2;
@@ -738,7 +722,6 @@ Suite* basic_suite (void)
     tcase_add_test (tc_core, test_comps_doc_setfeats);
     tcase_add_test (tc_core, test_comps_doc_union);
     tcase_add_test (tc_core, test_doc_defaults);
-    tcase_add_test (tc_core, test_comps_validate);
     suite_add_tcase (s, tc_core);
     return s;
 }

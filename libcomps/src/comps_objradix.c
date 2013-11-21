@@ -321,7 +321,7 @@ void __comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *ndata) {
 
     unsigned int len, offset=0;
     unsigned x, found = 0;
-    char ended, tmpch;
+    char ended;
 
     len = strlen(key);
 

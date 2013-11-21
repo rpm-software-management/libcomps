@@ -22,6 +22,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 
 /*! \file comps_mm.h
  * \brief COMPS memory management(reference counter) file

@@ -53,6 +53,12 @@
 #define COMPS_OBJECT_COPY(obj)\
     comps_object_copy(((COMPS_Object*)obj))
 
+#define COMPS_OBJECT_INCREF(obj)\
+    comps_object_incref(((COMPS_Object*)obj))
+
+#define COMPS_CAST_CONSTR void (*)(COMPS_Object*, COMPS_Object**)
+#define COMPS_CAST_DESTR void (*)(COMPS_Object*)
+
 /** ensure that COMPS_Object derivate has need struct members for properly
  * behaviour
  */
@@ -151,6 +157,7 @@ COMPS_Object* comps_object_copy(COMPS_Object *comps_obj);
  * @return non-zero value if equals, zero otherwise
 */
 signed char comps_object_cmp(COMPS_Object *obj1, COMPS_Object *obj2);
+char comps_object_cmp_v(void *obj1, void *obj2);
 
 /** Return string representation of COMPS_Object derivate
  *

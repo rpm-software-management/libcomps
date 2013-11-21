@@ -199,7 +199,6 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
                                     &__comps_docgroupid_cmp_set);
     it = e1->option_list?e1->option_list->first:NULL;
     char ret;
-    char *str;
     for (; it != NULL; it = it->next) {
         obj = comps_object_copy(it->comps_obj);
         ret = comps_set_add(set, obj);
@@ -508,7 +507,16 @@ COMPS_ObjectInfo COMPS_DocEnv_ObjInfo = {
 
 COMPS_ValRuleGeneric* COMPS_DocEnv_ValidateRules[] = {
     &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
-                         .get_f = &comps_docenv_get_id_obj,
-                         .check_f = &comps_id_check},
+                         .get_f = (COMPS_VAL_GETF)&comps_docenv_get_id_obj,
+                         .check_f = &comps_id_check,
+                         .verbose_msg = "Group id check"},
+    &(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
+                         .offset = offsetof(COMPS_DocEnv, group_list),
+                         .check_f = &comps_objlist_unique_check,
+                         .verbose_msg = "Environment unique group list check"},
+    &(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
+                         .offset = offsetof(COMPS_DocEnv, option_list),
+                         .check_f = &comps_objlist_unique_check,
+                         .verbose_msg = "Environment unique option list check"},
     NULL
 };

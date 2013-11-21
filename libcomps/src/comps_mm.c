@@ -18,12 +18,11 @@
  */
 
 #include "comps_mm.h"
-
 COMPS_RefC* comps_refc_create(void *obj, void (*destructor)(void*)) {
     COMPS_RefC *refc;
     refc = malloc(sizeof(*refc));
     if (!refc) {
-        // TOTO: MALLOC_FAIL
+        raise(SIGABRT);
         return NULL;
     }
     refc->ref_count = 0;
@@ -33,9 +32,8 @@ COMPS_RefC* comps_refc_create(void *obj, void (*destructor)(void*)) {
 }
 
 void comps_refc_destroy(COMPS_RefC *refc) {
-    //COMPS_Check_NULL(refc, )
     if (!refc->ref_count) {
-        refc->destructor(refc->obj);
+        if (refc->destructor) refc->destructor(refc->obj);
         free(refc);
     } else {
         refc->ref_count--;

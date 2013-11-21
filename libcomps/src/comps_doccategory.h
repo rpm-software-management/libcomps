@@ -200,5 +200,5 @@ COMPS_DocCategory* comps_doccategory_arch_filter(COMPS_DocCategory *source,
                                                  COMPS_ObjList *arches);
 
 extern COMPS_ObjectInfo COMPS_DocCategory_ObjInfo;
-
+extern COMPS_ValRuleGeneric* COMPS_DocCategory_ValidateRules[];
 #endif
