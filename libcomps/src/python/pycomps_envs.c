@@ -234,10 +234,25 @@ PyObject* PyCOMPSEnv_cmp(PyObject *self, PyObject *other, int op) {
     Py_RETURN_TRUE;
 }
 
+int pycomps_env_validate(COMPS_Object *obj) {
+    COMPS_ValGenResult *result = comps_validate_execute(obj,
+                                        COMPS_DocEnv_ValidateRules);
+    int ret = __pycomps_validate_process(result);
+    COMPS_OBJECT_DESTROY(result);
+    return ret;
+}
+
+PyObject* PyCOMPSEnv_validate(PyCOMPS_Env *env) {
+    if (pycomps_env_validate((COMPS_Object*)env->env))
+        return NULL;
+}
+
 PyMemberDef PyCOMPSEnv_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSEnv_methods[] = {
+    {"validate", (PyCFunction)PyCOMPSEnv_validate, METH_NOARGS,
+    "validate inner environment structure"},
     {NULL}  /* Sentinel */
 };
 
@@ -391,7 +406,8 @@ PyCOMPS_ItemInfo PyCOMPS_EnvsInfo = {
                         {&comps_envs_in},
     .out_convert_func = &comps_envs_out,
     .item_types_len = 1,
-    .props_offset = offsetof(COMPS_DocEnv, properties)
+    .props_offset = offsetof(COMPS_DocEnv, properties),
+    .pre_checker = &pycomps_env_validate
 };
 
 int PyCOMPSEnvs_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)

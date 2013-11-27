@@ -28,6 +28,7 @@
 
 #include "comps_utils.h"
 #include "comps_log.h"
+#include "comps_validate.h"
 
 /** COMPS_Object derivate representing group_id element in comps.xml file */
 typedef struct {
@@ -84,5 +85,6 @@ signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
                                   COMPS_Log *log, COMPS_XMLOptions *options);
 
 extern COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo;
+extern COMPS_ValRuleGeneric* COMPS_DocGroupId_ValidateRules[];
 
 #endif

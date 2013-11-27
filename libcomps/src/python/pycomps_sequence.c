@@ -120,6 +120,10 @@ inline int list_setitem(PyObject *self, Py_ssize_t index, PyObject *item) {
         return -1;
     }
     if (item != NULL) {
+        if (_seq_->it_info->pre_checker &&
+            _seq_->it_info->pre_checker(converted_item)) {
+                return -1;
+        }
         comps_objlist_set(_seq_->list, index, converted_item);
     } else {
         comps_objlist_remove_at(_seq_->list, index);
@@ -421,6 +425,10 @@ PyObject* PyCOMPSSeq_append(PyObject * self, PyObject *item) {
                       Py_TYPE(self)->tp_name);
         return NULL;
     }
+    if (_seq_->it_info->pre_checker &&
+        _seq_->it_info->pre_checker(converted_item)) {
+        return NULL;
+    }
     comps_objlist_append_x(_seq_->list, converted_item);
     Py_RETURN_NONE;
     #undef _seq_
@@ -437,6 +445,10 @@ PyObject* PyCOMPSSeq_append_unique(PyObject * self, PyObject *item) {
     }
     if (list_unique_id_check(self, converted_item)) {
         COMPS_OBJECT_DESTROY(converted_item);
+        return NULL;
+    }
+    if (_seq_->it_info->pre_checker && 
+        _seq_->it_info->pre_checker(converted_item)) {
         return NULL;
     }
     comps_objlist_append_x(_seq_->list, converted_item);

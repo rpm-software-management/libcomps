@@ -146,3 +146,10 @@ COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo = {
     .to_str = &comps_docgroupid_str_u
 };
 
+COMPS_ValRuleGeneric* COMPS_DocGroupId_ValidateRules[] = {
+    &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
+                         .verbose_msg = "GroupId name check: ",
+                         .get_f = (COMPS_VAL_GETF) &comps_docgroupid_get_name,
+                         .check_f = &comps_empty_check},
+    NULL
+};

@@ -231,6 +231,20 @@ PyObject* PyCOMPSCat_cmp(PyObject *self, PyObject *other, int op) {
     Py_RETURN_TRUE;
 }
 
+int pycomps_category_validate(COMPS_Object *obj) {
+    COMPS_ValGenResult *result = comps_validate_execute(obj,
+                                        COMPS_DocCategory_ValidateRules);
+    int ret = __pycomps_validate_process(result);
+    COMPS_OBJECT_DESTROY(result);
+    return ret;
+}
+
+PyObject* PyCOMPSCat_validate(PyCOMPS_Category *cat) {
+    if (pycomps_category_validate(cat->cat))
+        return NULL;
+}
+
+
 __COMPS_LIST_GETSET_CLOSURE(COMPS_DocCategory) DocCat_GroupIdsClosure = {
     .get_f = &comps_doccategory_group_ids,
     .set_f = &comps_doccategory_set_group_ids,
@@ -283,6 +297,8 @@ PyMemberDef PyCOMPSCat_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSCat_methods[] = {
+    {"validate", (PyCFunction)PyCOMPSCat_validate, METH_NOARGS,
+    "validate inner category structure"},
     {NULL}  /* Sentinel */
 };
 
@@ -376,7 +392,8 @@ PyCOMPS_ItemInfo PyCOMPS_CatsInfo = {
                         {&comps_cats_in},
     .out_convert_func = &comps_cats_out,
     .item_types_len = 1,
-    .props_offset = offsetof(COMPS_DocCategory, properties)
+    .props_offset = offsetof(COMPS_DocCategory, properties),
+    .pre_checker = &pycomps_category_validate
 };
 
 int PyCOMPSCats_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)

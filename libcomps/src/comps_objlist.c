@@ -425,6 +425,13 @@ COMPS_ObjList* comps_objlist_concat(COMPS_ObjList *list1, COMPS_ObjList *list2) 
     return ret;
 }
 
+void comps_objlist_concat_in(COMPS_ObjList *list1, COMPS_ObjList *list2) {
+    COMPS_ObjListIt *it;
+    for (it = list2->first; it != NULL; it = it->next) {
+        comps_objlist_append(list1, it->comps_obj);
+    }
+}
+
 signed char comps_objlist_cmp(COMPS_Object *list1, COMPS_Object *list2) {
     COMPS_ObjListIt *it, *it2;
     if (!list1 || !list2) return -1;

@@ -256,6 +256,18 @@ PyObject* comps_gids_out(COMPS_Object *cobj) {
     ret->gid = (COMPS_DocGroupId*)cobj;
     return (PyObject*)ret;
 }
+int pycomps_gid_validate(COMPS_Object *obj) {
+    COMPS_ValGenResult *result = comps_validate_execute(obj,
+                                        COMPS_DocGroupId_ValidateRules);
+    int ret = __pycomps_validate_process(result);
+    COMPS_OBJECT_DESTROY(result);
+    return ret;
+}
+
+PyObject* PyCOMPSGID_validate(PyCOMPS_GID *gid) {
+    if (pycomps_group_validate(gid->gid))
+        return NULL;
+}
 
 PyCOMPS_ItemInfo PyCOMPS_GIDsInfo = {
 #if PY_MAJOR_VERSION >= 3
@@ -274,7 +286,8 @@ PyCOMPS_ItemInfo PyCOMPS_GIDsInfo = {
                          &comps_gids_str_in},
     .item_types_len = 3,
 #endif
-    .out_convert_func = &comps_gids_out
+    .out_convert_func = &comps_gids_out,
+    .pre_checker = &pycomps_gid_validate
 };
 
 int PyCOMPSGIDs_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
@@ -289,6 +302,8 @@ PyMemberDef PyCOMPSGIDs_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSGIDs_methods[] = {
+    {"validate", (PyCFunction)PyCOMPSGID_validate, METH_NOARGS,
+    "validate inner groupid structure"},
     {NULL}  /* Sentinel */
 };
 

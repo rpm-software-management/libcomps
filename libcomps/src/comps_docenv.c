@@ -508,15 +508,15 @@ COMPS_ObjectInfo COMPS_DocEnv_ObjInfo = {
 COMPS_ValRuleGeneric* COMPS_DocEnv_ValidateRules[] = {
     &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
                          .get_f = (COMPS_VAL_GETF)&comps_docenv_get_id_obj,
-                         .check_f = &comps_id_check,
-                         .verbose_msg = "Group id check"},
+                         .check_f = &comps_empty_check,
+                         .verbose_msg = "Environment id check: "},
     &(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
                          .offset = offsetof(COMPS_DocEnv, group_list),
                          .check_f = &comps_objlist_unique_check,
-                         .verbose_msg = "Environment unique group list check"},
+                         .verbose_msg = "Environment unique group list check: "},
     &(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
                          .offset = offsetof(COMPS_DocEnv, option_list),
                          .check_f = &comps_objlist_unique_check,
-                         .verbose_msg = "Environment unique option list check"},
+                         .verbose_msg = "Environment unique option list check: "},
     NULL
 };

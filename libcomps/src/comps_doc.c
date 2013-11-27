@@ -683,6 +683,72 @@ COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches) {
     return ret;
 }
 
+COMPS_ValGenResult* comps_doc_listobjs_validate(COMPS_Object *object,
+                                                COMPS_Object *objlist,
+                                                COMPS_ValRuleGeneric** rules) {
+    (void)object;
+    COMPS_ValGenResult *valres = NULL, *tmpres;
+    size_t x = 0;
+    char *str;
+    for (COMPS_ObjListIt *it = ((COMPS_ObjList*)objlist)->first;
+         it != NULL;
+         it = it->next, x++) {
+        tmpres = comps_validate_execute(it->comps_obj, rules);
+        if (tmpres->obj_info == &COMPS_ValErrResult_ObjInfo) {
+            if (!valres) {
+                valres = (COMPS_ValGenResult*)comps_object_create(
+                                                    &COMPS_ValErrResult_ObjInfo,
+                                                    NULL);
+            }
+            str = malloc(digits_count(x)*(sizeof(char)+2));
+            sprintf(str, "%zu.", x);
+            comps_valgenres_prefix(tmpres, str);
+            free(str);
+            comps_valgenres_concat(&valres, tmpres);
+        }
+        COMPS_OBJECT_DESTROY(tmpres);
+    }
+    if (!valres) {
+        valres = (COMPS_ValGenResult*)comps_object_create(
+                                            &COMPS_ValOkResult_ObjInfo,
+                                            NULL);
+    }
+    return valres;
+}
+
+COMPS_ValGenResult* comps_docgroups_validate(COMPS_Object *object,
+                                             COMPS_Object *objlist) {
+    return comps_doc_listobjs_validate(object, objlist,
+                                       COMPS_DocGroup_ValidateRules);
+}
+COMPS_ValGenResult* comps_doccategories_validate(COMPS_Object *object,
+                                             COMPS_Object *objlist) {
+    return comps_doc_listobjs_validate(object, objlist,
+                                       COMPS_DocCategory_ValidateRules);
+}
+COMPS_ValGenResult* comps_docenvs_validate(COMPS_Object *object,
+                                             COMPS_Object *objlist) {
+    return comps_doc_listobjs_validate(object, objlist,
+                                       COMPS_DocEnv_ValidateRules);
+}
+
+COMPS_ValRuleGeneric* COMPS_Doc_ValidateRules[] = {
+    &(COMPS_ValRuleList2){COMPS_VAL_RULE_LIST2,
+                         .verbose_msg = "Groups check:",
+                         .get_f = (COMPS_Object*(*)(COMPS_Object*))comps_doc_groups,
+                         .check_f = &comps_docgroups_validate},
+    &(COMPS_ValRuleList2){COMPS_VAL_RULE_LIST2,
+                         .verbose_msg = "Categories check:",
+                         .get_f = (COMPS_Object*(*)(COMPS_Object*))comps_doc_categories,
+                         .check_f = &comps_doccategories_validate},
+    &(COMPS_ValRuleList2){COMPS_VAL_RULE_LIST2,
+                         .verbose_msg = "Environments check:",
+                         .get_f = (COMPS_Object*(*)(COMPS_Object*))
+                                                   comps_doc_environments,
+                         .check_f = &comps_docenvs_validate},
+    NULL
+};
+
 COMPS_ObjectInfo COMPS_Doc_ObjInfo = {
     .obj_size = sizeof(COMPS_Doc),
     .constructor = &comps_doc_create_u,

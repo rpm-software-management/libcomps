@@ -29,6 +29,7 @@
 #include "comps_docgroup.h"
 #include "comps_doccategory.h"
 #include "comps_docenv.h"
+#include "comps_validate.h"
 
 /** \file comps_doc.h
  * \brief COMPS_Doc header file
@@ -413,6 +414,7 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2);
 COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches);
 
 extern COMPS_ObjectInfo COMPS_Doc_ObjInfo;
+extern COMPS_ValRuleGeneric* COMPS_Doc_ValidateRules[];
 
 #endif //COMPS_DOC_H
 

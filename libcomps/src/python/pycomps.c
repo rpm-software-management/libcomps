@@ -437,6 +437,45 @@ PyObject* PyCOMPS_filter_arches(PyObject *self, PyObject *other) {
     return (PyObject*)doc;
 }
 
+PyObject* PyCOMPS_validate(PyCOMPS *comps) {
+    #define _result_ ((COMPS_ValErrResult*)result)
+    COMPS_ValGenResult *result;
+    result = comps_validate_execute((COMPS_Object*)comps->comps_doc,
+                                    COMPS_Doc_ValidateRules);
+    if (result->obj_info == &COMPS_ValOkResult_ObjInfo) {
+        COMPS_OBJECT_DESTROY(result);
+        Py_RETURN_NONE;
+    } else {
+        PyErr_Format(PyExc_ValueError, "%s",
+                     ((COMPS_ValErr*)(_result_->err_list->first->comps_obj))->err_msg);
+        COMPS_OBJECT_DESTROY(result);
+        return NULL;
+    }
+    #undef _result_
+}
+
+PyObject* PyCOMPS_validate_nf(PyCOMPS *comps) {
+    #define _result_ ((COMPS_ValErrResult*)result)
+    COMPS_ValGenResult *result;
+    PyObject *list;
+    result = comps_validate_execute((COMPS_Object*)comps->comps_doc,
+                                    COMPS_Doc_ValidateRules);
+    list = PyList_New(0);
+    if (result->obj_info == &COMPS_ValOkResult_ObjInfo) {
+        COMPS_OBJECT_DESTROY(result);
+        return list;
+    } else {
+        for (COMPS_ObjListIt *it = _result_->err_list->first;
+             it != NULL; it = it->next) {
+            PyList_Append(list, PyUnicode_FromString(
+                                    ((COMPS_ValErr*)it->comps_obj)->err_msg));
+        }
+        return list;
+        COMPS_OBJECT_DESTROY(result);
+    }
+    #undef _result_
+}
+
 PyCOMPS_GetSetClosure envs_closure = {&PyCOMPS_EnvsType,
                                       offsetof(PyCOMPS, p_environments),
                                       &comps_doc_environments,
@@ -489,6 +528,10 @@ static PyMemberDef PyCOMPS_members[] = {
     {NULL}};
 
 static PyMethodDef PyCOMPS_methods[] = {
+    {"validate", (PyCFunction)PyCOMPS_validate, METH_NOARGS,
+    "validate inner comps structure"},
+    {"validate_nf", (PyCFunction)PyCOMPS_validate_nf, METH_NOARGS,
+    "validate inner comps structure"},
     {"xml_f", (PyCFunction)PyCOMPS_toxml_f, METH_KEYWORDS,
     "write XML represenstation of COMPS to file"},
     {"xml_str", (PyCFunction)PyCOMPS_toxml_str, METH_KEYWORDS,

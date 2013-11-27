@@ -412,11 +412,11 @@ COMPS_ObjectInfo COMPS_DocGroup_ObjInfo = {
 
 COMPS_ValRuleGeneric* COMPS_DocGroup_ValidateRules[] = {
     &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
-                         .verbose_msg = "Group id check",
+                         .verbose_msg = "Group id check: ",
                          .get_f = (COMPS_VAL_GETF) &comps_docgroup_get_id,
-                         .check_f = &comps_id_check},
+                         .check_f = &comps_empty_check},
     &(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
-                         .verbose_msg = "Group unique package list check",
+                         .verbose_msg = "Group unique package list check: ",
                          .offset = offsetof(COMPS_DocGroup, packages),
                          .check_f = &comps_objlist_unique_check},
     NULL

@@ -404,3 +404,15 @@ PyObject* __PyCOMPS_get_boolattr(PyObject *self, void *closure) {
         Py_RETURN_NONE;
     #undef _closure_
 }
+
+int __pycomps_validate_process(COMPS_ValGenResult *result) {
+    #define _result_ ((COMPS_ValErrResult*)result)
+    if (result->obj_info == &COMPS_ValOkResult_ObjInfo) {
+        return 0;
+    } else {
+        PyErr_Format(PyExc_ValueError, "%s",
+                     ((COMPS_ValErr*)(_result_->err_list->first->comps_obj))->err_msg);
+        return -1;
+    }
+    #undef _result_
+}

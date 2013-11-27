@@ -78,10 +78,11 @@ class BaseObjTestClass(object):
         data_desc = []
         for x in inspect.getmembers(obj.__class__):
             if (inspect.isdatadescriptor(x[1]) or\
-                inspect.isgetsetdescriptor(x[1]) or\
-               inspect.ismemberdescriptor(x[1])) and not x[0].startswith("__"):
+               inspect.isgetsetdescriptor(x[1]) or\
+               inspect.ismemberdescriptor(x[1])) and\
+               not x[0].startswith("__") and\
+               not inspect.ismethod(x[1]):
                 data_desc.append(x)
-        #print(data_desc)
         for attr in data_desc:
             z = getattr(obj, x[0])
             attr_types = self.obj_getset[attr[0]]
@@ -95,7 +96,7 @@ class BaseObjTestClass(object):
                         setattr(obj, attr[0], val)
 
             with self.assertRaises(TypeError):
-                self.assertTrue(delattr(obj, x[0]), x[0])
+                self.assertTrue(delattr(obj, attr), x[0])
 
     #@unittest.skip("")
     def test_dictmembers(self):
@@ -1001,6 +1002,25 @@ class COMPSTest(unittest.TestCase):
         comps5 = libcomps.Comps()
         comps5.fromxml_str(s)
         self.assertTrue(comps == comps5)
+
+    def test_validate(self):
+        c = libcomps.Comps()
+        c.fromxml_f("comps/f21-rawhide-comps.xml")
+        self.assertRaises(ValueError, c.validate)
+
+        c2 = libcomps.Comps()
+        cat1 = libcomps.Category()
+        self.assertRaises(ValueError, c2.categories.append, cat1)
+        group1 = libcomps.Group()
+        self.assertRaises(ValueError, c2.groups.append, group1)
+        env1 = libcomps.Environment()
+        self.assertRaises(ValueError, c2.environments.append, env1)
+
+        self.assertRaises(ValueError, cat1.group_ids.append, "")
+        self.assertRaises(ValueError, env1.group_ids.append, "")
+        self.assertRaises(ValueError, env1.option_ids.append, "")
+        self.assertRaises(ValueError, group1.packages.append,
+                                      libcomps.Package(""))
 
 if __name__ == "__main__":
     unittest.main(testRunner = utest.MyRunner)

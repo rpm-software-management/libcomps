@@ -271,10 +271,25 @@ PyObject* pycomps_group_boolattr_getter(PyObject *self, void *closure) {
         Py_RETURN_NONE;
 }
 
+int pycomps_group_validate(COMPS_Object *obj) {
+    COMPS_ValGenResult *result = comps_validate_execute(obj,
+                                        COMPS_DocGroup_ValidateRules);
+    int ret = __pycomps_validate_process(result);
+    COMPS_OBJECT_DESTROY(result);
+    return ret;
+}
+
+PyObject* PyCOMPSGroup_validate(PyCOMPS_Group *group) {
+    if (pycomps_group_validate((COMPS_Object*)group->group))
+        return NULL;
+}
+
 PyMemberDef PyCOMPSGroup_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSGroup_methods[] = {
+    {"validate", (PyCFunction)PyCOMPSGroup_validate, METH_NOARGS,
+    "validate inner group structure"},
     {NULL}  /* Sentinel */
 };
 
@@ -431,7 +446,8 @@ PyCOMPS_ItemInfo PyCOMPS_GroupsInfo = {
                         {&comps_groups_in},
     .out_convert_func = &comps_groups_out,
     .item_types_len = 1,
-    .props_offset = offsetof(COMPS_DocGroup, properties)
+    .props_offset = offsetof(COMPS_DocGroup, properties),
+    .pre_checker = &pycomps_group_validate
 };
 
 int PyCOMPSGroups_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
@@ -580,12 +596,27 @@ PyObject* comps_pkgs_out(COMPS_Object *cobj) {
     return (PyObject*)ret;
 }
 
+int pycomps_package_validate(COMPS_Object *obj) {
+    COMPS_ValGenResult *result = comps_validate_execute(obj,
+                                        COMPS_DocGroupPackage_ValidateRules);
+    int ret = __pycomps_validate_process(result);
+    COMPS_OBJECT_DESTROY(result);
+    return ret;
+}
+
+PyObject* PyCOMPSPackage_validate(PyCOMPS_Package *pkg) {
+    if (pycomps_package_validate(pkg->package))
+        return NULL;
+}
+
+
 PyCOMPS_ItemInfo PyCOMPS_PkgsInfo = {
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_PackType},
     .in_convert_funcs = (PyCOMPS_in_itemconvert[])
                         {&comps_pkgs_in},
     .out_convert_func = &comps_pkgs_out,
-    .item_types_len = 1
+    .item_types_len = 1,
+    .pre_checker = &pycomps_package_validate
 };
 
 int PyCOMPSPacks_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
@@ -779,6 +810,7 @@ int PyCOMPSPack_print(PyObject *self, FILE *f, int flags) {
     }
     fprintf(f, ">");
     return 0;
+    #undef _package_
 }
 
 PyObject* PyCOMPSPack_cmp(PyObject *self, PyObject *other, int op) {
@@ -806,6 +838,8 @@ PyMemberDef PyCOMPSPack_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSPack_methods[] = {
+    {"validate", (PyCFunction)PyCOMPSPackage_validate, METH_NOARGS,
+    "validate inner package structure"},
     {NULL}  /* Sentinel */
 };
 

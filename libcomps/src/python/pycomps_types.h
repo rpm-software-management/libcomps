@@ -30,6 +30,7 @@ typedef struct PyCOMPS_ItemInfo {
     PyTypeObject ** itemtypes;
     PyCOMPS_in_itemconvert *in_convert_funcs;
     PyCOMPS_out_itemconvert out_convert_func;
+    int (*pre_checker)(COMPS_Object*);
     unsigned item_types_len;
     size_t props_offset;
 } PyCOMPS_ItemInfo;

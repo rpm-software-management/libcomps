@@ -203,6 +203,8 @@ COMPS_ObjList* comps_objlist_sublist_it(COMPS_ObjListIt *startit,
 COMPS_ObjList* comps_objlist_filter(COMPS_ObjList *list,
                                   char (*filter_func)(COMPS_Object*));
 
+void comps_objlist_concat_in(COMPS_ObjList *list1, COMPS_ObjList *list2);
+
 extern COMPS_ObjectInfo COMPS_ObjList_ObjInfo;
 
 #endif

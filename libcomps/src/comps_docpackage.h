@@ -24,6 +24,8 @@
 #include "comps_obj.h"
 #include "comps_log.h"
 
+#include "comps_validate.h"
+
 /** \file comps_docpackage.h
  * \brief COMPS_DocPackage header file
  */
@@ -136,6 +138,7 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
 
 
 extern COMPS_ObjectInfo COMPS_DocGroupPackage_ObjInfo;
+extern COMPS_ValRuleGeneric* COMPS_DocGroupPackage_ValidateRules[];
 
 #endif
 
