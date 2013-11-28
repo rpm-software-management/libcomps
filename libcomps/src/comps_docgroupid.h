@@ -29,6 +29,7 @@
 #include "comps_utils.h"
 #include "comps_log.h"
 #include "comps_validate.h"
+#include "comps_default.h"
 
 /** COMPS_Object derivate representing group_id element in comps.xml file */
 typedef struct {
@@ -82,7 +83,8 @@ void comps_docgroupid_set_arches(COMPS_DocGroupId *gid,
 
 signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
                                   xmlTextWriterPtr writer,
-                                  COMPS_Log *log, COMPS_XMLOptions *options);
+                                  COMPS_Log *log, COMPS_XMLOptions *options,
+                                  COMPS_DefaultsOptions *def_options);
 
 extern COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo;
 extern COMPS_ValRuleGeneric* COMPS_DocGroupId_ValidateRules[];

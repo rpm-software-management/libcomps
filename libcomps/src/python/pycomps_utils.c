@@ -391,12 +391,16 @@ PyObject* __PyCOMPS_get_boolattr(PyObject *self, void *closure) {
     COMPS_Object* tmp_prop, *obj;
 
     obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    printf("bool getter\n");
     tmp_prop = _closure_->get_f(obj);
     if (tmp_prop) {
+        printf("bool getter:%d\n", ((COMPS_Num*)tmp_prop)->val);
         if (((COMPS_Num*)tmp_prop)->val) {
+            printf("true\n");
             COMPS_OBJECT_DESTROY(tmp_prop);
             Py_RETURN_TRUE;
         } else {
+            printf("false\n");
             COMPS_OBJECT_DESTROY(tmp_prop);
             Py_RETURN_FALSE;
         }

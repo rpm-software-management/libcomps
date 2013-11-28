@@ -122,6 +122,7 @@ inline int list_setitem(PyObject *self, Py_ssize_t index, PyObject *item) {
     if (item != NULL) {
         if (_seq_->it_info->pre_checker &&
             _seq_->it_info->pre_checker(converted_item)) {
+                COMPS_OBJECT_DESTROY(converted_item);
                 return -1;
         }
         comps_objlist_set(_seq_->list, index, converted_item);
@@ -427,6 +428,7 @@ PyObject* PyCOMPSSeq_append(PyObject * self, PyObject *item) {
     }
     if (_seq_->it_info->pre_checker &&
         _seq_->it_info->pre_checker(converted_item)) {
+        COMPS_OBJECT_DESTROY(converted_item);
         return NULL;
     }
     comps_objlist_append_x(_seq_->list, converted_item);
@@ -449,6 +451,7 @@ PyObject* PyCOMPSSeq_append_unique(PyObject * self, PyObject *item) {
     }
     if (_seq_->it_info->pre_checker && 
         _seq_->it_info->pre_checker(converted_item)) {
+        COMPS_OBJECT_DESTROY(converted_item);
         return NULL;
     }
     comps_objlist_append_x(_seq_->list, converted_item);

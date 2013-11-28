@@ -245,6 +245,8 @@ int pycomps_env_validate(COMPS_Object *obj) {
 PyObject* PyCOMPSEnv_validate(PyCOMPS_Env *env) {
     if (pycomps_env_validate((COMPS_Object*)env->env))
         return NULL;
+    else
+        Py_RETURN_NONE;
 }
 
 PyMemberDef PyCOMPSEnv_members[] = {

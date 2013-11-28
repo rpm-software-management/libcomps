@@ -542,7 +542,7 @@ START_TEST(test_comps_doc_xml)
         }
         comps_doc_add_category(doc, c);
     }
-    comps2xml_f(doc, "testfile.xml", 1, NULL);
+    comps2xml_f(doc, "testfile.xml", 1, NULL, NULL);
     COMPS_OBJECT_DESTROY(doc);
 }
 END_TEST
@@ -627,13 +627,13 @@ START_TEST(test_comps_doc_union)
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 0);
     fp = fopen("sample_comps.xml", "r");
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
 
     COMPS_Doc *doc1, *doc2, *doc3;
     doc1 = parsed->comps_doc;
     parsed->comps_doc = NULL;
     fp = fopen("f21-rawhide-comps.xml", "r");
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
     doc2 = parsed->comps_doc;
     parsed->comps_doc = NULL;
     comps_parse_parsed_destroy(parsed);
@@ -694,10 +694,10 @@ START_TEST(test_doc_defaults) {
     comps_docgroup_add_package(g, p);
 
     comps_doc_add_group(doc, g);
-    tmp = comps2xml_str(doc, NULL);
+    tmp = comps2xml_str(doc, NULL, NULL);
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
-    comps_parse_str(parsed, tmp);
+    comps_parse_str(parsed, tmp, NULL);
     doc2 = parsed->comps_doc;
     groups = comps_doc_groups(doc2);
     g = (COMPS_DocGroup*)groups->first->comps_obj;

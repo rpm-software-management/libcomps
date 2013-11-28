@@ -133,7 +133,7 @@ START_TEST(test_doc_validate) {
     fp = fopen("f21-rawhide-comps.xml", "r");
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 0);
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
     doc = parsed->comps_doc;
     result = comps_validate_execute((COMPS_Object*)doc, COMPS_Doc_ValidateRules);
     comps_valgenres_print(result, stdout);
@@ -147,9 +147,9 @@ Suite* basic_suite (void)
     Suite *s = suite_create ("Basic Tests");
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
-    //tcase_add_test (tc_core, test_docgroup_validate);
-    //tcase_add_test (tc_core, test_doccategory_validate);
-    //tcase_add_test (tc_core, test_docenv_validate);
+    tcase_add_test (tc_core, test_docgroup_validate);
+    tcase_add_test (tc_core, test_doccategory_validate);
+    tcase_add_test (tc_core, test_docenv_validate);
     tcase_add_test (tc_core, test_doc_validate);
     suite_add_tcase (s, tc_core);
     return s;

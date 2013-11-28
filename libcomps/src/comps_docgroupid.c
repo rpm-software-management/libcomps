@@ -97,10 +97,12 @@ char* comps_docgroupid_str_u(COMPS_Object* docgroupid) {
 
 signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
                                   xmlTextWriterPtr writer,
-                                  COMPS_Log *log, COMPS_XMLOptions *options) {
+                                  COMPS_Log *log, COMPS_XMLOptions *options,
+                                  COMPS_DefaultsOptions *def_options) {
     char *str;
     bool default_def = false;
     int ret;
+    (void)def_options;
 
     ret = xmlTextWriterStartElement(writer, BAD_CAST "groupid");
     if (options->arch_output) {

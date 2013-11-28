@@ -301,7 +301,8 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
 }
 
 signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
-                             COMPS_Log *log, COMPS_XMLOptions *options) {
+                             COMPS_Log *log, COMPS_XMLOptions *xml_options,
+                             COMPS_DefaultsOptions *def_options) {
     COMPS_ObjListIt *it;
     COMPS_Object *obj;
     COMPS_HSList *pairlist;
@@ -317,7 +318,7 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     int ret;
 
     if (env->group_list->len == 0 && env->group_list->len == 0 &&
-        !options->empty_environments) {
+        !xml_options->empty_environments) {
         obj = comps_docenv_get_id(env);
         comps_log_error(log, COMPS_ERR_PKGLIST_EMPTY, 1, obj);
         COMPS_OBJECT_DESTROY(obj);
@@ -325,7 +326,7 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     }
     ret = xmlTextWriterStartElement(writer, BAD_CAST "environment");
     COMPS_XMLRET_CHECK
-    if (options->arch_output) {
+    if (xml_options->arch_output) {
         obj = (COMPS_Object*)comps_docenv_arches(env);
         str = __comps_xml_arch_str(obj);
         ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
@@ -364,7 +365,7 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
             comps_hslist_destroy(&pairlist);
         }
     }
-    if (env->group_list->len || options->empty_grouplist) {
+    if (env->group_list->len || xml_options->empty_grouplist) {
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
         COMPS_XMLRET_CHECK
         for (it = env->group_list->first; it != NULL; it = it->next) {
@@ -387,7 +388,7 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
         COMPS_XMLRET_CHECK
     }
 
-    if (env->option_list->len || options->empty_optionlist) {
+    if (env->option_list->len || xml_options->empty_optionlist) {
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"optionlist");
         COMPS_XMLRET_CHECK
         for (it = env->option_list->first; it != NULL; it = it->next) {

@@ -76,20 +76,64 @@ char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
     return 1;
 }
 
+char __pycomps_dict_to_def_opts(PyObject* pobj, void *cobj) {
+    PyObject *val;
+    COMPS_DefaultsOptions ** options = (COMPS_DefaultsOptions**)cobj;
+    int x;
+    long tmp;
+    const char *keys2[] = {"default_uservisible", "default_default", NULL};
+    const char *keys1[] = {"default_pkgtype", NULL};
+    *options = malloc(sizeof(COMPS_DefaultsOptions));
+    bool *props2[] = {&(*options)->default_uservisible,
+                      &(*options)->default_default};
+    int *props1[] = {&(*options)->default_pkgtype};
+    **options = COMPS_DDefaultsOptions;
+
+    if (!PyDict_Check(pobj)) {
+        cobj = NULL;
+        return 0;
+    } else {
+        for (x = 0; keys1[x] != NULL; x++) {
+            val = PyDict_GetItemString(pobj, keys1[x]);
+            if (val && PyLong_Check(val)) {
+                tmp = PyLong_AsLong(val);
+                if (tmp == COMPS_PACKAGE_DEFAULT ||
+                    tmp == COMPS_PACKAGE_OPTIONAL ||
+                    tmp == COMPS_PACKAGE_CONDITIONAL ||
+                    tmp == COMPS_PACKAGE_MANDATORY) {
+                    *props1[x] = tmp;
+                }
+            }
+        }
+        for (x = 0; keys2[x] != NULL; x++) {
+            val = PyDict_GetItemString(pobj, keys2[x]);
+            if (val && PyBool_Check(val)) {
+                if (val == Py_True)
+                    *props2[x] = true;
+                else
+                    *props2[x] = false;
+            }
+        }
+    }
+    return 1;
+}
+
 PyObject* PyCOMPS_toxml_f(PyObject *self, PyObject *args, PyObject *kwds) {
     const char *errors = NULL;
     char *tmps, *fname = NULL;
     int i;
     signed char genret;
-    COMPS_XMLOptions *options = NULL;
+    COMPS_XMLOptions *xml_options = NULL;
+    COMPS_DefaultsOptions *def_options = NULL;
     COMPS_HSListItem *it;
     PyObject *ret, *tmp;
-    char* keywords[] = {"fname", "options", NULL};
+    char* keywords[] = {"fname", "xml_options", "def_options", NULL};
     PyCOMPS *self_comps = (PyCOMPS*)self;
 
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "s|O&", keywords, &fname,
-                                    __pycomps_dict_to_xml_opts, &options)) {
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "s|O&O&", keywords, &fname,
+                                    __pycomps_dict_to_xml_opts, &xml_options,
+                                    __pycomps_dict_to_def_opts, &def_options)) {
 
     }
 
@@ -97,9 +141,12 @@ PyObject* PyCOMPS_toxml_f(PyObject *self, PyObject *args, PyObject *kwds) {
        self_comps->comps_doc->encoding = comps_str("UTF-8");
     comps_hslist_clear(self_comps->comps_doc->log->entries);
 
-    genret = comps2xml_f(self_comps->comps_doc, fname, 0, options);
-    if (options)
-        free(options);
+    genret = comps2xml_f(self_comps->comps_doc, fname,
+                         0, xml_options, def_options);
+    if (xml_options)
+        free(xml_options);
+    if (def_options)
+        free(def_options);
     if (genret == -1) {
         PyErr_SetString(PyCOMPSExc_XMLGenError, "Error during generating xml");
     }
@@ -121,16 +168,22 @@ PyObject* PyCOMPS_toxml_f(PyObject *self, PyObject *args, PyObject *kwds) {
 PyObject* PyCOMPS_toxml_str(PyObject *self, PyObject *args, PyObject *kwds) {
     PyObject *ret;
     const char *errors = NULL;
-    COMPS_XMLOptions *options = NULL;
-    char* keywords[] = {"options"};
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "|O&", keywords,
-                                    __pycomps_dict_to_xml_opts, &options)) {
+    COMPS_XMLOptions *xml_options = NULL;
+    COMPS_DefaultsOptions *def_options = NULL;
+    char* keywords[] = {"xml_options", "def_options",NULL};
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|O&O&", keywords,
+                                    __pycomps_dict_to_xml_opts, &xml_options,
+                                    __pycomps_dict_to_def_opts, &def_options)) {
 
+    } else {
+        return NULL;
     }
 
-    char *s = comps2xml_str(((PyCOMPS*)self)->comps_doc, options);
-    if (options)
-        free(options);
+    char *s = comps2xml_str(((PyCOMPS*)self)->comps_doc, xml_options, def_options);
+    if (xml_options)
+        free(xml_options);
+    if (def_options)
+        free(def_options);
     ret = PyUnicode_DecodeUTF8(s, strlen(s), errors);
     free(s);
     return ret;
@@ -153,27 +206,45 @@ PyObject* PyCOMPS_clear(PyObject *self) {
     Py_RETURN_NONE;
 }
 
-PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
+PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *args, PyObject* kwds) {
     FILE *f;
     COMPS_Parsed *parsed;
-    char *fname;
+    char *fname = NULL;
     signed char parsed_ret;
     PyCOMPS *self_comps = (PyCOMPS*)self;
     COMPS_Object *tmpstr;
+    COMPS_DefaultsOptions *options = NULL;
 
-    if (__pycomps_arg_to_char(other, &fname)) return NULL;
+    char* keywords[] = {"fname", "options", NULL};
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "s|O&", keywords, &fname,
+                                    __pycomps_dict_to_def_opts, &options)) {
+
+    }
 
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 0);
     f =  fopen(fname, "r");
     if (!f) {
         PyErr_Format(PyExc_IOError, "Cannot open %s for reading", fname);
-        free(fname);
+        //free(fname);
         comps_parse_parsed_destroy(parsed);
+        if (options)
+            free(options);
         return NULL;
     }
-    parsed_ret = comps_parse_file(parsed, f);
+    parsed_ret = comps_parse_file(parsed, f, options);
+    Py_CLEAR(self_comps->p_groups);
+    Py_CLEAR(self_comps->p_categories);
+    Py_CLEAR(self_comps->p_environments);
+    Py_CLEAR(self_comps->p_langpacks);
+    Py_CLEAR(self_comps->p_blacklist);
+    Py_CLEAR(self_comps->p_whiteout);
+
+
     COMPS_OBJECT_DESTROY(self_comps->comps_doc);
+    if (options)
+        free(options);
+
     if (parsed->comps_doc) {
         self_comps->comps_doc = parsed->comps_doc;
     } else {
@@ -186,7 +257,7 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *other) {
     self_comps->comps_doc->log = parsed->log;
     parsed->log = NULL;
 
-    free(fname);
+    //free(fname);
     parsed->comps_doc = NULL;
     comps_parse_parsed_destroy(parsed);
 
@@ -244,22 +315,32 @@ PyObject* PyCOMPS_get_last_log(PyObject *self, void *closure)
 }
 
 
-PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *other) {
+PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *args, PyObject *kwds) {
     char *tmps;
     signed char parsed_ret;
     PyCOMPS *self_comps = (PyCOMPS*)self;
+    char* keywords[] = {"str", "options", NULL};
+    COMPS_DefaultsOptions *options = NULL;
 
-    if (__pycomps_arg_to_char(other, &tmps)) return NULL;
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "s|O&", keywords, &tmps,
+                                    __pycomps_dict_to_def_opts, &options)) {
+
+    }
 
     COMPS_Parsed *parsed;
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 0);
-    parsed_ret = comps_parse_str(parsed, tmps);
-    free(tmps);
-
-    //pycomps_clear(self);
-    //pycomps_doc_destroy((void*)self_comps->comps);
+    parsed_ret = comps_parse_str(parsed, tmps, options);
+    if (options)
+        free(options);
+    Py_CLEAR(self_comps->p_groups);
+    Py_CLEAR(self_comps->p_categories);
+    Py_CLEAR(self_comps->p_environments);
+    Py_CLEAR(self_comps->p_langpacks);
+    Py_CLEAR(self_comps->p_blacklist);
+    Py_CLEAR(self_comps->p_whiteout);
     COMPS_OBJECT_DESTROY(self_comps->comps_doc);
+
     self_comps->comps_doc = parsed->comps_doc;
     COMPS_OBJECT_DESTROY(self_comps->comps_doc->log);
     self_comps->comps_doc->log = parsed->log;
@@ -532,17 +613,17 @@ static PyMethodDef PyCOMPS_methods[] = {
     "validate inner comps structure"},
     {"validate_nf", (PyCFunction)PyCOMPS_validate_nf, METH_NOARGS,
     "validate inner comps structure"},
-    {"xml_f", (PyCFunction)PyCOMPS_toxml_f, METH_KEYWORDS,
+    {"xml_f", (PyCFunction)PyCOMPS_toxml_f, METH_VARARGS | METH_KEYWORDS,
     "write XML represenstation of COMPS to file"},
-    {"xml_str", (PyCFunction)PyCOMPS_toxml_str, METH_KEYWORDS,
+    {"xml_str", (PyCFunction)PyCOMPS_toxml_str, METH_VARARGS | METH_KEYWORDS,
     "return XML represenstation of COMPS as string"},
-    {"toxml_f", (PyCFunction)PyCOMPS_toxml_f, METH_KEYWORDS,
+    {"toxml_f", (PyCFunction)PyCOMPS_toxml_f, METH_VARARGS | METH_KEYWORDS,
     "write XML represenstation of COMPS to file"},
-    {"toxml_str", (PyCFunction)PyCOMPS_toxml_str, METH_KEYWORDS,
+    {"toxml_str", (PyCFunction)PyCOMPS_toxml_str, METH_VARARGS | METH_KEYWORDS,
     "return XML represenstation of COMPS as string"},
-    {"fromxml_f", (PyCFunction)PyCOMPS_fromxml_f, METH_O,
+    {"fromxml_f", (PyCFunction)PyCOMPS_fromxml_f, METH_VARARGS | METH_KEYWORDS,
     "Load COMPS from xml file"},
-    {"fromxml_str", (PyCFunction)PyCOMPS_fromxml_str, METH_O,
+    {"fromxml_str", (PyCFunction)PyCOMPS_fromxml_str, METH_VARARGS | METH_KEYWORDS,
     "Load COMPS from xml string"},
     {"clear", (PyCFunction)PyCOMPS_clear, METH_NOARGS,
     "Clear COMPS"},
@@ -726,7 +807,7 @@ static PyMethodDef LibcompsMethods[] = {
             "_libpycomps",
             "libcomps module",
             -1,
-            &LibcompsMethods, //myextension_methods,
+            LibcompsMethods, //myextension_methods,
             NULL,
             NULL, //myextension_traverse,
             NULL, //myextension_clear,

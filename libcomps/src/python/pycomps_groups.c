@@ -246,7 +246,7 @@ int pycomps_group_boolattr_setter(PyObject *self, PyObject *val, void *closure) 
         PyErr_Format(PyExc_TypeError, "Can't delete %s", (char*)closure);
         return -1;
     }
-    if (val && !PyBool_Check(val)) {
+    if (!PyBool_Check(val)) {
         PyErr_SetString(PyExc_TypeError, "Not bool object");
         return -1;
     }
@@ -282,6 +282,8 @@ int pycomps_group_validate(COMPS_Object *obj) {
 PyObject* PyCOMPSGroup_validate(PyCOMPS_Group *group) {
     if (pycomps_group_validate((COMPS_Object*)group->group))
         return NULL;
+    else
+        Py_RETURN_NONE;
 }
 
 PyMemberDef PyCOMPSGroup_members[] = {
@@ -605,8 +607,10 @@ int pycomps_package_validate(COMPS_Object *obj) {
 }
 
 PyObject* PyCOMPSPackage_validate(PyCOMPS_Package *pkg) {
-    if (pycomps_package_validate(pkg->package))
+    if (pycomps_package_validate((COMPS_Object*)pkg->package))
         return NULL;
+    else
+        Py_RETURN_NONE;
 }
 
 

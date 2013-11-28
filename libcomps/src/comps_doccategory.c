@@ -227,8 +227,9 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
 }
 
 signed char comps_doccategory_xml(COMPS_DocCategory *category,
-                                  xmlTextWriterPtr writer,
-                                  COMPS_Log *log, COMPS_XMLOptions *options) {
+                                  xmlTextWriterPtr writer, COMPS_Log *log,
+                                  COMPS_XMLOptions *xml_options,
+                                  COMPS_DefaultsOptions *def_options) {
     COMPS_ObjListIt *it;
     COMPS_Object *obj;
     COMPS_HSList *pairlist;
@@ -241,7 +242,7 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
     char *str;
     int ret;
 
-    if (category->group_ids->len == 0 && !options->empty_categories) {
+    if (category->group_ids->len == 0 && !xml_options->empty_categories) {
         obj = comps_doccategory_get_id(category);
         comps_log_error(log, COMPS_ERR_PKGLIST_EMPTY, 1, obj);
         COMPS_OBJECT_DESTROY(obj);
@@ -249,7 +250,7 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
     }
     ret = xmlTextWriterStartElement(writer, BAD_CAST "category");
     COMPS_XMLRET_CHECK
-    if (options->arch_output) {
+    if (xml_options->arch_output) {
         obj = (COMPS_Object*)comps_doccategory_arches(category);
         str = __comps_xml_arch_str(obj);
         ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
@@ -288,12 +289,12 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
             comps_hslist_destroy(&pairlist);
         }
     }
-    if (category->group_ids->len || options->empty_grouplist) {
+    if (category->group_ids->len || xml_options->empty_grouplist) {
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
         COMPS_XMLRET_CHECK
         for (it = category->group_ids->first; it != NULL; it = it->next) {
             comps_docgroupid_xml((COMPS_DocGroupId*)(COMPS_DocGroupId*)it->comps_obj,
-                                 writer, log, options);
+                                 writer, log, xml_options, def_options);
         }
         ret = xmlTextWriterEndElement(writer);
         COMPS_XMLRET_CHECK

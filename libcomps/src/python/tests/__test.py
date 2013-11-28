@@ -942,7 +942,7 @@ class COMPSTest(unittest.TestCase):
         self.assertEqual(len(comps2.categories), 0)
         self.assertEqual(len(comps2.environments), 0)
         
-        s = comps.toxml_str(options={"empty_groups": True,
+        s = comps.toxml_str(xml_options={"empty_groups": True,
                                      "empty_categories": True,
                                      "empty_environments": True})
         comps2 = libcomps.Comps()
@@ -951,7 +951,7 @@ class COMPSTest(unittest.TestCase):
         self.assertEqual(len(comps2.categories), 1)
         self.assertEqual(len(comps2.environments), 1)
 
-        s = comps.toxml_str(options={"empty_groups": True,
+        s = comps.toxml_str(xml_options={"empty_groups": True,
                                      "empty_categories": True,
                                      "empty_environments": True,
                                      "uservisible_explicit": True,
@@ -960,7 +960,7 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue("</uservisible>" in s)
 
         g.packages.append(libcomps.Package("pkg"))
-        s = comps.toxml_str(options={"empty_groups": True,
+        s = comps.toxml_str(xml_options={"empty_groups": True,
                                      "empty_categories": True,
                                      "empty_environments": True,
                                      "bao_explicit": True})
@@ -1003,11 +1003,11 @@ class COMPSTest(unittest.TestCase):
         comps5.fromxml_str(s)
         self.assertTrue(comps == comps5)
 
+    #@unittest.skip("")
     def test_validate(self):
         c = libcomps.Comps()
         c.fromxml_f("comps/f21-rawhide-comps.xml")
         self.assertRaises(ValueError, c.validate)
-
         c2 = libcomps.Comps()
         cat1 = libcomps.Category()
         self.assertRaises(ValueError, c2.categories.append, cat1)
@@ -1021,6 +1021,32 @@ class COMPSTest(unittest.TestCase):
         self.assertRaises(ValueError, env1.option_ids.append, "")
         self.assertRaises(ValueError, group1.packages.append,
                                       libcomps.Package(""))
+
+    @unittest.skip("")
+    def test_defaults(self):
+        c = libcomps.Comps()
+        c.fromxml_f("comps/main_def.xml",
+                    options={"default_uservisible": True,
+                             "default_default": True,
+                             "default_pkgtype":
+                             libcomps.PACKAGE_TYPE_DEFAULT})
+
+        self.assertTrue(c.groups[0].default == True)
+        self.assertTrue(c.groups[0].uservisible == True)
+        self.assertTrue(c.groups[0].packages[0].type == \
+                        libcomps.PACKAGE_TYPE_DEFAULT)
+
+        c.fromxml_f("comps/main_def.xml",
+                    options={"default_uservisible": False,
+                             "default_default": False,
+                             "default_pkgtype":
+                             libcomps.PACKAGE_TYPE_MANDATORY})
+
+        self.assertTrue(c.groups[0].default == False)
+        self.assertTrue(c.groups[0].uservisible == False)
+
+        self.assertTrue(c.groups[0].packages[0].type == \
+                        libcomps.PACKAGE_TYPE_MANDATORY)
 
 if __name__ == "__main__":
     unittest.main(testRunner = utest.MyRunner)

@@ -152,7 +152,8 @@ int comps_parse_validate_dtd(char *filename, char *dtd_file) {
         return ret;
 }
 
-signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
+signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f,
+                             COMPS_DefaultsOptions *options) {
     void *buff;
     int bytes_read;
 
@@ -162,6 +163,10 @@ signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
         return -1;
     }
     comps_parse_parsed_reinit(parsed);
+    if (options)
+        parsed->def_options = options;
+    else
+        parsed->def_options = &COMPS_DDefaultsOptions;
 
     for (;;) {
         buff = XML_GetBuffer(parsed->parser, BUFF_SIZE);
@@ -192,7 +197,13 @@ signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f) {
         return -1;
 }
 
-signed char comps_parse_str(COMPS_Parsed *parsed, char *str) {
+signed char comps_parse_str(COMPS_Parsed *parsed, char *str,
+                            COMPS_DefaultsOptions *options) {
+    if (options)
+        parsed->def_options = options;
+    else
+        parsed->def_options = &COMPS_DDefaultsOptions;
+
     if (!XML_Parse(parsed->parser, str, strlen(str), 1)) {
         comps_log_error_x(parsed->log, COMPS_ERR_PARSER, 3,
                           comps_num(XML_GetCurrentLineNumber(parsed->parser)),

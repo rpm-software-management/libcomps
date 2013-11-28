@@ -25,6 +25,7 @@
 #include "comps_log.h"
 
 #include "comps_validate.h"
+#include "comps_default.h"
 
 /** \file comps_docpackage.h
  * \brief COMPS_DocPackage header file
@@ -134,8 +135,8 @@ void comps_docpackage_set_arches(COMPS_DocGroupPackage *pkg,
 
 signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
                                  xmlTextWriterPtr writer,
-                                 COMPS_Log *log, COMPS_XMLOptions *options);
-
+                                 COMPS_Log *log, COMPS_XMLOptions *xml_options,
+                                 COMPS_DefaultsOptions *def_options);
 
 extern COMPS_ObjectInfo COMPS_DocGroupPackage_ObjInfo;
 extern COMPS_ValRuleGeneric* COMPS_DocGroupPackage_ValidateRules[];

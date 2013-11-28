@@ -465,13 +465,16 @@ void comps_elem_group_postproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
     __comps_check_required_param(comps_docgroup_get_name(group), "name", parsed);
     __comps_check_required_param(comps_docgroup_get_desc(group), "description", parsed);
     obj = comps_docgroup_get_def(group);
+    //printf("default_default: %d\n", parsed->def_options->default_default);
     if (!obj) {
-        comps_docgroup_set_def(group, 1, false);
+        comps_docgroup_set_def(group, parsed->def_options->default_default, 0);
     }
     COMPS_OBJECT_DESTROY(obj);
     obj = comps_docgroup_get_uservisible(group);
     if (!obj) {
-        comps_docgroup_set_uservisible(group, 1, false);
+        comps_docgroup_set_uservisible(group,
+                                      parsed->def_options->default_uservisible,
+                                      0);
     }
     COMPS_OBJECT_DESTROY(obj);
     COMPS_OBJECT_DESTROY(list);
@@ -578,8 +581,11 @@ void comps_elem_packagereq_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
               comps_object_create(&COMPS_DocGroupPackage_ObjInfo,
                                   NULL);
     comps_docgroup_add_package(group, package);
-    package->type = comps_package_get_type(comps_dict_get(elem->attrs,
-                                                          "type"));
+    tmp = comps_dict_get(elem->attrs, "type");
+    if (!tmp)
+        package->type = parsed->def_options->default_pkgtype;
+    else
+        package->type = comps_package_get_type(tmp);
     tmp = comps_dict_get(elem->attrs, "requires");
     if (tmp)
         package->requires = comps_str(tmp);

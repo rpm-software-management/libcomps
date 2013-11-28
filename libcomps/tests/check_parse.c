@@ -81,7 +81,7 @@ START_TEST(test_comps_parse1)
 
 
     fp = fopen("sample-comps.xml", "r");
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
     //fail_unless(comps_parse_validate_dtd("sample-comps.xml", "comps.dtd"));
 
     if (parsed->log->entries->first != NULL) {
@@ -177,7 +177,7 @@ START_TEST(test_comps_parse1)
 
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
     ret = comps_parse_validate_dtd("sample-bad-elem.xml", "comps.dtd");
     fail_if(ret >0, "XML shouldn't be valid. Validation returned: %d", ret);
 
@@ -287,7 +287,7 @@ START_TEST(test_comps_parse2)
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
     fp = fopen("sample_comps.xml", "r");
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
 
     fail_if(parsed->log->entries->first == NULL);
     i = check_errors(parsed->log, known_errors, 10);
@@ -329,7 +329,7 @@ START_TEST(test_comps_parse3)
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
     fp = fopen("sample_comps_bad1.xml", "r");
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
 
     fail_if(parsed->log->entries->first == NULL);
     check_errors(parsed->log, known_errors, 3);
@@ -398,7 +398,7 @@ START_TEST(test_comps_parse4)
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
     fp = fopen("sample_comps_bad2.xml", "r");
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
 
     fail_if(parsed->log->entries->first == NULL);
     check_errors(parsed->log, known_errors, 15);
@@ -431,7 +431,7 @@ START_TEST(test_comps_parse5)
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
     fp = fopen("sample_comps_bad3.xml", "r");
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
     //comps_log_print(parsed->log);
 
     fail_if(parsed->log->entries->first == NULL);
@@ -457,7 +457,7 @@ START_TEST(test_comps_fedora_parse)
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 0);
     fp = fopen("fedora_comps.xml", "r");
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
     //printf("log len:%d\n", parsed->log->logger_data->len);
     fail_if(parsed->fatal_error != 0, "Some fatal errors found after parsing");
     //printf("log len:%d\n", parsed->log->logger_data->len);
@@ -469,7 +469,7 @@ START_TEST(test_comps_fedora_parse)
 
     //print_all_str(((COMPS_DocGroup*)comps_doc_groups(parsed->comps_doc)
     //                                ->first->data)->name_by_lang);
-    comps2xml_f(parsed->comps_doc, "fed2.xml", 0, NULL);
+    comps2xml_f(parsed->comps_doc, "fed2.xml", 0, NULL, NULL);
     //printf("%s\n", tmp);
 
     //free(tmp);
@@ -486,7 +486,7 @@ START_TEST(test_main2)
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 0);
     fp = fopen("main_comps2.xml", "r");
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
     fail_if(parsed->fatal_error != 0, "Some fatal errors found after parsing");
     //comps2xml_f(parsed->comps_doc, "fed2.xml", 0);
     comps_parse_parsed_destroy(parsed);
@@ -536,7 +536,7 @@ START_TEST(test_arch)
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 0);
     fp = fopen("main_arches.xml", "r");
-    comps_parse_file(parsed, fp);
+    comps_parse_file(parsed, fp, NULL);
     //comps_log_print(parsed->log);
     fail_if(parsed->fatal_error != 0, "Some fatal errors found after parsing");
     //comps2xml_f(parsed->comps_doc, "fed2.xml", 0);

@@ -265,8 +265,10 @@ int pycomps_gid_validate(COMPS_Object *obj) {
 }
 
 PyObject* PyCOMPSGID_validate(PyCOMPS_GID *gid) {
-    if (pycomps_group_validate(gid->gid))
+    if (pycomps_gid_validate((COMPS_Object*)gid->gid))
         return NULL;
+    else
+        Py_RETURN_NONE;
 }
 
 PyCOMPS_ItemInfo PyCOMPS_GIDsInfo = {

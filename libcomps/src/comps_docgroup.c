@@ -269,7 +269,8 @@ COMPS_DocGroup* comps_docgroup_intersect(COMPS_DocGroup *g1,
 
 
 signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
-                               COMPS_Log *log, COMPS_XMLOptions *options) {
+                               COMPS_Log *log, COMPS_XMLOptions *xml_options,
+                               COMPS_DefaultsOptions *def_options) {
     COMPS_ObjListIt *it;
     COMPS_Object *obj;
     COMPS_HSList *pairlist;
@@ -284,8 +285,12 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
     static char* aliases[] = {NULL, NULL, NULL, "description", "description",
                               "default", NULL, NULL, NULL};
     static bool explicit[] = {true, true, true, true, true, false, false, true};
-    static char *default_val[] = {NULL, NULL, NULL, NULL, NULL,
-                                  "false", "true", NULL, NULL};
+    const char *str_true = "true";
+    const char *str_false = "false";
+    const char *default_val[] = {NULL, NULL, NULL, NULL, NULL,
+                           def_options->default_default?str_true:str_false,
+                           def_options->default_uservisible?str_true:str_false,
+                           NULL, NULL};
 
     static char*(*tostrf[])(COMPS_Object*) = {&comps_object_tostr,
                                                &comps_object_tostr,
@@ -298,9 +303,9 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                                                &comps_object_tostr};
     char *str;
     int ret;
-    explicit[5] = options->default_explicit;
-    explicit[6] = options->uservisible_explicit;
-    if (group->packages->len == 0 && !options->empty_groups) {
+    explicit[5] = xml_options->default_explicit;
+    explicit[6] = xml_options->uservisible_explicit;
+    if (group->packages->len == 0 && !xml_options->empty_groups) {
         obj = comps_docgroup_get_id(group);
         comps_log_error(log, COMPS_ERR_PKGLIST_EMPTY, 1, obj);
         COMPS_OBJECT_DESTROY(obj);
@@ -308,7 +313,7 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
     }
     ret = xmlTextWriterStartElement(writer, BAD_CAST "group");
     COMPS_XMLRET_CHECK
-    if (options->arch_output) {
+    if (xml_options->arch_output) {
         obj = (COMPS_Object*)comps_docgroup_arches(group);
         str = __comps_xml_arch_str(obj);
         ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
@@ -328,7 +333,7 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                     free(str);
                 } else if (default_val[i]){
                     __comps_xml_prop((aliases[i])?aliases[i]:props[i],
-                                     default_val[i], writer);
+                                     (char*)default_val[i], writer);
                 }
             } else {
                 if (obj) {
@@ -364,12 +369,12 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
             comps_hslist_destroy(&pairlist);
         }
     }
-    if (group->packages->len || options->empty_packages) {
+    if (group->packages->len || xml_options->empty_packages) {
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"packagelist");
         COMPS_XMLRET_CHECK
         for (it = group->packages->first; it != NULL; it = it->next) {
             comps_docpackage_xml((COMPS_DocGroupPackage*)it->comps_obj,
-                                 writer, log, options);
+                                 writer, log, xml_options, def_options);
         }
         ret = xmlTextWriterEndElement(writer);
         COMPS_XMLRET_CHECK

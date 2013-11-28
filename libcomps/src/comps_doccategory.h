@@ -28,6 +28,7 @@
 #include "comps_validate.h"
 #include "comps_radix.h"
 #include "comps_log.h"
+#include "comps_default.h"
 
 #include <stddef.h>
 #include <assert.h>
@@ -194,8 +195,9 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
                                                COMPS_DocCategory *c2);
 
 signed char comps_doccategory_xml(COMPS_DocCategory *category,
-                                  xmlTextWriterPtr writer,
-                                  COMPS_Log *log, COMPS_XMLOptions *options);
+                                  xmlTextWriterPtr writer, COMPS_Log *log,
+                                  COMPS_XMLOptions *xml_options,
+                                  COMPS_DefaultsOptions *def_options);
 COMPS_DocCategory* comps_doccategory_arch_filter(COMPS_DocCategory *source,
                                                  COMPS_ObjList *arches);
 

@@ -27,12 +27,12 @@
 #include "comps_doc.h"
 #include "comps_types.h"
 #include "comps_log.h"
-//#include "comps_elem.h"
+#include "comps_default.h"
 
 #include <expat.h>
 #include <libxml/parser.h>
 
-typedef struct {
+typedef struct COMPS_Parsed {
     COMPS_List *elem_stack;
     COMPS_Doc *comps_doc;
     COMPS_List *text_buffer;
@@ -43,6 +43,7 @@ typedef struct {
     char fatal_error;
     XML_Parser parser;
     const char *enc;
+    COMPS_DefaultsOptions *def_options;
 } COMPS_Parsed;
 
 COMPS_Parsed* comps_parse_parsed_create();
@@ -65,8 +66,10 @@ void comps_parse_char_data_handler(void *userData,
 //void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed);
 //void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed);
 
-signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f);
-signed char comps_parse_str(COMPS_Parsed *parsed, char *str);
+signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f,
+                             COMPS_DefaultsOptions *options);
+signed char comps_parse_str(COMPS_Parsed *parsed, char *str,
+                            COMPS_DefaultsOptions *options);
 
 unsigned comps_parse_init_parser(XML_Parser *p);//, COMPS_DTDRuleList * rules);
 void comps_parse_parsed_destroy(COMPS_Parsed *parsed);

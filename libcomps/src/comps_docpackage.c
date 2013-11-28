@@ -137,14 +137,16 @@ inline char comps_docpackage_cmp_set(void *pkg1, void *pkg2) {
 
 signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
                                  xmlTextWriterPtr writer,
-                                 COMPS_Log *log, COMPS_XMLOptions *options) {
+                                 COMPS_Log *log, COMPS_XMLOptions *xml_options,
+                                 COMPS_DefaultsOptions *def_options) {
     char *str;
     int ret;
     bool bao_def = false;
+    (void)def_options;
 
     ret = xmlTextWriterStartElement(writer, BAD_CAST "packagereq");
     COMPS_XMLRET_CHECK
-    if (options->arch_output) {
+    if (xml_options->arch_output) {
         COMPS_Object *obj = (COMPS_Object*)pkg->arches;
         str = __comps_xml_arch_str(obj);
         ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
@@ -169,7 +171,7 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
         free(str);
     }
     COMPS_XMLRET_CHECK
-    if (options->bao_explicit) {
+    if (xml_options->bao_explicit) {
         if (pkg->basearchonly) {
             ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
                                                 BAD_CAST "true");

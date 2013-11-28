@@ -240,8 +240,10 @@ int pycomps_category_validate(COMPS_Object *obj) {
 }
 
 PyObject* PyCOMPSCat_validate(PyCOMPS_Category *cat) {
-    if (pycomps_category_validate(cat->cat))
+    if (pycomps_category_validate((COMPS_Object*)cat->cat))
         return NULL;
+    else
+        Py_RETURN_NONE;
 }
 
 

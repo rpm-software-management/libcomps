@@ -12,6 +12,7 @@
 #include "comps_validate.h"
 #include "comps_radix.h"
 #include "comps_log.h"
+#include "comps_default.h"
 
 /** COMPS_Object derivate representing environment element in comps.xml file */
 typedef struct {
@@ -191,7 +192,8 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
 COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2);
 
 signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
-                             COMPS_Log *log, COMPS_XMLOptions *options);
+                             COMPS_Log *log, COMPS_XMLOptions *xml_options,
+                             COMPS_DefaultsOptions *def_options);
 COMPS_DocEnv* comps_docenv_arch_filter(COMPS_DocEnv *source,
                                        COMPS_ObjList *arches);
 

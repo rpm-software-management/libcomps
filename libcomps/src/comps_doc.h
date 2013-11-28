@@ -30,6 +30,7 @@
 #include "comps_doccategory.h"
 #include "comps_docenv.h"
 #include "comps_validate.h"
+#include "comps_default.h"
 
 /** \file comps_doc.h
  * \brief COMPS_Doc header file
@@ -393,13 +394,15 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
  * -1 if fatal error emerge during xml generation
  */
 signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect,
-                        COMPS_XMLOptions *options);
+                        COMPS_XMLOptions *xml_options,
+                        COMPS_DefaultsOptions *def_options);
 
 /** Generate XML string representating COMPS_Doc structure
  * @param doc COMPS_Doc object
  * @return XML string
  */
-char* comps2xml_str(COMPS_Doc *doc, COMPS_XMLOptions *options);
+char* comps2xml_str(COMPS_Doc *doc, COMPS_XMLOptions *options,
+                    COMPS_DefaultsOptions *def_options);
 
 /** Union two COMPS_Doc structures
  * COMPS_Doc structures are unioned as unioning it's subparts
