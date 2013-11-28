@@ -39,9 +39,9 @@ class TestLibcomps(unittest.TestCase):
         group.id = "core"
         self.comps.groups.append(group)
 
-        data = self.comps.xml_str(options = {"empty_groups":True,
-                                             "default_explicit":True,
-                                             "uservisible_explicit":True})
+        data = self.comps.xml_str(xml_options = {"empty_groups":True,
+                                                 "default_explicit":True,
+                                                 "uservisible_explicit":True})
         expected_data_1 = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE comps PUBLIC "-//Red Hat, Inc.//DTD Comps info//EN" "comps.dtd">
 <comps>
@@ -66,15 +66,15 @@ class TestLibcomps(unittest.TestCase):
   </group>
 </comps>
 """
-        data = self.comps.xml_str(options = {"empty_groups":True,
-                                             "default_explicit":True,
-                                             "uservisible_explicit":True})
+        data = self.comps.xml_str(xml_options = {"empty_groups":True,
+                                                 "default_explicit":True,
+                                                 "uservisible_explicit":True})
         self.assertEqual(data, expected_data_2)
 
         group.display_order = None
-        data = self.comps.xml_str(options = {"empty_groups":True,
-                                             "default_explicit":True,
-                                             "uservisible_explicit":True})
+        data = self.comps.xml_str(xml_options = {"empty_groups":True,
+                                                 "default_explicit":True,
+                                                 "uservisible_explicit":True})
         self.assertEqual(data, expected_data_1)
 
     def test_add_package(self):
