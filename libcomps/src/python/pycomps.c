@@ -73,7 +73,6 @@ char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
             }
         }
     }
-    printf("uservisible_explicit:%d\n", &(*options)->uservisible_explicit);
     return 1;
 }
 
@@ -96,7 +95,10 @@ char __pycomps_dict_to_def_opts(PyObject* pobj, void *cobj) {
     } else {
         for (x = 0; keys1[x] != NULL; x++) {
             val = PyDict_GetItemString(pobj, keys1[x]);
-            if (val && PyLong_Check(val)) {
+            if (val) {
+                if (PyINT_CHECK(val)) {
+                    tmp = PyINT_ASLONG(val);
+                }
                 tmp = PyLong_AsLong(val);
                 if (tmp == COMPS_PACKAGE_DEFAULT ||
                     tmp == COMPS_PACKAGE_OPTIONAL ||

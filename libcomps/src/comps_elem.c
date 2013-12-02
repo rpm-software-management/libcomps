@@ -611,6 +611,7 @@ void comps_elem_packagereq_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     }
     COMPS_OBJECT_DESTROY(list);
     parsed->tmp_buffer = NULL;
+    #undef last_pkg
 }
 
 void comps_elem_groupid_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
