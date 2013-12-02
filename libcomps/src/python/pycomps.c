@@ -73,6 +73,7 @@ char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
             }
         }
     }
+    printf("uservisible_explicit:%d\n", &(*options)->uservisible_explicit);
     return 1;
 }
 

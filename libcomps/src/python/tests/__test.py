@@ -665,7 +665,7 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(len(comps3.groups) == 3)
         self.assertTrue(len(comps3.categories) == 2)
         self.assertTrue(len(comps3.environments) == 0)
-        x = self.comps.xml_str(options={""})
+        x = self.comps.xml_str(xml_options={})
         y = comps2.xml_str()
 
         self.assertTrue(x == y)
@@ -678,9 +678,11 @@ class COMPSTest(unittest.TestCase):
         #for x in comps.get_last_parse_log():
         #    print x
         self.assertTrue(ret != -1)
-        comps.xml_f("fed2.xml", options={"empty_groups":True,
-                                         "empty_categories":True,
-                                         "empty_environments":True})
+        comps.xml_f("fed2.xml", xml_options={"empty_groups":True,
+                                             "empty_categories":True,
+                                             "empty_environments":True,
+                                             "uservisible_explicit": True,
+                                             "default_explicit": True})
         comps2 = libcomps.Comps()
         comps2.fromxml_f("fed2.xml")
         self.assertTrue(comps == comps2)
@@ -692,9 +694,11 @@ class COMPSTest(unittest.TestCase):
         #print comps.get_last_parse_log()
         self.assertTrue(ret != -1)
 
-        comps.xml_f("sample2.xml", options={"empty_groups":True,
-                                         "empty_categories":True,
-                                         "empty_environments":True})
+        comps.xml_f("sample2.xml", xml_options={"empty_groups":True,
+                                                "empty_categories":True,
+                                                "empty_environments":True,
+                                                "uservisible_explicit": True,
+                                                "default_explicit": True})
         comps2 = libcomps.Comps()
         comps2.fromxml_f("sample2.xml")
         self.assertTrue(comps == comps2)
@@ -707,10 +711,10 @@ class COMPSTest(unittest.TestCase):
         comps.xml_f("main2.xml")
         comps2 = libcomps.Comps()
         comps2.fromxml_f("main2.xml")
-        x = comps.xml_str(options={"empty_groups":True,
+        x = comps.xml_str(xml_options={"empty_groups":True,
                                          "empty_categories":True,
                                          "empty_environments":True})
-        y = comps2.xml_str(options={"empty_groups":True,
+        y = comps2.xml_str(xml_options={"empty_groups":True,
                                          "empty_categories":True,
                                          "empty_environments":True})
         self.assertTrue(comps == comps2)
@@ -998,7 +1002,7 @@ class COMPSTest(unittest.TestCase):
         comps4 = comps.arch_filter(["x86", "x86_64", "s390"])
         self.assertTrue(comps == comps4)
 
-        s = comps.toxml_str(options = {"arch_output":True})
+        s = comps.toxml_str(xml_options = {"arch_output":True})
         comps5 = libcomps.Comps()
         comps5.fromxml_str(s)
         self.assertTrue(comps == comps5)
@@ -1022,7 +1026,7 @@ class COMPSTest(unittest.TestCase):
         self.assertRaises(ValueError, group1.packages.append,
                                       libcomps.Package(""))
 
-    @unittest.skip("")
+    #@unittest.skip("")
     def test_defaults(self):
         c = libcomps.Comps()
         c.fromxml_f("comps/main_def.xml",

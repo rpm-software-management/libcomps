@@ -9,8 +9,8 @@
    <description xml:lang="cs">Tato skupina zahrnuje nejmenší možnou množinu balíčků. Je vhodná například na instalace malých routerů nebo firewallů.</description>
    <description xml:lang="de">Diese Gruppe enthält eine minimale Paketauswahl. Dies ist zum Beispiel nützlich zum Aufbau kleiner Router-/Firewall-Rechner.</description>
     <packagelist>
-      <packagereq type="mandatory">pepper</packagereq>
-      <packagereq type="mandatory">tour</packagereq>
+      <packagereq>pepper</packagereq>
+      <packagereq>tour</packagereq>
     </packagelist>
   </group>
   <group>
