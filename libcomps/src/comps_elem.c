@@ -623,9 +623,9 @@ void comps_elem_groupid_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     tmp = comps_dict_get(elem->attrs, "default");
     if (tmp)
         comps_docgroupid_set_default(groupid,
-                                     __comps_strcmp(tmp, "true")?0:1);
+                                     __comps_strcmp(tmp, "true")?1:0);
     else
-        comps_docgroupid_set_default(groupid,0);
+        comps_docgroupid_set_default(groupid, 0);
     if (elem->ancestor->type == COMPS_ELEM_OPTLIST) {
         list = comps_doc_environments(parsed->comps_doc);
         COMPS_DocEnv *env = (COMPS_DocEnv*)list->last->comps_obj;

@@ -34,6 +34,8 @@
     <description xml:lang="de">Verschiedene Kernstücke des Systems.</description>
     <grouplist>
      <groupid>base</groupid>
+     <groupid default="true">X11</groupid>
+     <groupid>KDE</groupid>
     </grouplist>
   </category>
 </comps>
