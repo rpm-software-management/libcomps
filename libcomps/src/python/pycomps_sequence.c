@@ -54,19 +54,21 @@ inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
     COMPS_Object *oid;
     PyObject *ret = NULL;
     COMPS_Object *tmpstr;
+    int _ret;
 
     if (PyUnicode_Check(id)) {
-        if (!__pycomps_stringable_to_char(id, &strid)) {
+        if ((_ret = __pycomps_stringable_to_char(id, &strid))) {
+            printf("%d\n", _ret);
             return NULL;
         }
-    } else if (PyBytes_Check(id)){
+    } else if (PyBytes_Check(id)) {
         strid = PyBytes_AsString(id);
     }
     tmpstr = (COMPS_Object*)comps_str(strid);
     for (it = ((PyCOMPS_Sequence*)self)->list->first; it != NULL;
          it = it->next) {
         props = (COMPS_ObjDict*)GET_FROM(it->comps_obj,
-                                         ((PyCOMPS_Sequence*)self)->it_info->props_offset);
+                                     ((PyCOMPS_Sequence*)self)->it_info->props_offset);
 
         oid = comps_objdict_get_x(props, "id");
         if (comps_object_cmp(oid, tmpstr)) {
