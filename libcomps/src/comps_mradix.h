@@ -42,6 +42,8 @@ void comps_mrtree_data_destroy(COMPS_MRTreeData * rtd);
 void comps_mrtree_data_destroy_v(void * rtd);
 COMPS_MRTreeData * comps_mrtree_data_create(COMPS_MRTree* tree,
                                             char * key, void * data);
+COMPS_MRTreeData * comps_mrtree_data_create_n(COMPS_MRTree * tree, char * key,
+                                              size_t keylen, void * data);
 
 COMPS_MRTree * comps_mrtree_create(void* (*data_constructor)(void*),
                                    void* (*data_cloner)(void*),
@@ -49,8 +51,7 @@ COMPS_MRTree * comps_mrtree_create(void* (*data_constructor)(void*),
 void comps_mrtree_destroy(COMPS_MRTree *rt);
 
 void comps_mrtree_set(COMPS_MRTree *rt, char *key, void *data);
-void comps_mrtree_set_n(COMPS_MRTree *rt, char *key, unsigned int len,
-                        void *data);
+void comps_mrtree_set_n(COMPS_MRTree * rt, char * key, size_t len, void * data);
 
 COMPS_HSList* comps_mrtree_get(COMPS_MRTree *rt, const char *key);
 COMPS_HSList** comps_mrtree_getp(COMPS_MRTree *rt, const char *key);

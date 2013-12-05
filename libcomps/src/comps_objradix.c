@@ -347,11 +347,9 @@ void __comps_objrtree_set(COMPS_ObjRTree *rt, char *key, size_t len,
                 subnodes = rtdata->subnodes;
                 offset += x;
             } else {
-                COMPS_Object *tmpdata;
-                COMPS_HSList *tmphslist;
+                COMPS_Object *tmpdata = rtdata->data;
+                COMPS_HSList *tmphslist = rtdata->subnodes;
                 //tmpch = rtdata->key[x];             // split mutual key
-                tmpdata = ((COMPS_ObjRTreeData*)it->data)->data;
-                tmphslist = rtdata->subnodes;
                 rtdata->subnodes = comps_hslist_create();
                 comps_hslist_init(rtdata->subnodes, NULL, NULL,
                                   &comps_objrtree_data_destroy_v);
@@ -377,6 +375,7 @@ void __comps_objrtree_set(COMPS_ObjRTree *rt, char *key, size_t len,
                 }
                 rtdata->key = realloc(rtdata->key, sizeof(char)*(x+1));
                 rtdata->key[x] = 0;
+                rt->len++;
                 return;
             }
         }

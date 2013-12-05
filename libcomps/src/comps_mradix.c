@@ -31,32 +31,8 @@ inline void comps_mrtree_data_destroy_v(void * rtd) {
     comps_mrtree_data_destroy((COMPS_MRTreeData*)rtd);
 }
 
-COMPS_MRTreeData * comps_mrtree_data_create(COMPS_MRTree * tree,
-                                            char * key, void * data) {
-
-    COMPS_MRTreeData * rtd;
-    if ((rtd = malloc(sizeof(*rtd))) == NULL)
-        return NULL;
-    if ((rtd->key = malloc(sizeof(char) * (strlen(key)+1))) == NULL) {
-        free(rtd);
-        return NULL;
-    }
-    memcpy(rtd->key, key, sizeof(char)*((strlen(key)+1)));
-    rtd->is_leaf = 1;
-    rtd->data = comps_hslist_create();
-    comps_hslist_init(rtd->data, NULL, tree->data_cloner,
-                                       tree->data_destructor);
-    if (data)
-        comps_hslist_append(rtd->data, data, 0);
-    rtd->subnodes = comps_hslist_create();
-    comps_hslist_init(rtd->subnodes, NULL,
-                                     NULL,
-                                     &comps_mrtree_data_destroy_v);
-    return rtd;
-}
-
 COMPS_MRTreeData * comps_mrtree_data_create_n(COMPS_MRTree * tree, char * key,
-                                            unsigned keylen, void * data) {
+                                              size_t keylen, void * data) {
     COMPS_MRTreeData * rtd;
     if ((rtd = malloc(sizeof(*rtd))) == NULL)
         return NULL;
@@ -78,6 +54,12 @@ COMPS_MRTreeData * comps_mrtree_data_create_n(COMPS_MRTree * tree, char * key,
                                      &comps_mrtree_data_destroy_v);
     return rtd;
 }
+
+COMPS_MRTreeData * comps_mrtree_data_create(COMPS_MRTree * tree,
+                                            char * key, void * data) {
+    return comps_mrtree_data_create_n(tree, key, strlen(key), data);
+}
+
 
 COMPS_MRTree * comps_mrtree_create(void* (*data_constructor)(void*),
                                    void* (*data_cloner)(void*),
@@ -342,19 +324,17 @@ COMPS_HSList* comps_mrtree_keys(COMPS_MRTree * rt) {
     return ret;
 }
 
-void comps_mrtree_set(COMPS_MRTree * rt, char * key, void * data)
+void __comps_mrtree_set(COMPS_MRTree * rt, char * key, size_t len, void * data)
 {
     static COMPS_HSListItem *it;
     COMPS_HSList *subnodes;
     COMPS_MRTreeData *rtd;
     static COMPS_MRTreeData *rtdata;
 
-    unsigned int len, offset=0;
+    size_t _len, offset=0;
     unsigned x, found = 0;
     void *ndata;
     char ended, tmpch;
-
-    len = strlen(key);
 
     if (rt->subnodes == NULL)
         return;
@@ -392,135 +372,59 @@ void comps_mrtree_set(COMPS_MRTree * rt, char * key, void * data)
             } else if (ended == 2) { //global key ends first; make global leaf
                 comps_hslist_remove(subnodes, it);
                 it->next = NULL;
-                rtd = comps_mrtree_data_create(rt, key,  ndata);
+                rtd = comps_mrtree_data_create(rt, key+offset,  ndata);
                 comps_hslist_append(subnodes, rtd, 0);
                 ((COMPS_MRTreeData*)subnodes->last->data)->subnodes->last = it;
                 ((COMPS_MRTreeData*)subnodes->last->data)->subnodes->first = it;
-                len = strlen(key + offset);
-                memmove(rtdata->key,rtdata->key+strlen(key+offset),
-                                    strlen(rtdata->key) - len);
-                rtdata->key[strlen(rtdata->key) - len] = 0;
-                rtdata->key = realloc(rtdata->key, sizeof(char)* (strlen(rtdata->key)+1));
+                _len = strlen(key + offset);
+                memmove(rtdata->key,rtdata->key+_len, strlen(rtdata->key) - _len);
+                rtdata->key[strlen(rtdata->key) - _len] = 0;
+                rtdata->key = realloc(rtdata->key,
+                                      sizeof(char)* (strlen(rtdata->key)+1));
                 return;
             } else if (ended == 1) { //local key ends first; go deeper
                 subnodes = rtdata->subnodes;
                 offset += x;
             } else { /* keys differ */
-                comps_hslist_remove(subnodes, it);      /*remove existing item*/
-                tmpch = rtdata->key[x];
-                rtdata->key[x] = 0;     /*cut existing item key to common key*/
-                /* create new parent node with common key with no data*/
-                rtd = comps_mrtree_data_create(rt, rtdata->key, NULL);
-                /* append to the end of subnodes in current tree level*/
-                comps_hslist_append(subnodes, rtd, 0);
+                void *tmpdata = rtdata->data;
+                COMPS_HSList *tmpnodes = rtdata->subnodes;
 
-                /* create new item with differ part inserting key*/
-                rtd = comps_mrtree_data_create(rt, key+offset+x, ndata);
-                comps_hslist_append(
-                            ((COMPS_MRTreeData*)subnodes->last->data)->subnodes,
-                            rtd, 0);
-                /* create new item with differ part existing key*/
-                it->next = NULL;
-                ((COMPS_MRTreeData*)subnodes->last->data)->subnodes->last->next = it;
-                ((COMPS_MRTreeData*)subnodes->last->data)->subnodes->last = it;
-                rtdata->key[x] = tmpch;
-                len = strlen(rtdata->key+x);
-                memmove(rtdata->key,rtdata->key+x, sizeof(char)*len);
-                rtdata->key = realloc(rtdata->key, sizeof(char)*(len+1));
-                rtdata->key[len] = 0;
+                int cmpret = strcmp(key+offset+x, rtdata->key+x);
+                rtdata->subnodes = comps_hslist_create();
+                comps_hslist_init(rtdata->subnodes, NULL, NULL,
+                                  &comps_mrtree_data_destroy_v);
+                rtdata->data = NULL;
+                if (cmpret > 0) {
+                    rtd = comps_mrtree_data_create(rt, rtdata->key+x, tmpdata);
+                    comps_hslist_destroy(&rtd->subnodes);
+                    rtd->subnodes = tmpnodes;
+                    comps_hslist_append(rtdata->subnodes, rtd, 0);
+                    rtd = comps_mrtree_data_create(rt, key+offset+x, ndata);
+                    comps_hslist_append(rtdata->subnodes, rtd, 0);
+                } else {
+                    rtd = comps_mrtree_data_create(rt, key+offset+x, ndata);
+                    comps_hslist_append(rtdata->subnodes, rtd, 0);
+                    rtd = comps_mrtree_data_create(rt, rtdata->key+x, tmpdata);
+                    comps_hslist_destroy(&rtd->subnodes);
+                    rtd->subnodes = tmpnodes;
+                    comps_hslist_append(rtdata->subnodes, rtd, 0);
+                }
+                rtdata->key = realloc(rtdata->key, sizeof(char)*(x+1));
+                rtdata->key[x] = 0;
                 return;
             }
         }
     }
 }
 
-void comps_mrtree_set_n(COMPS_MRTree *rt, char *key,
-                        unsigned int len, void *data)
+void comps_mrtree_set(COMPS_MRTree * rt, char * key, void * data)
 {
-    static COMPS_HSListItem *it;
-    COMPS_HSList *subnodes;
-    COMPS_MRTreeData *rtd;
-    static COMPS_MRTreeData *rtdata;
+    __comps_mrtree_set(rt, key, strlen(key), data);
+}
 
-    unsigned int klen, offset=0;
-    unsigned x, found = 0;
-    void *ndata;
-    char ended, tmpch;
-
-    if (rt->subnodes == NULL)
-        return;
-    if (rt->data_constructor)
-        ndata = rt->data_constructor(data);
-    else
-        ndata = data;
-
-    subnodes = rt->subnodes;
-    while (offset != len)
-    {
-        found = 0;
-        for (it = subnodes->first; it != NULL; it=it->next) {
-            if (((COMPS_MRTreeData*)it->data)->key[0] == key[offset]) {
-                found = 1;
-                break;
-            }
-        }
-        if (!found) { /* not found in subnodes; create new subnode */
-            rtd = comps_mrtree_data_create_n(rt, key+offset, len, ndata);
-            comps_hslist_append(subnodes, rtd, 0);
-            return;
-        } else {
-            rtdata = (COMPS_MRTreeData*)it->data;
-            ended = 0;
-            for (x=1; ;x++) {
-                if (rtdata->key[x] == 0) ended += 1;
-                if (x == len-offset) ended += 2;
-                if (ended != 0) break;
-                if (key[offset+x] != rtdata->key[x]) break;
-            }
-            if (ended == 3) { //keys equals; append new data
-                comps_hslist_append(rtdata->data, ndata, 0);
-                return;
-            } else if (ended == 2) { //global key ends first; make global leaf
-                comps_hslist_remove(subnodes, it);
-                it->next = NULL;
-                rtd = comps_mrtree_data_create_n(rt, key+offset, len, ndata);
-                comps_hslist_append(subnodes, rtd, 0);
-                ((COMPS_MRTreeData*)subnodes->last->data)->subnodes->last = it;
-                ((COMPS_MRTreeData*)subnodes->last->data)->subnodes->first = it;
-                klen = len-offset;
-                memmove(rtdata->key,rtdata->key+(len-offset), sizeof(char)*klen);
-                rtdata->key[len] = 0;
-                return;
-            } else if (ended == 1) { //local key ends first; go deeper
-                subnodes = rtdata->subnodes;
-                offset += x;
-            } else {
-                comps_hslist_remove(subnodes, it);
-                tmpch = rtdata->key[x];
-                rtdata->key[x] = 0;
-                rtd = comps_mrtree_data_create(rt, rtdata->key, NULL);
-                comps_hslist_append(subnodes, rtd, 0);
-
-                rtd = comps_mrtree_data_create_n(rt, key+offset+x,
-                                                 len-offset-x, ndata);
-                comps_hslist_append(
-                            ((COMPS_MRTreeData*)subnodes->last->data)->subnodes,
-                            rtd, 0);
-
-                rtdata->key[x] = tmpch;
-                it->next = NULL;
-                ((COMPS_MRTreeData*)subnodes->last->data)->subnodes->last->next = it;
-                ((COMPS_MRTreeData*)subnodes->last->data)->subnodes->last = it;
-////                printf("len: %d\n",(int)strlen(rtdata->key+x));
-                len = strlen(rtdata->key+x);
-                memmove(rtdata->key,rtdata->key+x, sizeof(char)*len);
-                rtdata->key = realloc(rtdata->key, sizeof(char)*(len+1));
-                rtdata->key[len] = 0;
-////                printf("new sub-key2: %s\n", rtdata->key);
-                return;
-            }
-        }
-    }
+void comps_mrtree_set_n(COMPS_MRTree * rt, char * key, size_t len, void * data)
+{
+    __comps_mrtree_set(rt, key, len, data);
 }
 
 COMPS_HSList * comps_mrtree_get(COMPS_MRTree * rt, const char * key) {

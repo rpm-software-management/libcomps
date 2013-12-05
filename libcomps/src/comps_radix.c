@@ -102,35 +102,6 @@ void comps_rtree_print(COMPS_HSList * hl, unsigned  deep) {
     }
 }
 
-/*COMPS_HSList * comps_rtree_values(COMPS_RTree * rt) {
-    COMPS_HSList *ret, *tmplist, *tmp_subnodes;
-    COMPS_HSListItem *it, *firstit;
-    ret = comps_hslist_create();
-    comps_hslist_init(ret, NULL, NULL, NULL);
-    tmplist = comps_hslist_create();
-    comps_hslist_init(tmplist, NULL, NULL, NULL);
-    comps_hslist_append(tmplist, rt->subnodes, 0);
-    while (tmplist->first != NULL) {
-        it = tmplist->first;
-        firstit = it;
-        comps_hslist_remove(tmplist, firstit);
-        tmp_subnodes = (COMPS_HSList*)it->data;
-        for (it = tmp_subnodes->first; it != NULL; it=it->next) {
-            if (((COMPS_RTreeData*)it->data)->subnodes->first) {
-                comps_hslist_append(tmplist,
-                                    ((COMPS_RTreeData*)it->data)->subnodes, 0);
-            }
-            if (((COMPS_RTreeData*)it->data)->data != NULL) {
-                comps_hslist_append(ret,
-                                    ((COMPS_RTreeData*)it->data)->data, 0);
-            }
-        }
-        free(firstit);
-    }
-    comps_hslist_destroy(&tmplist);
-    return ret;
-}*/
-
 COMPS_RTree * comps_rtree_clone(COMPS_RTree *rt) {
 
     COMPS_HSList *to_clone, *tmplist, *new_subnodes;
@@ -270,7 +241,6 @@ void __comps_rtree_set(COMPS_RTree * rt, char * key, size_t len, void * data)
                 rtdata->data = ndata;
                 return;
             } else if (ended == 2) { //global key ends first; make global leaf
-                printf("ended2\n");
                 comps_hslist_remove(subnodes, it);
                 it->next = NULL;
                 rtd = comps_rtree_data_create_n(rt, key+offset,

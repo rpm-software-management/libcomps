@@ -58,11 +58,12 @@ void comps_objmrtree_destroy_u(COMPS_Object * rt);
 void comps_objmrtree_copy_u(COMPS_Object *rt1, COMPS_Object *rt2);
 signed char comps_objmrtree_cmp_u(COMPS_Object *ort1, COMPS_Object *ort2);
 
-void __comps_objmrtree_set(COMPS_ObjMRTree *rt, char *key, COMPS_Object *ndata);
+void __comps_objmrtree_set(COMPS_ObjMRTree *rt, char *key,
+                           size_t len, COMPS_Object *ndata);
 void comps_objmrtree_set(COMPS_ObjMRTree * rt, char * key, COMPS_Object * ndata);
 void comps_objmrtree_set_x(COMPS_ObjMRTree *rt, char *key, COMPS_Object *data);
-void comps_objmrtree_set_n(COMPS_ObjMRTree *rt, char *key, unsigned int len,
-                        void *data);
+void comps_objmrtree_set_n(COMPS_ObjMRTree *rt, char *key, size_t len,
+                           void *ndata);
 
 COMPS_ObjList * comps_objmrtree_get(COMPS_ObjMRTree * rt, const char * key);
 
