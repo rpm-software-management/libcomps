@@ -90,6 +90,39 @@ void comps_hslist_insert_after(COMPS_HSList * hslist, COMPS_HSListItem *item,
         hslist->last = it;
     }
 }
+int comps_hslist_insert_at(COMPS_HSList * hslist, int pos,
+                               void *data, unsigned construct) {
+    COMPS_HSListItem *it, *oldit, *newit;
+    int n;
+    
+    if (hslist == NULL)
+        return 0;
+    if ((newit = malloc(sizeof(*newit))) == NULL)
+        return 0;
+    if (construct && hslist->data_constructor) {
+        newit->data = hslist->data_constructor(data);
+    } else {
+        newit->data = data;
+    }
+    oldit=NULL;
+    for (n=0, it = hslist->first; n != pos && it != NULL; n++, it = it->next) {
+        oldit = it;
+    }
+    if (n == 0 && pos == 0) {
+        newit->next = hslist->first;
+        hslist->first = newit;
+        if (hslist->last == NULL)
+            hslist->last = newit;
+    } else if (n == pos) {
+        newit->next = oldit->next;
+        oldit->next = newit;
+    } else {
+        if (hslist->data_destructor)
+            hslist->data_destructor(newit->data);
+        free(newit);
+    }
+    return 1;
+}
 
 void comps_hslist_shift(COMPS_HSList * hslist, void *data, unsigned construct) {
     COMPS_HSListItem * it;

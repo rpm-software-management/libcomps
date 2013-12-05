@@ -236,7 +236,7 @@ void comps_docpackage_set_arches(COMPS_DocGroupPackage *pkg,
 }
 
 COMPS_ValRuleGeneric* COMPS_DocGroupPackage_ValidateRules[] = {
-    &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
+    (COMPS_ValRuleGeneric*)&(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
                          .verbose_msg = "Package name check: ",
                          .get_f = (COMPS_VAL_GETF) &comps_docpackage_get_name,
                          .check_f = &comps_empty_check},

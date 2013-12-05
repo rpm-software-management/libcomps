@@ -262,6 +262,11 @@ int main(int argc, char * argv[]) {
     printf("loading acronym dict\n");
     tree = load_acrodict("dict-test.txt");
     print_all_str(tree);
+    printf("------------\n");
+    comps_rtree_destroy(tree);
+
+    tree = load_acrodict("dict-test2.txt");
+    print_all_str(tree);
     /*for (COMPS_HSListItem *it = tree->subnodes->first;
          it != NULL; it = it->next) {
         printf("%s\n", ((COMPS_RTreeData*)it->data)->key);

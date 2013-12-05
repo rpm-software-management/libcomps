@@ -382,11 +382,11 @@ COMPS_ObjectInfo COMPS_DocCategory_ObjInfo = {
 };
 
 COMPS_ValRuleGeneric* COMPS_DocCategory_ValidateRules[] = {
-    &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
+    (COMPS_ValRuleGeneric*)&(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
                          .verbose_msg = "Category id check: ",
                          .get_f = (COMPS_VAL_GETF) &comps_doccategory_get_id,
                          .check_f = &comps_empty_check},
-    &(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
+    (COMPS_ValRuleGeneric*)&(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
                          .verbose_msg = "Category unique package list check: ",
                          .offset = offsetof(COMPS_DocCategory, group_ids),
                          .check_f = &comps_objlist_unique_check},

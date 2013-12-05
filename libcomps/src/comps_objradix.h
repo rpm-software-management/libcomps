@@ -46,19 +46,17 @@ typedef struct {
     COMPS_Object *data;
 } COMPS_ObjRTreePair;
 
-COMPS_ObjRTreeData* __comps_objrtree_data_create(char *key,
-                                                  unsigned int keylen,
+COMPS_ObjRTreeData * __comps_objrtree_data_create(char *key,
+                                                  size_t keylen,
                                                   COMPS_Object *data);
 COMPS_HSList* __comps_objrtree_all(COMPS_ObjRTree *rt, char pairorkey);
 
 void comps_objrtree_data_destroy(COMPS_ObjRTreeData *rtd);
 void comps_objrtree_data_destroy_v(void *rtd);
 
-COMPS_ObjRTreeData* comps_objrtree_data_create(char *key,
-                                               COMPS_Object *data);
-COMPS_ObjRTreeData* comps_objrtree_data_create_n(char *key,
-                                                 unsigned int len,
-                                                 COMPS_Object *data);
+COMPS_ObjRTreeData * comps_objrtree_data_create(char *key, COMPS_Object *data);
+COMPS_ObjRTreeData * comps_objrtree_data_create_n(char *key, size_t keylen,
+                                                  COMPS_Object *data);
 
 
 void comps_objrtree_copy_u(COMPS_Object *rt1, COMPS_Object *rt2);
@@ -66,11 +64,12 @@ signed char comps_objrtree_cmp_u(COMPS_Object *ort1, COMPS_Object *ort2);
 void comps_objrtree_create_u(COMPS_Object *rtree, COMPS_Object **args);
 void comps_objrtree_destroy_u(COMPS_Object * rt);
 
-void __comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *data);
-void comps_objrtree_set_x(COMPS_ObjRTree *rt, char *key, COMPS_Object *data);
 void comps_objrtree_set(COMPS_ObjRTree *rt, char *key, COMPS_Object *data);
-void comps_objrtree_set_n(COMPS_ObjRTree *rt, char *key, unsigned int len,
+void comps_objrtree_set_x(COMPS_ObjRTree *rt, char *key, COMPS_Object *data);
+void comps_objrtree_set_n(COMPS_ObjRTree *rt, char *key, size_t len,
                           COMPS_Object *data);
+void comps_objrtree_set_nx(COMPS_ObjRTree *rt, char *key, size_t len,
+                           COMPS_Object *data);
 
 COMPS_Object* comps_objrtree_get(COMPS_ObjRTree * rt, const char * key);
 COMPS_Object* comps_objrtree_get_x(COMPS_ObjRTree * rt, const char * key);

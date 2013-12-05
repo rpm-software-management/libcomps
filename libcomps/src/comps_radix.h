@@ -55,8 +55,7 @@ void comps_rtree_data_destroy_v(void * rtd);
 COMPS_RTreeData * comps_rtree_data_create(COMPS_RTree *rt, char * key,
                                           void * data);
 COMPS_RTreeData * comps_rtree_data_create_n(COMPS_RTree *rt, char * key,
-                                            unsigned int len,
-                                            void * data);
+                                            size_t keylen, void * data);
 
 COMPS_RTree * comps_rtree_create(void* (*data_constructor)(void*),
                                  void* (*data_cloner)(void*),
@@ -64,8 +63,8 @@ COMPS_RTree * comps_rtree_create(void* (*data_constructor)(void*),
 void comps_rtree_destroy(COMPS_RTree * rt);
 
 void comps_rtree_set(COMPS_RTree *rt, char *key, void *data);
-void comps_rtree_set_n(COMPS_RTree *rt, char *key, unsigned int len,
-                       void *data);
+void comps_rtree_set_n(COMPS_RTree * rt, char * key,
+                       size_t keylen, void * data);
 
 void* comps_rtree_get(COMPS_RTree * rt, const char * key);
 void comps_rtree_unset(COMPS_RTree * rt, const char * key);

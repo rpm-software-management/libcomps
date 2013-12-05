@@ -221,6 +221,10 @@ char* comps2xml_str(COMPS_Doc *doc, COMPS_XMLOptions *xml_options,
     if (!def_options)
         def_options = &COMPS_DDefaultsOptions;
     genret = comps_doc_xml(doc, writer, xml_options, def_options);
+    if (genret)
+        comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
+    if (retc<0)
+        comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
     retc = xmlTextWriterEndDocument(writer);
     if (retc<0) comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
     xmlSaveFormatFileTo(xmlobuff, xmldoc, NULL, 1);
@@ -745,15 +749,15 @@ COMPS_ValGenResult* comps_docenvs_validate(COMPS_Object *object,
 }
 
 COMPS_ValRuleGeneric* COMPS_Doc_ValidateRules[] = {
-    &(COMPS_ValRuleList2){COMPS_VAL_RULE_LIST2,
+    (COMPS_ValRuleGeneric*)&(COMPS_ValRuleList2){COMPS_VAL_RULE_LIST2,
                          .verbose_msg = "Groups check:",
                          .get_f = (COMPS_Object*(*)(COMPS_Object*))comps_doc_groups,
                          .check_f = &comps_docgroups_validate},
-    &(COMPS_ValRuleList2){COMPS_VAL_RULE_LIST2,
+    (COMPS_ValRuleGeneric*)&(COMPS_ValRuleList2){COMPS_VAL_RULE_LIST2,
                          .verbose_msg = "Categories check:",
                          .get_f = (COMPS_Object*(*)(COMPS_Object*))comps_doc_categories,
                          .check_f = &comps_doccategories_validate},
-    &(COMPS_ValRuleList2){COMPS_VAL_RULE_LIST2,
+    (COMPS_ValRuleGeneric*)&(COMPS_ValRuleList2){COMPS_VAL_RULE_LIST2,
                          .verbose_msg = "Environments check:",
                          .get_f = (COMPS_Object*(*)(COMPS_Object*))
                                                    comps_doc_environments,

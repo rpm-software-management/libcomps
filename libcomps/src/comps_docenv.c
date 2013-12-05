@@ -369,20 +369,8 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
         COMPS_XMLRET_CHECK
         for (it = env->group_list->first; it != NULL; it = it->next) {
-            ret = xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
-            COMPS_XMLRET_CHECK
-            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
-                ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
-                                                          BAD_CAST "true");
-                COMPS_XMLRET_CHECK
-            }
-            str = comps_object_tostr((COMPS_Object*)
-                                     ((COMPS_DocGroupId*)it->comps_obj)->name);
-            ret = xmlTextWriterWriteString(writer, BAD_CAST str);
-            COMPS_XMLRET_CHECK
-            free(str);
-            ret = xmlTextWriterEndElement(writer);
-            COMPS_XMLRET_CHECK
+            comps_docgroupid_xml((COMPS_DocGroupId*)(COMPS_DocGroupId*)it->comps_obj,
+                                 writer, log, xml_options, def_options);
         }
         ret = xmlTextWriterEndElement(writer);
         COMPS_XMLRET_CHECK
@@ -392,20 +380,8 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"optionlist");
         COMPS_XMLRET_CHECK
         for (it = env->option_list->first; it != NULL; it = it->next) {
-            ret = xmlTextWriterStartElement(writer, (xmlChar*)"groupid");
-            COMPS_XMLRET_CHECK
-            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
-                ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
-                                                          BAD_CAST "true");
-                COMPS_XMLRET_CHECK
-            }
-            str = comps_object_tostr((COMPS_Object*)
-                                     ((COMPS_DocGroupId*)it->comps_obj)->name);
-            ret = xmlTextWriterWriteString(writer, BAD_CAST str);
-            COMPS_XMLRET_CHECK
-            free(str);
-            ret = xmlTextWriterEndElement(writer);
-            COMPS_XMLRET_CHECK
+            comps_docgroupid_xml((COMPS_DocGroupId*)(COMPS_DocGroupId*)it->comps_obj,
+                                 writer, log, xml_options, def_options);
         }
         ret = xmlTextWriterEndElement(writer);
         COMPS_XMLRET_CHECK
@@ -507,15 +483,15 @@ COMPS_ObjectInfo COMPS_DocEnv_ObjInfo = {
 };
 
 COMPS_ValRuleGeneric* COMPS_DocEnv_ValidateRules[] = {
-    &(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
+    (COMPS_ValRuleGeneric*)&(COMPS_ValRuleProp){COMPS_VAL_RULE_PROP,
                          .get_f = (COMPS_VAL_GETF)&comps_docenv_get_id_obj,
                          .check_f = &comps_empty_check,
                          .verbose_msg = "Environment id check: "},
-    &(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
+    (COMPS_ValRuleGeneric*)&(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
                          .offset = offsetof(COMPS_DocEnv, group_list),
                          .check_f = &comps_objlist_unique_check,
                          .verbose_msg = "Environment unique group list check: "},
-    &(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
+    (COMPS_ValRuleGeneric*)&(COMPS_ValRuleList){COMPS_VAL_RULE_LIST,
                          .offset = offsetof(COMPS_DocEnv, option_list),
                          .check_f = &comps_objlist_unique_check,
                          .verbose_msg = "Environment unique option list check: "},

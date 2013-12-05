@@ -115,3 +115,10 @@ char* __comps_strcpy(char *str) {
     ret = malloc(sizeof(char)*(strlen(str)+1));
     return memcpy(ret, str, sizeof(char)*(strlen(str)+1));
 }
+
+char* __comps_strcat(char *str1, char *str2) {
+    char *ret;
+    ret = malloc(sizeof(char)*(strlen(str1)+strlen(str2)+1));
+    memcpy(ret, str1, sizeof(char)*(strlen(str1)+1));
+    strcat(ret, str2);
+}
