@@ -162,9 +162,9 @@ char __comps_docgroup_idcmp(void *g1, void *g2) {
     char ret;
     obj1 = comps_objdict_get(((COMPS_DocGroup*)g1)->properties, "id");
     obj2 = comps_objdict_get(((COMPS_DocGroup*)g2)->properties, "id");
+    ret = comps_object_cmp(obj1, obj2);
     COMPS_OBJECT_DESTROY(obj1);
     COMPS_OBJECT_DESTROY(obj2);
-    ret = comps_object_cmp(obj1, obj2);
     return ret;
 }
 
@@ -284,7 +284,8 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                               0, 0, 0};
     static char* aliases[] = {NULL, NULL, NULL, "description", "description",
                               "default", NULL, NULL, NULL};
-    static bool explicit[] = {true, true, true, true, true, false, false, true};
+    static bool explicit[] = {true, true, true, true, true, false, false,
+                              true, true};
     const char *str_true = "true";
     const char *str_false = "false";
     const char *default_val[] = {NULL, NULL, NULL, NULL, NULL,

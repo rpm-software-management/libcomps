@@ -181,7 +181,7 @@ char __comps_strcmp(void *s1, void *s2);
 char* __comps_strcpy(char *str);
 char* __comps_strcat(char *str1, char *str2);
 void* __comps_str_clone(void *str);
-void __comps_xml_prop(char *key, char *val, xmlTextWriterPtr writer);
+int __comps_xml_prop(char *key, char *val, xmlTextWriterPtr writer);
 char* __comps_num2boolstr(COMPS_Object* obj);
 unsigned int digits_count(unsigned int x);
 bool __comps_objlist_intersected(COMPS_ObjList *list1, COMPS_ObjList *list2);

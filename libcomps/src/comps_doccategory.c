@@ -120,9 +120,9 @@ char __comps_doccategory_idcmp(void *c1, void *c2) {
     char ret;
     obj1 = comps_objdict_get(((COMPS_DocCategory*)c1)->properties, "id");
     obj2 = comps_objdict_get(((COMPS_DocCategory*)c2)->properties, "id");
+    ret = comps_object_cmp(obj1, obj2);
     COMPS_OBJECT_DESTROY(obj1);
     COMPS_OBJECT_DESTROY(obj2);
-    ret = comps_object_cmp(obj1, obj2);
     return ret;
 }
 

@@ -223,7 +223,7 @@ signed char comps_parse_str(COMPS_Parsed *parsed, char *str,
 void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
     //COMPS_ListItem * item;
     char * alltext = NULL;
-    size_t item_len;
+    //size_t item_len;
     int index=0;
     void *data;
     #define parser_line XML_GetCurrentLineNumber(((COMPS_Parsed*)userData)->parser)
@@ -241,7 +241,7 @@ void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
         alltext[0]=0;
     }
     while ((data = comps_hslist_shift(parsed->text_buffer)) != NULL) {
-        item_len = strlen((char*)data);
+        //item_len = strlen((char*)data);
         alltext = strcat(alltext, data);
         free(data);
         //index += item_len;

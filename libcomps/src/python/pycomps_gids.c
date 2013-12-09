@@ -151,7 +151,8 @@ COMPS_DocGroupId* comps_gid_from_str(PyObject *other) {
     char *name;
     gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo,
                                                  NULL);
-    __pycomps_stringable_to_char(other, &name);
+    if (__pycomps_stringable_to_char(other, &name))
+        return NULL;
     gid->name = comps_str_x(name);
     if (!gid->name) {
         COMPS_OBJECT_DESTROY(gid);

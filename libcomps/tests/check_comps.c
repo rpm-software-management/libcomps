@@ -267,7 +267,7 @@ START_TEST(test_comps_doc_setfeats)
     COMPS_ObjList *list;
 
     str = comps_str("UTF-8");
-    doc = (COMPS_DocGroup*)comps_object_create(&COMPS_Doc_ObjInfo,
+    doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
                                 (COMPS_Object*[]){(COMPS_Object*)str});
     COMPS_OBJECT_DESTROY(str);
     for (int i=0; i<4; i++) {
@@ -318,7 +318,7 @@ START_TEST(test_comps_doc_setfeats)
     }
 
     str = comps_str("UTF-8");
-    doc2 = (COMPS_DocGroup*)comps_object_create(&COMPS_Doc_ObjInfo,
+    doc2 = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
                                 (COMPS_Object*[]){(COMPS_Object*)str});
     COMPS_OBJECT_DESTROY(str);
     for (int i=0; i<4; i++) {
@@ -394,7 +394,7 @@ START_TEST(test_comps_doc_setfeats)
     c2 = (COMPS_DocCategory*)list->first->next->comps_obj;
 
     c = comps_doccategory_union(c1, c2);
-    print_category(c);
+    //print_category(c);
     fail_if(c->group_ids->len != 4, "Union of (c1 v c2) should have 4 "
             "group ids, have %d", c->group_ids->len);
     COMPS_OBJECT_DESTROY(c);
@@ -509,7 +509,7 @@ START_TEST(test_comps_doc_xml)
     COMPS_Str *str;
     str = comps_str("UTF-8");
     doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
-                                          (COMPS_Object*[]){str});
+                                          (COMPS_Object*[]){(COMPS_Object*)str});
     COMPS_OBJECT_DESTROY(str);
     for (int i=0; i<2; i++) {
         g = (COMPS_DocGroup*)comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);

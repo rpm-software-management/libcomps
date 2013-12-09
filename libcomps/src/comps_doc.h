@@ -136,8 +136,8 @@
         comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)ret);\
     } else {\
     }\
-    COMPS_OBJECT_DESTROY(ret);\
     comps_objlist_append_x(ret, (COMPS_Object*)obj);\
+    COMPS_OBJECT_DESTROY(ret);\
 }
 /** <@hideinititalizer */
 #define HEAD_COMPS_DOC_ADDOBJLIST(OBJNAME, OBJTYPE) void CONCAT(comps_doc_add_,\

@@ -72,6 +72,7 @@ COMPS_ObjRTree * load_acrodict(char *filename) {
             printf("%s\n", ((COMPS_RTreeData*)it->data)->key);
   gtgt      }*/
     }
+    fclose(f);
     return rt;
 }
 

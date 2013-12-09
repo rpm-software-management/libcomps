@@ -334,7 +334,7 @@ void __comps_mrtree_set(COMPS_MRTree * rt, char * key, size_t len, void * data)
     size_t _len, offset=0;
     unsigned x, found = 0;
     void *ndata;
-    char ended, tmpch;
+    char ended;//, tmpch;
 
     if (rt->subnodes == NULL)
         return;

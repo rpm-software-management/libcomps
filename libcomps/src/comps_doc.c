@@ -566,7 +566,7 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
     dict = comps_doc_langpacks(doc);
     if (dict && dict->len) {
         retc = xmlTextWriterStartElement(writer, BAD_CAST "langpacks");
-        __comps_check_xml_get(retc, doc->log);
+        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
         hslist = comps_objrtree_pairs(dict);
 
         for (hsit = hslist->first; hsit != NULL; hsit = hsit->next) {
@@ -622,7 +622,7 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
     mdict = comps_doc_whiteout(doc);
     if (mdict && mdict->len) {
         retc = xmlTextWriterStartElement(writer, BAD_CAST "whiteout");
-        __comps_check_xml_get(retc, doc->log);
+        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
         hslist = comps_objmrtree_pairs(mdict);
 
         for (hsit = hslist->first; hsit != NULL; hsit = hsit->next) {

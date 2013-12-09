@@ -199,7 +199,7 @@ PyObject* PyCOMPSMDict_cmp(PyObject *self, PyObject *other, int op) {
         if (op == Py_EQ) Py_RETURN_TRUE;
         else Py_RETURN_FALSE;
     }
-    else if (hsit !=NULL || hsit2 != NULL) {
+    else {
         comps_hslist_destroy(&pairlist);
         comps_hslist_destroy(&pairlist2);
         if (op == Py_EQ) Py_RETURN_FALSE;

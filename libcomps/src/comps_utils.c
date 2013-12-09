@@ -36,11 +36,13 @@ inline char __comps_strcmp(void *s1, void *s2) {
     return (strcmp((const char*)s1, (const char*)s2) == 0);
 }
 
-inline void __comps_xml_prop(char *key, char *val,
+inline int __comps_xml_prop(char *key, char *val,
                              xmlTextWriterPtr writer) {
-    xmlTextWriterStartElement(writer, BAD_CAST key);
-    xmlTextWriterWriteString(writer, BAD_CAST val);
-    xmlTextWriterEndElement(writer);
+    int retc, x;
+    retc = (x=xmlTextWriterStartElement(writer, BAD_CAST key)<0)?x:retc;
+    retc = (x=xmlTextWriterWriteString(writer, BAD_CAST val)<0)?x:retc;
+    retc = (x=xmlTextWriterEndElement(writer)<0)?x:retc;
+    return retc;
 }
 
 char* __comps_num2boolstr(COMPS_Object* obj) {
@@ -121,4 +123,5 @@ char* __comps_strcat(char *str1, char *str2) {
     ret = malloc(sizeof(char)*(strlen(str1)+strlen(str2)+1));
     memcpy(ret, str1, sizeof(char)*(strlen(str1)+1));
     strcat(ret, str2);
+    return ret;
 }

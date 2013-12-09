@@ -45,7 +45,7 @@ void print_all_str(COMPS_RTree *rt) {
 START_TEST(test_comps_parse1)
 {
     FILE *fp;
-    char *err_log;
+    //char *err_log;
     COMPS_Parsed *parsed;
 
     const char *groups_ids[] = {"additional-devel", "backup-client", "backup-server"};
@@ -626,14 +626,14 @@ Suite* basic_suite (void)
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
     tcase_add_test (tc_core, test_comps_parse1);
-    //tcase_add_test (tc_core, test_comps_parse2);
-    //tcase_add_test (tc_core, test_comps_parse3);
-    //tcase_add_test (tc_core, test_comps_parse4);
-    //tcase_add_test (tc_core, test_comps_parse5);
-    //tcase_add_test (tc_core, test_comps_fedora_parse);
+    tcase_add_test (tc_core, test_comps_parse2);
+    tcase_add_test (tc_core, test_comps_parse3);
+    tcase_add_test (tc_core, test_comps_parse4);
+    tcase_add_test (tc_core, test_comps_parse5);
+    tcase_add_test (tc_core, test_comps_fedora_parse);
 
-    //tcase_add_test (tc_core, test_main2);
-    //tcase_add_test (tc_core, test_arch);
+    tcase_add_test (tc_core, test_main2);
+    tcase_add_test (tc_core, test_arch);
 
     tcase_set_timeout(tc_core, 15);
     suite_add_tcase (s, tc_core);

@@ -111,7 +111,8 @@ signed char comps_num_cmp_u(COMPS_Object *num1, COMPS_Object *num2) {
 
 void comps_str_create_u(COMPS_Object* str, COMPS_Object **args){
     if (args && args[0]->obj_info == &COMPS_Str_ObjInfo) {
-        ((COMPS_Str*)str)->val = malloc(sizeof(char) * (strlen(((COMPS_Str*)args[0])->val)+1));
+        ((COMPS_Str*)str)->val = malloc(sizeof(char) *
+                                        (strlen(((COMPS_Str*)args[0])->val)+1));
         strcpy(((COMPS_Str*)str)->val, ((COMPS_Str*)args[0])->val);
     }
 }

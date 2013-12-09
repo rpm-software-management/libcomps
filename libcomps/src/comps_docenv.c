@@ -145,9 +145,9 @@ char __comps_docenv_idcmp(void *e1, void *e2) {
     char ret;
     obj1 = comps_objdict_get(((COMPS_DocEnv*)e1)->properties, "id");
     obj2 = comps_objdict_get(((COMPS_DocEnv*)e2)->properties, "id");
+    ret = comps_object_cmp(obj1, obj2);
     COMPS_OBJECT_DESTROY(obj1);
     COMPS_OBJECT_DESTROY(obj2);
-    ret = comps_object_cmp(obj1, obj2);
     return ret;
 }
 
@@ -316,7 +316,7 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     char *str;
     int ret;
 
-    if (env->group_list->len == 0 && env->group_list->len == 0 &&
+    if (env->group_list->len == 0 && env->option_list->len == 0 &&
         !xml_options->empty_environments) {
         obj = comps_docenv_get_id(env);
         comps_log_error(log, COMPS_ERR_PKGLIST_EMPTY, 1, obj);
