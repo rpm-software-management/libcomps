@@ -36,12 +36,6 @@
 #define CONCAT(A,B) CONCAT2(A, B)
 #define CONCAT2(A, B) A ## B
 
-#define COMPS_DOCLIST_PREP(OBJ, LIST)\
-    if (OBJ->LIST == NULL) {\
-        OBJ->LIST = comps_list_create();\
-        comps_list_init(OBJ->LIST);\
-    }
-
 #define COMPS_PROP_CMP(OBJNAME, PROPNAME, GETTER)\
 char CONCAT(CONCAT(CONCAT(CONCAT(__comps_, OBJNAME),_),PROPNAME),cmp) (void *obj1,\
                                                                        void *obj2){\

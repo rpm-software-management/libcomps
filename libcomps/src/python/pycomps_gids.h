@@ -24,7 +24,7 @@
 #include "structmember.h"
 
 #include "libcomps/comps_doc.h"
-#include "libcomps/comps_list.h"
+//#include "libcomps/comps_list.h"
 #include "libcomps/comps_docgroupid.h"
 
 #include "pycomps_types.h"

@@ -22,7 +22,7 @@
 
 #include <Python.h>
 #include "libcomps/comps_doc.h"
-#include "libcomps/comps_list.h"
+//#include "libcomps/comps_list.h"
 #include "structmember.h"
 #include "pycomps_sequence.h"
 #include "pycomps_utils.h"

@@ -206,12 +206,7 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
     comps_hslist_destroy(&pairs2);
     comps_set_clear(set);
 
-    //set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_docgroupid_cmp_set);
-
-    //res->group_ids = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
-    //                                                     NULL);
-    //comps_list_init(res->group_ids);
 
     for (it = c1->group_ids->first; it != NULL; it = it->next) {
         comps_set_add(set, it->comps_obj);

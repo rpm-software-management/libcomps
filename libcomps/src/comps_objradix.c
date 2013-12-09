@@ -307,7 +307,7 @@ void __comps_objrtree_set(COMPS_ObjRTree *rt, char *key, size_t len,
         if (!found) { // not found in subnodes; create new subnode
             rtd = comps_objrtree_data_create_n(key+offset, len-offset, ndata);
             if (!lesser) {
-                comps_hslist_shift(subnodes, rtd, 0);
+                comps_hslist_prepend(subnodes, rtd, 0);
             } else {
                 comps_hslist_insert_after(subnodes, lesser, rtd, 0);
             }

@@ -269,7 +269,6 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     }
     //res->group_list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
     //                                                      NULL);
-    //comps_list_init(res->group_list);
     for (hsit = set2->data->first; hsit!= NULL; hsit = hsit->next) {
         comps_docenv_add_groupid(res,
                               (COMPS_DocGroupId*)comps_object_copy(hsit->data));

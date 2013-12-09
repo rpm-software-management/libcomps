@@ -1,5 +1,5 @@
-set (testlist_SOURCE check_list.c check_utils.c)
-set (testlist_HEADERS check_list.h check_utils.h)
+#set (testlist_SOURCE check_list.c check_utils.c)
+#set (testlist_HEADERS check_list.h check_utils.h)
 
 set (testobjrtree_SOURCE check_objrtree.c check_utils.c)
 set (testobjrtree_HEADERS check_objrtree.h check_utils.h)
@@ -17,7 +17,7 @@ set (testcomps_SOURCE check_comps.c)
 
 set (testvalidate_SOURCE check_validate.c)
 
-add_executable(test_list ${testlist_SOURCE})
+#add_executable(test_list ${testlist_SOURCE})
 add_executable(test_rtree ${testrtree_SOURCE})
 add_executable(test_objrtree ${testobjrtree_SOURCE})
 add_executable(test_brtree ${testbrtree_SOURCE})
@@ -26,8 +26,8 @@ add_executable(test_parse ${testparse_SOURCE})
 add_executable(test_comps ${testcomps_SOURCE})
 add_executable(test_validate ${testvalidate_SOURCE})
 
-target_link_libraries(test_list libcomps)
-target_link_libraries(test_list ${CHECK_LIBRARY})
+#target_link_libraries(test_list libcomps)
+#target_link_libraries(test_list ${CHECK_LIBRARY})
 
 target_link_libraries(test_brtree libcomps)
 target_link_libraries(test_brtree ${CHECK_LIBRARY})

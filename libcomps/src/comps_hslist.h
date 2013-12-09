@@ -53,7 +53,9 @@ void comps_hslist_insert_after(COMPS_HSList * hslist, COMPS_HSListItem *item,
                                void *data, unsigned construct);
 int comps_hslist_insert_at(COMPS_HSList * hslist, int pos,
                                void *data, unsigned construct);
-void comps_hslist_shift(COMPS_HSList * hslist, void *data, unsigned construct);
+void comps_hslist_prepend(COMPS_HSList * hslist, void *data, unsigned construct);
+void* comps_hslist_shift(COMPS_HSList * hslist);
+void* comps_hslist_pop(COMPS_HSList * hslist);
 
 COMPS_HSList* comps_hslist_clone(COMPS_HSList * hslist);
 void comps_hslist_clear(COMPS_HSList * hslist);

@@ -57,8 +57,8 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
     XML_SetCharacterDataHandler(parsed->parser, &comps_parse_char_data_handler);
 
     parsed->enc = encoding;
-    parsed->elem_stack = comps_list_create();
-    parsed->text_buffer = comps_list_create();
+    parsed->elem_stack = comps_hslist_create();
+    parsed->text_buffer = comps_hslist_create();
     parsed->text_buffer_len = 0;
     parsed->text_buffer_pt = NULL;
     parsed->tmp_buffer = NULL;
@@ -68,15 +68,15 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
     parsed->fatal_error = 0;
     if (parsed->elem_stack == NULL || parsed->text_buffer == NULL) {
         if (!parsed->elem_stack)
-            comps_list_destroy(&parsed->elem_stack);
+            comps_hslist_destroy(&parsed->elem_stack);
         if (!parsed->text_buffer)
-            comps_list_destroy(&parsed->text_buffer);
+            comps_hslist_destroy(&parsed->text_buffer);
         COMPS_OBJECT_DESTROY(parsed->log);
         free(parsed);
         return 0;
     }
-    comps_list_init(parsed->elem_stack);
-    comps_list_init(parsed->text_buffer);
+    comps_hslist_init(parsed->elem_stack, NULL, NULL, &comps_elem_destroy);
+    comps_hslist_init(parsed->text_buffer, NULL, NULL, &free);
     XML_SetUserData(parsed->parser, parsed);
     return 1;
 }
@@ -89,16 +89,16 @@ void comps_parse_parsed_reinit(COMPS_Parsed *parsed) {
                                           &comps_parse_end_elem_handler);
     XML_SetCharacterDataHandler(parsed->parser, &comps_parse_char_data_handler);
     XML_SetUserData(parsed->parser, parsed);
-    comps_list_clear(parsed->elem_stack);
-    comps_list_clear(parsed->text_buffer);
+    comps_hslist_clear(parsed->elem_stack);
+    comps_hslist_clear(parsed->text_buffer);
     comps_hslist_clear(parsed->log->entries);
     COMPS_OBJECT_DESTROY(parsed->comps_doc);
     //comps_doc_destroy(&parsed->comps_doc);
 }
 
 void comps_parse_parsed_destroy(COMPS_Parsed *parsed) {
-    comps_list_destroy(&parsed->elem_stack);
-    comps_list_destroy(&parsed->text_buffer);
+    comps_hslist_destroy(&parsed->elem_stack);
+    comps_hslist_destroy(&parsed->text_buffer);
     COMPS_OBJECT_DESTROY(parsed->log);
     //if (parsed->log)
     //    comps_log_destroy(parsed->log);
@@ -221,10 +221,11 @@ signed char comps_parse_str(COMPS_Parsed *parsed, char *str,
 }
 
 void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
-    COMPS_ListItem * item;
+    //COMPS_ListItem * item;
     char * alltext = NULL;
     size_t item_len;
     int index=0;
+    void *data;
     #define parser_line XML_GetCurrentLineNumber(((COMPS_Parsed*)userData)->parser)
     #define parser_col XML_GetCurrentColumnNumber(((COMPS_Parsed*)userData)->parser)
     #define parsed ((COMPS_Parsed*)userData)
@@ -237,12 +238,13 @@ void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
             comps_log_error(parsed->log, COMPS_ERR_MALLOC, 0);
             raise(SIGABRT);
         }
+        alltext[0]=0;
     }
-    while ((item = comps_list_shift(parsed->text_buffer)) != NULL) {
-        item_len = strlen((char*)item->data);
-        memcpy(alltext + index, item->data, item_len * sizeof(char));
-        comps_list_item_destroy(item);
-        index += item_len;
+    while ((data = comps_hslist_shift(parsed->text_buffer)) != NULL) {
+        item_len = strlen((char*)data);
+        alltext = strcat(alltext, data);
+        free(data);
+        //index += item_len;
     }
     /* set zero char at the end of string */
     if (alltext)
@@ -261,8 +263,8 @@ void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
                               comps_num(parser_col));
         }
         /* finaly, remove element from element stack */
-        item = comps_list_pop(parsed->elem_stack);
-        comps_list_item_destroy(item);
+        data = comps_hslist_pop(parsed->elem_stack);
+        comps_elem_destroy(data);
     }
     free(alltext);
     parsed->text_buffer_len = 0;
@@ -288,7 +290,6 @@ void comps_parse_start_elem_handler(void *userData,
 
     COMPS_Elem * elem = NULL;
     COMPS_ElemType type;
-    COMPS_ListItem * item;
 
     /* create new element */
     type = comps_elem_get_type(s);
@@ -321,20 +322,18 @@ void comps_parse_start_elem_handler(void *userData,
                           comps_num(parser_line),
                           comps_num(parser_col));
     }
-
-    item = comps_list_item_create(elem, NULL, &comps_elem_destroy);
     if (((COMPS_Parsed*)userData)->text_buffer->first) {
         comps_log_error_x(((COMPS_Parsed*)userData)->log,
                           COMPS_ERR_TEXT_BETWEEN, 3,
                           comps_str((char*)((COMPS_Parsed*)userData)
                                          ->text_buffer->first->data),
                           comps_num(parser_line), comps_num(parser_col));
-        comps_list_clear(((COMPS_Parsed*)userData)->text_buffer);
+        comps_hslist_clear(((COMPS_Parsed*)userData)->text_buffer);
         ((COMPS_Parsed*)userData)->text_buffer_len = 0;
     }
 
     /* end append it to element stack */
-    comps_list_append(((COMPS_Parsed*)userData)->elem_stack, item);
+    comps_hslist_append(((COMPS_Parsed*)userData)->elem_stack, elem, 0);
     if (ELEMINFO->attributes) {
        comps_parse_check_attributes(((COMPS_Parsed*)userData), elem);
     }
@@ -360,7 +359,7 @@ void comps_parse_char_data_handler(void *userData,
                             int len) {
 
     char * c = NULL;
-    COMPS_ListItem * it;
+    //COMPS_ListItem * it;
 
     /* skip whitespace data */
     if (__comps_is_whitespace_only(s, len)) {
@@ -379,8 +378,7 @@ void comps_parse_char_data_handler(void *userData,
     /* and increment total lenght of strings in text_buffer */
     ((COMPS_Parsed*)userData)->text_buffer_len += len;
 
-    it = comps_list_item_create((void*)c, NULL, &free);
-        comps_list_append(((COMPS_Parsed*)userData)->text_buffer, it);
+    comps_hslist_append(((COMPS_Parsed*)userData)->text_buffer, c, 0);
 
 }
 

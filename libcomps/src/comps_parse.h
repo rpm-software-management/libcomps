@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <signal.h>
 
-#include "comps_list.h"
+#include "comps_hslist.h"
 #include "comps_obj.h"
 #include "comps_doc.h"
 #include "comps_types.h"
@@ -33,9 +33,9 @@
 #include <libxml/parser.h>
 
 typedef struct COMPS_Parsed {
-    COMPS_List *elem_stack;
+    COMPS_HSList *elem_stack;
     COMPS_Doc *comps_doc;
-    COMPS_List *text_buffer;
+    COMPS_HSList *text_buffer;
     unsigned int text_buffer_len;
     char **text_buffer_pt;
     char *tmp_buffer;
@@ -63,15 +63,12 @@ void comps_parse_char_data_handler(void *userData,
                             const XML_Char *s,
                             int len);
 
-//void comps_parse_el_preprocess(COMPS_Elem *elem, COMPS_Parsed *parsed);
-//void comps_parse_el_postprocess(const char *s, COMPS_Parsed *parsed);
-
 signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f,
                              COMPS_DefaultsOptions *options);
 signed char comps_parse_str(COMPS_Parsed *parsed, char *str,
                             COMPS_DefaultsOptions *options);
 
-unsigned comps_parse_init_parser(XML_Parser *p);//, COMPS_DTDRuleList * rules);
+unsigned comps_parse_init_parser(XML_Parser *p);
 void comps_parse_parsed_destroy(COMPS_Parsed *parsed);
 int comps_parse_validate_dtd(char *filename, char *dtd_file);
 

@@ -322,8 +322,6 @@ void __comps_objmrtree_set(COMPS_ObjMRTree *rt, char *key,
     unsigned x, found = 0;
     char ended;//, tmpch;
 
-    //len = strlen(key);
-
     if (rt->subnodes == NULL)
         return;
 

@@ -46,18 +46,16 @@ void comps_hslist_init(COMPS_HSList * hslist,
 
 void comps_hslist_append(COMPS_HSList * hslist, void * data, unsigned construct) {
     COMPS_HSListItem * it;
-    void * ndata;
 
     if (hslist == NULL)
         return;
     if ((it = malloc(sizeof(*it))) == NULL)
         return;
     if (construct && hslist->data_constructor) {
-        ndata = hslist->data_constructor(data);
+        it->data = hslist->data_constructor(data);
     } else {
-        ndata = data;
+        it->data = data;
     }
-    it->data = ndata;
     it->next = NULL;
     if (hslist->last == NULL) {
         hslist->last = it;
@@ -124,7 +122,7 @@ int comps_hslist_insert_at(COMPS_HSList * hslist, int pos,
     return 1;
 }
 
-void comps_hslist_shift(COMPS_HSList * hslist, void *data, unsigned construct) {
+void comps_hslist_prepend(COMPS_HSList * hslist, void *data, unsigned construct) {
     COMPS_HSListItem * it;
     void * ndata;
 
@@ -140,6 +138,44 @@ void comps_hslist_shift(COMPS_HSList * hslist, void *data, unsigned construct) {
     it->data = ndata;
     it->next = hslist->first;
     hslist->first = it;
+}
+
+void* comps_hslist_shift(COMPS_HSList * hslist) {
+    void * data;
+    COMPS_HSListItem *it;
+
+    if (hslist == NULL || hslist->first == NULL) {
+        //printf("ret null %p\n", hslist->first);
+        return NULL;
+    }
+    it = hslist->first;
+    data = hslist->first->data;
+    hslist->first = hslist->first->next;
+    if (hslist->first == NULL)
+        hslist->last=NULL;
+    free(it);
+    return data;
+}
+
+void* comps_hslist_pop(COMPS_HSList * hslist) {
+    void * data;
+    COMPS_HSListItem *it, *it2;
+
+    if (hslist == NULL || hslist->first == NULL)
+        return NULL;
+    it2 = NULL;
+    for (it = hslist->first; it != hslist->last; it2=it, it = it->next);
+
+    if (!it2) {
+        hslist->last = NULL;
+        hslist->first = NULL;
+    } else {
+        hslist->last = it2;
+        it2->next = NULL;
+    }
+    data = it->data;
+    free(it);
+    return data;
 }
 
 inline void comps_hslist_destroy_v(void ** hslist) {

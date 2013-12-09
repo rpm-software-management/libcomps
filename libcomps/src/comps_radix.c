@@ -196,7 +196,7 @@ void __comps_rtree_set(COMPS_RTree * rt, char * key, size_t len, void * data)
     size_t offset=0, _len;
     unsigned x, found = 0;
     void *ndata;
-    char ended, tmpch;
+    char ended;//, tmpch;
 
     if (rt->subnodes == NULL)
         return;
@@ -222,7 +222,7 @@ void __comps_rtree_set(COMPS_RTree * rt, char * key, size_t len, void * data)
         if (!found) { // not found in subnodes; create new subnode
             rtd = comps_rtree_data_create(rt, key+offset, ndata);
             if (!lesser) {
-                comps_hslist_shift(subnodes, rtd, 0);
+                comps_hslist_prepend(subnodes, rtd, 0);
             } else {
                 comps_hslist_insert_after(subnodes, lesser, rtd, 0);
             }
