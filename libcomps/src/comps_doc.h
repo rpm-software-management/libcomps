@@ -23,7 +23,6 @@
 #include "comps_obj.h"
 #include "comps_objdict.h"
 #include "comps_objlist.h"
-#include "comps_utils.h"
 #include "comps_log.h"
 #include "comps_types.h"
 #include "comps_docgroup.h"

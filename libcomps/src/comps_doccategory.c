@@ -251,8 +251,8 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
         ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
                                           BAD_CAST str);
         free(str);
-        COMPS_XMLRET_CHECK
         COMPS_OBJECT_DESTROY(obj);
+        COMPS_XMLRET_CHECK
     }
     for (int i=0; i<6; i++) {
         if (!type[i]) {
@@ -270,16 +270,28 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
             for (hsit = pairlist->first; hsit != NULL; hsit = hsit->next) {
                 ret = xmlTextWriterStartElement(writer,
                             (const xmlChar*)(aliases[i]?aliases[i]:props[i]));
-                COMPS_XMLRET_CHECK
+                if (__comps_check_xml_get(ret, (COMPS_Object*)log) < 0) {
+                    comps_hslist_destroy(&pairlist);
+                    return -1;
+                }
                 ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "xml:lang",
                         (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
-                COMPS_XMLRET_CHECK
+                if (__comps_check_xml_get(ret, (COMPS_Object*)log) < 0) {
+                    comps_hslist_destroy(&pairlist);
+                    return -1;
+                }
                 str = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
                 ret = xmlTextWriterWriteString(writer, (xmlChar*)str);
-                COMPS_XMLRET_CHECK
                 free(str);
+                if (__comps_check_xml_get(ret, (COMPS_Object*)log) < 0) {
+                    comps_hslist_destroy(&pairlist);
+                    return -1;
+                }
                 ret = xmlTextWriterEndElement(writer);
-                COMPS_XMLRET_CHECK
+                if (__comps_check_xml_get(ret, (COMPS_Object*)log) < 0) {
+                    comps_hslist_destroy(&pairlist);
+                    return -1;
+                }
             }
             comps_hslist_destroy(&pairlist);
         }

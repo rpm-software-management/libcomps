@@ -350,16 +350,28 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
             for (hsit = pairlist->first; hsit != NULL; hsit = hsit->next) {
                 ret = xmlTextWriterStartElement(writer,
                                    BAD_CAST((aliases[i])?aliases[i]:props[i]));
-                COMPS_XMLRET_CHECK
+                if (__comps_check_xml_get(ret, (COMPS_Object*)log) < 0) {
+                    comps_hslist_destroy(&pairlist);
+                    return -1;
+                }
                 ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "xml:lang",
                         (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
-                COMPS_XMLRET_CHECK
+                if (__comps_check_xml_get(ret, (COMPS_Object*)log) < 0) {
+                    comps_hslist_destroy(&pairlist);
+                    return -1;
+                }
                 str = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
                 ret = xmlTextWriterWriteString(writer, (xmlChar*)str);
-                COMPS_XMLRET_CHECK
+                if (__comps_check_xml_get(ret, (COMPS_Object*)log) < 0) {
+                    comps_hslist_destroy(&pairlist);
+                    return -1;
+                }
                 free(str);
                 ret = xmlTextWriterEndElement(writer);
-                COMPS_XMLRET_CHECK
+                if (__comps_check_xml_get(ret, (COMPS_Object*)log) < 0) {
+                    comps_hslist_destroy(&pairlist);
+                    return -1;
+                }
             }
             comps_hslist_destroy(&pairlist);
         }

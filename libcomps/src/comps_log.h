@@ -4,8 +4,8 @@
 #include <stdarg.h>
 
 #include "comps_log_codes.h"
-#include "comps_types.h"
 #include "comps_hslist.h"
+#include "comps_types.h"
 
 struct COMPS_LogEntry {
     COMPS_Object **args;

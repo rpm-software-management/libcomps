@@ -19,7 +19,8 @@
 
 #include "comps_doc.h"
 #include "comps_set.h"
-#include "comps_types.h"
+//#include "comps_types.h"
+#include "comps_utils.h"
 
 #include <stdio.h>
 #include <assert.h>
@@ -502,13 +503,6 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
     #undef group
 }
 
-inline int __comps_check_xml_get(int retcode, COMPS_Log * log) {
-    if (retcode<0) {
-        comps_log_error(log, COMPS_ERR_XMLGEN, 0);
-        return -1;
-    } return 0;
-}
-
 static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                                  COMPS_XMLOptions *xml_options,
                                  COMPS_DefaultsOptions *def_options) {
@@ -526,10 +520,10 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                                          BAD_CAST "-//Red Hat, Inc.//DTD Comps"
                                                   " info//EN",
                                          BAD_CAST "comps.dtd", NULL);
-    if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+    if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) return -1;
 
     retc = xmlTextWriterStartElement(writer, BAD_CAST "comps");
-    if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+    if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) return -1;
     list = comps_doc_groups(doc);
     if (list) {
         for (it = list->first; it != NULL; it = it->next) {
@@ -566,12 +560,19 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
     dict = comps_doc_langpacks(doc);
     if (dict && dict->len) {
         retc = xmlTextWriterStartElement(writer, BAD_CAST "langpacks");
-        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+        if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
+            COMPS_OBJECT_DESTROY(dict);
+            return -1;
+        }
         hslist = comps_objrtree_pairs(dict);
 
         for (hsit = hslist->first; hsit != NULL; hsit = hsit->next) {
             retc = xmlTextWriterStartElement(writer, BAD_CAST "match");
-            if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+            if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) { 
+                COMPS_OBJECT_DESTROY(dict);
+                comps_hslist_destroy(&hslist);
+                return -1;
+            }
 
             xmlTextWriterWriteAttribute(writer, BAD_CAST "name",
                     (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
@@ -581,27 +582,40 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
             free(tmp);
 
             retc = xmlTextWriterEndElement(writer);
-            if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+            if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
+                COMPS_OBJECT_DESTROY(dict);
+                comps_hslist_destroy(&hslist);
+                return -1;
+            }
         }
         comps_hslist_destroy(&hslist);
 
         retc = xmlTextWriterEndElement(writer);
-        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+        if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
+            COMPS_OBJECT_DESTROY(dict);
+            return -1;
+        }
     }
     COMPS_OBJECT_DESTROY(dict);
 
     mdict = comps_doc_blacklist(doc);
     if (mdict && mdict->len) {
         retc = xmlTextWriterStartElement(writer, BAD_CAST "blacklist");
-        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+        if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
+            COMPS_OBJECT_DESTROY(dict);
+            return -1;
+        }
         hslist = comps_objmrtree_pairs(mdict);
 
         for (hsit = hslist->first; hsit != NULL; hsit = hsit->next) {
             for (it = ((COMPS_ObjMRTreePair*)hsit->data)->data->first;
                  it != NULL; it = it->next) {
                 retc = xmlTextWriterStartElement(writer, BAD_CAST "package");
-                if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
-
+                if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
+                    COMPS_OBJECT_DESTROY(dict);
+                    comps_hslist_destroy(&hslist);
+                    return -1;
+                }
                 xmlTextWriterWriteAttribute(writer, BAD_CAST "name",
                         (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
 
@@ -610,26 +624,40 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                 free(tmp);
 
                 retc = xmlTextWriterEndElement(writer);
-                if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+                if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
+                    COMPS_OBJECT_DESTROY(dict);
+                    comps_hslist_destroy(&hslist);
+                    return -1;
+                }
             }
         }
         comps_hslist_destroy(&hslist);
 
         retc = xmlTextWriterEndElement(writer);
-        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+        if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
+            COMPS_OBJECT_DESTROY(dict);
+            return -1;
+        }
     }
     COMPS_OBJECT_DESTROY(mdict);
     mdict = comps_doc_whiteout(doc);
     if (mdict && mdict->len) {
         retc = xmlTextWriterStartElement(writer, BAD_CAST "whiteout");
-        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+        if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
+            COMPS_OBJECT_DESTROY(mdict);
+            return -1;
+        }
         hslist = comps_objmrtree_pairs(mdict);
 
         for (hsit = hslist->first; hsit != NULL; hsit = hsit->next) {
             for (it = ((COMPS_ObjMRTreePair*)hsit->data)->data->first;
                  it != NULL; it = it->next) {
                 retc = xmlTextWriterStartElement(writer, BAD_CAST "ignoredep");
-                if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+                if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
+                    COMPS_OBJECT_DESTROY(dict);
+                    comps_hslist_destroy(&hslist);
+                    return -1;
+                }
 
                 xmlTextWriterWriteAttribute(writer, BAD_CAST "requires",
                         (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
@@ -639,17 +667,24 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                 free(tmp);
 
                 retc = xmlTextWriterEndElement(writer);
-                if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+                if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
+                    COMPS_OBJECT_DESTROY(dict);
+                    comps_hslist_destroy(&hslist);
+                    return -1;
+                }
             }
         }
         comps_hslist_destroy(&hslist);
 
         retc = xmlTextWriterEndElement(writer);
-        if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+        if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
+            COMPS_OBJECT_DESTROY(dict);
+            return -1;
+        }
     }
     COMPS_OBJECT_DESTROY(mdict);
     retc = xmlTextWriterEndElement(writer);
-    if (__comps_check_xml_get(retc, doc->log) < 0) return -1;
+    if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) return -1;
     return ret;
 }
 

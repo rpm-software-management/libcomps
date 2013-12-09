@@ -125,3 +125,10 @@ char* __comps_strcat(char *str1, char *str2) {
     strcat(ret, str2);
     return ret;
 }
+
+inline int __comps_check_xml_get(int retcode, COMPS_Object * log) {
+    if (retcode<0) {
+        comps_log_error((COMPS_Log*)log, COMPS_ERR_XMLGEN, 0);
+        return -1;
+    } return 0;
+}

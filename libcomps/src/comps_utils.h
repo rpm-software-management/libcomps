@@ -186,4 +186,6 @@ char* __comps_num2boolstr(COMPS_Object* obj);
 unsigned int digits_count(unsigned int x);
 bool __comps_objlist_intersected(COMPS_ObjList *list1, COMPS_ObjList *list2);
 char* __comps_xml_arch_str(COMPS_Object *arches);
+
+int __comps_check_xml_get(int retcode, COMPS_Object * log);
 #endif
