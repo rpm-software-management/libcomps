@@ -377,6 +377,21 @@ class BaseListTestClass(object):
         for x in range(0, len(self.items_data)):
             self.assertTrue(listobj[x] == self.item_type(**self.items_data[x]))
 
+    def test_insert(self):
+        listobj = self.list_type()
+        for x in self.items_data[:4]:
+            listobj.insert(0, self.item_type(**x))
+        for x in range(0, 4):
+            self.assertTrue(listobj[x] == self.item_type(**self.items_data[3-x]))
+        listobj.insert(-100, self.item_type(**self.items_data[0]))
+        self.assertTrue(listobj[0] == self.item_type(**self.items_data[0]))
+
+        listobj.insert(100, self.item_type(**self.items_data[-1]))
+        self.assertTrue(listobj[-1] == self.item_type(**self.items_data[-1]))
+
+        listobj.insert(-4, self.item_type(**self.items_data[-1]))
+        self.assertTrue(listobj[-4] == self.item_type(**self.items_data[-1]))
+
     def test_slice(self):
         listobj = self.list_type()
         for x in self.items_data:
