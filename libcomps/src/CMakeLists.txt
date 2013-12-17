@@ -1,12 +1,12 @@
 set (libcomps_SOURCES comps_doc.c comps_docgroup.c comps_doccategory.c
                       comps_docenv.c comps_docpackage.c comps_docgroupid.c
-     comps_obj.c comps_mm.c 
-     #comps_list.c 
+     comps_obj.c comps_mm.c
+     #comps_list.c
      comps_hslist.c comps_dict.c
      comps_objradix.c comps_objmradix.c comps_objdict.c comps_objlist.c
      comps_elem.c comps_radix.c comps_mradix.c comps_bradix.c comps_set.c
      comps_parse.c comps_log.c comps_default.c
-     comps_utils.c comps_validate.c 
+     comps_utils.c comps_validate.c
      comps_log_codes.c
      comps_types.c
      )
