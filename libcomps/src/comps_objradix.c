@@ -201,6 +201,55 @@ void comps_objrtree_copy(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2){
 }
 COMPS_COPY_u(objrtree, COMPS_ObjRTree) /*comps_utils.h macro*/
 
+void  comps_objrtree_copy_shallow(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2){
+    COMPS_HSList *to_clone, *tmplist, *new_subnodes;
+    COMPS_HSListItem *it, *it2;
+    COMPS_ObjRTreeData *rtdata;
+    COMPS_Object *new_data;
+
+    to_clone = comps_hslist_create();
+    comps_hslist_init(to_clone, NULL, NULL, NULL);
+
+    for (it = rt2->subnodes->first; it != NULL; it = it->next) {
+        rtdata = comps_objrtree_data_create(
+                                    ((COMPS_ObjRTreeData*)it->data)->key, NULL);
+        if (((COMPS_ObjRTreeData*)it->data)->data != NULL)
+            new_data = comps_object_incref(((COMPS_ObjRTreeData*)it->data)->data);
+        else
+            new_data = NULL;
+        comps_hslist_destroy(&rtdata->subnodes);
+        rtdata->subnodes = ((COMPS_ObjRTreeData*)it->data)->subnodes;
+        rtdata->data = new_data;
+        comps_hslist_append(rt1->subnodes, rtdata, 0);
+        comps_hslist_append(to_clone, rtdata, 0);
+    }
+
+    while (to_clone->first) {
+        it2 = to_clone->first;
+        tmplist = ((COMPS_ObjRTreeData*)it2->data)->subnodes;
+        comps_hslist_remove(to_clone, to_clone->first);
+
+        new_subnodes = comps_hslist_create();
+        comps_hslist_init(new_subnodes, NULL, NULL, &comps_objrtree_data_destroy_v);
+        for (it = tmplist->first; it != NULL; it = it->next) {
+            rtdata = comps_objrtree_data_create(
+                                      ((COMPS_ObjRTreeData*)it->data)->key, NULL);
+            if (((COMPS_ObjRTreeData*)it->data)->data != NULL)
+                new_data = comps_object_incref(((COMPS_ObjRTreeData*)it->data)->data);
+            else
+                new_data = NULL;
+            comps_hslist_destroy(&rtdata->subnodes);
+            rtdata->subnodes = ((COMPS_ObjRTreeData*)it->data)->subnodes;
+            rtdata->data = new_data;
+            comps_hslist_append(new_subnodes, rtdata, 0);
+            comps_hslist_append(to_clone, rtdata, 0);
+        }
+        ((COMPS_ObjRTreeData*)it2->data)->subnodes = new_subnodes;
+        free(it2);
+    }
+    comps_hslist_destroy(&to_clone);
+}
+
 void comps_objrtree_values_walk(COMPS_ObjRTree * rt, void* udata,
                               void (*walk_f)(void*, COMPS_Object*)) {
     COMPS_HSList *tmplist, *tmp_subnodes;
@@ -550,14 +599,18 @@ void comps_objrtree_clear(COMPS_ObjRTree * rt) {
     oldit = rt->subnodes->first;
     it = (oldit)?oldit->next:NULL;
     for (;it != NULL; it=it->next) {
-        comps_object_destroy(oldit->data);
+        comps_objrtree_data_destroy(oldit->data);
+        //comps_object_destroy(oldit->data);
         free(oldit);
         oldit = it;
     }
     if (oldit) {
-        comps_object_destroy(oldit->data);
+        comps_objrtree_data_destroy(oldit->data);
         free(oldit);
     }
+    rt->subnodes->first = NULL;
+    rt->subnodes->last = NULL;
+    rt->len = 0;
 }
 
 inline COMPS_HSList* __comps_objrtree_all(COMPS_ObjRTree * rt, char keyvalpair) {
@@ -625,66 +678,47 @@ inline COMPS_HSList* __comps_objrtree_all(COMPS_ObjRTree * rt, char keyvalpair) 
 }
 
 void comps_objrtree_unite(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2) {
-    COMPS_HSList *tmplist, *tmp_subnodes;
-    COMPS_HSListItem *it;
+    COMPS_HSList *to_process;
+    COMPS_HSListItem *hsit, *oldit;
+    size_t x;
     struct Pair {
-        COMPS_HSList * subnodes;
-        char * key;
-        char added;
-    } *pair, *parent_pair;
+        char *key;
+        void *data;
+        COMPS_HSList *subnodes;
+    } *pair, *current_pair=NULL;//, *oldpair=NULL;
 
-    pair = malloc(sizeof(struct Pair));
-    pair->subnodes = rt2->subnodes;
-    pair->key = NULL;
+    to_process = comps_hslist_create();
+    comps_hslist_init(to_process, NULL, NULL, &free);
 
-    tmplist = comps_hslist_create();
-    comps_hslist_init(tmplist, NULL, NULL, &free);
-    comps_hslist_append(tmplist, pair, 0);
-
-    while (tmplist->first != NULL) {
-        it = tmplist->first;
-        comps_hslist_remove(tmplist, tmplist->first);
-        tmp_subnodes = ((struct Pair*)it->data)->subnodes;
-        parent_pair = (struct Pair*) it->data;
-        //printf("key-part:%s\n", parent_pair->key);
-        free(it);
-
-        //pair->added = 0;
-        for (it = tmp_subnodes->first; it != NULL; it=it->next) {
-            pair = malloc(sizeof(struct Pair));
-            pair->subnodes = ((COMPS_ObjRTreeData*)it->data)->subnodes;
-
-            if (parent_pair->key != NULL) {
-                pair->key = malloc(sizeof(char)
-                               * (strlen(((COMPS_ObjRTreeData*)it->data)->key)
-                               + strlen(parent_pair->key) + 1));
-                memcpy(pair->key, parent_pair->key,
-                       sizeof(char) * strlen(parent_pair->key));
-                memcpy(pair->key + strlen(parent_pair->key),
-                       ((COMPS_ObjRTreeData*)it->data)->key,
-                       sizeof(char)*(strlen(((COMPS_ObjRTreeData*)it->data)->key)+1));
-            } else {
-                pair->key = malloc(sizeof(char)*
-                                (strlen(((COMPS_ObjRTreeData*)it->data)->key) +1));
-                memcpy(pair->key, ((COMPS_ObjRTreeData*)it->data)->key,
-                       sizeof(char)*(strlen(((COMPS_ObjRTreeData*)it->data)->key)+1));
-            }
-            /* current node has data */
-            if (((COMPS_ObjRTreeData*)it->data)->data != NULL) {
-                    comps_objrtree_set(rt1, pair->key,
-                                      (((COMPS_ObjRTreeData*)it->data)->data));
-            }
-            if (((COMPS_ObjRTreeData*)it->data)->subnodes->first) {
-                comps_hslist_append(tmplist, pair, 0);
-            } else {
-                free(pair->key);
-                free(pair);
-            }
-        }
-        free(parent_pair->key);
-        free(parent_pair);
+    for (hsit = rt2->subnodes->first; hsit != NULL; hsit = hsit->next) {
+        pair = malloc(sizeof(struct Pair));
+        pair->key = __comps_strcpy(((COMPS_ObjRTreeData*)hsit->data)->key);
+        pair->data = ((COMPS_ObjRTreeData*)hsit->data)->data;
+        pair->subnodes = ((COMPS_ObjRTreeData*)hsit->data)->subnodes;
+        comps_hslist_append(to_process, pair, 0);
     }
-    comps_hslist_destroy(&tmplist);
+    while (to_process->first) {
+        current_pair = to_process->first->data;
+        oldit = to_process->first;
+        comps_hslist_remove(to_process, to_process->first);
+        if (current_pair->data) {
+            comps_objrtree_set(rt1, current_pair->key, current_pair->data);
+        }
+        for (hsit = current_pair->subnodes->first, x = 0;
+             hsit != NULL; hsit = hsit->next, x++) {
+            pair = malloc(sizeof(struct Pair));
+            pair->key = __comps_strcat(current_pair->key,
+                                       ((COMPS_ObjRTreeData*)hsit->data)->key);
+            pair->data = ((COMPS_ObjRTreeData*)hsit->data)->data;
+            pair->subnodes = ((COMPS_ObjRTreeData*)hsit->data)->subnodes;
+            comps_hslist_insert_at(to_process, x, pair, 0);
+        }
+        free(current_pair->key);
+        free(current_pair);
+        free(oldit);
+    }
+
+    comps_hslist_destroy(&to_process);
 }
 
 COMPS_ObjRTree* comps_objrtree_union(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2){

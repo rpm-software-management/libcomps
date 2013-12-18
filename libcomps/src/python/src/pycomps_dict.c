@@ -103,13 +103,10 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
     tmp = ret;
     tmpkey = __pycomps_lang_decode(((COMPS_RTreePair*)it->data)->key);
     if (!tmpkey) {
-        //PyErr_SetString(PyExc_TypeError, "key convert error");
         return NULL;
     }
     tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
-    //printf("Dict_str val:%s\n", tmpstr);
     tmpval = __pycomps_lang_decode(tmpstr);
-    //printf("after decode\n");
     free(tmpstr);
     if (!tmpval) {
         //PyErr_SetString(PyExc_TypeError, "val convert error");
@@ -158,62 +155,59 @@ int PyCOMPSDict_print(PyObject *self, FILE *f, int flags) {
 
 
 PyObject* PyCOMPSDict_cmp(PyObject *self, PyObject *other, int op) {
-    COMPS_HSList *pairlist, *pairlist2;
-    COMPS_HSListItem *hsit, *hsit2;
+    char ret;
 
-    if (other == NULL || !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self))) {
-        PyErr_Format(PyExc_TypeError, "Not Dict subclass, %s", Py_TYPE(other)->tp_name);
+    if (other == NULL || (Py_TYPE(other) != Py_TYPE(self) &&
+                          !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self)))) {
+        PyErr_Format(PyExc_TypeError, "Not Dict subclass, %s",
+                                      Py_TYPE(other)->tp_name);
         return NULL;
     }
     if (op != Py_EQ && op != Py_NE) {
         PyErr_Format(PyExc_TypeError, "Unsuported operator");
         return Py_INCREF(Py_NotImplemented), Py_NotImplemented;
     }
-    pairlist = comps_objdict_pairs(((PyCOMPS_Dict*)self)->dict);
-    pairlist2 = comps_objdict_pairs(((PyCOMPS_Dict*)other)->dict);
-    hsit = pairlist->first;
-    hsit2 = pairlist2->first;
-    for (; hsit != NULL && hsit2 != NULL; hsit = hsit->next,
-                                          hsit2 = hsit2->next) {
-        if (strcmp(((COMPS_ObjRTreePair*)hsit->data)->key,
-                    ((COMPS_ObjRTreePair*)hsit2->data)->key) ||
-            !comps_object_cmp(((COMPS_ObjRTreePair*)hsit->data)->data,
-                             ((COMPS_ObjRTreePair*)hsit->data)->data)) {
-            comps_hslist_destroy(&pairlist);
-            comps_hslist_destroy(&pairlist2);
-            if (op == Py_EQ)
-                Py_RETURN_FALSE;
-            else
-                Py_RETURN_TRUE;
-        }
+    ret = comps_object_cmp((COMPS_Object*)((PyCOMPS_Dict*)self)->dict,
+                           (COMPS_Object*)((PyCOMPS_Dict*)other)->dict);
+    if ((!ret && op == Py_NE) || (ret && op == Py_EQ)) {
+        Py_RETURN_TRUE;
+    } else {
+        Py_RETURN_FALSE;
     }
-    if (hsit == NULL && hsit2 == NULL) {
-        comps_hslist_destroy(&pairlist);
-        comps_hslist_destroy(&pairlist2);
-        if (op == Py_EQ) Py_RETURN_TRUE;
-        else Py_RETURN_FALSE;
-    }
-    else {
-        comps_hslist_destroy(&pairlist);
-        comps_hslist_destroy(&pairlist2);
-        if (op == Py_EQ) Py_RETURN_FALSE;
-        else Py_RETURN_TRUE;
-    }
-    /*comps_hslist_destroy(&pairlist);
-    comps_hslist_destroy(&pairlist2);
-    if (op == Py_EQ) Py_RETURN_TRUE;
-    else Py_RETURN_FALSE;*/
 }
 
 Py_ssize_t PyCOMPSDict_len(PyObject *self) {
-    (void)self;
-    return 0;
+    return ((PyCOMPS_Dict*)self)->dict->len;
+}
+PyObject* PyCOMPSDict_clear(PyObject *self) {
+    comps_objrtree_clear(((PyCOMPS_Dict*)self)->dict);
+    Py_RETURN_NONE;
+}
+PyObject* PyCOMPSDict_copy(PyObject *self) {
+    PyObject *ret;
+    ret = PyCOMPSDict_new(Py_TYPE(self), NULL, NULL);
+    Py_TYPE(self)->tp_init(ret, NULL, NULL);
+    comps_objrtree_copy_shallow(((PyCOMPS_Dict*)ret)->dict,
+                                ((PyCOMPS_Dict*)self)->dict);
+    return ret;
+}
+
+PyObject* PyCOMPSDict_update(PyObject *self, PyObject *other) {
+    if (other == NULL || (Py_TYPE(other) != Py_TYPE(self) &&
+                          !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self)))) {
+        PyErr_Format(PyExc_TypeError, "Not %s type or subclass, %s",
+                     Py_TYPE(self)->tp_name, Py_TYPE(other)->tp_name);
+        return NULL;
+    }
+    comps_objrtree_unite(((PyCOMPS_Dict*)self)->dict,
+                           ((PyCOMPS_Dict*)other)->dict);
+    Py_RETURN_NONE;
 }
 
 PyObject* PyCOMPSDict_get(PyObject *self, PyObject *key) {
     char *ckey;
     COMPS_Object* val;
-    PyObject *ret;
+    PyObject *ret = NULL;
 
     if (__pycomps_stringable_to_char(key, &ckey)) {
         return NULL;
@@ -221,15 +215,13 @@ PyObject* PyCOMPSDict_get(PyObject *self, PyObject *key) {
     val = comps_objdict_get(((PyCOMPS_Dict*)self)->dict, ckey);
     if (!val) {
         PyErr_Format(PyExc_KeyError, "KeyError: '%s'", ckey);
-        free(ckey);
-        return NULL;
     }
     else {
-        free(ckey);
         ret = ((PyCOMPS_Dict*)self)->it_info->out_convert_func(val);
         COMPS_OBJECT_DESTROY(val);
-        return ret;
     }
+    free(ckey);
+    return ret;
 }
 
 PyObject* PyCOMPSDict_get_(PyObject *self, PyObject *key) {
@@ -237,9 +229,9 @@ PyObject* PyCOMPSDict_get_(PyObject *self, PyObject *key) {
     COMPS_Object* val;
     PyObject *ret;
 
-    if (__pycomps_stringable_to_char(key, &ckey)) {
+    if (__pycomps_stringable_to_char(key, &ckey))
         return NULL;
-    }
+
     val = comps_objdict_get(((PyCOMPS_Dict*)self)->dict, ckey);
     if (!val) {
         free(ckey);
@@ -255,21 +247,21 @@ PyObject* PyCOMPSDict_get_(PyObject *self, PyObject *key) {
     }
 }
 
+#define _DICT_ ((PyCOMPS_Dict*)self)
+#define _INFO_ ((PyCOMPS_Dict*)self)->it_info
 int PyCOMPSDict_set(PyObject *self, PyObject *key, PyObject *val) {
-    #define _dict_ ((PyCOMPS_Dict*)self)
     char *ckey;
     COMPS_Object *ret = NULL;
-    for (unsigned i = 0; i < _dict_->it_info->item_types_len; i++) {
-        if (Py_TYPE(val) != _dict_->it_info->itemtypes[i])
+    for (unsigned i = 0; i < _INFO_->item_types_len; i++) {
+        if (Py_TYPE(val) != _INFO_->itemtypes[i])
             continue;
-        if (_dict_->it_info->in_convert_funcs[i]) {
-            ret = _dict_->it_info->in_convert_funcs[i](val);
+        if (_INFO_->in_convert_funcs[i]) {
+            ret = _INFO_->in_convert_funcs[i](val);
             break;
         }
     }
-    if (__pycomps_stringable_to_char(key, &ckey)) {
+    if (__pycomps_stringable_to_char(key, &ckey))
         return -1;
-    }
 
     if (!ret && val) {
         PyErr_Format(PyExc_TypeError, "Cannot set %s to %s",
@@ -277,16 +269,66 @@ int PyCOMPSDict_set(PyObject *self, PyObject *key, PyObject *val) {
                      Py_TYPE(self)->tp_name);
         free(ckey);
         return -1;
-    } else if (val) {
-        comps_objdict_set_x(((PyCOMPS_Dict*)self)->dict, ckey, ret);
-    } else if (!val){
-        comps_objdict_unset(((PyCOMPS_Dict*)self)->dict, ckey);
-    }
-    free(ckey);
+    } else if (val)
+        comps_objdict_set_x(_DICT_->dict, ckey, ret);
+    else if (!val)
+        comps_objdict_unset(_DICT_->dict, ckey);
 
+    free(ckey);
     return 0;
-    #undef _dict_
 }
+
+PyObject* PyCOMPSDict_keys(PyObject * self, PyObject *args) {
+    (void)args;
+    PyObject *ret, *item;
+    COMPS_HSList *list = comps_objrtree_keys(_DICT_->dict);
+
+    ret = PyList_New(0);
+    for (COMPS_HSListItem *it = list->first; it != NULL; it = it->next) {
+        item = PyUnicode_FromString(it->data);
+        PyList_Append(ret, item);
+        Py_DECREF(item);
+    }
+    comps_hslist_destroy(&list);
+    return ret;
+}
+
+PyObject* PyCOMPSDict_values(PyObject * self, PyObject *args) {
+    (void)args;
+    PyObject *ret, *item;
+    COMPS_HSList *list = comps_objrtree_values(_DICT_->dict);
+
+    ret = PyList_New(0);
+    for (COMPS_HSListItem *it = list->first; it != NULL; it = it->next) {
+        item = _INFO_->out_convert_func(it->data);
+        PyList_Append(ret, item);
+        Py_DECREF(item);
+    }
+    comps_hslist_destroy(&list);
+    return ret;
+}
+
+PyObject* PyCOMPSDict_items(PyObject * self, PyObject *args) {
+    (void)args;
+    PyObject *ret, *k, *v, *tp;
+    COMPS_HSList *list = comps_objrtree_pairs(((PyCOMPS_Dict*)self)->dict);
+
+    ret = PyList_New(0);
+    for (COMPS_HSListItem *it = list->first; it != NULL; it = it->next) {
+        k = PyUnicode_FromString(((COMPS_ObjRTreePair*)it->data)->key);
+        v = _INFO_->out_convert_func(((COMPS_ObjRTreePair*)it->data)->data);
+        tp = PyTuple_Pack(2, k, v);
+        Py_DECREF(k);
+        Py_DECREF(v);
+        PyList_Append(ret, tp);
+        Py_DECREF(tp);
+    }
+    comps_hslist_destroy(&list);
+    return ret;
+}
+#undef _DICT_
+#undef _INFO_
+
 
 PyObject* PyCOMPSDict_has_key(PyObject * self, PyObject *key) {
     char *ckey;
@@ -334,11 +376,10 @@ PyObject* PyCOMPSDict_getitervalues(PyObject *self) {
 }
 
 PyMappingMethods PyCOMPSDict_mapping = {
-    NULL, //PyCOMPSDict_len,
+    PyCOMPSDict_len,
     PyCOMPSDict_get,
     PyCOMPSDict_set
 };
-
 
 PyMemberDef PyCOMPSDict_members[] = {
     {NULL}};
@@ -354,6 +395,19 @@ PyMethodDef PyCOMPSDict_methods[] = {
      "return iterator returning item's value"},
      {"iterkeys", (PyCFunction)PyCOMPSDict_getiter, METH_NOARGS,
      "return iterator returning item's key"},
+     {"keys", (PyCFunction)PyCOMPSDict_keys, METH_NOARGS,
+     "return iterator returning list of keys"},
+     {"values", (PyCFunction)PyCOMPSDict_values, METH_NOARGS,
+     "return iterator returning list of values"},
+     {"items", (PyCFunction)PyCOMPSDict_items, METH_NOARGS,
+     "return iterator returning list of (key, val) tuples"},
+     {"clear", (PyCFunction)PyCOMPSDict_clear, METH_NOARGS,
+     "clear the dict"},
+     {"copy", (PyCFunction)PyCOMPSDict_copy, METH_NOARGS,
+     "return shallow copy of dict"},
+     {"update", (PyCFunction)PyCOMPSDict_update, METH_O,
+     "update dict with (key,value) pairs from another dict. Overwrite existing"
+      "values."},
     {NULL}  /* Sentinel */
 };
 
@@ -488,12 +542,12 @@ PyTypeObject PyCOMPS_DictIterType = {
     PyCOMPSDictIter_new,             /* tp_new */};
 
 
-PyMemberDef PyCOMPSStrDict_members[] = {
+/*PyMemberDef PyCOMPSStrDict_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSStrDict_methods[] = {
-    {NULL}  /* Sentinel */
-};
+    {NULL}
+};*/
 
 PyCOMPS_ItemInfo PyCOMPS_StrDictInfo = {
     .itemtypes = (PyTypeObject*[]){&PyUnicode_Type, &PyBytes_Type},

@@ -607,6 +607,46 @@ class DictTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             x = _dict["notindict"]
 
+    if hasattr(libcomps.StrDict, "keys"):
+        def test_keys_vals_items(self):
+            _dict = libcomps.StrDict()
+            self.assertTrue([] == _dict.keys())
+            self.assertTrue([] == _dict.values())
+            self.assertTrue([] == _dict.items())
+            _dict["cs"] = "Ahoj svete"
+            _dict["en"] = "Hello world"
+            self.assertTrue(["cs", "en"] == _dict.keys())
+            self.assertTrue(["Ahoj svete", "Hello world"] == _dict.values())
+            self.assertTrue([("cs", "Ahoj svete"),
+                             ("en", "Hello world")] == _dict.items())
+    #@unittest.skip("")
+    def test_clear(self):
+        _dict = libcomps.StrDict()
+        _dict["cs"] = "Ahoj svete"
+        _dict["en"] = "Hello world"
+        _dict.clear()
+        #for x in _dict:
+        #    self.assertTrue(False)
+        #self.assertTrue(len(_dict) == 0)
+
+    #@unittest.skip("")
+    def test_copy(self):
+        _dict = libcomps.StrDict()
+        _dict["a"] = "boo"
+        _dict2 = _dict.copy()
+        self.assertTrue(_dict == _dict2)
+
+    def test_update(self):
+        _dict = libcomps.StrDict()
+        _dict["a"] = "boo"
+        _dict["b"] = "foo"
+        _dict2 = libcomps.StrDict()
+        _dict2["a"] = "aloha"
+        _dict.update(_dict2)
+        self.assertTrue(_dict["a"] == "aloha")
+        self.assertTrue(_dict["b"] == "foo")
+
+
 #@unittest.skip("skip")
 class MDictTest(unittest.TestCase):
     def test_blacklist(self):
@@ -632,7 +672,7 @@ class MDictTest(unittest.TestCase):
             x = obj1["key"]
         self.assertFalse(obj1 == obj2)
 
-#@unittest.skip("skip")
+@unittest.skip("skip")
 class COMPSTest(unittest.TestCase):
     def setUp(self):
         self.comps = libcomps.Comps()
