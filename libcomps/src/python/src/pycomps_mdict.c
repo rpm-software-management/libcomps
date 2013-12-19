@@ -67,7 +67,6 @@ PyObject* PyCOMPSMDict_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     return (PyObject*) self;
 }
 
-
 PyObject* PyCOMPSMDict_str(PyObject *self) {
     COMPS_HSList *pairlist;
     COMPS_HSListItem *it;
@@ -159,15 +158,11 @@ int PyCOMPSMDict_print(PyObject *self, FILE *f, int flags) {
     return 0;
 }
 
-
 PyObject* PyCOMPSMDict_cmp(PyObject *self, PyObject *other, int op) {
-    COMPS_HSList *pairlist, *pairlist2;
-    COMPS_HSListItem *hsit, *hsit2;
-
-    if (other == NULL || (Py_TYPE(self) != Py_TYPE(other) &&
+    char ret;
+    if (other == NULL || (Py_TYPE(other) != Py_TYPE(self) &&
                           !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self)))) {
-        PyErr_Format(PyExc_TypeError, "%s subclass, %s",
-                                      Py_TYPE(self)->tp_name,
+        PyErr_Format(PyExc_TypeError, "Not Dict subclass, %s",
                                       Py_TYPE(other)->tp_name);
         return NULL;
     }
@@ -175,45 +170,40 @@ PyObject* PyCOMPSMDict_cmp(PyObject *self, PyObject *other, int op) {
         PyErr_Format(PyExc_TypeError, "Unsuported operator");
         return Py_INCREF(Py_NotImplemented), Py_NotImplemented;
     }
-    pairlist = comps_objmdict_pairs(((PyCOMPS_MDict*)self)->dict);
-    pairlist2 = comps_objmdict_pairs(((PyCOMPS_MDict*)other)->dict);
-    hsit = pairlist->first;
-    hsit2 = pairlist2->first;
-    for (; hsit != NULL && hsit2 != NULL; hsit = hsit->next,
-                                          hsit2 = hsit2->next) {
-        if (strcmp(((COMPS_ObjRTreePair*)hsit->data)->key,
-                    ((COMPS_ObjRTreePair*)hsit2->data)->key) ||
-            !COMPS_OBJECT_CMP(((COMPS_ObjMRTreePair*)hsit->data)->data,
-                             ((COMPS_ObjMRTreePair*)hsit->data)->data)) {
-            comps_hslist_destroy(&pairlist);
-            comps_hslist_destroy(&pairlist2);
-            if (op == Py_EQ)
-                Py_RETURN_FALSE;
-            else
-                Py_RETURN_TRUE;
-        }
+    ret = comps_object_cmp((COMPS_Object*)((PyCOMPS_Dict*)self)->dict,
+                           (COMPS_Object*)((PyCOMPS_Dict*)other)->dict);
+    if ((!ret && op == Py_NE) || (ret && op == Py_EQ)) {
+        Py_RETURN_TRUE;
+    } else {
+        Py_RETURN_FALSE;
     }
-    if (hsit == NULL && hsit2 == NULL) {
-        comps_hslist_destroy(&pairlist);
-        comps_hslist_destroy(&pairlist2);
-        if (op == Py_EQ) Py_RETURN_TRUE;
-        else Py_RETURN_FALSE;
-    }
-    else {
-        comps_hslist_destroy(&pairlist);
-        comps_hslist_destroy(&pairlist2);
-        if (op == Py_EQ) Py_RETURN_FALSE;
-        else Py_RETURN_TRUE;
-    }
-    comps_hslist_destroy(&pairlist);
-    comps_hslist_destroy(&pairlist2);
-    if (op == Py_EQ) Py_RETURN_TRUE;
-    else Py_RETURN_FALSE;
 }
 
 Py_ssize_t PyCOMPSMDict_len(PyObject *self) {
-    (void)self;
-    return 0;
+    return ((PyCOMPS_MDict*)self)->dict->len;
+}
+PyObject* PyCOMPSMDict_clear(PyObject *self) {
+    comps_objmrtree_clear(((PyCOMPS_MDict*)self)->dict);
+    Py_RETURN_NONE;
+}
+PyObject* PyCOMPSMDict_copy(PyObject *self) {
+    PyObject *ret;
+    ret = PyCOMPSDict_new(Py_TYPE(self), NULL, NULL);
+    Py_TYPE(self)->tp_init(ret, NULL, NULL);
+    comps_objmrtree_copy_shallow(((PyCOMPS_MDict*)ret)->dict,
+                                 ((PyCOMPS_MDict*)self)->dict);
+    return ret;
+}
+PyObject* PyCOMPSMDict_update(PyObject *self, PyObject *other) {
+    if (other == NULL || (Py_TYPE(other) != Py_TYPE(self) &&
+                          !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self)))) {
+        PyErr_Format(PyExc_TypeError, "Not %s type or subclass, %s",
+                     Py_TYPE(self)->tp_name, Py_TYPE(other)->tp_name);
+        return NULL;
+    }
+    comps_objmrtree_unite(((PyCOMPS_MDict*)self)->dict,
+                          ((PyCOMPS_MDict*)other)->dict);
+    Py_RETURN_NONE;
 }
 
 PyObject* PyCOMPSMDict_get(PyObject *self, PyObject *key) {
@@ -290,6 +280,57 @@ int PyCOMPSMDict_set(PyObject *self, PyObject *key, PyObject *val) {
     #undef _dict_
 }
 
+#define _DICT_ ((PyCOMPS_MDict*)self)
+#define _INFO_ ((PyCOMPS_MDict*)self)->it_info
+PyObject* PyCOMPSMDict_keys(PyObject * self, PyObject *args) {
+    (void)args;
+    PyObject *ret, *item;
+    COMPS_HSList *list = comps_objmrtree_keys(_DICT_->dict);
+
+    ret = PyList_New(0);
+    for (COMPS_HSListItem *it = list->first; it != NULL; it = it->next) {
+        item = PyUnicode_FromString(it->data);
+        PyList_Append(ret, item);
+        Py_DECREF(item);
+    }
+    comps_hslist_destroy(&list);
+    return ret;
+}
+
+PyObject* PyCOMPSMDict_values(PyObject * self, PyObject *args) {
+    (void)args;
+    PyObject *ret, *item;
+    COMPS_HSList *list = comps_objmrtree_values(_DICT_->dict);
+
+    ret = PyList_New(0);
+    for (COMPS_HSListItem *it = list->first; it != NULL; it = it->next) {
+        item = _INFO_->out_convert_func(it->data);
+        PyList_Append(ret, item);
+        Py_DECREF(item);
+    }
+    comps_hslist_destroy(&list);
+    return ret;
+}
+
+PyObject* PyCOMPSMDict_items(PyObject * self, PyObject *args) {
+    (void)args;
+    PyObject *ret, *k, *v, *tp;
+    COMPS_HSList *list = comps_objrtree_pairs(((PyCOMPS_Dict*)self)->dict);
+
+    ret = PyList_New(0);
+    for (COMPS_HSListItem *it = list->first; it != NULL; it = it->next) {
+        k = PyUnicode_FromString(((COMPS_ObjRTreePair*)it->data)->key);
+        v = _INFO_->out_convert_func(((COMPS_ObjRTreePair*)it->data)->data);
+        tp = PyTuple_Pack(2, k, v);
+        Py_DECREF(k);
+        Py_DECREF(v);
+        PyList_Append(ret, tp);
+        Py_DECREF(tp);
+    }
+    comps_hslist_destroy(&list);
+    return ret;
+}
+
 PyObject* PyCOMPSMDict_has_key(PyObject * self, PyObject *key) {
     char *ckey;
     COMPS_ObjList *val;
@@ -336,7 +377,7 @@ PyObject* PyCOMPSMDict_getitervalues(PyObject *self) {
 }
 
 PyMappingMethods PyCOMPSMDict_mapping = {
-    NULL, //PyCOMPSMDict_len,
+    PyCOMPSMDict_len,
     PyCOMPSMDict_get,
     PyCOMPSMDict_set
 };
@@ -345,15 +386,61 @@ PyMappingMethods PyCOMPSMDict_mapping = {
 PyMemberDef PyCOMPSMDict_members[] = {
     {NULL}};
 
+PyDoc_STRVAR(PyCOMPSMDict_get__doc__,
+             "get(key)->list of strings\n"
+             "Return object associated with key\n"
+             "\n"
+             ":param str/unicode key: object key\n"
+             "\n"
+             ":returns: object if there's object associated with key\n\n"
+             "          None otherwise\n");
+
+PyDoc_STRVAR(PyCOMPSMDict_has_key__doc__,
+             "has_key(key)->bool\n"
+             "Tests if there's key in object\n"
+             "\n"
+             ":param str/unicode key: object key\n"
+             "\n"
+             ":returns: True if there's object associated with key\n\n"
+             "          False otherwise\n");
+PyDoc_STRVAR(PyCOMPSMDict_update__doc__,
+             "update(dict)->None\n"
+             "Update dictionary with (key,value) pair from another dictionary."
+             "Existing pairs are overwritten\n"
+             "\n"
+             ":param dict: :py:class:`libcomps.Dict`"
+             " instance or subclass instance\n"
+             "\n"
+             ":returns: None\n");
+
 PyMethodDef PyCOMPSMDict_methods[] = {
-     {"get", (PyCFunction)PyCOMPSMDict_get, METH_O,
-     "alias for libcomps.Dict[key]"},
+     {"get", (PyCFunction)PyCOMPSMDict_get, METH_O, PyCOMPSMDict_get__doc__},
      {"has_key", (PyCFunction)PyCOMPSMDict_has_key, METH_O,
-     "alias for key in dict"},
+     PyCOMPSMDict_has_key__doc__},
      {PYCOMPS_DICT_ITERITEMS, (PyCFunction)PyCOMPSMDict_getiteritems, METH_NOARGS,
      "return iterator returning (key, value) tuple"},
-     {"itervalues", (PyCFunction)PyCOMPSMDict_getitervalues, METH_NOARGS,
-     "return iterator returning (key, value) tuple"},
+     {PYCOMPS_DICT_ITERVALUES, (PyCFunction)PyCOMPSMDict_getitervalues, METH_NOARGS,
+     "return iterator returning item's value"},
+     {PYCOMPS_DICT_ITERKEYS, (PyCFunction)PyCOMPSMDict_getiter, METH_NOARGS,
+     "return iterator returning item's key"},
+
+#if PY_MAJOR_VERSION == 2
+
+     {"keys", (PyCFunction)PyCOMPSMDict_keys, METH_NOARGS,
+     "return list of keys"},
+     {"values", (PyCFunction)PyCOMPSMDict_values, METH_NOARGS,
+     "return list of values"},
+     {"items", (PyCFunction)PyCOMPSMDict_items, METH_NOARGS,
+     "return list of (key, val) tuples"},
+
+#endif
+
+     {"clear", (PyCFunction)PyCOMPSMDict_clear, METH_NOARGS,
+     "clear the dict"},
+     {"copy", (PyCFunction)PyCOMPSMDict_copy, METH_NOARGS,
+     "return shallow copy of dict"},
+     {"update", (PyCFunction)PyCOMPSMDict_update, METH_O,
+      PyCOMPSMDict_update__doc__},
     {NULL}  /* Sentinel */
 };
 

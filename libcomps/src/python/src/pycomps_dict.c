@@ -156,7 +156,6 @@ int PyCOMPSDict_print(PyObject *self, FILE *f, int flags) {
 
 PyObject* PyCOMPSDict_cmp(PyObject *self, PyObject *other, int op) {
     char ret;
-
     if (other == NULL || (Py_TYPE(other) != Py_TYPE(self) &&
                           !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self)))) {
         PyErr_Format(PyExc_TypeError, "Not Dict subclass, %s",
@@ -191,7 +190,6 @@ PyObject* PyCOMPSDict_copy(PyObject *self) {
                                 ((PyCOMPS_Dict*)self)->dict);
     return ret;
 }
-
 PyObject* PyCOMPSDict_update(PyObject *self, PyObject *other) {
     if (other == NULL || (Py_TYPE(other) != Py_TYPE(self) &&
                           !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self)))) {
@@ -384,30 +382,60 @@ PyMappingMethods PyCOMPSDict_mapping = {
 PyMemberDef PyCOMPSDict_members[] = {
     {NULL}};
 
+PyDoc_STRVAR(PyCOMPSDict_get__doc__,
+             "get(key)->object\n"
+             "Return object associated with key\n"
+             "\n"
+             ":param str/unicode key: object key\n"
+             "\n"
+             ":returns: object if there's object associated with key\n\n"
+             "          None otherwise\n");
+
+PyDoc_STRVAR(PyCOMPSDict_has_key__doc__,
+             "has_key(key)->bool\n"
+             "Tests if there's key in object\n"
+             "\n"
+             ":param str/unicode key: object key\n"
+             "\n"
+             ":returns: True if there's object associated with key\n\n"
+             "          False otherwise\n");
+PyDoc_STRVAR(PyCOMPSDict_update__doc__,
+             "update(dict)->None\n"
+             "Update dictionary with (key,value) pair from another dictionary."
+             "Existing pairs are overwritten\n"
+             "\n"
+             ":param dict: :py:class:`libcomps.Dict`"
+             " instance or subclass instance\n"
+             "\n"
+             ":returns: None\n");
+
 PyMethodDef PyCOMPSDict_methods[] = {
-     {"get", (PyCFunction)PyCOMPSDict_get_, METH_O,
-     "alias for libcomps.Dict[key] without raising exception in not-found case"},
+     {"get", (PyCFunction)PyCOMPSDict_get_, METH_O, PyCOMPSDict_get__doc__},
      {"has_key", (PyCFunction)PyCOMPSDict_has_key, METH_O,
-     "alias for `key in dict`"},
+       PyCOMPSDict_has_key__doc__},
      {PYCOMPS_DICT_ITERITEMS, (PyCFunction)PyCOMPSDict_getiteritems, METH_NOARGS,
      "return iterator returning (key, value) tuple"},
-     {"itervalues", (PyCFunction)PyCOMPSDict_getitervalues, METH_NOARGS,
+     {PYCOMPS_DICT_ITERVALUES, (PyCFunction)PyCOMPSDict_getitervalues, METH_NOARGS,
      "return iterator returning item's value"},
-     {"iterkeys", (PyCFunction)PyCOMPSDict_getiter, METH_NOARGS,
+     {PYCOMPS_DICT_ITERKEYS, (PyCFunction)PyCOMPSDict_getiter, METH_NOARGS,
      "return iterator returning item's key"},
+#if PY_MAJOR_VERSION == 2
+
      {"keys", (PyCFunction)PyCOMPSDict_keys, METH_NOARGS,
-     "return iterator returning list of keys"},
+     "return list of keys"},
      {"values", (PyCFunction)PyCOMPSDict_values, METH_NOARGS,
-     "return iterator returning list of values"},
+     "return list of values"},
      {"items", (PyCFunction)PyCOMPSDict_items, METH_NOARGS,
-     "return iterator returning list of (key, val) tuples"},
+     "return list of (key, val) tuples"},
+
+#endif
+
      {"clear", (PyCFunction)PyCOMPSDict_clear, METH_NOARGS,
      "clear the dict"},
      {"copy", (PyCFunction)PyCOMPSDict_copy, METH_NOARGS,
      "return shallow copy of dict"},
      {"update", (PyCFunction)PyCOMPSDict_update, METH_O,
-     "update dict with (key,value) pairs from another dict. Overwrite existing"
-      "values."},
+      PyCOMPSDict_update__doc__},
     {NULL}  /* Sentinel */
 };
 

@@ -606,7 +606,7 @@ PyGetSetDef PyCOMPS_getset[] = {
      ":py:class:`libcomps.EnvList` of environments", &envs_closure},
     {"langpacks",
      (getter)PyCOMPS_get_, (setter)PyCOMPS_set_,
-     ":py:class:`libcomps.Dict` of langpacks", &langpacks_closure},
+     ":py:class:`libcomps.StrDict` of langpacks", &langpacks_closure},
     {"blacklist",
      (getter)PyCOMPS_get_, (setter)PyCOMPS_set_,
      ":py:class:`libcomps.MDict` of blacklist", &blacklist_closure},
@@ -1013,6 +1013,8 @@ PYINIT_FUNC(void) {
     PyModule_AddObject(m, "Langpacks", (PyObject*) &PyCOMPS_LangPacksType);
     Py_INCREF(&PyCOMPS_StrSeqType);
     PyModule_AddObject(m, "StrSeq", (PyObject*) &PyCOMPS_StrSeqType);
+    //Py_INCREF(&PyCOMPS_MDictType);
+    //PyModule_AddObject(m, "MDict", (PyObject*) &PyCOMPS_MDictType);
 
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_DEFAULT", COMPS_PACKAGE_DEFAULT);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_OPTIONAL", COMPS_PACKAGE_OPTIONAL);

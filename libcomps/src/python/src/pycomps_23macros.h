@@ -36,6 +36,8 @@
     #define PyINT_FROM_LONG(OB) PyLong_FromLong(OB)
     #define SLICE_CAST PyObject*
     #define PYCOMPS_DICT_ITERITEMS "items"
+    #define PYCOMPS_DICT_ITERVALUES "values"
+    #define PYCOMPS_DICT_ITERKEYS "keys"
 #else
     #define MODINIT_RET_NONE return
     #define PY_OBJ_HEAD_INIT PyObject_HEAD_INIT(NULL)\
@@ -46,6 +48,8 @@
 
     #define SLICE_CAST PySliceObject*
     #define PYCOMPS_DICT_ITERITEMS "iteritems"
+    #define PYCOMPS_DICT_ITERVALUES "itervalues"
+    #define PYCOMPS_DICT_ITERKEYS "iterkeys"
 #endif
 
 

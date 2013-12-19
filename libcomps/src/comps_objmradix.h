@@ -55,6 +55,7 @@ COMPS_ObjMRTreeData * comps_objmrtree_data_create(char *key, COMPS_Object *data)
 
 void comps_objmrtree_create_u(COMPS_Object *mrtree, COMPS_Object **args);
 void comps_objmrtree_destroy_u(COMPS_Object * rt);
+void comps_objmrtree_copy_shallow(COMPS_ObjMRTree *ret, COMPS_ObjMRTree *rt);
 void comps_objmrtree_copy_u(COMPS_Object *rt1, COMPS_Object *rt2);
 signed char comps_objmrtree_cmp_u(COMPS_Object *ort1, COMPS_Object *ort2);
 
