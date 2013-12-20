@@ -18,7 +18,6 @@ import sys, os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 sys.path.insert(0, os.path.abspath("@PYCOMPS_LIB_PATH@"))
-print "@PYCOMPS_LIB_PATH@"
 import libcomps
 
 # -- General configuration -----------------------------------------------------
@@ -44,7 +43,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'@CMAKE_PROJECT_NAME@'
-copyright = u''
+copyright = u'RedHat 2013'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

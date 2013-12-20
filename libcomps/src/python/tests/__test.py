@@ -37,9 +37,13 @@ if sys.version_info[0] == 3:
 if hasattr(dict, "iteritems"):
     def _iteritems(_dict):
         return _dict.iteritems()
+    def _itervalues(_dict):
+        return _dict.itervalues()
 else:
     def _iteritems(_dict):
         return _dict.items()
+    def _itervalues(_dict):
+        return _dict.values()
 
 class BaseObjTestClass(object):
     obj_data = []
@@ -605,7 +609,7 @@ class DictTest(unittest.TestCase):
 
         _values =  []
         _values2 = ["Ahoj svete", "Hello world"] 
-        for v in _dict.itervalues():
+        for v in _itervalues(_dict):
             _values.append(v)
         self.assertTrue(set(_values) == set(_values2))
 

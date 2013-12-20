@@ -24,7 +24,7 @@ comps XML files. Supports read/write XML file, structure(s) modification.
 
 %package doc
 Summary:        Documentation files for libcomps library
-Group:          Development/Libraries
+Group:          Documentation
 Requires:       %{name} = %{version}-%{release}
 BuildArch:      noarch
 BuildRequires:  doxygen
@@ -32,14 +32,14 @@ BuildRequires:  doxygen
 %description doc
 Documentation files for libcomps library
 
-%package pydoc
+%package -n python-libcomps-doc
 Summary:        Documentation files for python bindings libcomps library
-Group:          Development/Libraries
+Group:          Documentation
 Requires:       %{name} = %{version}-%{release}
 BuildArch:      noarch
 BuildRequires:  sphinx
 
-%description pydoc
+%description -n python-libcomps-doc
 Documentation files for python bindings libcomps library
 
 %package devel
@@ -81,11 +81,11 @@ mv ../py3 ./
 %cmake -DPYTHON_DESIRED:STRING=2 libcomps/
 make %{?_smp_mflags}
 make %{?_smp_mflags} docs
+make %{?_smp_mflags} pydocs
 
 pushd py3
 %cmake -DPYTHON_DESIRED:STRING=3 libcomps/
 make %{?_smp_mflags}
-make %{?_smp_mflags} docs
 popd
 
 
@@ -119,8 +119,8 @@ rm -rf $buildroot
 %files doc
 %doc docs/libcomps-doc/html
 
-%files pydoc
-%doc python/docs/html
+%files -n python-libcomps-doc
+%doc src/python/docs/html
 
 %files -n python-libcomps
 %{_libdir}/python2*

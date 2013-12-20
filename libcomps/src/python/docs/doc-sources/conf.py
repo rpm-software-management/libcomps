@@ -17,8 +17,7 @@ import sys, os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-sys.path.insert(0, os.path.abspath("/home/jluza/_dmach/libcomps-build/src/python/src/python2"))
-print "/home/jluza/_dmach/libcomps-build/src/python/src/python2"
+sys.path.insert(0, os.path.abspath("/home/jluza/_dmach/libcomps-build/src/python/src/python3"))
 import libcomps
 
 # -- General configuration -----------------------------------------------------
@@ -44,7 +43,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'libcomps'
-copyright = u''
+copyright = u'RedHat 2013'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

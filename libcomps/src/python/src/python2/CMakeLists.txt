@@ -9,7 +9,6 @@ include_directories(${LIBCOMPS_INCLUDE_PATH})
 configure_file(${pycomps_TESTSDIR}/run_tests.sh.in
                ./libcomps/run_tests.sh)
 
-
 list(LENGTH TESTS_FILES len)
 math (EXPR len "${len} - 1")
 foreach(x RANGE 0 ${len})
