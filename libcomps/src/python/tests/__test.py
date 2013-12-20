@@ -161,6 +161,16 @@ class BaseObjTestClass(object):
         obj1 = self.__union_prep1()
         obj2 = self.obj_constructor(**self.obj_data[1])
         obj = obj1 + obj2
+        for x in inspect.getmembers(obj.__class__):
+            if (inspect.isdatadescriptor(x[1]) or\
+               inspect.isgetsetdescriptor(x[1]) or\
+               inspect.ismemberdescriptor(x[1])) and\
+               not x[0].startswith("__") and\
+               not inspect.ismethod(x[1]):
+                if getattr(obj2, x[0]):
+                    self.assertTrue(getattr(obj, x[0]) == getattr(obj2, x[0]))
+                else:
+                    self.assertTrue(getattr(obj, x[0]) == getattr(obj1, x[0]))
 
         for member, v in _iteritems(self.obj_list_members):
             _list = getattr(obj, member)
@@ -441,8 +451,6 @@ class BaseListTestClass(object):
         listobj = listobj2 + listobj1
         self.assertTrue(listobj == listobj1)
 
-        return
-
         listobj2 = self.list_type()
         for x in self.items_data[3:]:
             listobj2.append(self.item_type(**x))
@@ -450,8 +458,8 @@ class BaseListTestClass(object):
                 for val in vals[3:]:
                     self.items_extra_data_setter[k](getattr(listobj2[-1], k),
                                                     val)
+
         listobj = listobj1 + listobj2
-        #print listobj
         self.assertTrue(len(listobj) == len(self.items_data))
         item = listobj[3]
         for k, vals in _iteritems(self.items_extra_data):
@@ -607,46 +615,6 @@ class DictTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             x = _dict["notindict"]
 
-    if hasattr(libcomps.StrDict, "keys"):
-        def test_keys_vals_items(self):
-            _dict = libcomps.StrDict()
-            self.assertTrue([] == _dict.keys())
-            self.assertTrue([] == _dict.values())
-            self.assertTrue([] == _dict.items())
-            _dict["cs"] = "Ahoj svete"
-            _dict["en"] = "Hello world"
-            self.assertTrue(["cs", "en"] == _dict.keys())
-            self.assertTrue(["Ahoj svete", "Hello world"] == _dict.values())
-            self.assertTrue([("cs", "Ahoj svete"),
-                             ("en", "Hello world")] == _dict.items())
-    #@unittest.skip("")
-    def test_clear(self):
-        _dict = libcomps.StrDict()
-        _dict["cs"] = "Ahoj svete"
-        _dict["en"] = "Hello world"
-        _dict.clear()
-        #for x in _dict:
-        #    self.assertTrue(False)
-        #self.assertTrue(len(_dict) == 0)
-
-    #@unittest.skip("")
-    def test_copy(self):
-        _dict = libcomps.StrDict()
-        _dict["a"] = "boo"
-        _dict2 = _dict.copy()
-        self.assertTrue(_dict == _dict2)
-
-    def test_update(self):
-        _dict = libcomps.StrDict()
-        _dict["a"] = "boo"
-        _dict["b"] = "foo"
-        _dict2 = libcomps.StrDict()
-        _dict2["a"] = "aloha"
-        _dict.update(_dict2)
-        self.assertTrue(_dict["a"] == "aloha")
-        self.assertTrue(_dict["b"] == "foo")
-
-
 #@unittest.skip("skip")
 class MDictTest(unittest.TestCase):
     def test_blacklist(self):
@@ -672,7 +640,7 @@ class MDictTest(unittest.TestCase):
             x = obj1["key"]
         self.assertFalse(obj1 == obj2)
 
-@unittest.skip("skip")
+#@unittest.skip("skip")
 class COMPSTest(unittest.TestCase):
     def setUp(self):
         self.comps = libcomps.Comps()

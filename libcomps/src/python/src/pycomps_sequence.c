@@ -615,15 +615,31 @@ PyMappingMethods PyCOMPSSeq_mapping_extra = {
 PyMemberDef PyCOMPSSeq_members[] = {
     {NULL}};
 
+PyDoc_STRVAR(PyCOMPSSeq_insert__doc__,
+             "insert(pos, item) -> None\n"
+             "Insert item into list at position pos"
+             "\n\n"
+             ":param pos: int"
+             "position\n"
+             "\n"
+             ":returns: None\n");
+
+PyDoc_STRVAR(PyCOMPSSeq_remove__doc__,
+             "remove(item) -> None\n"
+             "Remove first occurence of item from list"
+             "\n\n"
+             ":raise TypeError: If type of item is not type acceptable for list\n"
+             ":raise ValueError: If item is not in the list\n");
+
 PyMethodDef PyCOMPSSeq_methods[] = {
      {"append", (PyCFunction)PyCOMPSSeq_append, METH_O,
      "Append item to new of the list"},
      {"remove", (PyCFunction)PyCOMPSSeq_remove, METH_O,
-     "Remove item from list"},
+     PyCOMPSSeq_remove__doc__},
      {"clear", (PyCFunction)PyCOMPSSeq_clear, METH_NOARGS,
      "Clear the list"},
      {"insert", (PyCFunction)PyCOMPSSeq_insert, METH_VARARGS,
-     "insert item to given position"},
+     PyCOMPSSeq_insert__doc__},
     {NULL}  /* Sentinel */
 };
 

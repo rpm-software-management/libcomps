@@ -467,7 +467,7 @@ int comps_objlist_set(COMPS_ObjList *objlist, unsigned int atpos,
 char* comps_objlist_tostr_u(COMPS_Object* list) {
     char *items[((COMPS_ObjList*)list)->len];
     char *tmps, *ret;
-    int i=0, total_strlen = 10, total2;
+    int i=0, total_strlen = 10;//, total2;
     const int sep_len = strlen(", ");
 
     COMPS_ObjListIt *it = ((COMPS_ObjList*)list)->first;
@@ -483,25 +483,25 @@ char* comps_objlist_tostr_u(COMPS_Object* list) {
     }
     //printf("total len:%d", total_strlen);
     //printf("list len:%d\n", ((COMPS_ObjList*)list)->len);
-    total2=0;
+    //total2=0;
     ret = malloc(sizeof(char) * (total_strlen));
     ret[0]=0;
     strcat(ret, "[");
-    total2 += strlen("[");
+    //total2 += strlen("[");
     for (i = 0; i < (int)(((COMPS_ObjList*)list)->len-1); i++) {
         strcat(ret, items[i]);
-        total2 += strlen(items[i]);
+        //total2 += strlen(items[i]);
         strcat(ret, ", ");
-        total2 += strlen(", ");
+        //total2 += strlen(", ");
         free(items[i]);
     }
     if (((COMPS_ObjList*)list)->len) {
         strcat(ret, items[i]);
-        total2 += strlen(items[i]);
+        //total2 += strlen(items[i]);
         free(items[i]);
     }
     strcat(ret, "]");
-    total2 += strlen("]");
+    //total2 += strlen("]");
     //printf("total len2:%d\n", total2);
     return ret;
 }

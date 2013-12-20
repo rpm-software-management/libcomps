@@ -137,19 +137,25 @@ int PyCOMPSGroup_print(PyObject *self, FILE *f, int flags) {
 
     tmp_prop = comps_docgroup_get_id(_group_->group);
     id = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    COMPS_OBJECT_DESTROY(tmp_prop);
     tmp_prop = comps_docgroup_get_name(_group_->group);
     name = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    COMPS_OBJECT_DESTROY(tmp_prop);
     tmp_prop = comps_docgroup_get_desc(_group_->group);
     desc = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    COMPS_OBJECT_DESTROY(tmp_prop);
     tmp_prop = comps_docgroup_get_display_order(_group_->group);
     disp_ord = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    COMPS_OBJECT_DESTROY(tmp_prop);
     tmp_prop = comps_docgroup_get_langonly(_group_->group);
     lang = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    COMPS_OBJECT_DESTROY(tmp_prop);
     tmp_prop = comps_docgroup_get_def(_group_->group);
     def = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    COMPS_OBJECT_DESTROY(tmp_prop);
     tmp_prop = comps_docgroup_get_uservisible(_group_->group);
     uservis = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-
+    COMPS_OBJECT_DESTROY(tmp_prop);
 
     fprintf(f, "<COMPS_Group: id='%s', name='%s', description='%s',  "
             "default='%s', uservisible='%s', lang_only='%s', display_order=%s ",
@@ -469,40 +475,36 @@ int PyCOMPSGroups_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
 
 COMPS_ObjList* comps_groups_union(COMPS_ObjList *groups1,
                                   COMPS_ObjList *groups2) {
-    COMPS_HSListItem *hsit;
     COMPS_Set *set;
     COMPS_ObjList *ret;
     COMPS_DocGroup *tmpgroup;
     COMPS_ObjListIt *it;
-    void *tmpdata;
+    void *data;
+    int index;
 
     ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_docgroup_idcmp);
-
+    comps_set_init(set, NULL, NULL, &comps_object_destroy_v,
+                                    &__comps_docgroup_idcmp);
     for (it = groups1 ? groups1->first : NULL; it != NULL; it = it->next) {
-        comps_set_add(set, comps_object_copy(it->comps_obj));
+        tmpgroup = (COMPS_DocGroup*) comps_object_copy(it->comps_obj);
+        comps_set_add(set, tmpgroup);
+        comps_objlist_append(ret, (COMPS_Object*)tmpgroup);
     }
     for (it = groups2 ? groups2->first : NULL; it != NULL; it = it->next) {
-        if (comps_set_in(set, it->comps_obj)) {
-            tmpgroup = comps_docgroup_union(
-                                (COMPS_DocGroup*)comps_set_data_at(set,
-                                                               it->comps_obj),
-                                (COMPS_DocGroup*)it->comps_obj);
-            tmpdata = comps_set_data_at(set, it->comps_obj);
-            comps_set_remove(set, it->comps_obj);
-            comps_object_destroy((COMPS_Object*)tmpdata);
-            comps_set_add(set, tmpgroup);
+        if ((data = comps_set_data_at(set, it->comps_obj)) != NULL) {
+            index = comps_objlist_index(ret, data);
+            comps_objlist_remove_at(ret, index);
+            tmpgroup = comps_docgroup_union((COMPS_DocGroup*)data,
+                                            (COMPS_DocGroup*)it->comps_obj);
+
+            comps_objlist_insert_at_x(ret, index, (COMPS_Object*)tmpgroup);
         } else {
-            comps_set_add(set, comps_object_copy(it->comps_obj));
+            comps_objlist_append(ret, it->comps_obj);
         }
     }
-    for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
-        comps_objlist_append_x(ret, (COMPS_Object*)hsit->data);
-    }
     comps_set_destroy(&set);
-
     return ret;
 }
 

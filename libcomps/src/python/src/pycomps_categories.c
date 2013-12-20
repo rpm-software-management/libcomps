@@ -182,26 +182,14 @@ int PyCOMPSCat_print(PyObject *self, FILE *f, int flags) {
     if (_cat_->cat->group_ids) {
         for (it = _cat_->cat->group_ids->first; it != NULL &&
              it != _cat_->cat->group_ids->last; it = it->next){
-            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
-                name = comps_object_tostr(it->comps_obj);
-                fprintf(f, "['%s' default=true], ", name);
-                free(name);
-            } else {
-                name = comps_object_tostr(it->comps_obj);
-                fprintf(f, "'%s', ", name);
-                free(name);
-            }
+            name = comps_object_tostr(it->comps_obj);
+            fprintf(f, "'%s', ", name);
+            free(name);
         }
         if (it) {
-            if (((COMPS_DocGroupId*)it->comps_obj)->def) {
-                name = comps_object_tostr(it->comps_obj);
-                fprintf(f, "['%s' default=true]", name);
-                free(name);
-            } else {
-                name = comps_object_tostr(it->comps_obj);
-                fprintf(f, "'%s'", name);
-                free(name);
-            }
+            name = comps_object_tostr(it->comps_obj);
+            fprintf(f, "'%s'", name);
+            free(name);
         }
     }
     fprintf(f, "]>");
@@ -410,33 +398,31 @@ COMPS_ObjList* comps_cats_union(COMPS_ObjList *cats1, COMPS_ObjList *cats2) {
     COMPS_ObjListIt *it;
     COMPS_Set *set;
     COMPS_DocCategory *tmpcat;
-    COMPS_HSListItem *hsit;
     COMPS_ObjList *ret;
-    void *tmpdata;
+    void *data;
+    int index;
 
     ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_doccategory_idcmp);
+    comps_set_init(set, NULL, NULL, &comps_object_destroy_v,
+                                    &__comps_doccategory_idcmp);
     for (it = cats1 ? cats1->first : NULL; it != NULL; it = it->next) {
-        comps_set_add(set, comps_object_copy(it->comps_obj));
+        tmpcat = (COMPS_DocCategory*) comps_object_copy(it->comps_obj);
+        comps_set_add(set, tmpcat);
+        comps_objlist_append(ret, (COMPS_Object*)tmpcat);
     }
     for (it = cats2 ? cats2->first : NULL; it != NULL; it = it->next) {
-        if (comps_set_in(set, it->comps_obj)) {
-            tmpcat = comps_doccategory_union(
-                                (COMPS_DocCategory*)it->comps_obj,
-                                (COMPS_DocCategory*)comps_set_data_at(set,
-                                                                it->comps_obj));
-            tmpdata = comps_set_data_at(set, it->comps_obj);
-            comps_set_remove(set, it->comps_obj);
-            comps_object_destroy((COMPS_Object*)tmpdata);
-            comps_set_add(set, tmpcat);
+        if ((data = comps_set_data_at(set, it->comps_obj)) != NULL) {
+            index = comps_objlist_index(ret, data);
+            comps_objlist_remove_at(ret, index);
+            tmpcat = comps_doccategory_union((COMPS_DocCategory*)data,
+                                             (COMPS_DocCategory*)it->comps_obj);
+            comps_objlist_insert_at_x(ret, index, (COMPS_Object*)tmpcat);
+
         } else {
-            comps_set_add(set, comps_object_copy(it->comps_obj));
+            comps_objlist_append(ret, it->comps_obj);
         }
-    }
-    for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
-        comps_objlist_append_x(ret, (COMPS_Object*)hsit->data);
     }
     comps_set_destroy(&set);
     return ret;
@@ -455,6 +441,7 @@ PyObject* PyCOMPSCats_union(PyObject *self, PyObject *other) {
     PyCOMPSCats_init(res, NULL, NULL);
     res_list = comps_cats_union(((PyCOMPS_Sequence*)self)->list,
                                 ((PyCOMPS_Sequence*)other)->list);
+
     COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)res)->list);
     res->list = res_list;
     return (PyObject*)res;

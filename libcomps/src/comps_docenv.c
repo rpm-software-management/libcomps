@@ -154,23 +154,15 @@ char __comps_docenv_idcmp(void *e1, void *e2) {
 COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     COMPS_DocEnv *res;
     COMPS_ObjListIt *it;
-    COMPS_HSListItem *hsit;
     COMPS_Set *set;
-    COMPS_HSList *pairs;
     COMPS_Object *obj;
     int index;
     void *data;
 
     res = (COMPS_DocEnv*)comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
     COMPS_OBJECT_DESTROY(res->properties);
-    res->properties = comps_objdict_clone(e2->properties);
-    pairs = comps_objdict_pairs(e2->properties);
-    for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
-        comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
-                         ((COMPS_RTreePair*)hsit->data)->data);
-    }
-    comps_hslist_destroy(&pairs);
 
+    res->properties = comps_objdict_union(e1->properties, e2->properties);
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, (void(*)(void*))&comps_object_destroy,
                                     &__comps_docgroupid_cmp_set);
@@ -199,6 +191,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
                                     &__comps_docgroupid_cmp_set);
     it = e1->option_list?e1->option_list->first:NULL;
     char ret;
+    /*!!! DO NOT MODIFY some comps have same optionid in one option_list !!!*/
     for (; it != NULL; it = it->next) {
         obj = comps_object_copy(it->comps_obj);
         ret = comps_set_add(set, obj);
@@ -224,8 +217,8 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     comps_set_destroy(&set);
     comps_object_destroy((COMPS_Object*)res->name_by_lang);
     comps_object_destroy((COMPS_Object*)res->desc_by_lang);
-    res->name_by_lang = comps_objdict_union(e2->name_by_lang, e1->name_by_lang);
-    res->desc_by_lang = comps_objdict_union(e2->desc_by_lang, e1->desc_by_lang);
+    res->name_by_lang = comps_objdict_union(e1->name_by_lang, e2->name_by_lang);
+    res->desc_by_lang = comps_objdict_union(e1->desc_by_lang, e2->desc_by_lang);
     return res;
 }
 
@@ -418,6 +411,7 @@ char* comps_docenv_tostr_u(COMPS_Object* env) {
         tmpprop = getters[i](_env_);
         props[i] = comps_object_tostr(tmpprop);
         total_len += strlen(props[i]);
+        COMPS_OBJECT_DESTROY(tmpprop);
     }
     name_by_lang_str = comps_object_tostr((COMPS_Object*)_env_->name_by_lang);
     total_len += strlen(name_by_lang_str);

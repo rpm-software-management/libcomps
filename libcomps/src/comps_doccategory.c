@@ -130,22 +130,16 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
                                            COMPS_DocCategory *c2) {
     COMPS_DocCategory *res;
     COMPS_ObjListIt *it;
-    COMPS_HSListItem *hsit;
     COMPS_Set *set;
-    COMPS_HSList *pairs;
     COMPS_Object *obj;
+    void *data;
+    int index;
 
     res = (COMPS_DocCategory*)comps_object_create(&COMPS_DocCategory_ObjInfo,
                                                   NULL);
     COMPS_OBJECT_DESTROY(res->properties);
 
-    res->properties = comps_objdict_clone(c2->properties);
-    pairs = comps_objdict_pairs(c1->properties);
-    for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
-        comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
-                          ((COMPS_RTreePair*)hsit->data)->data);
-    }
-    comps_hslist_destroy(&pairs);
+    res->properties = comps_objdict_union(c1->properties, c2->properties);
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, &comps_object_destroy_v,
                                     &__comps_docgroupid_cmp_set);
@@ -155,9 +149,7 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
         comps_set_add(set, (void*)comps_object_incref(obj));
         comps_doccategory_add_groupid(res, (COMPS_DocGroupId*)obj);
     }
-    void *data;
-    int index;
-    it = c2->group_ids?c2->group_ids->first:NULL;
+    it = c2->group_ids ? c2->group_ids->first : NULL;
     for (; it != NULL; it = it->next) {
         if ((data = comps_set_data_at(set, (void*)it->comps_obj)) != NULL) {
             index = comps_objlist_index(res->group_ids, (COMPS_Object*)data);
@@ -172,8 +164,8 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     comps_set_destroy(&set);
     COMPS_OBJECT_DESTROY(res->name_by_lang);
     COMPS_OBJECT_DESTROY(res->desc_by_lang);
-    res->name_by_lang = comps_objdict_union(c2->name_by_lang, c1->name_by_lang);
-    res->desc_by_lang = comps_objdict_union(c2->desc_by_lang, c1->desc_by_lang);
+    res->name_by_lang = comps_objdict_union(c1->name_by_lang, c2->name_by_lang);
+    res->desc_by_lang = comps_objdict_union(c1->desc_by_lang, c2->desc_by_lang);
     return res;
 }
 
@@ -326,6 +318,7 @@ char* comps_doccategory_tostr_u(COMPS_Object* cat) {
         tmpprop = getters[i](_cat_);
         props[i] = comps_object_tostr(tmpprop);
         total_len += strlen(props[i]);
+        COMPS_OBJECT_DESTROY(tmpprop);
     }
     name_by_lang_str = comps_object_tostr((COMPS_Object*)_cat_->name_by_lang);
     total_len += strlen(name_by_lang_str);

@@ -709,7 +709,7 @@ static PyMethodDef PyCOMPS_methods[] = {
     {"fromxml_str", (PyCFunction)PyCOMPS_fromxml_str, METH_VARARGS | METH_KEYWORDS,
     PyCOMPS_fromxml_str__doc__},
     {"clear", (PyCFunction)PyCOMPS_clear, METH_NOARGS,
-    "Clear COMPS"},
+    "Clear Comps"},
     {"get_last_errors", (PyCFunction)PyCOMPS_get_last_errors,
      METH_NOARGS,"return list of messages from log of last parse action, "
                  "contains errors only"},
@@ -1013,8 +1013,8 @@ PYINIT_FUNC(void) {
     PyModule_AddObject(m, "Langpacks", (PyObject*) &PyCOMPS_LangPacksType);
     Py_INCREF(&PyCOMPS_StrSeqType);
     PyModule_AddObject(m, "StrSeq", (PyObject*) &PyCOMPS_StrSeqType);
-    //Py_INCREF(&PyCOMPS_MDictType);
-    //PyModule_AddObject(m, "MDict", (PyObject*) &PyCOMPS_MDictType);
+    Py_INCREF(&PyCOMPS_MDictType);
+    PyModule_AddObject(m, "MDict", (PyObject*) &PyCOMPS_MDictType);
 
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_DEFAULT", COMPS_PACKAGE_DEFAULT);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_OPTIONAL", COMPS_PACKAGE_OPTIONAL);

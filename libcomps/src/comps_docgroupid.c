@@ -82,8 +82,8 @@ signed char comps_docgroupid_cmp_u(COMPS_Object *gid1, COMPS_Object *gid2) {
 }
 
 char __comps_docgroupid_cmp_set(void *gid1, void *gid2) {
-    return comps_docgroupid_cmp_u((COMPS_Object*)gid1,
-                                  (COMPS_Object*)gid2);
+    return comps_object_cmp((COMPS_Object*)((COMPS_DocGroupId*)gid1)->name,
+                            (COMPS_Object*)((COMPS_DocGroupId*)gid2)->name);
 }
 char* comps_docgroupid_str_u(COMPS_Object* docgroupid) {
     const int len = strlen("<COMPS_DocGroupId name='' default=''>");

@@ -171,21 +171,13 @@ char __comps_docgroup_idcmp(void *g1, void *g2) {
 COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     COMPS_DocGroup *res;
     COMPS_ObjListIt *it;
-    COMPS_HSListItem *hsit;
     COMPS_Set *set;
-    COMPS_HSList *pairs;
     COMPS_DocGroupPackage *pkg;
 
     res = (COMPS_DocGroup*)comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
     COMPS_OBJECT_DESTROY(res->properties);
 
-    res->properties = comps_objdict_clone(g1->properties);
-    pairs = comps_objdict_pairs(g2->properties);
-    for (hsit = pairs->first; hsit != NULL; hsit = hsit->next) {
-        comps_objdict_set(res->properties, ((COMPS_RTreePair*)hsit->data)->key,
-                          ((COMPS_RTreePair*)hsit->data)->data);
-    }
-    comps_hslist_destroy(&pairs);
+    res->properties = comps_objdict_union(g1->properties, g2->properties);
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, (void(*)(void*))&comps_object_destroy,
                                     &comps_docpackage_cmp_set);
@@ -212,8 +204,8 @@ COMPS_DocGroup* comps_docgroup_union(COMPS_DocGroup *g1, COMPS_DocGroup *g2) {
     comps_set_destroy(&set);
     comps_object_destroy((COMPS_Object*)res->name_by_lang);
     comps_object_destroy((COMPS_Object*)res->desc_by_lang);
-    res->name_by_lang = comps_objdict_union(g2->name_by_lang, g1->name_by_lang);
-    res->desc_by_lang = comps_objdict_union(g2->desc_by_lang, g1->desc_by_lang);
+    res->name_by_lang = comps_objdict_union(g1->name_by_lang, g2->name_by_lang);
+    res->desc_by_lang = comps_objdict_union(g1->desc_by_lang, g2->desc_by_lang);
     return res;
 }
 
@@ -385,6 +377,53 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
     return 0;
 }
 
+char* comps_docgroup_tostr_u(COMPS_Object* group) {
+    #define _group_ ((COMPS_DocGroup*)group)
+    char *ret, *name_by_lang_str, *desc_by_lang_str, *group_packages_str;
+    int total_len = 0;
+    const char *head = "<COMPS_Group ";
+    COMPS_Object *tmpprop;
+    COMPS_Object*(*getters[])(COMPS_DocGroup*)= {comps_docgroup_get_id,
+                                     comps_docgroup_get_name,
+                                     comps_docgroup_get_desc,
+                                     comps_docgroup_get_display_order,
+                                     comps_docgroup_get_def,
+                                     comps_docgroup_get_langonly};
+    char *props[6];
+    for (int i=0; i<6; i++) {
+        tmpprop = getters[i](_group_);
+        props[i] = comps_object_tostr(tmpprop);
+        total_len += strlen(props[i]);
+        COMPS_OBJECT_DESTROY(tmpprop);
+    }
+    name_by_lang_str = comps_object_tostr((COMPS_Object*)_group_->name_by_lang);
+    total_len += strlen(name_by_lang_str);
+    desc_by_lang_str = comps_object_tostr((COMPS_Object*)_group_->desc_by_lang);
+    total_len += strlen(desc_by_lang_str);
+    //group_packages_str = comps_object_tostr((COMPS_Object*)_group_->packages);
+    //total_len += strlen(group_packages_str);
+    
+    ret = malloc(sizeof(char) * (total_len+2+(8*2)+strlen(head)));
+    ret[0] = 0;
+    strcat(ret, head);
+    for (int i=0; i<6; i++) {
+        strcat(ret, props[i]);
+        free(props[i]);
+        strcat(ret, ", ");
+    }
+    strcat(ret, name_by_lang_str);
+    free(name_by_lang_str);
+    strcat(ret, ", ");
+    strcat(ret, desc_by_lang_str);
+    free(desc_by_lang_str);
+    strcat(ret, ", ");
+    //strcat(ret, group_packages_str);
+    //free(group_packages_str);
+    strcat(ret, ">");
+    return ret;
+    #undef _group_
+}
+
 COMPS_DocGroup* comps_docgroup_arch_filter(COMPS_DocGroup *source,
                                            COMPS_ObjList *arches) {
     COMPS_ObjList *arches2;
@@ -413,7 +452,8 @@ COMPS_ObjectInfo COMPS_DocGroup_ObjInfo = {
     .constructor = &comps_docgroup_create_u,
     .destructor = &comps_docgroup_destroy_u,
     .copy = &comps_docgroup_copy_u,
-    .obj_cmp = &comps_docgroup_cmp_u
+    .obj_cmp = &comps_docgroup_cmp_u,
+    .to_str = &comps_docgroup_tostr_u
 };
 
 COMPS_ValRuleGeneric* COMPS_DocGroup_ValidateRules[] = {

@@ -432,37 +432,33 @@ COMPS_ObjList* comps_envs_union(COMPS_ObjList *envs1, COMPS_ObjList *envs2) {
     COMPS_ObjListIt *it;
     COMPS_Set *set;
     COMPS_DocEnv *tmpenv;
-    COMPS_HSListItem *hsit;
     COMPS_ObjList *ret;
-    void *tmpdata;
+    void *data;
+    int index;
 
     ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
 
     set = comps_set_create();
-    comps_set_init(set, NULL, NULL, NULL, &__comps_docenv_idcmp);
-    if (envs1) {
-        for (it = envs1->first; it != NULL; it = it->next) {
-            comps_set_add(set, comps_object_copy(it->comps_obj));
-        }
+    comps_set_init(set, NULL, NULL, &comps_object_destroy_v,
+                                    &__comps_docenv_idcmp);
+    for (it = envs1 ? envs1->first : NULL; it != NULL; it = it->next) {
+        tmpenv = (COMPS_DocEnv*) comps_object_copy(it->comps_obj);
+        comps_set_add(set, tmpenv);
+        comps_objlist_append(ret, (COMPS_Object*)tmpenv);
     }
-    if (envs2) {
-        for (it = envs2->first; it != NULL; it = it->next) {
-            if (comps_set_in(set, it->comps_obj)) {
-                tmpenv = comps_docenv_union(
-                                    (COMPS_DocEnv*)comps_set_data_at(set,
-                                                                it->comps_obj),
-                                    (COMPS_DocEnv*)it->comps_obj);
-                tmpdata = comps_set_data_at(set, it->comps_obj);
-                comps_set_remove(set, it->comps_obj);
-                comps_object_destroy((COMPS_Object*)tmpdata);
-                comps_set_add(set, tmpenv);
-            } else {
-                comps_set_add(set, comps_object_copy(it->comps_obj));
-            }
+    for (it = envs2 ? envs2->first : NULL; it != NULL; it = it->next) {
+        if ((data = comps_set_data_at(set, it->comps_obj)) != NULL) {
+            index = comps_objlist_index(ret, data);
+            comps_objlist_remove_at(ret, index);
+
+            tmpenv = comps_docenv_union((COMPS_DocEnv*)data,
+                                        (COMPS_DocEnv*)it->comps_obj);
+
+            comps_objlist_insert_at_x(ret, index, (COMPS_Object*)tmpenv);
+
+        } else {
+            comps_objlist_append(ret, it->comps_obj);
         }
-    }
-    for (hsit = set->data->first; hsit != NULL; hsit = hsit->next) {
-        comps_objlist_append_x(ret, (COMPS_Object*)hsit->data);
     }
     comps_set_destroy(&set);
     return ret;
