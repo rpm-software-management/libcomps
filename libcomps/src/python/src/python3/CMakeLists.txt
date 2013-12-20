@@ -6,23 +6,23 @@ execute_process (COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from d
 include_directories(${PYTHON_INCLUDE_PATH})
 include_directories(${LIBCOMPS_INCLUDE_PATH})
 
-configure_file(${pycomps_SRCDIR}/tests/run_tests.sh.in
+configure_file(${pycomps_TESTSDIR}/run_tests.sh.in
                ./libcomps/run_tests.sh)
 
 list(LENGTH TESTS_FILES len)
 math (EXPR len "${len} - 1")
 foreach(x RANGE 0 ${len})
     list(GET TESTS_FILES ${x} val)
-    file(COPY ${pycomps_SRCDIR}/tests/${val} DESTINATION ./libcomps/)
+    file(COPY ${pycomps_TESTSDIR}/${val} DESTINATION ./libcomps/)
 endforeach()
 
 list(LENGTH COMPS_FILES len)
 math (EXPR len "${len} - 1")
 foreach(x RANGE 0 ${len})
     list(GET COMPS_FILES ${x} val)
-    file(COPY ${pycomps_SRCDIR}/tests/comps/${val} DESTINATION ./libcomps/comps/)
+    file(COPY ${pycomps_TESTSDIR}/comps/${val} DESTINATION ./libcomps/comps/)
 endforeach()
-
+file(COPY ${pycomps_SRCDIR}/__init__.py DESTINATION ./libcomps/)
 
 add_library(pycomps SHARED ${pycomps_SRC})
 set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")

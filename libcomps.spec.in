@@ -38,9 +38,8 @@ Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 BuildArch:      noarch
 BuildRequires:  sphinx
-BuildRequires:  %{name}%{?_isa} = %{version}-%{release}
 
-%description doc
+%description pydoc
 Documentation files for python bindings libcomps library
 
 %package devel
