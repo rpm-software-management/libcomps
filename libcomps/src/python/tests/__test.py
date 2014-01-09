@@ -484,8 +484,12 @@ class BaseListTestClass(object):
                     self.items_extra_data_setter[k](getattr(listobj1[-1], k),
                                                     val)
         index = 0
+        if hasattr(self.item_type, "id"):
+            attr = "id"
+        else:
+            attr = "name"
         for x in self.items_data[0:4]:
-            item = listobj1[x["id"]]
+            item = listobj1[x[attr]]
             self.assertTrue(item == listobj1[index])
             index += 1
         self.assertRaises(KeyError, listobj1.__getitem__, "notid")
@@ -578,6 +582,22 @@ class EnvList_Test(unittest.TestCase, BaseListTestClass):
                         "option_ids": ["g1", "g2", "g3", "g4", "g5", "g6"],
                         "name_by_lang": [("foo", "bar"), ("red", "black"),
                                          ("fire", "water")]}
+
+#@unittest.skip(" ")
+class PackageList_Test(unittest.TestCase, BaseListTestClass):
+    list_type = libcomps.PackageList
+    item_type = libcomps.Package
+    items_data = [{"name":"p1", "type": libcomps.PACKAGE_TYPE_DEFAULT},
+                  {"name":"p2", "type": libcomps.PACKAGE_TYPE_DEFAULT},
+                  {"name":"p3", "type": libcomps.PACKAGE_TYPE_DEFAULT},
+                  {"name":"p4", "type": libcomps.PACKAGE_TYPE_DEFAULT},
+                  {"name":"p5", "type": libcomps.PACKAGE_TYPE_DEFAULT},
+                  {"name":"p6", "type": libcomps.PACKAGE_TYPE_DEFAULT},
+                  {"name":"p7", "type": libcomps.PACKAGE_TYPE_DEFAULT}]
+
+    items_extra_data_cmp = {}
+    items_extra_data_setter = {}
+    items_extra_data = {}
 
 #@unittest.skip("skip")
 class PackageTest(unittest.TestCase):
