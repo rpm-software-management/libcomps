@@ -404,7 +404,7 @@ class BaseListTestClass(object):
         self.assertTrue(listobj[-1] == self.item_type(**self.items_data[-1]))
 
         listobj.insert(-4, self.item_type(**self.items_data[-1]))
-        self.assertTrue(listobj[-4] == self.item_type(**self.items_data[-1]))
+        self.assertTrue(listobj[-5] == self.item_type(**self.items_data[-1]))
 
     def test_slice(self):
         listobj = self.list_type()
