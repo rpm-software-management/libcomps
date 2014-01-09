@@ -289,7 +289,7 @@ char comps_objrtree_paircmp(void *obj1, void *obj2) {
                ((COMPS_ObjRTreePair*)obj2)->key) != 0)
         return 0;
     return comps_object_cmp(((COMPS_ObjRTreePair*)obj1)->data,
-                            ((COMPS_ObjRTreePair*)obj1)->data);
+                            ((COMPS_ObjRTreePair*)obj2)->data);
 }
 
 
@@ -315,19 +315,23 @@ signed char comps_objrtree_cmp(COMPS_ObjRTree *ort1, COMPS_ObjRTree *ort2) {
     comps_set_destroy(&set1);
     comps_set_destroy(&set2);
     //printf("objrtree cmp %d\n", !ret);
-
-    if (ret) {
-        /*for (it = values1->first; it != NULL; it = it->next) {
-            printf("dict item %s\n", ((COMPS_ObjRTreePair*)it->data)->key);
-        }
-        printf("----------\n");
-        for (it = values2->first; it != NULL; it = it->next) {
-            printf("dict item %s\n", ((COMPS_ObjRTreePair*)it->data)->key);
-        }*/
+    
+    char *str;
+    /*for (it = values1->first; it != NULL; it = it->next) {
+        str = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
+        printf("dict item %s=%s\n", ((COMPS_ObjRTreePair*)it->data)->key, str);
+        free(str);
     }
+    printf("----------\n");
+    for (it = values2->first; it != NULL; it = it->next) {
+        str = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
+        printf("dict item %s=%s\n", ((COMPS_ObjRTreePair*)it->data)->key, str);
+        free(str);
+    }
+    printf("cmp objrtree ret:%d\n", ret);*/
     comps_hslist_destroy(&values1);
     comps_hslist_destroy(&values2);
-    return !ret;
+    return ret==0;
 }
 COMPS_CMP_u(objrtree, COMPS_ObjRTree)
 

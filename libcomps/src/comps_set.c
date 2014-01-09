@@ -139,7 +139,7 @@ char comps_set_cmp(COMPS_Set *set1, COMPS_Set *set2) {
     unsigned int x, index;
     COMPS_Set *not_processed1, *not_processed2;
     COMPS_HSListItem *it;
-    void *item;
+    void *item;//, *tmpdata;
     char ret;
     int at;
 
@@ -160,6 +160,7 @@ char comps_set_cmp(COMPS_Set *set1, COMPS_Set *set2) {
     it = set1->data->first;
 
     index = 0;
+    ret = 0;
     while (!comps_set_is_empty(not_processed1) &&
            !comps_set_is_empty(not_processed2)) {
         if ((at = comps_set_at(set2, it->data)) != -1) {
@@ -167,20 +168,26 @@ char comps_set_cmp(COMPS_Set *set1, COMPS_Set *set2) {
             free(item);
             item = comps_set_remove(not_processed2 , (void*)&at);
             free(item);
+            //tmpdata = comps_hslist_data_at(set2->data, at);
+        } else {
+            ret = 2;
+            break;
         }
         it = it->next;
         index++;
         if (it == NULL) break;
     }
-    if (comps_set_is_empty(not_processed1)) {
-        if (comps_set_is_empty(not_processed2))
-            ret = 0;
-        if (!comps_set_is_empty(not_processed2))
-            ret = -1;
-    } else {
-        if (comps_set_is_empty(not_processed2))
-            ret = 1;
-        else ret = 2;
+    if (ret == 0) {
+        if (comps_set_is_empty(not_processed1)) {
+            /*if (comps_set_is_empty(not_processed2))
+                ret = 0;*/
+            if (!comps_set_is_empty(not_processed2))
+                ret = -1;
+        } else {
+            if (comps_set_is_empty(not_processed2))
+                ret = 1;
+            else ret = 2;
+        }
     }
     comps_set_destroy(&not_processed1);
     comps_set_destroy(&not_processed2);

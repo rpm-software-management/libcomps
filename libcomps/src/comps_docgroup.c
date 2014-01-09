@@ -400,8 +400,8 @@ char* comps_docgroup_tostr_u(COMPS_Object* group) {
     total_len += strlen(name_by_lang_str);
     desc_by_lang_str = comps_object_tostr((COMPS_Object*)_group_->desc_by_lang);
     total_len += strlen(desc_by_lang_str);
-    //group_packages_str = comps_object_tostr((COMPS_Object*)_group_->packages);
-    //total_len += strlen(group_packages_str);
+    group_packages_str = comps_object_tostr((COMPS_Object*)_group_->packages);
+    total_len += strlen(group_packages_str);
     
     ret = malloc(sizeof(char) * (total_len+2+(8*2)+strlen(head)));
     ret[0] = 0;

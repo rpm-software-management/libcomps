@@ -129,6 +129,7 @@ void comps_docpackage_set_basearchonly(COMPS_DocGroupPackage *pkg,
  * */
 COMPS_Object* comps_docpackage_get_basearchonly(COMPS_DocGroupPackage *pkg);
 
+char __comps_docpackage_idcmp(void *pkg1, void *pkg2);
 COMPS_ObjList* comps_docpackage_arches(COMPS_DocGroupPackage *pkg);
 void comps_docpackage_set_arches(COMPS_DocGroupPackage *pkg,
                                  COMPS_ObjList *arches);

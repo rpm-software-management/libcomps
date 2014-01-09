@@ -117,6 +117,11 @@ signed char comps_docpackage_cmp_u(COMPS_Object *pkg1, COMPS_Object *pkg2) {
     #undef _pkg2
 }
 
+char __comps_docpackage_idcmp(void *pkg1, void *pkg2) {
+    return comps_object_cmp((COMPS_Object*)((COMPS_DocGroupPackage*)pkg1)->name,
+                           (COMPS_Object*)((COMPS_DocGroupPackage*)pkg2)->name);
+}
+
 const char* comps_docpackage_type_str(COMPS_PackageType type) {
     switch(type){
         case COMPS_PACKAGE_OPTIONAL:

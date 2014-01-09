@@ -51,8 +51,7 @@ inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
     #define _seq_ ((PyCOMPS_Sequence*)self)
     char *strid=NULL;
     COMPS_ObjListIt *it;
-    COMPS_ObjDict *props;
-    COMPS_Object *oid;
+    COMPS_Object *props, *oid;
     PyObject *ret = NULL;
     COMPS_Object *tmpstr;
 
@@ -67,10 +66,13 @@ inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
     tmpstr = (COMPS_Object*)comps_str(strid);
     for (it = ((PyCOMPS_Sequence*)self)->list->first; it != NULL;
          it = it->next) {
-        props = (COMPS_ObjDict*)GET_FROM(it->comps_obj,
+        props = (COMPS_Object*)GET_FROM(it->comps_obj,
                                          _seq_->it_info->props_offset);
-
-        oid = comps_objdict_get_x(props, "id");
+        if (props->obj_info == &COMPS_ObjDict_ObjInfo) {
+            oid = comps_objdict_get_x((COMPS_ObjDict*)props, "id");
+        } else {
+            oid = props;
+        }
         if (comps_object_cmp(oid, tmpstr)) {
             comps_object_incref(it->comps_obj);
             ret = ((PyCOMPS_Sequence*)self)->it_info->out_convert_func(it->comps_obj);

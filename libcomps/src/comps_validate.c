@@ -143,7 +143,7 @@ COMPS_ValGenResult* comps_empty_check(COMPS_Object *obj, COMPS_Object *prop) {
     (void)obj;
 
     if (!prop) err = 1;
-    else if (strcmp("", ((COMPS_Str*)prop)->val) == 0) err=2;
+    else if (__comps_strcmp("", ((COMPS_Str*)prop)->val)) err=2;
 
     if (err) {
         valres = (COMPS_ValGenResult*)comps_object_create(

@@ -224,7 +224,6 @@ PyObject* PyCOMPSGroup_cmp(PyObject *self, PyObject *other, int op) {
 
     // Only eq and neq operators allowed
     CMP_OP_EQ_NE_CHECK(op)
-    //printf("pygroup cmp\n");
 
     if (other == NULL || ( Py_TYPE(other) != Py_TYPE(self)
                            && other != Py_None)) {
@@ -236,7 +235,7 @@ PyObject* PyCOMPSGroup_cmp(PyObject *self, PyObject *other, int op) {
 
     ret = COMPS_OBJECT_CMP(((PyCOMPS_Group*)self)->group,
                            ((PyCOMPS_Group*)other)->group);
-    //printf("pygroup cmp 2\n");
+    //printf("cmpgroup :%d\n",ret);
     if (op == Py_EQ) {
         if (!ret) Py_RETURN_FALSE;
     } else {
@@ -500,6 +499,7 @@ COMPS_ObjList* comps_groups_union(COMPS_ObjList *groups1,
                                             (COMPS_DocGroup*)it->comps_obj);
 
             comps_objlist_insert_at_x(ret, index, (COMPS_Object*)tmpgroup);
+
         } else {
             comps_objlist_append(ret, it->comps_obj);
         }
@@ -622,6 +622,54 @@ PyObject* PyCOMPSPackage_validate(PyCOMPS_Package *pkg) {
         Py_RETURN_NONE;
 }
 
+COMPS_ObjList* comps_pkgs_union(COMPS_ObjList *pkgs1, COMPS_ObjList *pkgs2) {
+    COMPS_ObjListIt *it;
+    COMPS_Set *set;
+    COMPS_DocGroupPackage *tmppkg;
+    COMPS_ObjList *ret;
+    void *data;
+    //int index;
+
+    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+
+    set = comps_set_create();
+    comps_set_init(set, NULL, NULL, &comps_object_destroy_v,
+                                    &__comps_docpackage_idcmp);
+    for (it = pkgs1 ? pkgs1->first : NULL; it != NULL; it = it->next) {
+        tmppkg = (COMPS_DocGroupPackage*)comps_object_copy(it->comps_obj);
+        comps_set_add(set, tmppkg);
+        comps_objlist_append(ret, (COMPS_Object*)tmppkg);
+    }
+    for (it = pkgs2 ? pkgs2->first : NULL; it != NULL; it = it->next) {
+        if ((data = comps_set_data_at(set, it->comps_obj)) != NULL) {
+            ((COMPS_DocGroupPackage*)data)->type =
+                    ((COMPS_DocGroupPackage*)it->comps_obj)->type;
+        } else {
+            comps_objlist_append(ret, it->comps_obj);
+        }
+    }
+    comps_set_destroy(&set);
+    return ret;
+}
+
+PyObject* PyCOMPSPacks_union(PyObject *self, PyObject *other) {
+    PyCOMPS_Sequence *res;
+    COMPS_ObjList *res_list;
+
+    if (other == NULL || Py_TYPE(other) != &PyCOMPS_PacksType) {
+        PyErr_Format(PyExc_TypeError, "Not %s instance", Py_TYPE(self)->tp_name);
+        return NULL;
+    }
+
+    res = (PyCOMPS_Sequence*) Py_TYPE(self)->tp_new(Py_TYPE(self), NULL, NULL);
+    PyCOMPSPacks_init(res, NULL, NULL);
+    res_list = comps_pkgs_union(((PyCOMPS_Sequence*)self)->list,
+                                ((PyCOMPS_Sequence*)other)->list);
+
+    COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)res)->list);
+    res->list = res_list;
+    return (PyObject*)res;
+}
 
 PyCOMPS_ItemInfo PyCOMPS_PkgsInfo = {
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_PackType},
@@ -629,7 +677,8 @@ PyCOMPS_ItemInfo PyCOMPS_PkgsInfo = {
                         {&comps_pkgs_in},
     .out_convert_func = &comps_pkgs_out,
     .item_types_len = 1,
-    .pre_checker = &pycomps_package_validate
+    .props_offset = offsetof(COMPS_DocGroupPackage, name),
+    .pre_checker = &pycomps_package_validate,
 };
 
 int PyCOMPSPacks_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds)
@@ -647,6 +696,10 @@ PyMethodDef PyCOMPSPacks_methods[] = {
     {NULL}  /* Sentinel */
 };
 
+PyNumberMethods PyCOMPSPacks_Nums = {
+    .nb_add = PyCOMPSPacks_union
+};
+
 PyTypeObject PyCOMPS_PacksType = {
     PY_OBJ_HEAD_INIT
     "libcomps.PackageList",   /*tp_name*/
@@ -658,9 +711,9 @@ PyTypeObject PyCOMPS_PacksType = {
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/
     0,                         /*tp_repr*/
-    0,                         /*tp_as_number*/
+    &PyCOMPSPacks_Nums,        /*tp_as_number*/
     0,//&PyCOMPSPack_sequence,       /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
+    &PyCOMPSSeq_mapping_extra, /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
     PyCOMPSSeq_str,           /*tp_str*/
@@ -712,21 +765,25 @@ PyObject* PyCOMPSPack_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
 int PyCOMPSPack_init(PyCOMPS_Package *self, PyObject *args, PyObject *kwds)
 {
-    char *name = NULL;
+    char *name = NULL, *requires=NULL;
     int type = COMPS_PACKAGE_UNKNOWN;
 
-   (void) kwds;
+    #define _pkg_ ((PyCOMPS_Package*)self)->package
 
-    if (args!=NULL && PyArg_ParseTuple(args, "|si", &name, &type)) {
-        comps_docpackage_set_name(((PyCOMPS_Package*)self)->package, name, 1);
-        comps_docpackage_set_type(((PyCOMPS_Package*)self)->package, type, false);
+    static char *kwlist[] = {"name", "type", "requires", NULL};
+
+    if (!args && !kwds) {
+        return 0;
+    } else if (PyArg_ParseTupleAndKeywords(args, kwds, "|sis", kwlist,
+                                          &name, &type, &requires)) {
+        comps_docpackage_set_name(_pkg_, name, 1);
+        comps_docpackage_set_requires(_pkg_, requires, 1);
+        comps_docpackage_set_type_i(_pkg_, type, 0);
         return 0;
     } else {
-        ((PyCOMPS_Package*)self)->package->name = NULL;
-        ((PyCOMPS_Package*)self)->package->type = COMPS_PACKAGE_UNKNOWN;
-        return 0;
+        return -1;
     }
-    return 1;
+    #undef _pkg_
 }
 
 PyObject* PyCOMPSPack_strget_(PyCOMPS_Package *self, void *closure) {
