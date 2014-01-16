@@ -132,8 +132,11 @@
 
         * accepting only specified type of object.
           :py:class:`PackageList` devours only :py:class:`Package` instance.
+        * accepting string argument in getter/setter items methods
+          as indentificator of package name.
         * run validation procedure on absorbed object so you can't
           append/insert/set invalid :py:class:`Package` object
+
 
     libcomps.Package
     ----------------
