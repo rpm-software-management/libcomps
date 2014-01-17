@@ -37,7 +37,7 @@ Summary:        Documentation files for python bindings libcomps library
 Group:          Documentation
 Requires:       %{name} = %{version}-%{release}
 BuildArch:      noarch
-BuildRequires:  sphinx
+BuildRequires:  python-sphinx
 
 %description -n python-libcomps-doc
 Documentation files for python bindings libcomps library
