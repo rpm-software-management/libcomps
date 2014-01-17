@@ -1,14 +1,14 @@
-%global commit @GITREVLONG@
+%global commit ${GITREVLONG}
 
 Name:           libcomps
-Version:        @VERSION@
-Release:        @libcomps_RELEASE@%{?dist}
+Version:        ${VERSION}
+Release:        ${libcomps_RELEASE}%{?dist}
 Summary:        Comps XML file manipulation library
 
 Group:          Development/Libraries
 License:        GPLv2+
 URL:            https://github.com/midnightercz/libcomps/
-Source0:        https://github.com/midnightercz/libcomps/@SOURCE_URL_PATH@
+Source0:        https://github.com/midnightercz/libcomps/${SOURCE_URL_PATH}
 BuildRequires:  libxml2-devel
 BuildRequires:  check-devel
 BuildRequires:  expat-devel
@@ -132,4 +132,4 @@ rm -rf $buildroot
 
 
 %changelog
-@CHANGELOG@
+${CHANGELOG}
