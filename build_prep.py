@@ -11,7 +11,10 @@ def is_commit_tag(commit):
                           '--tags', "--exact-match", "%s"%commit],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p.wait()
-    return p.returncode is 0
+    if p.returncode is 0:
+        return p.stdout.readline().strip()
+    else:
+        return None
 
 def tag_to_commit(tag):
     p = subprocess.Popen(['git', 'rev-parse', "%s^{commit}"%tag],
@@ -139,12 +142,13 @@ if __name__ == "__main__":
     tags = git_tags_chrono()
     subs["CHANGELOG"] = "\n".join(build_chlog(tags, top_commit))
 
-    if not is_commit_tag(top_commit):
+    tag = is_commit_tag(top_commit)
+    if not tag:
         subs["SOURCE_URL_PATH"] = "archive/%{commit}/libcomps-%{commit}.tar.gz"
         archive_name = "libcomps-%s.tar.gz"%(top_commit,)
     else:
         subs["SOURCE_URL_PATH"] = tags[-1]+".tar.gz"
-        archive_name = "%s.tar.gz"%(top_commit,)
+        archive_name = "%s.tar.gz"%(tag,)
 
     subs["VERSION"] = "%s.%s.%s" % (subs["libcomps_VERSION_MAJOR"],
                                     subs["libcomps_VERSION_MINOR"],
