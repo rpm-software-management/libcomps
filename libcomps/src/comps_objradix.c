@@ -316,7 +316,7 @@ signed char comps_objrtree_cmp(COMPS_ObjRTree *ort1, COMPS_ObjRTree *ort2) {
     comps_set_destroy(&set2);
     //printf("objrtree cmp %d\n", !ret);
     
-    char *str;
+    //char *str;
     /*for (it = values1->first; it != NULL; it = it->next) {
         str = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
         printf("dict item %s=%s\n", ((COMPS_ObjRTreePair*)it->data)->key, str);

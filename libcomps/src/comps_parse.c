@@ -224,7 +224,7 @@ void comps_parse_end_elem_handler(void *userData, const XML_Char *s) {
     //COMPS_ListItem * item;
     char * alltext = NULL;
     //size_t item_len;
-    int index=0;
+    //int index=0;
     void *data;
     #define parser_line XML_GetCurrentLineNumber(((COMPS_Parsed*)userData)->parser)
     #define parser_col XML_GetCurrentColumnNumber(((COMPS_Parsed*)userData)->parser)
