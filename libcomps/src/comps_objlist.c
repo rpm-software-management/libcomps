@@ -329,7 +329,7 @@ COMPS_ObjList* comps_objlist_sublist_it(COMPS_ObjListIt *startit,
                                       COMPS_ObjListIt *end) {
     COMPS_ObjList *ret;
     COMPS_ObjListIt *it;
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 
     for (it = startit; it != end; it = it->next) {
         comps_objlist_append(ret, it->comps_obj);
@@ -344,7 +344,7 @@ COMPS_ObjList* comps_objlist_sublist_it_step(COMPS_ObjListIt *startit,
     COMPS_ObjList *ret;
     COMPS_ObjListIt *it;
 
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
     stepc = step;
     for (it = startit; it->next != end; it = it->next, stepc++) {
         if (step == stepc) {
@@ -361,7 +361,7 @@ COMPS_ObjList* comps_objlist_sublist_indexed(COMPS_ObjList *objlist,
     unsigned int pos;
     COMPS_ObjList *ret;
     COMPS_ObjListIt *it;
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 
     for (it = objlist->first, pos=0;
          it != NULL && pos != start;
@@ -380,7 +380,7 @@ COMPS_ObjList* comps_objlist_sublist_indexed_step(COMPS_ObjList *objlist,
     unsigned int stepc;
     COMPS_ObjList *ret;
     COMPS_ObjListIt *it;
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 
     pos = 0;
     stepc = 0;
@@ -402,7 +402,7 @@ COMPS_ObjList* comps_objlist_filter(COMPS_ObjList *list,
     unsigned int i = 0;
     COMPS_ObjListIt *it;
 
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 
     for (i=0, it = list->first; i < list->len; it = it->next, i++) {
         if (filter_func(it->comps_obj))
@@ -415,7 +415,7 @@ COMPS_ObjList* comps_objlist_concat(COMPS_ObjList *list1, COMPS_ObjList *list2) 
     COMPS_ObjList *ret;
     COMPS_ObjListIt *it;
 
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
     for (it = list1->first; it != NULL; it = it->next) {
         comps_objlist_append(ret, it->comps_obj);
     }

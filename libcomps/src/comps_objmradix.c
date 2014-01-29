@@ -46,8 +46,7 @@ static COMPS_ObjMRTreeData * __comps_objmrtree_data_create(char * key,
     memcpy(rtd->key, key, sizeof(char)*keylen);
     rtd->key[keylen] = '\0';
     rtd->is_leaf = 1;
-    rtd->data = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
-                                                    NULL);
+    rtd->data = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
     if (data)
         comps_objlist_append_x(rtd->data, data);
     rtd->subnodes = comps_hslist_create();
@@ -232,7 +231,7 @@ COMPS_ObjMRTree * comps_objmrtree_clone(COMPS_ObjMRTree * rt) {
 
     to_clone = comps_hslist_create();
     comps_hslist_init(to_clone, NULL, NULL, NULL);
-    ret = (COMPS_ObjMRTree*)comps_object_create(&COMPS_ObjMRTree_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjMRTree, NULL);
 
     for (it = rt->subnodes->first; it != NULL; it = it->next) {
         rtdata = comps_objmrtree_data_create(
@@ -430,8 +429,7 @@ void __comps_objmrtree_set(COMPS_ObjMRTree *rt, char *key,
                 comps_hslist_init(rtdata->subnodes, NULL, NULL,
                                   &comps_objmrtree_data_destroy_v);
                 int cmpret = strcmp(key+offset+x, rtdata->key+x);
-                rtdata->data = (COMPS_ObjList*)
-                              comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+                rtdata->data = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 
                 if (cmpret > 0) {
                     rtd = comps_objmrtree_data_create(rtdata->key+x,

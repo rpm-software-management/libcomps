@@ -35,8 +35,7 @@ PyObject* PyCOMPSGID_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (PyCOMPS_GID*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->gid = (COMPS_DocGroupId*)comps_object_create(
-                                            &COMPS_DocGroupId_ObjInfo, NULL);
+        self->gid = COMPS_OBJECT_CREATE(COMPS_DocGroupId, NULL);
     }
     return (PyObject*) self;
 }
@@ -149,8 +148,7 @@ int PyCOMPSGID_print(PyObject *self, FILE *f, int flags) {
 COMPS_DocGroupId* comps_gid_from_str(PyObject *other) {
     COMPS_DocGroupId *gid;
     char *name;
-    gid = (COMPS_DocGroupId*)comps_object_create(&COMPS_DocGroupId_ObjInfo,
-                                                 NULL);
+    gid = COMPS_OBJECT_CREATE(COMPS_DocGroupId, NULL);
     if (__pycomps_stringable_to_char(other, &name))
         return NULL;
     gid->name = comps_str_x(name);

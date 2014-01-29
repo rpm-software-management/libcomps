@@ -29,9 +29,8 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                                  COMPS_DefaultsOptions *def_options);
 
 void comps_doc_create(COMPS_Doc* doc, COMPS_Object **args) {
-    doc->objects = (COMPS_ObjDict*) comps_object_create(&COMPS_ObjDict_ObjInfo,
-                                                       NULL);
-    doc->log = (COMPS_Log*)comps_object_create(&COMPS_Log_ObjInfo, NULL);
+    doc->objects = COMPS_OBJECT_CREATE(COMPS_ObjDict, NULL);
+    doc->log = COMPS_OBJECT_CREATE(COMPS_Log, NULL);
     //doc->log = comps_log_create(0);
     if (args && args[0]->obj_info == &COMPS_Str_ObjInfo) {
         doc->encoding = (COMPS_Str*) comps_object_incref(args[0]);
@@ -275,8 +274,8 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
     */
 
     void *tmpdata;
-    res = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
-             (COMPS_Object*[]){(COMPS_Object*)c1->encoding});
+    res = COMPS_OBJECT_CREATE(COMPS_Doc, (COMPS_Object*[]){(COMPS_Object*)
+                                                           c1->encoding});
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_docgroup_idcmp);
@@ -387,8 +386,8 @@ COMPS_Doc* comps_doc_intersect(COMPS_Doc *c1, COMPS_Doc *c2) {
     COMPS_ObjList *categories = comps_doc_categories(c1);
     COMPS_ObjList *envs = comps_doc_environments(c1);
 
-    res = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
-                            (COMPS_Object*[]){(COMPS_Object*)c1->encoding});
+    res = COMPS_OBJECT_CREATE(COMPS_Doc, (COMPS_Object*[])
+                                         {(COMPS_Object*)c1->encoding});
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &__comps_docgroup_idcmp);
@@ -461,7 +460,7 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
     objname = comps_str(name);
     objdesc = comps_str(desc);
 
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
     #define group ((COMPS_DocGroup*)it->comps_obj)
 
     if (id != NULL) matched_max++;
@@ -696,8 +695,8 @@ COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches) {
     COMPS_DocGroup *group;
     COMPS_DocEnv *env;
 
-    ret = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
-                          (COMPS_Object*[]){(COMPS_Object*)source->encoding});
+    ret = COMPS_OBJECT_CREATE(COMPS_Doc, (COMPS_Object*[])
+                                         {(COMPS_Object*)source->encoding});
     list = comps_doc_categories(source);
     for (COMPS_ObjListIt *it = list->first; it != NULL; it = it->next) {
         arches2 = comps_doccategory_arches((COMPS_DocCategory*)it->comps_obj);
@@ -747,9 +746,8 @@ COMPS_ValGenResult* comps_doc_listobjs_validate(COMPS_Object *object,
         tmpres = comps_validate_execute(it->comps_obj, rules);
         if (tmpres->obj_info == &COMPS_ValErrResult_ObjInfo) {
             if (!valres) {
-                valres = (COMPS_ValGenResult*)comps_object_create(
-                                                    &COMPS_ValErrResult_ObjInfo,
-                                                    NULL);
+                valres = (COMPS_ValGenResult*)
+                         COMPS_OBJECT_CREATE(COMPS_ValErrResult, NULL);
             }
             str = malloc(digits_count(x)*(sizeof(char)+2));
             sprintf(str, "%zu.", x);
@@ -760,9 +758,8 @@ COMPS_ValGenResult* comps_doc_listobjs_validate(COMPS_Object *object,
         COMPS_OBJECT_DESTROY(tmpres);
     }
     if (!valres) {
-        valres = (COMPS_ValGenResult*)comps_object_create(
-                                            &COMPS_ValOkResult_ObjInfo,
-                                            NULL);
+        valres = (COMPS_ValGenResult*)COMPS_OBJECT_CREATE(COMPS_ValOkResult,
+                                                          NULL);
     }
     return valres;
 }

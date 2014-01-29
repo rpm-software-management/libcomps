@@ -62,7 +62,7 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
     parsed->text_buffer_len = 0;
     parsed->text_buffer_pt = NULL;
     parsed->tmp_buffer = NULL;
-    parsed->log = (COMPS_Log*)comps_object_create(&COMPS_Log_ObjInfo, NULL);
+    parsed->log = COMPS_OBJECT_CREATE(COMPS_Log, NULL);
     parsed->log->std_out = log_stdout;
     parsed->comps_doc = NULL;
     parsed->fatal_error = 0;

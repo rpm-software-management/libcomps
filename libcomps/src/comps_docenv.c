@@ -22,16 +22,11 @@
 
 void comps_docenv_create(COMPS_DocEnv* env, COMPS_Object **args) {
     (void)args;
-    env->properties = (COMPS_ObjDict*)comps_object_create(
-                                                &COMPS_ObjDict_ObjInfo, NULL);
-    env->name_by_lang = (COMPS_ObjDict*)comps_object_create(
-                                                &COMPS_ObjDict_ObjInfo, NULL);
-    env->desc_by_lang = (COMPS_ObjDict*)comps_object_create(
-                                                &COMPS_ObjDict_ObjInfo, NULL);
-    env->group_list = (COMPS_ObjList*)comps_object_create(
-                                                &COMPS_ObjList_ObjInfo, NULL);
-    env->option_list = (COMPS_ObjList*)comps_object_create(
-                                                &COMPS_ObjList_ObjInfo, NULL);
+    env->properties = COMPS_OBJECT_CREATE(COMPS_ObjDict, NULL);
+    env->name_by_lang = COMPS_OBJECT_CREATE(COMPS_ObjDict, NULL);
+    env->desc_by_lang = COMPS_OBJECT_CREATE(COMPS_ObjDict, NULL);
+    env->group_list = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
+    env->option_list = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 }
 COMPS_CREATE_u(docenv, COMPS_DocEnv)
 
@@ -86,8 +81,7 @@ void comps_docenv_add_groupid(COMPS_DocEnv *env,
         return;
     }
     if (env->group_list == NULL) {
-        env->group_list = (COMPS_ObjList*) comps_object_create(
-                                            &COMPS_ObjList_ObjInfo, NULL);
+        env->group_list = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
     }
     comps_objlist_append_x(env->group_list, (COMPS_Object*)gid);
 }
@@ -100,8 +94,7 @@ void comps_docenv_add_optionid(COMPS_DocEnv *env,
         return;
     }
     if (env->option_list == NULL) {
-        env->option_list = (COMPS_ObjList*) comps_object_create(
-                                            &COMPS_ObjList_ObjInfo, NULL);
+        env->option_list = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
     }
     comps_objlist_append_x(env->option_list, (COMPS_Object*)gid);
 }
@@ -159,7 +152,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     int index;
     void *data;
 
-    res = (COMPS_DocEnv*)comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
+    res = COMPS_OBJECT_CREATE(COMPS_DocEnv, NULL);
     COMPS_OBJECT_DESTROY(res->properties);
 
     res->properties = comps_objdict_union(e1->properties, e2->properties);
@@ -229,7 +222,7 @@ COMPS_DocEnv* comps_docenv_intersect(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
     COMPS_Set *set, *set2;
     COMPS_HSList *pairs1, *pairs2;
 
-    res = (COMPS_DocEnv*)comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
+    res = COMPS_OBJECT_CREATE(COMPS_DocEnv, NULL);
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &comps_objrtree_paircmp);
 
@@ -449,8 +442,7 @@ char* comps_docenv_tostr_u(COMPS_Object* env) {
 COMPS_DocEnv* comps_docenv_arch_filter(COMPS_DocEnv *source,
                                        COMPS_ObjList *arches) {
     COMPS_ObjList *arches2;
-    COMPS_DocEnv *ret = (COMPS_DocEnv*)
-                          comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
+    COMPS_DocEnv *ret = COMPS_OBJECT_CREATE(COMPS_DocEnv, NULL);
     COMPS_OBJECT_DESTROY(ret->properties);
     ret->properties = (COMPS_ObjDict*)COMPS_OBJECT_COPY(source->properties);
     COMPS_OBJECT_DESTROY(ret->name_by_lang);

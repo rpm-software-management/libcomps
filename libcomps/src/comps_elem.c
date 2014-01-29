@@ -424,7 +424,7 @@ void __comps_check_allready_set(COMPS_Object *param, char *param_name,
 COMPS_ObjList * __comps_split_arches(char *arches) {
     COMPS_ObjList *list;
     char *pch;
-    list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    list = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
     pch = strtok(arches, " ");
     while (pch != NULL) {
         comps_objlist_append_x(list, (COMPS_Object*)comps_str(pch));
@@ -436,15 +436,13 @@ COMPS_ObjList * __comps_split_arches(char *arches) {
 void comps_elem_doc_preproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
     (void)elem;
     COMPS_Object *prop = (COMPS_Object*)comps_str(parsed->enc);
-    parsed->comps_doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
-                                            (COMPS_Object*[]){prop});
+    parsed->comps_doc = COMPS_OBJECT_CREATE(COMPS_Doc, (COMPS_Object*[]){prop});
     comps_object_destroy(prop);
 }
 void comps_elem_group_preproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
     char *arches;
     
-    COMPS_DocGroup *group = (COMPS_DocGroup*)
-                            comps_object_create(&COMPS_DocGroup_ObjInfo, NULL);
+    COMPS_DocGroup *group = COMPS_OBJECT_CREATE(COMPS_DocGroup, NULL);
     comps_doc_add_group(parsed->comps_doc, group);
     arches = comps_dict_get(elem->attrs, "_arch");
     if (arches) {
@@ -482,8 +480,7 @@ void comps_elem_group_postproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
 
 void comps_elem_category_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     char *arches;
-    COMPS_DocCategory *category = (COMPS_DocCategory*)
-                            comps_object_create(&COMPS_DocCategory_ObjInfo, NULL);
+    COMPS_DocCategory *category = COMPS_OBJECT_CREATE(COMPS_DocCategory, NULL);
     comps_doc_add_category(parsed->comps_doc, category);
     arches = comps_dict_get(elem->attrs, "_arch");
     if (arches) {
@@ -508,8 +505,7 @@ void comps_elem_category_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
 }
 void comps_elem_env_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     char *arches;
-    COMPS_DocEnv *env = (COMPS_DocEnv*)
-                            comps_object_create(&COMPS_DocEnv_ObjInfo, NULL);
+    COMPS_DocEnv *env = COMPS_OBJECT_CREATE(COMPS_DocEnv, NULL);
     comps_doc_add_environment(parsed->comps_doc, env);
     arches = comps_dict_get(elem->attrs, "_arch");
     if (arches) {
@@ -577,9 +573,8 @@ void comps_elem_packagereq_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     group = (COMPS_DocGroup*)list->last->comps_obj;
     COMPS_OBJECT_DESTROY(list);
 
-    package = (COMPS_DocGroupPackage*)
-              comps_object_create(&COMPS_DocGroupPackage_ObjInfo,
-                                  NULL);
+    package = COMPS_OBJECT_CREATE(COMPS_DocGroupPackage, NULL);
+
     comps_docgroup_add_package(group, package);
     tmp = comps_dict_get(elem->attrs, "type");
     if (!tmp)
@@ -618,8 +613,7 @@ void comps_elem_groupid_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     COMPS_DocGroupId *groupid;
     COMPS_ObjList *list;
     char *tmp;
-    groupid = (COMPS_DocGroupId*)
-              comps_object_create(&COMPS_DocGroupId_ObjInfo, NULL);
+    groupid = COMPS_OBJECT_CREATE(COMPS_DocGroupId, NULL);
     tmp = comps_dict_get(elem->attrs, "default");
     if (tmp)
         comps_docgroupid_set_default(groupid,

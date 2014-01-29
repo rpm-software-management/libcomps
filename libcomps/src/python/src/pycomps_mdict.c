@@ -61,8 +61,7 @@ PyObject* PyCOMPSMDict_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (PyCOMPS_MDict*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->dict = (COMPS_ObjMDict*)comps_object_create(&COMPS_ObjMDict_ObjInfo,
-                                                         NULL);
+        self->dict = COMPS_OBJECT_CREATE(COMPS_ObjMDict, NULL);
     }
     return (PyObject*) self;
 }

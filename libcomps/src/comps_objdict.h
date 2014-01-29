@@ -33,8 +33,10 @@
 #include "comps_objmradix.h"
 
 typedef COMPS_ObjRTree COMPS_ObjDict;
-//typedef COMPS_ObjRTree_ObjInfo COMPS_ObjDict_ObjInfo;
+COMPS_Object_TAIL(COMPS_ObjDict);
+
 typedef COMPS_ObjMRTree COMPS_ObjMDict;
+COMPS_Object_TAIL(COMPS_ObjMDict);
 
 COMPS_ObjDict* comps_objdict_create();
 COMPS_ObjMDict* comps_objmdict_create();
@@ -330,8 +332,4 @@ COMPS_HSList* comps_objmdict_pairs(COMPS_ObjMDict *rt);
  */
 COMPS_ObjDict* comps_objdict_union(COMPS_ObjDict *d1, COMPS_ObjDict *d2);
 /** @}*/
-
-extern COMPS_ObjectInfo COMPS_ObjDict_ObjInfo;
-extern COMPS_ObjectInfo COMPS_ObjMDict_ObjInfo;
-
 #endif

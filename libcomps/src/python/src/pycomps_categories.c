@@ -57,9 +57,7 @@ PyObject* PyCOMPSCat_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (PyCOMPS_Category*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->cat = (COMPS_DocCategory*)comps_object_create(
-                                                    &COMPS_DocCategory_ObjInfo,
-                                                    NULL);
+        self->cat = COMPS_OBJECT_CREATE(COMPS_DocCategory, NULL);
         self->p_group_ids = NULL;
         self->p_name_by_lang = NULL;
         self->p_desc_by_lang = NULL;
@@ -402,7 +400,7 @@ COMPS_ObjList* comps_cats_union(COMPS_ObjList *cats1, COMPS_ObjList *cats2) {
     void *data;
     int index;
 
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, &comps_object_destroy_v,

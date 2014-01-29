@@ -56,9 +56,7 @@ PyObject* PyCOMPSGroup_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (PyCOMPS_Group*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->group = (COMPS_DocGroup*)comps_object_create(
-                                                    &COMPS_DocGroup_ObjInfo,
-                                                    NULL);
+        self->group = COMPS_OBJECT_CREATE(COMPS_DocGroup, NULL);
         self->p_packages = NULL;
         self->p_name_by_lang = NULL;
         self->p_desc_by_lang = NULL;
@@ -481,7 +479,7 @@ COMPS_ObjList* comps_groups_union(COMPS_ObjList *groups1,
     void *data;
     int index;
 
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, &comps_object_destroy_v,
@@ -630,7 +628,7 @@ COMPS_ObjList* comps_pkgs_union(COMPS_ObjList *pkgs1, COMPS_ObjList *pkgs2) {
     void *data;
     //int index;
 
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, &comps_object_destroy_v,
@@ -756,9 +754,7 @@ PyObject* PyCOMPSPack_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (PyCOMPS_Package*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->package = (COMPS_DocGroupPackage*)
-                        comps_object_create(&COMPS_DocGroupPackage_ObjInfo,
-                                            NULL);
+        self->package = COMPS_OBJECT_CREATE(COMPS_DocGroupPackage, NULL);
     }
     return (PyObject*) self;
 }

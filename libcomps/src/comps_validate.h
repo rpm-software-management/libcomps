@@ -43,21 +43,25 @@ typedef struct COMPS_ValRuleList2 {
 struct COMPS_ValGenResult {
     H_COMPS_VAL_RESULT;
 };
+COMPS_Object_TAIL(COMPS_ValGenResult);
 
 typedef struct COMPS_ValOkResult {
     H_COMPS_VAL_RESULT;
 } COMPS_ValOkResult;
+COMPS_Object_TAIL(COMPS_ValOkResult);
 
 typedef struct COMPS_ValErrResult {
     H_COMPS_VAL_RESULT;
     COMPS_ObjList *err_list;
 } COMPS_ValErrResult;
+COMPS_Object_TAIL(COMPS_ValErrResult);
 
 typedef struct COMPS_ValErr {
     COMPS_Object_HEAD;
     COMPS_Object *err_object;
     char *err_msg;
 } COMPS_ValErr;
+COMPS_Object_TAIL(COMPS_ValErr);
 
 
 COMPS_ValGenResult* comps_validate_rule_prop_check(COMPS_ValRuleGeneric *rule,
@@ -77,8 +81,8 @@ void comps_valgenres_concat(COMPS_ValGenResult **res1,
                                      COMPS_ValGenResult *res2);
 void comps_valgenres_prefix(COMPS_ValGenResult *res, const char *prefix);
 
-extern COMPS_ObjectInfo COMPS_ValGenResult_ObjInfo;
-extern COMPS_ObjectInfo COMPS_ValOkResult_ObjInfo;
-extern COMPS_ObjectInfo COMPS_ValErrResult_ObjInfo;
-extern COMPS_ObjectInfo COMPS_ValErr_ObjInfo;
+//extern COMPS_ObjectInfo COMPS_ValGenResult_ObjInfo;
+//extern COMPS_ObjectInfo COMPS_ValOkResult_ObjInfo;
+//extern COMPS_ObjectInfo COMPS_ValErrResult_ObjInfo;
+//extern COMPS_ObjectInfo COMPS_ValErr_ObjInfo;
 #endif

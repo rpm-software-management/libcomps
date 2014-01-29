@@ -46,7 +46,7 @@
     COMPS_ObjList *ret;\
     ret = (COMPS_ObjList*)comps_objdict_get(doc->objects, #OBJS);\
     if (!ret) {\
-        ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);\
+        ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);\
         comps_objdict_set_x(doc->objects, #OBJS, (COMPS_Object*)ret);\
         ret = (COMPS_ObjList*)comps_object_incref((COMPS_Object*)ret);\
     }\
@@ -74,7 +74,7 @@
     COMPS_ObjDict *ret;\
     ret = (COMPS_ObjDict*)comps_objdict_get(doc->objects, #OBJNAME);\
     if (!ret) {\
-        ret = (COMPS_ObjDict*)comps_object_create(&COMPS_ObjDict_ObjInfo, NULL);\
+        ret = COMPS_OBJECT_CREATE(COMPS_ObjDict, NULL);\
         comps_objdict_set_x(doc->objects, #OBJNAME, (COMPS_Object*)ret);\
         ret = (COMPS_ObjDict*)comps_object_incref((COMPS_Object*)ret);\
     }\
@@ -90,7 +90,7 @@
     COMPS_ObjMDict *ret;\
     ret = (COMPS_ObjMDict*)comps_objdict_get(doc->objects, #OBJNAME);\
     if (!ret) {\
-        ret = (COMPS_ObjMDict*)comps_object_create(&COMPS_ObjMDict_ObjInfo, NULL);\
+        ret = COMPS_OBJECT_CREATE(COMPS_ObjMDict, NULL);\
         comps_objdict_set_x(doc->objects, #OBJNAME, (COMPS_Object*)ret);\
         ret = (COMPS_ObjMDict*)comps_object_incref((COMPS_Object*)ret);\
     }\
@@ -131,7 +131,7 @@
     COMPS_ObjList *ret;\
     ret = (COMPS_ObjList*)comps_objdict_get(doc->objects, #OBJS);\
     if (!ret) {\
-        ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);\
+        ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);\
         comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)ret);\
     } else {\
     }\
@@ -153,7 +153,7 @@
     COMPS_ObjDict *ret;\
     ret = (COMPS_ObjDict*)comps_objdict_get(doc->objects, #OBJS);\
     if (!ret) {\
-        ret = (COMPS_ObjDict*)comps_object_create(&COMPS_ObjDict_ObjInfo, NULL);\
+        ret = COMPS_OBJECT_CREATE(COMPS_ObjDict, NULL);\
         comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)ret);\
     }\
     comps_objdict_set_x(ret, key, (COMPS_Object*)obj);\
@@ -176,7 +176,7 @@
     COMPS_ObjMDict *ret;\
     ret = (COMPS_ObjMDict*)comps_objdict_get(doc->objects, #OBJS);\
     if (!ret) {\
-        ret = (COMPS_ObjMDict*)comps_object_create(&COMPS_ObjMDict_ObjInfo, NULL);\
+        ret = COMPS_OBJECT_CREATE(COMPS_ObjMDict, NULL);\
         comps_objdict_set(doc->objects, #OBJS, (COMPS_Object*)ret);\
     }\
     comps_objmdict_set_x(ret, key, (COMPS_Object*)obj);\
@@ -202,13 +202,15 @@ typedef struct {
      * by parsing and xml generating */
     COMPS_Str *encoding;   /**< comps.xml document encoding */
     } COMPS_Doc;
+COMPS_Object_TAIL(COMPS_Doc);
 
 //HEAD_COMPS_CREATE_u(doc, COMPS_Doc)  /*comps_utils.h macro*/
 //HEAD_COMPS_COPY_u(doc, COMPS_Doc)  /*comps_utils.h macro*/
 //HEAD_COMPS_DESTROY_u(doc, COMPS_Doc)  /*comps_utils.h macro*/
 
 /** constructor callback for COMPS_Doc object. COMPS_Doc is COMPS_Object
- * derivate. Use comps_object_create() for construction instead
+ * derivate. Use comps_object_create() or COMPS_OBJECT_CREATE for construction
+ * instead
  *
  * @param doc allocated COMPS_Doc object
  * @param args array of constructor arguments. COMPS_Doc constructor accepts
@@ -415,7 +417,7 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2);
 
 COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches);
 
-extern COMPS_ObjectInfo COMPS_Doc_ObjInfo;
+//extern COMPS_ObjectInfo COMPS_Doc_ObjInfo;
 extern COMPS_ValRuleGeneric* COMPS_Doc_ValidateRules[];
 
 #endif //COMPS_DOC_H

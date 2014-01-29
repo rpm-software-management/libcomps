@@ -44,7 +44,7 @@ typedef struct COMPS_ObjList {
     COMPS_ObjListIt *last; /**< last list item iterator */
     size_t len; /**< list lenght*/
 } COMPS_ObjList;
-
+COMPS_Object_TAIL(COMPS_ObjList);
 
 //void comps_objlist_create(COMPS_ObjList *objlist, COMPS_Object **args);
 //void comps_objlist_create_u(COMPS_Object *uobj, COMPS_Object **args);
@@ -205,6 +205,6 @@ COMPS_ObjList* comps_objlist_filter(COMPS_ObjList *list,
 
 void comps_objlist_concat_in(COMPS_ObjList *list1, COMPS_ObjList *list2);
 
-extern COMPS_ObjectInfo COMPS_ObjList_ObjInfo;
+//extern COMPS_ObjectInfo COMPS_ObjList_ObjInfo;
 
 #endif

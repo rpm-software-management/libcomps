@@ -154,13 +154,13 @@ signed char comps_str_cmp_u(COMPS_Object *str1, COMPS_Object *str2) {
 
 
 COMPS_Num* comps_num(int n) {
-    COMPS_Num *ret = (COMPS_Num*)comps_object_create(&COMPS_Num_ObjInfo, NULL);
+    COMPS_Num *ret = COMPS_OBJECT_CREATE(COMPS_Num, NULL);
     ret->val = n;
     return ret;
 }
 
 COMPS_Str* comps_str(const char *s) {
-    COMPS_Str *ret = (COMPS_Str*)comps_object_create(&COMPS_Str_ObjInfo, NULL);
+    COMPS_Str *ret = COMPS_OBJECT_CREATE(COMPS_Str, NULL);
     if (s) {
         ret->val = malloc(sizeof(char) * ((strlen(s)+1)));
         strcpy(ret->val, s);
@@ -169,7 +169,7 @@ COMPS_Str* comps_str(const char *s) {
     return ret;
 }
 COMPS_Str* comps_str_x(char *s) {
-    COMPS_Str *ret = (COMPS_Str*)comps_object_create(&COMPS_Str_ObjInfo, NULL);
+    COMPS_Str *ret = COMPS_OBJECT_CREATE(COMPS_Str, NULL);
     ret->val = s;
     return ret;
 }

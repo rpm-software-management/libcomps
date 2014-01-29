@@ -27,6 +27,14 @@
  *
  */
 
+/** \def COMPS_OBJECT_CREATE(obj_type, args)
+ * \brief macro for create object by choosen type without explicit needs
+ * of typecast. Macro returns concrete type of object not
+ * COMPS_Object type. If you want use this macro, you have to declare
+ * COMPS_ObjectInfo object exactly as <YourObject>_ObjInfo
+ * @see COMPS_Object_TAIL
+ */
+
 /** \def COMPS_OBJECT_CMP(obj1, obj2)
  * \brief macro for compare two COMPS_Object derivates without typecasting to
  *  COMPS_Object pointer
@@ -42,6 +50,14 @@
  *  COMPS_Object pointer
  */
 
+/** \def COMPS_Object_TAIL(obj)
+ * \brief insert "extern COMPS_ObjectInfo <obj>_ObjInfo" statement. Use this
+ * macro in combination with COMPS_OBJECT_CREATE
+ * @see COMPS_OBJECT_CREATE
+ */
+
+#define COMPS_OBJECT_CREATE(objtype, args)\
+    (objtype*)comps_object_create(&objtype##_ObjInfo, args)
 
 
 #define COMPS_OBJECT_CMP(obj1,obj2)\
@@ -64,6 +80,8 @@
  */
 #define COMPS_Object_HEAD COMPS_RefC *refc;\
                          COMPS_ObjectInfo *obj_info
+
+#define COMPS_Object_TAIL(obj) extern COMPS_ObjectInfo obj##_ObjInfo
 
 typedef struct COMPS_Object COMPS_Object;
 typedef struct COMPS_ObjectInfo COMPS_ObjectInfo;
@@ -111,6 +129,7 @@ struct COMPS_Num {
     COMPS_Object_HEAD; /** \n */
     int val; /**< value of represented number*/
 };
+COMPS_Object_TAIL(COMPS_Num);
 
 /** COMPS Object derivate representing string
  *
@@ -120,6 +139,7 @@ struct COMPS_Str {
     COMPS_Object_HEAD; /** \n */
     char *val; /**< holds reprezented string, freed at destruction time*/
 };
+COMPS_Object_TAIL(COMPS_Str);
 
 
 /** Create COMPS_Object derivate and pass \a args arguments to its constructor
@@ -201,7 +221,7 @@ COMPS_Str* comps_str_x(char *s);
  */
 void comps_str_set(COMPS_Str *str, char *s);
 
-extern COMPS_ObjectInfo COMPS_Num_ObjInfo;
-extern COMPS_ObjectInfo COMPS_Str_ObjInfo;
+//extern COMPS_ObjectInfo COMPS_Num_ObjInfo;
+//extern COMPS_ObjectInfo COMPS_Str_ObjInfo;
 
 #endif

@@ -30,6 +30,7 @@
 #include "comps_log.h"
 #include "comps_validate.h"
 #include "comps_default.h"
+#include "comps_obj.h"
 
 /** COMPS_Object derivate representing group_id element in comps.xml file */
 typedef struct {
@@ -40,6 +41,7 @@ typedef struct {
     /**< GroupId default attribute */
     COMPS_ObjList *arches;
 } COMPS_DocGroupId;
+COMPS_Object_TAIL(COMPS_DocGroupId);
 
 //HEAD_COMPS_CREATE_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
 //HEAD_COMPS_COPY_u(docgroupid, COMPS_DocGroupId)  /*comps_utils.h macro*/
@@ -86,7 +88,6 @@ signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
                                   COMPS_Log *log, COMPS_XMLOptions *options,
                                   COMPS_DefaultsOptions *def_options);
 
-extern COMPS_ObjectInfo COMPS_DocGroupId_ObjInfo;
 extern COMPS_ValRuleGeneric* COMPS_DocGroupId_ValidateRules[];
 
 #endif

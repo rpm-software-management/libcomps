@@ -528,8 +528,7 @@ PyObject* PyCOMPSSeq_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (PyCOMPS_Sequence*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->list = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
-                                                         NULL);
+        self->list = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
     } else return NULL;
     self->it_info = NULL;
     return (PyObject*) self;

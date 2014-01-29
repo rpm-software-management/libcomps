@@ -3,8 +3,7 @@
 static void comps_validate_errres_create(COMPS_ValErrResult *res,
                                          COMPS_Object *args) {
     (void)args;
-    res->err_list = (COMPS_ObjList*)
-                    comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    res->err_list = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 }
 
 static void comps_validate_errres_destroy(COMPS_ValErrResult *res) {
@@ -123,7 +122,7 @@ COMPS_ValGenResult* comps_validate_execute(COMPS_Object *obj,
         if (tmpres->obj_info != &COMPS_ValOkResult_ObjInfo) {
             if (!valres)
                 valres = (COMPS_ValGenResult*)
-                         comps_object_create(&COMPS_ValErrResult_ObjInfo, NULL);
+                         COMPS_OBJECT_CREATE(COMPS_ValErrResult, NULL);
             comps_valgenres_prefix(tmpres, rules[i]->verbose_msg);
             comps_valgenres_concat(&valres, tmpres);
         }
@@ -131,7 +130,7 @@ COMPS_ValGenResult* comps_validate_execute(COMPS_Object *obj,
     }
     if (!valres) {
         return (COMPS_ValGenResult*)
-               comps_object_create(&COMPS_ValOkResult_ObjInfo, NULL);
+               COMPS_OBJECT_CREATE(COMPS_ValOkResult, NULL);
     }
     return (COMPS_ValGenResult*)valres;
 }
@@ -146,11 +145,9 @@ COMPS_ValGenResult* comps_empty_check(COMPS_Object *obj, COMPS_Object *prop) {
     else if (__comps_strcmp("", ((COMPS_Str*)prop)->val)) err=2;
 
     if (err) {
-        valres = (COMPS_ValGenResult*)comps_object_create(
-                                                    &COMPS_ValErrResult_ObjInfo,
-                                                    NULL);
-        v_err = (COMPS_ValErr*)comps_object_create(&COMPS_ValErr_ObjInfo,
-                                                   NULL);
+        valres = (COMPS_ValGenResult*)COMPS_OBJECT_CREATE(COMPS_ValErrResult,
+                                                          NULL);
+        v_err = COMPS_OBJECT_CREATE(COMPS_ValErr, NULL);
         v_err->err_object = COMPS_OBJECT_INCREF(obj);
         if (err == 1)
             v_err->err_msg = __comps_strcpy("attr not set");
@@ -159,9 +156,8 @@ COMPS_ValGenResult* comps_empty_check(COMPS_Object *obj, COMPS_Object *prop) {
         comps_objlist_append_x(((COMPS_ValErrResult*)valres)->err_list,
                                (COMPS_Object*)v_err);
     } else {
-        valres = (COMPS_ValGenResult*)comps_object_create(
-                                                    &COMPS_ValOkResult_ObjInfo,
-                                                    NULL);
+        valres = (COMPS_ValGenResult*)COMPS_OBJECT_CREATE(COMPS_ValOkResult,
+                                                          NULL);
     }
     return valres;
 }
@@ -187,12 +183,11 @@ COMPS_ValGenResult* comps_objlist_unique_check(COMPS_Object *object,
             comps_set_add(set, it->comps_obj);
         } else {
             if (!valres) {
-                valres = (COMPS_ValGenResult*)comps_object_create(
-                                                    &COMPS_ValErrResult_ObjInfo,
+                valres = (COMPS_ValGenResult*)COMPS_OBJECT_CREATE(
+                                                    COMPS_ValErrResult,
                                                     NULL);
             }
-            v_err = (COMPS_ValErr*)comps_object_create(&COMPS_ValErr_ObjInfo,
-                                                       NULL);
+            v_err = COMPS_OBJECT_CREATE(COMPS_ValErr, NULL);
             v_err->err_object = COMPS_OBJECT_INCREF(object);
             index = comps_objlist_index(_objlist_, (COMPS_Object*)data);
             msg = malloc(sizeof(char) * (strlen(msg_fmt)-3)+digits_count(x)\
@@ -205,9 +200,8 @@ COMPS_ValGenResult* comps_objlist_unique_check(COMPS_Object *object,
     }
     comps_set_destroy(&set);
     if (!valres) {
-        valres = (COMPS_ValGenResult*)comps_object_create(
-                                                    &COMPS_ValOkResult_ObjInfo,
-                                                    NULL);
+        valres = (COMPS_ValGenResult*)COMPS_OBJECT_CREATE(COMPS_ValOkResult,
+                                                          NULL);
     }
     return valres;
     #undef _objlist_

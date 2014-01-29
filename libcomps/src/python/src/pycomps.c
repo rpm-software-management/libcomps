@@ -211,8 +211,7 @@ PyObject* PyCOMPS_clear(PyObject *self) {
     comps_object_incref((COMPS_Object*)((PyCOMPS*)self)->comps_doc->encoding);
 
     COMPS_OBJECT_DESTROY(((PyCOMPS*)self)->comps_doc);
-    ((PyCOMPS*)self)->comps_doc = (COMPS_Doc*)
-                                  comps_object_create(&COMPS_Doc_ObjInfo, NULL);
+    ((PyCOMPS*)self)->comps_doc = COMPS_OBJECT_CREATE(COMPS_Doc, NULL);
     ((PyCOMPS*)self)->comps_doc->encoding = enc;
     Py_RETURN_NONE;
 }
@@ -260,8 +259,8 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *args, PyObject* kwds) {
         self_comps->comps_doc = parsed->comps_doc;
     } else {
         tmpstr = (COMPS_Object*)comps_str("UTF-8");
-        self_comps->comps_doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
-                        (COMPS_Object*[]){tmpstr});
+        self_comps->comps_doc = COMPS_OBJECT_CREATE(COMPS_Doc,
+                                                    (COMPS_Object*[]){tmpstr});
         COMPS_OBJECT_DESTROY(tmpstr);
     }
     COMPS_OBJECT_DESTROY(self_comps->comps_doc->log);
@@ -506,8 +505,7 @@ PyObject* PyCOMPS_filter_arches(PyObject *self, PyObject *other) {
     }
     if (Py_TYPE(other) == &PyList_Type) {
         created = 1;
-        arches = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo,
-                                                    NULL);
+        arches = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
         for (Py_ssize_t x=0; x < PyList_Size(other); x++) {
             item = PyList_GetItem(other, x);
             __pycomps_arg_to_char(item, &str);
@@ -736,8 +734,7 @@ static PyObject* PyCOMPS_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     PyCOMPS *self;
     self = (PyCOMPS*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->comps_doc = (COMPS_Doc*)comps_object_create(&COMPS_Doc_ObjInfo,
-                                                          NULL);
+        self->comps_doc = COMPS_OBJECT_CREATE(COMPS_Doc, NULL);
         self->p_groups = NULL;
         self->p_categories = NULL;
         self->p_environments = NULL;

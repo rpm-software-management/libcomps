@@ -61,8 +61,7 @@ PyObject* PyCOMPSEnv_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (PyCOMPS_Env*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->env = (COMPS_DocEnv*)comps_object_create(&COMPS_DocEnv_ObjInfo,
-                                                       NULL);
+        self->env = COMPS_OBJECT_CREATE(COMPS_DocEnv, NULL);
         self->p_group_list = NULL;
         self->p_option_list = NULL;
         self->p_name_by_lang = NULL;
@@ -436,7 +435,7 @@ COMPS_ObjList* comps_envs_union(COMPS_ObjList *envs1, COMPS_ObjList *envs2) {
     void *data;
     int index;
 
-    ret = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, &comps_object_destroy_v,

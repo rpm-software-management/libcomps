@@ -22,14 +22,10 @@
 
 void comps_doccategory_create(COMPS_DocCategory *category, COMPS_Object **args) {
     (void)args;
-    category->properties = (COMPS_ObjDict*)comps_object_create(
-                                                  &COMPS_ObjDict_ObjInfo, NULL);
-    category->name_by_lang = (COMPS_ObjDict*)comps_object_create(
-                                                  &COMPS_ObjDict_ObjInfo, NULL);
-    category->desc_by_lang = (COMPS_ObjDict*)comps_object_create(
-                                                  &COMPS_ObjDict_ObjInfo, NULL);
-    category->group_ids = (COMPS_ObjList*)comps_object_create(
-                                                  &COMPS_ObjList_ObjInfo, NULL);
+    category->properties = COMPS_OBJECT_CREATE(COMPS_ObjDict, NULL);
+    category->name_by_lang = COMPS_OBJECT_CREATE(COMPS_ObjDict, NULL);
+    category->desc_by_lang = COMPS_OBJECT_CREATE(COMPS_ObjDict, NULL);
+    category->group_ids = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 }
 COMPS_CREATE_u(doccategory, COMPS_DocCategory)  /*comps_utils.h macro*/
 
@@ -79,8 +75,7 @@ void comps_doccategory_add_groupid(COMPS_DocCategory *category,
         return;
     }
     if (category->group_ids == NULL) {
-        category->group_ids = (COMPS_ObjList*) comps_object_create(
-                                                 &COMPS_ObjList_ObjInfo, NULL);
+        category->group_ids = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
     }
     comps_objlist_append_x(category->group_ids, (COMPS_Object*)gid);
 }
@@ -135,8 +130,7 @@ COMPS_DocCategory* comps_doccategory_union(COMPS_DocCategory *c1,
     void *data;
     int index;
 
-    res = (COMPS_DocCategory*)comps_object_create(&COMPS_DocCategory_ObjInfo,
-                                                  NULL);
+    res = COMPS_OBJECT_CREATE(COMPS_DocCategory,NULL);
     COMPS_OBJECT_DESTROY(res->properties);
 
     res->properties = comps_objdict_union(c1->properties, c2->properties);
@@ -178,7 +172,7 @@ COMPS_DocCategory* comps_doccategory_intersect(COMPS_DocCategory *c1,
 
     COMPS_HSList *pairs1, *pairs2;
 
-    res = (COMPS_DocCategory*)comps_object_create(&COMPS_DocCategory_ObjInfo, NULL);
+    res = COMPS_OBJECT_CREATE(COMPS_DocCategory, NULL);
     set = comps_set_create();
     comps_set_init(set, NULL, NULL, NULL, &comps_objrtree_paircmp);
 
@@ -351,9 +345,7 @@ char* comps_doccategory_tostr_u(COMPS_Object* cat) {
 COMPS_DocCategory* comps_doccategory_arch_filter(COMPS_DocCategory *source,
                                                  COMPS_ObjList *arches) {
     COMPS_ObjList *arches2;
-    COMPS_DocCategory *ret = (COMPS_DocCategory*)
-                             comps_object_create(&COMPS_DocCategory_ObjInfo,
-                                                 NULL);
+    COMPS_DocCategory *ret = COMPS_OBJECT_CREATE(COMPS_DocCategory, NULL);
     COMPS_OBJECT_DESTROY(ret->properties);
     ret->properties = (COMPS_ObjDict*)COMPS_OBJECT_COPY(source->properties);
     COMPS_OBJECT_DESTROY(ret->name_by_lang);

@@ -55,6 +55,7 @@ typedef struct {
     COMPS_ObjList *group_ids;
     /**< list of group_ids */
 } COMPS_DocCategory;
+COMPS_Object_TAIL(COMPS_DocCategory);
 
 
 //HEAD_COMPS_CREATE_u(doccategory, COMPS_DocCategory)  /*comps_utils.h macro*/
@@ -201,6 +202,5 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
 COMPS_DocCategory* comps_doccategory_arch_filter(COMPS_DocCategory *source,
                                                  COMPS_ObjList *arches);
 
-extern COMPS_ObjectInfo COMPS_DocCategory_ObjInfo;
 extern COMPS_ValRuleGeneric* COMPS_DocCategory_ValidateRules[];
 #endif
