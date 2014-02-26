@@ -248,7 +248,7 @@ const COMPS_ElemAttrInfo COMPS_ARCH_ElemAttrInfo = {
     .name="arch"
 };
 const COMPS_ElemAttrInfo COMPS_C_ARCH_ElemAttrInfo = {
-    .name="_arch"
+    .name="arch"
 };
 const COMPS_ElemAttrInfo COMPS_PACKAGE_ElemAttrInfo = {
     .name="package"
@@ -441,10 +441,10 @@ void comps_elem_doc_preproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
 }
 void comps_elem_group_preproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
     char *arches;
-    
+
     COMPS_DocGroup *group = COMPS_OBJECT_CREATE(COMPS_DocGroup, NULL);
     comps_doc_add_group(parsed->comps_doc, group);
-    arches = comps_dict_get(elem->attrs, "_arch");
+    arches = comps_dict_get(elem->attrs, "arch");
     if (arches) {
         COMPS_ObjList *larches = __comps_split_arches(arches);
         comps_docgroup_set_arches(group, larches);
@@ -482,7 +482,7 @@ void comps_elem_category_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     char *arches;
     COMPS_DocCategory *category = COMPS_OBJECT_CREATE(COMPS_DocCategory, NULL);
     comps_doc_add_category(parsed->comps_doc, category);
-    arches = comps_dict_get(elem->attrs, "_arch");
+    arches = comps_dict_get(elem->attrs, "arch");
     if (arches) {
         COMPS_ObjList *larches = __comps_split_arches(arches);
         comps_doccategory_set_arches(category, larches);
@@ -507,7 +507,7 @@ void comps_elem_env_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     char *arches;
     COMPS_DocEnv *env = COMPS_OBJECT_CREATE(COMPS_DocEnv, NULL);
     comps_doc_add_environment(parsed->comps_doc, env);
-    arches = comps_dict_get(elem->attrs, "_arch");
+    arches = comps_dict_get(elem->attrs, "arch");
     if (arches) {
         COMPS_ObjList *larches = __comps_split_arches(arches);
         comps_docenv_set_arches(env, larches);
@@ -587,7 +587,7 @@ void comps_elem_packagereq_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     tmp = comps_dict_get(elem->attrs, "basearchonly");
     if (tmp && (strcmp(tmp, "true") == 0))
         package->basearchonly = comps_num(1);
-    char *arches = comps_dict_get(elem->attrs, "_arch");
+    char *arches = comps_dict_get(elem->attrs, "arch");
     if (arches) {
         COMPS_ObjList *larches = __comps_split_arches(arches);
         comps_docpackage_set_arches(package, larches);
@@ -638,9 +638,11 @@ void comps_elem_groupid_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
             comps_doccategory_add_groupid(cat, groupid);
         }
     }
-    char *arches = comps_dict_get(elem->attrs, "_arch");
+    char *arches = comps_dict_get(elem->attrs, "arch");
     if (arches) {
+        //printf("arches :%s\n", arches);
         COMPS_ObjList *larches = __comps_split_arches(arches);
+        //printf("larches :%d\n", larches);
         comps_docgroupid_set_arches(groupid, larches);
     }
 }

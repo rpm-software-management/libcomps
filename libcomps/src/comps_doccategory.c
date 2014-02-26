@@ -233,10 +233,7 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
     COMPS_XMLRET_CHECK
     if (xml_options->arch_output) {
         obj = (COMPS_Object*)comps_doccategory_arches(category);
-        str = __comps_xml_arch_str(obj);
-        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
-                                          BAD_CAST str);
-        free(str);
+        ret = __comps_xml_arch(obj, writer);
         COMPS_OBJECT_DESTROY(obj);
         COMPS_XMLRET_CHECK
     }
@@ -355,6 +352,7 @@ COMPS_DocCategory* comps_doccategory_arch_filter(COMPS_DocCategory *source,
     for (COMPS_ObjListIt *it = source->group_ids->first;
          it != NULL; it = it->next) {
         arches2 = comps_docgroupid_arches((COMPS_DocGroupId*)it->comps_obj);
+        if (!arches2) continue;
         if (__comps_objlist_intersected(arches, arches2)) {
             comps_doccategory_add_groupid(ret, (COMPS_DocGroupId*)
                                           comps_object_copy(it->comps_obj));

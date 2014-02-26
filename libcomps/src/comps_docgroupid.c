@@ -30,8 +30,7 @@ COMPS_CREATE_u(docgroupid, COMPS_DocGroupId)
 void comps_docgroupid_copy(COMPS_DocGroupId *gid_dst,
                            COMPS_DocGroupId *gid_src) {
     gid_dst->name = (COMPS_Str*)comps_object_copy((COMPS_Object*)gid_src->name);
-    //gid_dst->arches = (COMPS_ObjList*)comps_object_copy((COMPS_Object*)gid_src->arches);
-    gid_dst->arches = NULL;
+    gid_dst->arches = (COMPS_ObjList*)comps_object_copy((COMPS_Object*)gid_src->arches);
     gid_dst->def = gid_src->def;
 }
 COMPS_COPY_u(docgroupid, COMPS_DocGroupId)    /*comps_utils.h macro*/
@@ -73,8 +72,13 @@ signed char comps_docgroupid_cmp_u(COMPS_Object *gid1, COMPS_Object *gid2) {
     #define _gid1 ((COMPS_DocGroupId*)gid1)
     #define _gid2 ((COMPS_DocGroupId*)gid2)
 
-    if (!COMPS_OBJECT_CMP(_gid1->name, _gid2->name)) return 0;
-    if (_gid1->def != _gid2->def) return 0;
+    if (!COMPS_OBJECT_CMP(_gid1->name, _gid2->name)) {
+        //printf("gid fail str %s != %s\n", _gid1->name, _gid2->name);
+        return 0;
+    }
+    if (_gid1->def != _gid2->def) { return 0;
+        //printf("gid fail %d != %d\n", _gid1->def, _gid2->def);
+    }
     return 1;
 
     #undef _gid1
@@ -107,10 +111,8 @@ signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
     ret = xmlTextWriterStartElement(writer, BAD_CAST "groupid");
     if (options->arch_output) {
         COMPS_Object *obj = (COMPS_Object*)groupid->arches;
-        str = __comps_xml_arch_str(obj);
-        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
-                                          BAD_CAST str);
-        free(str);
+        //printf("obj %d\n", obj);
+        ret = __comps_xml_arch(obj, writer);
         COMPS_XMLRET_CHECK
     }
     COMPS_XMLRET_CHECK

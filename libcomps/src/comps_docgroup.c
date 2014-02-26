@@ -303,10 +303,7 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
     COMPS_XMLRET_CHECK
     if (xml_options->arch_output) {
         obj = (COMPS_Object*)comps_docgroup_arches(group);
-        str = __comps_xml_arch_str(obj);
-        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
-                                          BAD_CAST str);
-        free(str);
+        ret = __comps_xml_arch(obj, writer);
         COMPS_XMLRET_CHECK
         COMPS_OBJECT_DESTROY(obj);
     }

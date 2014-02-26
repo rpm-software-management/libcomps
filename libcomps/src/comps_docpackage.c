@@ -153,10 +153,7 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
     COMPS_XMLRET_CHECK
     if (xml_options->arch_output) {
         COMPS_Object *obj = (COMPS_Object*)pkg->arches;
-        str = __comps_xml_arch_str(obj);
-        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
-                                          BAD_CAST str);
-        free(str);
+        ret = __comps_xml_arch(obj, writer);
         COMPS_XMLRET_CHECK
     }
     if (pkg->type == COMPS_PACKAGE_OPTIONAL)

@@ -120,12 +120,16 @@ signed char comps_docenv_cmp_u(COMPS_Object *env1, COMPS_Object *env2) {
     }
     if (!comps_object_cmp((COMPS_Object*)_env1->group_list,
                           (COMPS_Object*)_env2->group_list)) {
-        //printf("Env group_list cmp fail\n");
+        //char *str = comps_object_tostr(comps_objdict_get(_env1->properties, "id"));
+        //printf("Env group_list %s cmp fail\n", str);
+        //free(str);
         return 0;
     }
     if (!comps_object_cmp((COMPS_Object*)_env1->option_list,
                           (COMPS_Object*)_env2->option_list)) {
-        //printf("Env option_list cmp fail\n");
+        //char *str = comps_object_tostr(comps_objdict_get(_env1->properties, "id"));
+        //printf("Env group_list %s cmp fail\n", str);
+        //free(str);
         return 0;
     }
     return 1;
@@ -313,10 +317,7 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     COMPS_XMLRET_CHECK
     if (xml_options->arch_output) {
         obj = (COMPS_Object*)comps_docenv_arches(env);
-        str = __comps_xml_arch_str(obj);
-        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "_arch",
-                                          BAD_CAST str);
-        free(str);
+        ret = __comps_xml_arch(obj, writer);
         COMPS_XMLRET_CHECK
         COMPS_OBJECT_DESTROY(obj);
     }
@@ -452,6 +453,7 @@ COMPS_DocEnv* comps_docenv_arch_filter(COMPS_DocEnv *source,
     for (COMPS_ObjListIt *it = source->group_list->first;
          it != NULL; it = it->next) {
         arches2 = comps_docgroupid_arches((COMPS_DocGroupId*)it->comps_obj);
+        if (!arches2) continue;
         if (__comps_objlist_intersected(arches, arches2)) {
             comps_docenv_add_groupid(ret, (COMPS_DocGroupId*)
                                           comps_object_copy(it->comps_obj));
@@ -461,6 +463,7 @@ COMPS_DocEnv* comps_docenv_arch_filter(COMPS_DocEnv *source,
     for (COMPS_ObjListIt *it = source->option_list->first;
          it != NULL; it = it->next) {
         arches2 = comps_docgroupid_arches((COMPS_DocGroupId*)it->comps_obj);
+        if (!arches2) continue;
         if (__comps_objlist_intersected(arches, arches2)) {
             comps_docenv_add_optionid(ret, (COMPS_DocGroupId*)
                                           comps_object_copy(it->comps_obj));

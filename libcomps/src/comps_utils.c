@@ -82,6 +82,7 @@ bool __comps_objlist_intersected(COMPS_ObjList *list1, COMPS_ObjList *list2) {
     }
     return false;
 }
+
 char* __comps_xml_arch_str(COMPS_Object *archlist) {
     size_t x, total_len = 0;
     COMPS_ObjListIt *it;
@@ -111,6 +112,17 @@ char* __comps_xml_arch_str(COMPS_Object *archlist) {
     free(arches[x]);
     return arches_str;
 }
+
+int __comps_xml_arch(COMPS_Object *archlist, xmlTextWriterPtr writer) {
+    if (archlist && ((COMPS_ObjList*)archlist)->len != 0) {
+        char * str = __comps_xml_arch_str(archlist);
+        int ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "arch",
+                                              BAD_CAST str);
+        free(str);
+        return ret;
+    } else return 0; 
+}
+
 
 char* __comps_strcpy(char *str) {
     char *ret;

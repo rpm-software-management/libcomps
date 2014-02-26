@@ -92,7 +92,7 @@ signed char comps_doc_cmp_u(COMPS_Object *obj1, COMPS_Object *obj2) {
     COMPS_OBJECT_DESTROY(tmp1);
     COMPS_OBJECT_DESTROY(tmp2);
     if (!ret) {
-        //printf("envs cmp fail\n");
+        printf("envs cmp fail\n");
         return ret;
     }
 
@@ -700,6 +700,7 @@ COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches) {
     list = comps_doc_categories(source);
     for (COMPS_ObjListIt *it = list->first; it != NULL; it = it->next) {
         arches2 = comps_doccategory_arches((COMPS_DocCategory*)it->comps_obj);
+        if (!arches2) continue;
         if (__comps_objlist_intersected(arches, arches2)) {
             cat = comps_doccategory_arch_filter((COMPS_DocCategory*)it->comps_obj,
                                                 arches);
@@ -711,6 +712,7 @@ COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches) {
     list = comps_doc_groups(source);
     for (COMPS_ObjListIt *it = list->first; it != NULL; it = it->next) {
         arches2 = comps_docgroup_arches((COMPS_DocGroup*)it->comps_obj);
+        if (!arches2) continue;
         if (__comps_objlist_intersected(arches, arches2)) {
             group = comps_docgroup_arch_filter((COMPS_DocGroup*)it->comps_obj,
                                                 arches);
@@ -722,6 +724,7 @@ COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches) {
     list = comps_doc_environments(source);
     for (COMPS_ObjListIt *it = list->first; it != NULL; it = it->next) {
         arches2 = comps_docenv_arches((COMPS_DocEnv*)it->comps_obj);
+        if (!arches2) continue;
         if (__comps_objlist_intersected(arches, arches2)) {
             env = comps_docenv_arch_filter((COMPS_DocEnv*)it->comps_obj,
                                            arches);
