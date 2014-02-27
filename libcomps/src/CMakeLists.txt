@@ -21,6 +21,7 @@ set (libcomps_HEADERS comps_doc.h comps_docgroup.h comps_doccategory.h
      comps_utils.h comps_validate.h
      comps_log_codes.h
     )
+add_custom_target(src-copy)
 
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/libcomps_config.h.in"
                 "${PROJECT_SOURCE_DIR}/src/libcomps/libcomps_config.h")
@@ -30,8 +31,8 @@ file(GLOB files "${PROJECT_SOURCE_DIR}/src/*.h")
 file(MAKE_DIRECTORY "${PROJECT_SOURCE_DIR}/src/libcomps")
 
 foreach(file ${files})
-    add_custom_command(TARGET copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-                copy ${file} DESTINATION "${PROJECT_SOURCE_DIR}/src/libcomps/")
+    add_custom_command(TARGET src-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
+                create_symlink ${file} "${PROJECT_SOURCE_DIR}/src/libcomps/")
     #file(COPY ${file} DESTINATION "${PROJECT_SOURCE_DIR}/src/libcomps/")
 endforeach()
 
@@ -41,6 +42,8 @@ target_link_libraries(libcomps ${EXPAT_LIBRARY})
 target_link_libraries(libcomps ${LIBXML2_LIBRARIES})
 set_target_properties(libcomps PROPERTIES OUTPUT_NAME "comps")
 set_target_properties(libcomps PROPERTIES SOVERSION ${VERSION})
+
+add_dependencies(libcomps src-copy)
 
 IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
     SET (LIB_SUFFIX "64")

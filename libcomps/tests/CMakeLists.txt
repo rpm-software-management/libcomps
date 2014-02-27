@@ -1,5 +1,6 @@
 #set (testlist_SOURCE check_list.c check_utils.c)
 #set (testlist_HEADERS check_list.h check_utils.h)
+add_custom_target(test-copy)
 
 set (testobjrtree_SOURCE check_objrtree.c check_utils.c)
 set (testobjrtree_HEADERS check_objrtree.h check_utils.h)
@@ -56,13 +57,18 @@ target_link_libraries(test_comps ${CHECK_LIBRARY})
 target_link_libraries(test_comps libcomps)
 set_target_properties(test_comps PROPERTIES COMPILE_FLAGS "${CMAKE_C_FLAGS} -g")
 
+add_dependencies(test_comps test-copy)
+add_dependencies(test_parse test-copy)
+add_dependencies(test_validate test-copy)
+
+
 set(TEST_FILES fedora_comps.xml sample-comps.xml sample_comps.xml
                sample_comps_bad1.xml sample_comps_bad2.xml sample_comps_bad3.xml
                sample-bad-elem.xml comps.dtd dict-test.txt main_comps2.xml
                main_arches.xml f21-rawhide-comps.xml)
 foreach(file ${TEST_FILES})
-    add_custom_command(TARGET copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-                        copy ${CMAKE_CURRENT_SOURCE_DIR}/${file} DESTINATION ./)
+    add_custom_command(TARGET test-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
+                        copy ${CMAKE_CURRENT_SOURCE_DIR}/${file} ./)
     #file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${file} DESTINATION ./)
 endforeach()
 

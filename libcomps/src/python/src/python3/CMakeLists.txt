@@ -1,5 +1,6 @@
 find_package (PythonLibs 3.0)
 find_package (PythonInterp 3.0)
+add_custom_target(py3-copy)
 
 execute_process (COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from distutils import sysconfig; stdout.write(sysconfig.get_python_lib(True))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
 
@@ -14,22 +15,27 @@ math (EXPR len "${len} - 1")
 foreach(x RANGE 0 ${len})
     list(GET TESTS_FILES ${x} val)
     #file(COPY ${pycomps_TESTSDIR}/${val} DESTINATION ./libcomps/)
-    add_custom_command(TARGET copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-                        copy ${pycomps_TESTSDIR}/${val} DESTINATION ./libcomps/)
+    add_custom_command(TARGET py3-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
+                        copy ${pycomps_TESTSDIR}/${val} ./libcomps/)
 endforeach()
 
 list(LENGTH COMPS_FILES len)
 math (EXPR len "${len} - 1")
 foreach(x RANGE 0 ${len})
     list(GET COMPS_FILES ${x} val)
-    file(COPY ${pycomps_TESTSDIR}/comps/${val} DESTINATION ./libcomps/comps/)
+    #file(COPY ${pycomps_TESTSDIR}/comps/${val} DESTINATION ./libcomps/comps/)
+    add_custom_command(TARGET py3-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
+          copy ${pycomps_TESTSDIR}/comps/${val} ./libcomps/comps/)
 endforeach()
-file(COPY ${pycomps_SRCDIR}/__init__.py DESTINATION ./libcomps/)
+#file(COPY ${pycomps_SRCDIR}/__init__.py DESTINATION ./libcomps/)
+add_custom_command(TARGET py3-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
+      copy ${pycomps_SRCDIR}/__init__.py ./libcomps/)
 
 add_library(pycomps SHARED ${pycomps_SRC})
 set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
 set_target_properties(pycomps PROPERTIES PREFIX "")
 set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_NAME "_libpycomps")
+add_dependencies(pycomps py3-copy)
 
 target_link_libraries(pycomps libcomps)
 target_link_libraries(pycomps ${EXPAT_LIBRARIES})
