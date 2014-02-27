@@ -1047,6 +1047,7 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(empty_comps == comps3)
 
         comps4 = comps.arch_filter(["x86", "x86_64", "s390"])
+        comps4.environments[2].option_ids.append("o5")
         self.assertTrue(comps == comps4)
 
         s = comps.toxml_str(xml_options = {"arch_output":True})
