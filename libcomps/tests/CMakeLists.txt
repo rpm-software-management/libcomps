@@ -61,7 +61,9 @@ set(TEST_FILES fedora_comps.xml sample-comps.xml sample_comps.xml
                sample-bad-elem.xml comps.dtd dict-test.txt main_comps2.xml
                main_arches.xml f21-rawhide-comps.xml)
 foreach(file ${TEST_FILES})
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${file} DESTINATION ./)
+    add_custom_command(TARGET copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
+                        copy ${CMAKE_CURRENT_SOURCE_DIR}/${file} DESTINATION ./)
+    #file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${file} DESTINATION ./)
 endforeach()
 
 #add_custom_target(test ALL)

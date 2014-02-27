@@ -30,7 +30,9 @@ file(GLOB files "${PROJECT_SOURCE_DIR}/src/*.h")
 file(MAKE_DIRECTORY "${PROJECT_SOURCE_DIR}/src/libcomps")
 
 foreach(file ${files})
-    file(COPY ${file} DESTINATION "${PROJECT_SOURCE_DIR}/src/libcomps/")
+    add_custom_command(TARGET copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
+                copy ${file} DESTINATION "${PROJECT_SOURCE_DIR}/src/libcomps/")
+    #file(COPY ${file} DESTINATION "${PROJECT_SOURCE_DIR}/src/libcomps/")
 endforeach()
 
 

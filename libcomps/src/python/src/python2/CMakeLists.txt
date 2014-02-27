@@ -13,16 +13,22 @@ list(LENGTH TESTS_FILES len)
 math (EXPR len "${len} - 1")
 foreach(x RANGE 0 ${len})
     list(GET TESTS_FILES ${x} val)
-    file(COPY ${pycomps_TESTSDIR}/${val} DESTINATION ./libcomps/)
+    add_custom_command(TARGET copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
+                        copy ${pycomps_TESTSDIR}/${val} DESTINATION ./libcomps/)
+    #file(COPY ${pycomps_TESTSDIR}/${val} DESTINATION ./libcomps/)
 endforeach()
 
 list(LENGTH COMPS_FILES len)
 math (EXPR len "${len} - 1")
 foreach(x RANGE 0 ${len})
     list(GET COMPS_FILES ${x} val)
-    file(COPY ${pycomps_TESTSDIR}/comps/${val} DESTINATION ./libcomps/comps/)
+    add_custom_command(TARGET copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
+            copy ${pycomps_TESTSDIR}/comps/${val} DESTINATION ./libcomps/comps/)
+    #file(COPY ${pycomps_TESTSDIR}/comps/${val} DESTINATION ./libcomps/comps/)
 endforeach()
-file(COPY ${pycomps_SRCDIR}/__init__.py DESTINATION ./libcomps/)
+add_custom_command(TARGET copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
+        copy ${pycomps_SRCDIR}/__init__.py DESTINATION ./libcomps/)
+#file(COPY ${pycomps_SRCDIR}/__init__.py DESTINATION ./libcomps/)
 
 add_library(pycomps SHARED ${pycomps_SRC})
 set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
