@@ -1,5 +1,8 @@
 include(tests/tests.cmake)
 
+add_custom_target(py2-copy)
+add_custom_target(py3-copy)
+
 if (NOT PYTHON_DESIRED)
     set (PYTHON_DESIRED "2")
 endif()

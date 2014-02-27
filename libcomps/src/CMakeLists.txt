@@ -32,7 +32,7 @@ file(MAKE_DIRECTORY "${PROJECT_SOURCE_DIR}/src/libcomps")
 
 foreach(file ${files})
     add_custom_command(TARGET src-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-                create_symlink ${file} "${PROJECT_SOURCE_DIR}/src/libcomps/")
+                copy ${file} "${PROJECT_SOURCE_DIR}/src/libcomps/")
     #file(COPY ${file} DESTINATION "${PROJECT_SOURCE_DIR}/src/libcomps/")
 endforeach()
 

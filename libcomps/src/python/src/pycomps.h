@@ -27,6 +27,8 @@
 #include "libcomps/comps_dict.h"
 #include "libcomps/comps_log.h"
 
+#include "pycomps_23macros.h"
+
 #include "pycomps_categories.h"
 #include "pycomps_groups.h"
 #include "pycomps_envs.h"
@@ -37,9 +39,6 @@
 #include "pycomps_exc.h"
 #include "pycomps_lbw.h"
 
-
-#include <Python.h>
-#include "structmember.h"
 
 typedef struct {
     PyTypeObject * type;

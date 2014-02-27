@@ -749,7 +749,7 @@ static int PyCOMPS_init(PyCOMPS *self, PyObject *args, PyObject *kwds)
     (void)kwds;
     if (!args && !kwds) {
     }
-    else if (!PyArg_ParseTuple(args, "|sO!", &enc, &PyCapsule_Type, &c_caps))
+    else if (!PyArg_ParseTuple(args, "|sO!", &enc))// &PyCapsule_Type, &c_caps))
         return -1;
     self->comps_doc->encoding = comps_str(enc);
     return 0;

@@ -19,7 +19,11 @@
 
 #ifndef PYCOMPS_23MACROS_H
 #define PYCOMPS_23MACROS_H
+#include <sys/types.h>
+
+#include "pyport.h"
 #include <Python.h>
+#include "structmember.h"
 
 #if PY_MAJOR_VERSION >= 3
     #define PYINIT_FUNC PyInit__libpycomps

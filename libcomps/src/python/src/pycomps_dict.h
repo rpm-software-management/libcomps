@@ -26,6 +26,7 @@
 //#include "pycomps_types.h"
 #include "pycomps_utils.h"
 
+#include "pyport.h"
 #include <Python.h>
 #include "structmember.h"
 

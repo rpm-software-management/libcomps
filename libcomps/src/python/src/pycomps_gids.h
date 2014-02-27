@@ -20,8 +20,7 @@
 #ifndef PYCOMPS_GIDS_H
 #define PYCOMPS_GIDS_H
 
-#include <Python.h>
-#include "structmember.h"
+#include "pycomps_23macros.h"
 
 #include "libcomps/comps_doc.h"
 //#include "libcomps/comps_list.h"

@@ -20,8 +20,7 @@
 #ifndef PYCOMPS_CATEGORIES_H
 #define PYCOMPS_CATEGORIES_H
 
-#include <Python.h>
-#include "structmember.h"
+#include "pycomps_23macros.h"
 
 #include "libcomps/comps_doc.h"
 //#include "libcomps/comps_list.h"
@@ -30,7 +29,6 @@
 #include "pycomps_dict.h"
 #include "pycomps_gids.h"
 #include "pycomps_utils.h"
-#include "pycomps_23macros.h"
 
 typedef struct {
     PyObject_HEAD

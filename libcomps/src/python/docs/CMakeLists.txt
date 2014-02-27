@@ -16,4 +16,4 @@ find_package(Sphinx)
 add_custom_target (pydocs COMMAND python${pversion} ${SPHINX_EXECUTABLE} -E -b html
                                   "${CMAKE_CURRENT_SOURCE_DIR}/doc-sources/"
                                   "${CMAKE_CURRENT_BINARY_DIR}/html/"
-                          DEPENDS pycomps)
+                          DEPENDS pycomps py${pversion}-copy)

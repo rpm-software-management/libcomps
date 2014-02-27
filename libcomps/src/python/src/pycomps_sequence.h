@@ -20,14 +20,13 @@
 #ifndef PYCOMPS_SEQ_H
 #define PYCOMPS_SEQ_H
 
+#include "pycomps_23macros.h"
+
 #include "pycomps_hash.h"
 #include "pycomps_types.h"
 
 #include "libcomps/comps_objlist.h"
 #include "libcomps/comps_utils.h"
-
-#include <Python.h>
-#include "structmember.h"
 
 
 Py_ssize_t list_len(PyObject *self);

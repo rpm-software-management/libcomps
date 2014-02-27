@@ -20,9 +20,7 @@
 #ifndef PYCOMPS_EXC_H
 #define PYCOMPS_EXC_H
 
-#include <Python.h>
-#include "structmember.h"
-
+#include "pycomps_23macros.h"
 
 extern PyObject * PyCOMPSExc_ParserError;
 extern PyObject * PyCOMPSExc_XMLGenError;

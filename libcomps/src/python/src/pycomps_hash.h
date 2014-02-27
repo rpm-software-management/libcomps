@@ -20,10 +20,8 @@
 #ifndef PYCOMPS_HASH_H
 #define PYCOMPS_HASH_H
 
-#include <Python.h>
-#include "structmember.h"
-
 #include "pycomps_23macros.h"
+
 #include "crc32.h"
 #include "pycomps_utils.h"
 
