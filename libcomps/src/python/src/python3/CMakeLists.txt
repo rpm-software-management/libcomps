@@ -10,35 +10,13 @@ include_directories(${LIBCOMPS_INCLUDE_PATH})
 configure_file(${pycomps_TESTSDIR}/run_tests.sh.in
                ./libcomps/run_tests.sh)
 
-add_custom_command(TARGET py3-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-                    make_directory ./libcomps/comps/)
-
-list(LENGTH TESTS_FILES len)
-math (EXPR len "${len} - 1")
-foreach(x RANGE 0 ${len})
-    list(GET TESTS_FILES ${x} val)
-    #file(COPY ${pycomps_TESTSDIR}/${val} DESTINATION ./libcomps/)
-    add_custom_command(TARGET py3-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-                        copy ${pycomps_TESTSDIR}/${val} ./libcomps/)
-endforeach()
-
-list(LENGTH COMPS_FILES len)
-math (EXPR len "${len} - 1")
-foreach(x RANGE 0 ${len})
-    list(GET COMPS_FILES ${x} val)
-    #file(COPY ${pycomps_TESTSDIR}/comps/${val} DESTINATION ./libcomps/comps/)
-    add_custom_command(TARGET py3-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-          copy ${pycomps_TESTSDIR}/comps/${val} ./libcomps/comps/)
-endforeach()
-#file(COPY ${pycomps_SRCDIR}/__init__.py DESTINATION ./libcomps/)
-add_custom_command(TARGET py3-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-      copy ${pycomps_SRCDIR}/__init__.py ${PYCOMPS_LIB_PATH}/libcomps/)
+include(../../pycopy.cmake)
 
 add_library(pycomps SHARED ${pycomps_SRC})
 set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
 set_target_properties(pycomps PROPERTIES PREFIX "")
 set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_NAME "_libpycomps")
-add_dependencies(pycomps py3-copy src-copy)
+add_dependencies(pycomps src-copy)
 
 target_link_libraries(pycomps libcomps)
 target_link_libraries(pycomps ${EXPAT_LIBRARIES})

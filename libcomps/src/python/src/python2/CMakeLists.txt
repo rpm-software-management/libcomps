@@ -9,32 +9,8 @@ include_directories(${LIBCOMPS_INCLUDE_PATH})
 configure_file(${pycomps_TESTSDIR}/run_tests.sh.in
                ./libcomps/run_tests.sh)
 
-list(LENGTH TESTS_FILES len)
-math (EXPR len "${len} - 1")
+include(../../pycopy.cmake)
 
-add_custom_command(TARGET py2-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-                    make_directory ./libcomps/comps)
-foreach(x RANGE 0 ${len})
-    list(GET TESTS_FILES ${x} val)
-    add_custom_command(TARGET py2-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-                        copy ${pycomps_TESTSDIR}${val}
-                             ${PYCOMPS_LIB_PATH}/libcomps/
-                        COMMENT "copy ${pycomps_TESTSDIR}/${val} to ./libcomps/")
-    #file(COPY ${pycomps_TESTSDIR}/${val} DESTINATION ./libcomps/)
-endforeach()
-
-list(LENGTH COMPS_FILES len)
-math (EXPR len "${len} - 1")
-foreach(x RANGE 0 ${len})
-    list(GET COMPS_FILES ${x} val)
-    add_custom_command(TARGET py2-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-                       copy ${pycomps_TESTSDIR}/comps/${val}
-                            ${PYCOMPS_LIB_PATH}/libcomps/comps/)
-    #file(COPY ${pycomps_TESTSDIR}/comps/${val} DESTINATION ./libcomps/comps/)
-endforeach()
-add_custom_command(TARGET py2-copy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
-        copy ${pycomps_SRCDIR}/__init__.py ${PYCOMPS_LIB_PATH}/libcomps/)
-#file(COPY ${pycomps_SRCDIR}/__init__.py DESTINATION ./libcomps/)
 
 add_library(pycomps SHARED ${pycomps_SRC})
 set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")

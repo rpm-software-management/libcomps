@@ -1,10 +1,10 @@
 
 message (${CMAKE_CURRENT_SOURCE_DIR})
 #FILE(GLOB TESTS_FILES "*.py")
-FILE(GLOB TESTS_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/tests/"
-                      "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.py")
-FILE(GLOB COMPS_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/tests/comps/"
-                      "${CMAKE_CURRENT_SOURCE_DIR}/tests/comps/*.xml*")
+set(TESTS_DIR "${PROJECT_SOURCE_DIR}/src/python/tests/")
+FILE(GLOB TESTS_FILES RELATIVE "${TESTS_DIR}" "${TESTS_DIR}*.py")
+FILE(GLOB COMPS_FILES RELATIVE "${TESTS_DIR}comps/" 
+                               "${TESTS_DIR}/comps/*.xml*")
 
 list(LENGTH COMPS_FILES len)
 math (EXPR len "${len} - 1")

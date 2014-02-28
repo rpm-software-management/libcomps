@@ -1,0 +1,11 @@
+if (NOT PYTHON_DESIRED)
+    set (PYTHON_DESIRED "2")
+endif()
+
+if (${PYTHON_DESIRED} STREQUAL "2")
+    message("Building for python2")
+    set(pversion 2)
+else()
+    message("Building for python3")
+    set(pversion 3)
+endif()

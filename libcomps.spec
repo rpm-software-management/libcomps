@@ -1,10 +1,10 @@
-%global commit c5c7c21af9cf0620261f1409f5d903354ea81224
+%global commit 8e0d895285ea26db1d59c6ab35850cd0c1439401
 
 %if 0%{?rhel} && 0%{?rhel} <= 6
 %define python3_build 0
-%{!?__python2: %global __python2 /usr/bin/python2}
-%{!?python2_sitelib: %global python2_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%{!?python2_sitearch: %global python2_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
+#%{!?__python2: %global __python2 /usr/bin/python2}
+#%{!?python2_sitelib: %global python2_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+#%{!?python2_sitearch: %global python2_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 %else
 %define python3_build 1
 %endif
