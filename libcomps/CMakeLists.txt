@@ -26,12 +26,18 @@ include_directories(${CHECK_INCLUDE_DIR})
 include_directories(${EXPAT_INCLUDE_DIR})
 include_directories(${LIBXML2_INCLUDE_DIR})
 
-add_custom_target(pytest DEPENDS pytest_run)
-add_custom_target(ctest DEPENDS test_comps_run test_parse_run)
-add_custom_target(test DEPENDS ctest pytest)
+#add_custom_target(pytest DEPENDS pytest_run)
+#add_custom_target(ctest DEPENDS test_comps_run test_parse_run)
+#add_custom_target(test DEPENDS ctest pytest)
 #add_custom_command(TARGET test POST_BUILD COMMAND ./run_tests.sh
 #                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
 #                   COMMENT "Running python binding tests")
+
+add_custom_target(pytest)
+add_custom_target(ctest)
+add_custom_target(test)
+add_dependencies(test ctest)
+add_dependencies(test pytest)
 
 add_subdirectory (src)
 add_subdirectory (tests)

@@ -72,7 +72,6 @@ foreach(file ${TEST_FILES})
     #file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${file} DESTINATION ./)
 endforeach()
 
-#add_custom_target(test ALL)
 add_custom_target(test_comps_run COMMAND ./test_comps
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS test_comps
@@ -83,3 +82,4 @@ add_custom_target(test_parse_run COMMAND ./test_parse
                    DEPENDS test_parse
                    COMMENT "Running comps_parse test")
 
+add_dependencies(ctest test_comps_run test_parse_run)

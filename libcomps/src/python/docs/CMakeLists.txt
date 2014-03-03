@@ -4,7 +4,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc-sources/conf.py.in"
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
                      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
-include(../pycopy.cmake)
+#include(../pycopy.cmake)
 
 #find_package(Doxygen)
 #if(DOXYGEN_FOUND)
@@ -15,8 +15,12 @@ include(../pycopy.cmake)
 #endif(DOXYGEN_FOUND)
 
 find_package(Sphinx)
-message("pycopy" ${pycopy})
-add_custom_target (pydocs COMMAND python${pversion} ${SPHINX_EXECUTABLE} -E -b html
+
+set(pycopy pydocs)
+add_custom_target(pydocs DEPENDS pycomps)
+
+include(../pycopy.cmake)
+
+add_custom_command(TARGET pydocs COMMAND python${pversion} ${SPHINX_EXECUTABLE} -E -b html
                                   "${CMAKE_CURRENT_SOURCE_DIR}/doc-sources/"
-                                  "${CMAKE_CURRENT_BINARY_DIR}/html/"
-                          DEPENDS pycomps ${pycopy})
+                                  "${CMAKE_CURRENT_BINARY_DIR}/html/")

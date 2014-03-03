@@ -93,14 +93,12 @@ class BaseObjTestClass(object):
             for _type, vals in _iteritems(self.obj_types):
                 if _type not in attr_types:
                     #print (attr[0], vals[0])
-                    with self.assertRaises(TypeError):
-                        setattr(obj, attr[0], vals[0])
+                    self.assertRaises(TypeError, setattr, obj, attr[0], vals[0])
                 else:
                     for val in vals:
                         setattr(obj, attr[0], val)
 
-            with self.assertRaises(TypeError):
-                self.assertTrue(delattr(obj, attr), x[0])
+            self.assertRaises(TypeError, delattr, obj, attr)
 
     #@unittest.skip("")
     def test_dictmembers(self):
@@ -181,11 +179,11 @@ class BaseObjTestClass(object):
             self.assertTrue(len(_list) == 4)
 
         for member, v in _iteritems(self.obj_dict_members):
-            _d1 = {k: v for k,v in _iteritems(getattr(obj1, member))}
-            _d2 = {k: v for k,v in _iteritems(getattr(obj2, member))}
+            _d1 = dict([(k, v) for k, v in _iteritems(getattr(obj1, member))])
+            _d2 = dict([(k, v) for k, v in _iteritems(getattr(obj2, member))])
             _d1.update(_d2)
             _dict = getattr(obj, member)
-            _d = {k:v for k,v in _iteritems(_dict)}
+            _d = dict([(k,v) for k,v in _iteritems(_dict)])
             self.assertTrue(_d == _d1)
 
     #@unittest.skip("")
@@ -199,11 +197,11 @@ class BaseObjTestClass(object):
             self.assertTrue(len(_list) == 4)
 
         for member, v in _iteritems(self.obj_dict_members):
-            _d1 = {k: v for k,v in _iteritems(getattr(obj1, member))}
-            _d2 = {k: v for k,v in _iteritems(getattr(obj2, member))}
+            _d1 = dict([(k, v) for k,v in _iteritems(getattr(obj1, member))])
+            _d2 = dict([(k, v) for k,v in _iteritems(getattr(obj2, member))])
             _d1.update(_d2)
             _dict = getattr(obj, member)
-            _d = {k:v for k,v in _iteritems(_dict)}
+            _d = dict([(k, v) for k,v in _iteritems(_dict)])
             self.assertTrue(_d == _d1)
 
     #@unittest.skip("")
@@ -217,11 +215,11 @@ class BaseObjTestClass(object):
             self.assertTrue(len(_list) == len(v))
 
         for member, v in _iteritems(self.obj_dict_members):
-            _d1 = {k: v for k,v in _iteritems(getattr(obj1, member))}
-            _d2 = {k: v for k,v in _iteritems(getattr(obj2, member))}
+            _d1 = dict([(k, v) for k,v in _iteritems(getattr(obj1, member))])
+            _d2 = dict([(k, v) for k,v in _iteritems(getattr(obj2, member))])
             _d1.update(_d2)
             _dict = getattr(obj, member)
-            _d = {k:v for k,v in _iteritems(_dict)}
+            _d = dict([(k,v) for k,v in _iteritems(_dict)])
             self.assertTrue(_d == _d1)
 
 #@unittest.skip(" ")
@@ -376,13 +374,11 @@ class BaseListTestClass(object):
         self.assertTrue(len(listobj) == 1)
         del listobj[0]
         self.assertTrue(len(listobj) == 0)
-        with self.assertRaises(IndexError):
-            listobj[0]
+        self.assertRaises(IndexError, listobj.__getitem__, 0)
         listobj.append(item)
         self.assertTrue(listobj[0] == item)
         self.assertTrue(len(listobj) == 1)
-        with self.assertRaises(IndexError):
-            listobj[1]
+        self.assertRaises(IndexError, listobj.__getitem__, 1)
 
     def test_append(self):
         listobj = self.list_type()
@@ -435,8 +431,7 @@ class BaseListTestClass(object):
             listobj.append(self.item_type(**x))
         listobj.clear()
         self.assertTrue(len(listobj) == 0)
-        with self.assertRaises(IndexError):
-            listobj[0]
+        self.assertRaises(IndexError, listobj.__getitem__, 0)
         for x in self.items_data:
             listobj.append(self.item_type(**x))
         self.assertTrue(len(listobj) == len(self.items_data))
@@ -636,22 +631,21 @@ class DictTest(unittest.TestCase):
     def test_keyerror(self):
         _dict = libcomps.StrDict()
         self.assertTrue(_dict.get("notindict") == None)
-        with self.assertRaises(KeyError):
-            x = _dict["notindict"]
+        self.assertRaises(KeyError, _dict.__getitem__, "notindict")
 
 #@unittest.skip("skip")
 class MDictTest(unittest.TestCase):
     def test_blacklist(self):
         bl1 = libcomps.Blacklist()
         bl2 = libcomps.Blacklist()
-        self.__test(bl1, bl2)
+        self._test(bl1, bl2)
 
     def test_whiteout(self):
         wo1 = libcomps.Whiteout()
         wo2 = libcomps.Whiteout()
-        self.__test(wo1, wo2)
+        self._test(wo1, wo2)
     
-    def __test(self, obj1, obj2):
+    def _test(self, obj1, obj2):
         obj1["key"] = []
         self.assertTrue(obj1["key"] == libcomps.StrSeq())
         obj1["key"].append("val1")
@@ -660,8 +654,7 @@ class MDictTest(unittest.TestCase):
         self.assertTrue(obj1["key"] == obj2["key"])
         del obj1["key"]
         self.assertTrue("key" not in obj1)
-        with self.assertRaises(KeyError):
-            x = obj1["key"]
+        self.assertRaises(KeyError, obj1.__getitem__, "key")
         self.assertFalse(obj1 == obj2)
 
 #@unittest.skip("skip")
@@ -705,10 +698,8 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(len(comps2.environments) == 0)
 
         comps3 = libcomps.Comps()
-        with self.assertRaises(libcomps.ParserError):
-            ret = comps3.fromxml_str(compsdoc)
-            self.assertTrue(ret ==  -1, "%d %s" %(ret,
-                                                  comps3.get_last_errors()))
+        self.assertRaises(libcomps.ParserError, comps3.fromxml_str, compsdoc)
+
         self.assertTrue(len(comps3.groups) == 3)
         self.assertTrue(len(comps3.categories) == 2)
         self.assertTrue(len(comps3.environments) == 0)
@@ -860,9 +851,7 @@ class COMPSTest(unittest.TestCase):
     #@unittest.skip("")
     def test_gz(self):
         comps = libcomps.Comps()
-        with self.assertRaises(IOError):
-            ret = comps.fromxml_f("comps/sample_comp2.xml.gz")
-            self.assertTrue(ret == -1)
+        self.assertRaises(IOError, comps.fromxml_f, "comps/sample_comp2.xml.gz")
 
     #@unittest.skip("")
     def test_a_inoptid(self):
@@ -883,15 +872,13 @@ class COMPSTest(unittest.TestCase):
         gid1 = libcomps.GroupId("gid1")
         gid2 = libcomps.GroupId("gid2", default=False)
         gid3 = libcomps.GroupId("gid3", default=True)
-        with self.assertRaises(TypeError):
-            self.assertTrue(gid1 != 1)
+        self.assertRaises(TypeError, gid1.__eq__, 1)
         self.assertTrue(gid1 != None)
         self.assertTrue(gid1 == gid1)
         self.assertTrue(gid1 != "gid2")
         self.assertTrue(gid1 != gid2)
         self.assertTrue(gid1 != gid3)
-        with self.assertRaises(NotImplementedError):
-            gid1 < gid2
+        self.assertRaises(NotImplementedError, gid1.__lt__, gid2)
 
     #@unittest.skip("")
     def test_default(self):
@@ -907,8 +894,8 @@ class COMPSTest(unittest.TestCase):
         gid = libcomps.GroupId("groupid4", default=False)
         e.group_ids.append(gid)
 
-        with self.assertRaises(TypeError):
-            gid = libcomps.GroupId()
+        self.assertRaises(TypeError, libcomps.GroupId.__init__)
+        #    gid = libcomps.GroupId()
 
         self.assertFalse(e.group_ids[0].default)
         self.assertFalse(e.group_ids[1].default)
@@ -958,9 +945,10 @@ class COMPSTest(unittest.TestCase):
 
         if hasattr(self, "assertItemsEqual"):
             _f = self.assertItemsEqual
-        else:
+        elif hasattr(self, "assertItemsEqual"):
             _f = self.assertSequenceEqual
-
+        else:
+           _f = utest.assertSequenceEqual 
 
         _f([id_.name for id_ in env.group_ids],
                               group_ids)

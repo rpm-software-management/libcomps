@@ -20,6 +20,13 @@
 
 import unittest
 import traceback
+def assertSequenceEqual(seq1, seq2):
+    if len(seq1) != len(seq2):
+        raise AssertionError, "%s != %s" % (seq1, seq2)
+    for x,y in zip(seq1,seq2):
+        if x != y:
+            raise AssertionError, "%s != %s" % (seq1, seq2)
+        
 
 class MyResult(unittest.TestResult):
     WHITEBOLD = {"1":(1,),  "2":(0,)}
@@ -28,13 +35,19 @@ class MyResult(unittest.TestResult):
     RED = {"1": (38, 5, 1), "2":(38, 5, 7)}
     GREEN = {"1": (38, 5, 10), "2":(38, 5, 7)}
     YELLOW = {"1": (38, 5, 11), "2":(38, 5, 7)}
+    separator1 = "-" * 70
+    separator2 = "-" * 70
+
     def colored(self, color, string):
         return '\x1b[%sm%s\x1b[%sm' % (";".join(map(str, color["1"])), string,
                                        ";".join(map(str, color["2"])))
 
     def __init__(self, stream, descriptions, verbosity):
         self.stream = stream
-        super(MyResult, self).__init__(stream, descriptions, verbosity)
+	try:
+        	super(MyResult, self).__init__(stream, descriptions, verbosity)
+	except TypeError:
+        	super(MyResult, self).__init__()
         self.last_cls = None
         self.fail = False
 
@@ -102,6 +115,8 @@ class MyResult(unittest.TestResult):
     
     def wasSuccessful(self):
         return not self.fail
+    def printErrors(self):
+        pass
 
 class MyRunner(unittest.TextTestRunner):
     def _makeResult(self):
