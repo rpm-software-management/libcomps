@@ -1,4 +1,4 @@
-%global commit 365330487c6b63681459cbe2fc29fa80a1660e19
+%global commit 134c768001a3ff2c881da295554535cd51e5db46
 
 %if 0%{?rhel} && 0%{?rhel} <= 6
 %define python3_build 0
