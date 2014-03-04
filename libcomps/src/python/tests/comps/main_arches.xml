@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE comps PUBLIC "-//Red Hat, Inc.//DTD Comps info//EN" "comps.dtd">
+<comps>
+  <group arch="x86_64 x86 s390">
+   <id>group1</id>
+   <name>group1</name>
+    <packagelist>
+      <packagereq arch="x86_64">pkg1</packagereq>
+      <packagereq arch="x86_64">pkg2</packagereq>
+      <packagereq arch="x86 s390">pkg3</packagereq>
+      <packagereq arch="x86 s390">pkg4</packagereq>
+      <packagereq arch="x86_64 x86">pkg5</packagereq>
+      <packagereq arch="x86_64 x86">pkg6</packagereq>
+      <packagereq arch="x86_64 x86">pkg7</packagereq>
+    </packagelist>
+  </group>
+  <group arch="x86_64">
+   <id>group2</id>
+   <name>group2</name>
+    <packagelist>
+      <packagereq arch="x86_64 x86">pkg7</packagereq>
+    </packagelist>
+  </group>
+  <group arch="x86 s390">
+   <id>group3</id>
+   <name>group3</name>
+    <packagelist>
+      <packagereq arch="x86_64 x86">pkg7</packagereq>
+    </packagelist>
+  </group>
+  <category arch="x86_64 x86 s390">
+   <id>cat1</id>
+   <name>cat1</name>
+    <grouplist>
+      <groupid arch="x86_64 x86">g1</groupid>
+      <groupid arch="x86_64">g2</groupid>
+      <groupid arch="x86">g3</groupid>
+      <groupid arch="x86_64 x86 s390">g4</groupid>
+      <groupid arch="x86_64 s390">g5</groupid>
+      <groupid arch="x86 s390">g6</groupid>
+    </grouplist>
+  </category>
+  <category arch="x86_64">
+   <id>cat2</id>
+   <name>cat2</name>
+    <grouplist>
+      <groupid arch="x86_64 x86">g1</groupid>
+    </grouplist>
+  </category>
+  <category arch="s390">
+   <id>cat3</id>
+   <name>cat3</name>
+    <grouplist>
+      <groupid arch="x86_64 x86">g1</groupid>
+    </grouplist>
+  </category>
+  <environment arch="x86_64 x86 s390">
+   <id>env1</id>
+   <name>env1</name>
+    <grouplist>
+      <groupid arch="x86_64 x86">g1</groupid>
+      <groupid arch="x86_64 s390">g2</groupid>
+      <groupid arch="x86">g3</groupid>
+      <groupid arch="x86 s390">g4</groupid>
+      <groupid arch="x86_64">g5</groupid>
+    </grouplist>
+    <optionlist>
+      <groupid arch="x86_64 x86 s390">o1</groupid>
+      <groupid arch="s390">o2</groupid>
+      <groupid arch="x86 x86_64">o3</groupid>
+      <groupid arch="x86 s390">o4</groupid>
+      <groupid arch="x86_64">o5</groupid>
+    </optionlist>
+  </environment>
+  <environment arch="x86_64">
+   <id>env2</id>
+   <name>env2</name>
+    <grouplist>
+      <groupid arch="x86_64">g1</groupid>
+    </grouplist>
+    <optionlist>
+      <groupid arch="x86_64">o5</groupid>
+    </optionlist>
+  </environment>
+  <environment arch="x86_64 s390">
+   <id>env3</id>
+   <name>env3</name>
+    <grouplist>
+      <groupid arch="x86_64 s390">g1</groupid>
+    </grouplist>
+    <optionlist>
+      <groupid>o5</groupid>
+    </optionlist>
+  </environment>
+</comps>

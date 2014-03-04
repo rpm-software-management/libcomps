@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE comps PUBLIC "-//Red Hat, Inc.//DTD Comps info//EN" "comps.dtd">
+<comps>
+  <group>
+    <name>Additional Development</name>
+    <id>additional-devel</id>
+    <description>Additional development headers and libraries for developing applications</description>
+    <default>false</default>
+    <uservisible>false</uservisible>
+    <packagelist>
+      <packagereq type="default">alsa-lib-devel
+        <ishouldntbehere>here</ishouldntbehere>
+      </packagereq>
+      <packagereq type="default">audit-libs-devel</packagereq>
+      <packagereq type="default">binutils-devel</packagereq>
+      <packagereq type="default">boost-devel</packagereq>
+      <packagereq type="default">bzip2-devel</packagereq>
+      <packagereq type="default">cyrus-sasl-devel</packagereq>
+      <packagereq type="optional">xorg-x11-proto-devel</packagereq>
+      <packagereq type="optional">xz-devel</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>backup-client</id>
+    <name>Backup Client</name>
+    <description>Client tools for connecting to a backup server and doing backups.</description>
+    <default>true</default>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq type="mandatory">amanda-client</packagereq>
+      <packagereq type="optional">bacula-client</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>backup-server</id>
+    <name>Backup Server</name>
+    <description>Software to centralize your infrastructure's backups.</description>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq type="mandatory">amanda-server</packagereq>
+      <packagereq type="optional">mt-st</packagereq>
+      <packagereq type="optional">mtx</packagereq>
+    </packagelist>
+  </group>
+  <category>
+    <id>cat1</id>
+    <name>category1</name>
+    <description>This is category 1 description</description>
+    <grouplist>
+        <groupid>1</groupid>
+        <groupid>2</groupid>
+        <groupid>3</groupid>
+    </grouplist>
+  </category>
+</comps>

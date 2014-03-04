@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE comps PUBLIC "-//Red Hat, Inc.//DTD Comps info//EN" "comps.dtd">
+<comps>
+  <group>
+    <id>standard</id>
+    <name>Standard</name>
+    <description>Common set of utilities that extend the minimal installation.</description>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq>acl</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>core</id>
+    <name>Core</name>
+    <description>Smallest possible installation</description>
+    <default>true</default>
+    <uservisible>false</uservisible>
+    <packagelist>
+      <packagereq>bash</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>base-x</id>
+    <name>base-x</name>
+    <name xml:lang="cs">base-x</name>
+    <name xml:lang="de">base-x</name>
+    <name xml:lang="es">base-x</name>
+    <description>Local X.org display server</description>
+    <description xml:lang="cs">Místní X.org displej server</description>
+    <description xml:lang="de">Lokaler X.org-Displayserver</description>
+    <description xml:lang="es">Servidor X.org local</description>
+    <default>false</default>
+    <uservisible>false</uservisible>
+    <packagelist>
+      <packagereq>xorg-x11-server-Xorg</packagereq>
+      <packagereq>mesa-dri-drivers</packagereq>
+    </packagelist>
+  </group>
+  <environment>
+    <id>minimal-environment</id>
+    <name>Minimal install</name>
+    <description>Basic functionality.</description>
+    <display_order>99</display_order>
+    <grouplist>
+      <groupid>standard</groupid>
+      <groupid>core</groupid>
+    </grouplist>
+    <optionlist>
+      <groupid>core</groupid>
+      <groupid>standard</groupid>
+    </optionlist>
+  </environment>
+</comps>

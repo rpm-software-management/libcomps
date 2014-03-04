@@ -149,7 +149,7 @@ rm -rf $buildroot
 %if %{python3_build}
 %files -n python3-libcomps
 %{_libdir}/python3*
-%exclude %{_libdir}/python3/libcomps/__pycache__
+#%exclude %{_libdir}/python3/libcomps/__pycache__
 %endif
 
 %changelog

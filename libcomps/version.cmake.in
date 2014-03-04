@@ -1,0 +1,5 @@
+set (libcomps_VERSION_MAJOR ${libcomps_VERSION_MAJOR})
+set (libcomps_VERSION_MINOR ${libcomps_VERSION_MINOR})
+set (libcomps_VERSION_PATCH ${libcomps_VERSION_PATCH})
+set (libcomps_RELEASE ${libcomps_RELEASE})
+

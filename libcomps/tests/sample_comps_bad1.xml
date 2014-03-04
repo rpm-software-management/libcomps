@@ -1,0 +1,1332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE comps PUBLIC "-//Red Hat, Inc.//DTD Comps info//EN" "comps.dtd">
+<comps>
+  <group>
+    <!-- <id>admin-tools</id> -->
+    <!-- <name>Administration Tools</name> -->
+    <name xml:lang="af">Administrasienutsgoed</name>
+    <name xml:lang="am">የአስተዳደሩ መሣሪያዎች</name>
+    <name xml:lang="ar">أدوات الإدارة</name>
+    <name xml:lang="as">প্ৰশাসনৰ সঁজুলি</name>
+    <name xml:lang="ast">Ferramientes d'Alministración</name>
+    <name xml:lang="bal">وسایل مدیریت</name>
+    <name xml:lang="be">Адміністратыўныя сродкі</name>
+    <name xml:lang="bg">Административни инструменти</name>
+    <name xml:lang="bn">অ্যাডমিনিস্ট্রেশনের সফটওয়্যার</name>
+    <name xml:lang="bn_IN">প্রশাসনিক সরঞ্জাম</name>
+    <name xml:lang="bs">Administrativni alati</name>
+    <name xml:lang="ca">Eines d'administració</name>
+    <name xml:lang="cs">Administrace systému</name>
+    <name xml:lang="cy">Arfau Gweinyddol</name>
+    <name xml:lang="da">Administrationsværktøjer</name>
+    <name xml:lang="de">Verwaltungswerkzeuge</name>
+    <name xml:lang="el">Εργαλεία διαχείρισης</name>
+    <name xml:lang="en_GB">Administration Tools</name>
+    <name xml:lang="es">Herramientas de Administración</name>
+    <name xml:lang="et">Haldusvahendid</name>
+    <name xml:lang="fa">ابزارهای مدیریت</name>
+    <name xml:lang="fi">Hallintatyökalut</name>
+    <name xml:lang="fr">Outils d'administration</name>
+    <name xml:lang="gl">Ferramentas de Administración</name>
+    <name xml:lang="gu">સંચાલન સાધનો</name>
+    <name xml:lang="he">כלי ניהול</name>
+    <name xml:lang="hi">प्रशासन औज़ार</name>
+    <name xml:lang="hr">Administrativni alati</name>
+    <name xml:lang="hu">Adminisztrációs eszközök</name>
+    <name xml:lang="hy">Ադմինիստրատիվ գործիքներ</name>
+    <name xml:lang="id">Peralatan Administrasi</name>
+    <name xml:lang="ilo">Ramramit a pangtarawidwid</name>
+    <name xml:lang="is">Kerfisstjórnunartól</name>
+    <name xml:lang="it">Strumenti di amministrazione</name>
+    <name xml:lang="ja">管理ツール</name>
+    <name xml:lang="ka">ადმინისტრირების ინსტრუმენტები</name>
+    <name xml:lang="kn">ನಿರ್ವಹಣಾ ಉಪಕರಣಗಳು</name>
+    <name xml:lang="ko">관리 도구</name>
+    <name xml:lang="lv">Administrēšanas rīki</name>
+    <name xml:lang="mai">प्रशासन अओजार</name>
+    <name xml:lang="mk">Алатки за администрација</name>
+    <name xml:lang="ml">അഡ്മിനിസ്ട്രേഷന്‍ ഉപകരണങ്ങള്‍</name>
+    <name xml:lang="mr">प्रशासन उपकरणे</name>
+    <name xml:lang="ms">Alatan Pentadbiran</name>
+    <name xml:lang="nb">Administrasjonsverktøy</name>
+    <name xml:lang="ne">प्रशासन उपकरण</name>
+    <name xml:lang="nl">Administratieve hulpmiddelen</name>
+    <name xml:lang="no">Administrasjonsverktøy</name>
+    <name xml:lang="nso">Didirišwa tša Taolo</name>
+    <name xml:lang="or">ପ୍ରଶାସନୀୟ ଉପକରଣ</name>
+    <name xml:lang="pa">ਪਰਸ਼ਾਸ਼ਕੀ ਟੂਲ</name>
+    <name xml:lang="pl">Narzędzia administracyjne</name>
+    <name xml:lang="pt">Ferramentas de Administração</name>
+    <name xml:lang="pt_BR">Ferramentas administrativas</name>
+    <name xml:lang="ro">Unelte de administrare</name>
+    <name xml:lang="ru">Средства администрирования</name>
+    <name xml:lang="si">කළමණාකරන මෙවලම්</name>
+    <name xml:lang="sk">Administrátorské nástroje</name>
+    <name xml:lang="sl">Administrativna orodja</name>
+    <name xml:lang="sq">Mjete Administrimi</name>
+    <name xml:lang="sr">Административне алатке</name>
+    <name xml:lang="sr@Latn">Administrativne alatke</name>
+    <name xml:lang="sr@latin">Administrativne alatke</name>
+    <name xml:lang="sv">Administrationsverktyg</name>
+    <name xml:lang="ta">நிர்வாக கருவிகள்</name>
+    <name xml:lang="te">నిర్వాహణా సాధనాలు</name>
+    <name xml:lang="tg">Барномаҳои идоракунӣ</name>
+    <name xml:lang="th">เครื่องมือจัดการระบบ</name>
+    <name xml:lang="tl">Kasangkapang Pangasiwa</name>
+    <name xml:lang="tr">Yönetim Araçları</name>
+    <name xml:lang="uk">Засоби адміністрування</name>
+    <name xml:lang="ur"> اڈمنسٹراشن الات</name>
+    <name xml:lang="vi">Công cụ quản trị</name>
+    <name xml:lang="zh_CN">管理工具</name>
+    <name xml:lang="zh_TW">管理工具</name>
+    <name xml:lang="zu">Amathuluzi Okuphatha</name>
+    <!--<description>This group is a collection of graphical administration tools for the system, such as for managing user accounts and configuring system hardware.</description> -->
+    <description xml:lang="af">Hierdie groep is 'n versameling grafiese administrasienutsgoed vir die rekenaar, byvoorbeeld vir die bestuur van gebruikersrekeninge en die opstelling van rekenaarhardeware.</description>
+    <description xml:lang="am">ይህ ቡድን ለሲስተሙ የንድፋዊ አስተዳደር መሣሪያ ለተጠቃሚው ታሪክ እና የሲስተሙን ሀርድዌር ማስተካከያ ስብስብ ነው።</description>
+    <description xml:lang="ar">تحتوي هذه المجموعة على أدوات ذات واجهة رسومية لإدارة النظام مثل إدارة حسابات المستخدمين و تهيئة عتاد النّظام.</description>
+    <description xml:lang="as">এই গোট ব্যৱস্থাপ্ৰণালীৰ বাবে চিত্ৰাংকিত প্ৰশাসনিক সঁজুলিৰ সংগ্ৰহ, যেনে, ব্যৱহাৰকৰ্তাৰ হিচাপ-বহি নিয়ন্ত্ৰণ কৰা আৰু ব্যৱস্থাপ্ৰণালীৰ যন্ত্ৰৰ বিন্যাস ।</description>
+    <description xml:lang="ast">Esti grupu ye una escoyeta de ferramientes gráfiques d'alministración, tales como alministración de cuentes d'usuarios y de configuración del hardware del sistema.</description>
+    <description xml:lang="bal">ای گروه یک جمعی چه ابزار مدیرتی گرافیکینت په سیستم مثلا په مدیریت حسابان کامرز کنوک و تنظیم سخت افزاری سیستم.</description>
+    <description xml:lang="bg">Тази група е колекция от графични инструменти за администриране на системата, като например управление на потребителските акаунти и настройка на системния хардуер.</description>
+    <description xml:lang="bn">এই সংকলনে সিস্টেম অ্যাডমিনিস্ট্রেশনে কাজে লাগবে এমন কিছু গ্রাফিকাল প্রোগ্রাম আছে, যার সাহায্যে অ্যাকাউন্ট ব্যবস্থাপনা, হার্ডওয়্যার কনফিগারেশন ইত্যাদি কাজ করা যেতে পারে।</description>
+    <description xml:lang="bn_IN">সিস্টেম পরিচালনার উদ্দেশ্যে কিছু গ্রাফিকাল সরঞ্জাম এই সংকলনের মধ্যে উপস্থিত রয়েছে যেগুলির সাহায্যে ব্যবহারকারীদের অ্যাকাউন্ট পরিচলনা ও সিস্টেম হার্ডওয়্যার কনফিগার করা যাবে।</description>
+    <description xml:lang="bs">Ova je grupa kolekcija grafičkih administrativnih alata za sistem, poput alata za upravljanje korisničkim nalozima i konfiguriranje hardvera.</description>
+    <description xml:lang="ca">Aquest grup és una col·lecció d'eines d'administració gràfica per al sistema, per exemple gestionar comptes d'usuari i configurar el maquinari.</description>
+    <description xml:lang="cs">Skupina s grafickými administrátorskými nástroji, např. správu uživatelských účtů a konfiguraci hardware.</description>
+    <description xml:lang="cy">Mae'r grŵp yma'n gasgliad o erfynnau cyflunio graffigol ar gyfer y system, megis ar gyfer trefnu cyfrifon defnyddwyr a chyflunio caledwedd system.</description>
+    <description xml:lang="da">Denne gruppe er en samling af grafiske administrationsværktøjer til systemet, for eksempel til at administrere brugerkonti eller systemhardware.</description>
+    <description xml:lang="de">Diese Gruppe enthält eine Reihe grafischer Verwaltungswerkzeuge für das System, darunter Programme zum Verwalten von Benutzerkonten und Konfigurieren der Systemhardware.</description>
+    <description xml:lang="el">Αυτή η ομάδα είναι μια συλλογή από γραφικά εργαλεία διαχείρισης συστήματος, όπως είναι διαχείριση λογαριασμών χρηστών και ρύθμιση υλικού.</description>
+    <description xml:lang="en_GB">This group is a collection of graphical administration tools for the system, such as for managing user accounts and configuring system hardware.</description>
+    <description xml:lang="es">Este grupo es una colección  de herramientas gráficas de administración, tales como administración de cuentas de usuarios  y de configuración del hardware del sistema.</description>
+    <description xml:lang="et">See rühm on sisaldab graafiliste haldusvahendite kogumit, sealhulgas kasutajate haldus ja riistvara seadistamise vahendid.</description>
+    <description xml:lang="fa">این گروه مجموعه‌ای از ابزارهای گرافیکی مدیریت سیستم است، مثلاً برای مدیریت حساب‌های کاربران و پیکربندی سخت‌افزارهای سیستم.</description>
+    <description xml:lang="fi">Tämä ryhmä sisältää kokoelman graafisia järjestelmänhallintatyökaluja, kuten käyttäjätunnuksien ja järjestelmän laitteiston hallinnan.</description>
+    <description xml:lang="fr">Ce groupe est un ensemble d'outils graphiques d'administration pour le système, comme pour la gestion des comptes utilisateurs et la configuration du matériel système.</description>
+    <description xml:lang="gu">આ જૂથ એ સિસ્ટમ માટે ગ્રાફિકવાળું સંચાલન સાધનોનો સંગ્રહ છે, જેમ કે વપરાશકર્તાના ખાતાઓની વ્યવસ્થા કરવા માટે અને સિસ્ટમ હાર્ડવેર રુપરેખાંકિત કરવા માટે.</description>
+    <description xml:lang="he">אוסף של כלים גרפיים לניהול המערכת כגון ניהול משתמשים וחומרת המחשב.</description>
+    <description xml:lang="hi">यह समूह तंत्र के लिए आलेखी प्रशासन औज़ार का संग्रह है, जैसे उपयोक्ता लेखा प्रबंधन के लिए और तंत्र हार्डवेयर विन्यास के लिये.</description>
+    <description xml:lang="hr">Ova je grupa kolekcija grafičkih administrativnih alata za sustav, poput alata za upravljanje korisničkim nalozima i konfiguriranje hardvera.</description>
+    <description xml:lang="hu">E csoportba grafikus felületű adminisztratív eszközök, például felhasználó számlákat igazgató és hardverbeállító programok kerültek.</description>
+    <description xml:lang="id">Grup ini berisikan koleksi alat bantu untuk administrasi secara grafis untuk sistem, seperti untuk mengatur akun pengguna dan mengkonfigurasi perangkat keras sistem.</description>
+    <description xml:lang="is">Þessi hópur inniheldur safn myndrænna kerfisstjórnunartóla fyrir vélina eins og til dæmis tól til að vinna með notendur og stilla vélbúnað.</description>
+    <description xml:lang="it">Questo gruppo contiene un insieme di strumenti grafici per l'amministrazione di sistema, ad esempio per gestire gli account utente o configurare le periferiche hardware.</description>
+    <description xml:lang="ja">このグループはユーザーアカウントを管理したり、システムハードウェアを設定したりするシステムの為のグラフィカル管理ツールのコレクションです。</description>
+    <description xml:lang="kn">ಈ ಸಮೂಹ ಬಳಕೆದಾರರ ಖಾತೆಗಳ ನಿಭಾವಣೆ, ಗಣಕವ್ಯವಸ್ಥೆಯ ಯಂತ್ರಾಂಶ ಸಂರಚನೆ ಹಾಗೂ ಇತರ ಕಾರ್ಯಗಳಿಗೆ ಅಗತ್ಯವಾದ ಚಿತ್ರಾತ್ಮಕ ನಿರ್ವಹಣಾ ಉಪಕರಣಗಳನ್ನೊಳಗೊಂಡಿದೆ.</description>
+    <description xml:lang="ko">이 그룹은 사용자 계정을 관리하고 시스템 하드웨어를 설정하는 그래픽 시스템 관리 도구 모음입니다. </description>
+    <description xml:lang="lv">Šī grupa ietver grafiskus rīkus sistēmas administrēšanai, piemēram, lietotāju kontu pārvaldībai un sistēmas aparatūras konfigurēšanai.</description>
+    <description xml:lang="mai">ई समूह मे सिस्टम क' लेल आलेखी प्रशासन अओजार क संमुच्चय अछि, जहिना प्रयोक्ता लेखा प्रबंधन क' लेल आओर सिस्टम हार्डवेयरक विन्यास क' लेल.</description>
+    <description xml:lang="mk">Оваа група е збирка на графички алатки за администрација на системот, како на пр.: менаџмент на кориснци и конфигурација на хардверот.</description>
+    <description xml:lang="ml">ഉപയോക്താവിന്റെ അക്കൌണ്ടുകള്‍ കൈകാര്യം ചെയ്യുക, കംപ്യൂട്ടറിന്റെ ഹാര്‍ഡ്‌വെയര്‍ 
+ക്രമികരിക്കുക എന്നീ ഗ്രാഫിക്കല്‍ അഡ്മിനിസ്ട്രേഷന്‍ ടൂളുകളുടെ ഒരു ശേഖരമാണ് ഈ വിഭാഗം.</description>
+    <description xml:lang="mr">हा समुह तुमच्या प्रणालीसाठी आलेखीय प्रशासन उपकरणांचा संचय आहे, उदाहरणार्थ उपयोक्ता खाते व्यवस्थापन आणि प्रणाली यंत्रभागांची(हार्डवेयर) व्यूहरचना करणे.</description>
+    <description xml:lang="ms">Kumpulan ini adalah kumpulan alatan pentadbiran untuk sistem, seperti mengurus akaun pengguna dan menentutetap perkakasan sistem.</description>
+    <description xml:lang="nb">Denne gruppen er en samling av grafiske administrasjonsverktøy for systemet, inkludert brukeradministrasjon og hardwarekonfigurering.</description>
+    <description xml:lang="ne">यो समूह, प्रयोगकर्ता खाता प्रबन्ध गर्ने र प्रणाली हार्डवेयर कन्फिगर गर्ने जस्ता प्रणालीका लागि ग्राफिकल प्रशासन उपकरणको सङ्कलन हो ।</description>
+    <description xml:lang="nl">Deze groep is een collectie van (grafische) administratieve hulpmiddelen voor het systeem om bijvoorbeeld gebruiker accounts te kunnen beheren of systeem hardware te kunnen configureren.</description>
+    <description xml:lang="no">Denne gruppen er en samling av grafiske administrasjonsverktøy for systemet, inkludert brukeradministrasjon og hardwarekonfigurering.</description>
+    <description xml:lang="nso">Sehlopha se ke kgoboketšo ya didirišwa tša taolo ya diswantšho bakeng sa tshepedišo, bjalo ka go laola diakhaonto tša modiriši le go fetola sebopego sa lenaneo le thata la tshepedišo.</description>
+    <description xml:lang="or">ଏହି ସମୂହଟି ତନ୍ତ୍ର ପାଇଁ ଆଲେଖୀକ ପ୍ରଶାସନୀୟ ଉପକରଣ ମାନଙ୍କ ର ସଂଗ୍ରହାଳୟ, ଉଦାହରଣ ସ୍ବରୂପ ଚାଳକ ର ହିସାବ ଖାତା ର ପରିଚାଳନା କରିବା କିମ୍ବା ତନ୍ତ୍ର ର ହାର୍ଡଓ୍ବେର କୁ ବିନ୍ଯାସ କରିବା</description>
+    <description xml:lang="pa">ਇਸ ਗਰੁੱਪ ਵਿੱਚ ਸਿਸਟਮ ਲਈ ਗਰਾਫਿਕਲ ਪਰਸ਼ਾਸ਼ਕੀ ਟੂਲ ਸ਼ਾਮਿਲ ਹਨ, ਜਿਵੇਂ ਕਿ ਯੂਜ਼ਰ ਅਕਾਊਂਟ ਪਰਬੰਧ ਅਤੇ ਸਿਸਟਮ ਜੰਤਰ ਸੰਰਚਨਾ ਆਦਿ।</description>
+    <description xml:lang="pl">Ta grupa zawiera zbiór graficznych narzędzi administracyjnych, takich jak zarządzanie kontami użytkowników i konfigurowanie sprzętu systemu.</description>
+    <description xml:lang="pt">Este grupo é uma colecção de ferramentas gráficas de administração para o sistema, tal como a gestão das contas de utilizadores e configurar o 'hardware' do sistema.</description>
+    <description xml:lang="pt_BR">Este grupo é uma coleção de ferramentas gráficas de administração para o sistema, como a gestão de contas dos usuários e a configuração do hardware do sistema.</description>
+    <description xml:lang="ro">Acest grup este o colecție de unelte grafice de administrare pentru sistem, cum ar fi administrarea conturilor de utilizator și configurarea hardware.</description>
+    <description xml:lang="ru">Эта группа содержит графические приложения для настройки системы. С помощью этих приложений можно добавить новых пользователей, настроить звук, разрешение экрана и пр.</description>
+    <description xml:lang="si">මෙම කණ්ඩායම තුල චිත්‍රක භාවිතයෙන් සිදුකරන පද්ධති කළමණාකාර මෙවලම් ඇතුලත් වේ, මීට පරිශීලකයින්ගේ ගිණුම් කළමණාකරනය සහ පද්ධතියේ දෘඪාංග මානකරන වැඩසටහන් ඇතුලත් වේ.</description>
+    <description xml:lang="sk">Táto skupina je kolekciou grafických administrátorských nástrojov pre počítač, napr. správa používateľských účtov a konfigurácia hardvéru.</description>
+    <description xml:lang="sl">Ta skupina je zbirka grafičnih skrbniških orodij za sistemska opravila, kot je upravljanje uporabniških računov in prikrojitev sistemske strojne opreme.</description>
+    <description xml:lang="sq">Ky grup është një koleksion mjetesh grafike administrimi të sistemit, të tillë si ata për administrimin e llogarive të përdoruesve dhe formësimin e hardware-it të sistemit.</description>
+    <description xml:lang="sr">Ова група је скуп графичких системских административних алатки, нпр. за управљање корисничким налозима и подешавање хардвера у систему.</description>
+    <description xml:lang="sr@Latn">Ova grupa je skup grafičkih sistemskih administrativnih alatki, npr. za upravljanje korisničkim nalozima i podešavanje hardvera u sistemu.</description>
+    <description xml:lang="sr@latin">Ova grupa je skup grafičkih sistemskih administrativnih alatki, npr. za upravljanje korisničkim nalozima i podešavanje hardvera u sistemu.</description>
+    <description xml:lang="sv">Denna grupp är en samling grafiska administrationsverktyg för systemet, som exempelvis hantering av användarkonton och konfiguration av systemhårdvara.</description>
+    <description xml:lang="ta">இந்த குழு கணினிக்கான வரைவியல் நிர்வாகக்கருவிகள் அடங்கிய தொகுப்பு, அதாவது பயனர் கணக்குகளை மேலாண்மை செய்தல் மற்றும் வன்பொருள் கட்டமைப்புக்கான கருவிகள்.</description>
+    <description xml:lang="te">ఈ సమూహం వినియోగదారుని ఖాతా మరియూ కంప్యూటరు hardware నిర్ధారణాది కంప్యూటరు చిత్ర నిర్వహణ ఉపకరణాల సమాహారం</description>
+    <description xml:lang="tg">Ин гуруҳ дорои маҷмӯъи асбобҳо идоракунии графикӣ монанди идоракунии ҳисоботи корбар ва танзимоти сахтафзор барои система мебошад.</description>
+    <description xml:lang="th">กลุ่มนี้ประกอบด้วยเครื่องมือบริหารจัดการระบบแบบกราฟิก เช่น การจัดการบัญชีผู้ใช้และตั้งค่าฮาร์ดแวร์ของระบบ</description>
+    <description xml:lang="tr">Bu grup, kullanıcı hesaplarının yönetimi ve donanım yapılandırması gibi sistem yönetimi araçlarının grafik ortamda çalışanlarını içerir.</description>
+    <description xml:lang="uk">Ця група містить графічні додатки для налаштовування системи. За допомогою цих програм можна керувати системними обліковими записами користувачів та налаштовувати параметри обладнання.</description>
+    <description xml:lang="ur">اس مجموعہ میں تصویراتی نظامی اڈمنسٹراشن الات ہں جسے نظام استمال کرنے والوں کی دیکھبال، حساب اور نظام کے حارڈ ویر  کی دیکھبال ہں</description>
+    <description xml:lang="vi">Nhóm này là tập hợp các công cụ quản trị hệ thống, như quản lý tài khoản người dùng và cấu hình phần cứng.</description>
+    <description xml:lang="zh_CN">这组是系统图形管理工具合集，比如用于管理用户帐户和配置系统硬件的工具。</description>
+    <description xml:lang="zh_TW">這個群組是系統中圖形管理工具的收集，例如用來管理使用者帳號與設定系統硬體。</description>
+    <description xml:lang="zu">Leli qembu liyiqoqo lamathuluzi okuphatha emidwebo yesistimu, njengokuphatha ama-akhawunti omphathi kanye nengaphakathi yekhomputha yesistimu yokuhlanganisa.</description>
+    <default>true</default>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq type="default">authconfig-gtk</packagereq>
+      <packagereq type="default">gnome-disk-utility</packagereq>
+      <packagereq type="default">gnome-packagekit</packagereq>
+      <packagereq type="default">setroubleshoot</packagereq>
+      <packagereq type="default">system-config-date</packagereq>
+      <packagereq type="default">system-config-firewall</packagereq>
+      <packagereq type="default">system-config-keyboard</packagereq>
+      <packagereq type="default">system-config-language</packagereq>
+      <packagereq type="default">system-config-users</packagereq>
+      <packagereq type="optional">apper</packagereq>
+      <packagereq type="optional">cacti</packagereq>
+      <packagereq type="optional">dbench</packagereq>
+      <packagereq type="optional">etherape</packagereq>
+      <packagereq type="optional">ettercap-gtk</packagereq>
+      <packagereq type="optional">galternatives</packagereq>
+      <packagereq type="optional">gparted</packagereq>
+      <packagereq type="optional">gpointing-device-settings</packagereq>
+      <packagereq type="optional">kde-partitionmanager</packagereq>
+      <packagereq type="optional">lshw-gui</packagereq>
+      <packagereq type="optional">luma</packagereq>
+      <packagereq type="optional">ntop</packagereq>
+      <packagereq type="optional">pessulus</packagereq>
+      <packagereq type="optional">qtparted</packagereq>
+      <packagereq type="optional">system-config-boot</packagereq>
+      <packagereq type="optional">system-config-kickstart</packagereq>
+      <packagereq type="optional">system-config-lvm</packagereq>
+      <packagereq type="optional">system-config-network</packagereq>
+      <packagereq type="optional">system-config-rootpassword</packagereq>
+      <packagereq type="optional">yumex</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>afrikaans-support</id>
+    <name>Afrikaans Support</name>
+    <name xml:lang="af">Afrikaanse taalsteun</name>
+    <name xml:lang="am">የአፍሪካዊያን ድጋፍ</name>
+    <name xml:lang="ar">دعم الجنوب إفريقيّة</name>
+    <name xml:lang="as">আফ্ৰিক্যান ভাষাৰ সমৰ্থন</name>
+    <name xml:lang="ast">Sofitu pal Afrikaners</name>
+    <name xml:lang="bal">آپریکایی حمایت</name>
+    <name xml:lang="be">Падтрымка мовы Афрыканс</name>
+    <name xml:lang="bg">Поддръжка на Африкаанс</name>
+    <name xml:lang="bn">আফ্রিকান ব্যবহারের সহায়ক</name>
+    <name xml:lang="bn_IN">আফ্রিকান ভাষা ব্যবহারের বৈশিষ্ট্য</name>
+    <name xml:lang="bs">Podrška za afrikaans</name>
+    <name xml:lang="ca">Suport per a l'afrikaans</name>
+    <name xml:lang="cs">Podpora afrikánštiny</name>
+    <name xml:lang="cy">Cynhaliaeth Affricaneg</name>
+    <name xml:lang="da">Understøttelse af afrikaans</name>
+    <name xml:lang="de">Unterstützung für Afrikaans</name>
+    <name xml:lang="el">Υποστήριξη Αφρικανικών</name>
+    <name xml:lang="en_GB">Afrikaans Support</name>
+    <name xml:lang="es">Soporte para africano</name>
+    <name xml:lang="et">Afrikaani keele tugi</name>
+    <name xml:lang="fa">پشتیبانی آفریکانس</name>
+    <name xml:lang="fi">Afrikaansin kielituki</name>
+    <name xml:lang="fr">Prise en charge de l'afrikaans</name>
+    <name xml:lang="gu">આફ્રિકાનો આધાર</name>
+    <name xml:lang="he">תמיכה באפריקנית</name>
+    <name xml:lang="hi">अफ्रीकांस समर्थन</name>
+    <name xml:lang="hr">Podrška za afrikaans</name>
+    <name xml:lang="hu">Afrikán (Dél-Afrika-i holland) támogatás</name>
+    <name xml:lang="hy">աֆրիկերենի սպասարկում</name>
+    <name xml:lang="id">Dukungan Afrika</name>
+    <name xml:lang="is">Afríkanska</name>
+    <name xml:lang="it">Supporto lingua africana</name>
+    <name xml:lang="ja">アフリカーンス語のサポート</name>
+    <name xml:lang="kn">ಆಫ್ರಿಕಾನಾಸ್ ಬೆಂಬಲ</name>
+    <name xml:lang="ko">남아프리카 공용 네덜란드어 지원</name>
+    <name xml:lang="lv">Afrikandu valodas atbalsts</name>
+    <name xml:lang="mai">अफ्रीकी समर्थन</name>
+    <name xml:lang="mk">Поддршка за африкански</name>
+    <name xml:lang="ml">ആഫ്രിക്കന്‍സ് പിന്തുണ</name>
+    <name xml:lang="mr">आफ्रीकी समर्थन</name>
+    <name xml:lang="ms">Sokongan Afrikaan</name>
+    <name xml:lang="nb">Støtte for Afrikaans</name>
+    <name xml:lang="nds">Unnerstütten för Afrikaans</name>
+    <name xml:lang="ne">अफ्रिकी समर्थन</name>
+    <name xml:lang="nl">Ondersteuning voor Afrikaans</name>
+    <name xml:lang="no">Støtte for Afrikaans</name>
+    <name xml:lang="nso">Thekgo ya Seburu</name>
+    <name xml:lang="or">ଆଫ୍ରାକୀୟ ସହାୟତା</name>
+    <name xml:lang="pa">ਅਫਰੀਕੀ ਸਹਿਯੋਗ</name>
+    <name xml:lang="pl">Obsługa afrykanerskiego</name>
+    <name xml:lang="pt">Suporte a Afrikaans</name>
+    <name xml:lang="pt_BR">Suporte à Afrikaans</name>
+    <name xml:lang="ro">Suport pentru africană</name>
+    <name xml:lang="ru">Поддержка африкаанс</name>
+    <name xml:lang="si">ඇෆ්රිකාන්ස් භාශා පහසුකම</name>
+    <name xml:lang="sk">Juhoafrická podpora</name>
+    <name xml:lang="sl">Afrikanška podpora</name>
+    <name xml:lang="sr">Подршка за африкански</name>
+    <name xml:lang="sr@Latn">Podrška za afrikanski</name>
+    <name xml:lang="sr@latin">Podrška za afrikanski</name>
+    <name xml:lang="sv">Stöd för afrikaans</name>
+    <name xml:lang="ta">ஆப்ரிக்க துணை</name>
+    <name xml:lang="te">ఆఫ్రికాన్‌ల మద్దతు</name>
+    <name xml:lang="tg">Пуштибонии забони африкоӣ</name>
+    <name xml:lang="th">การสนับสนุนภาษาแอฟริกา</name>
+    <name xml:lang="tl">Pagsasang-ayong Wikang Afrikaans</name>
+    <name xml:lang="tr">Afrikanca Desteği</name>
+    <name xml:lang="uk">Підтримка Африканс</name>
+    <name xml:lang="ur">افریقہ ساتھ  </name>
+    <name xml:lang="vi">Hỗ trợ Afrikaans</name>
+    <name xml:lang="zh_CN">南非荷兰语支持</name>
+    <name xml:lang="zh_TW">南非荷蘭文支援</name>
+    <name xml:lang="zu">Ukuxhasa KwesiBhunu</name>
+    <description/>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <langonly>af</langonly>
+    <packagelist>
+      <packagereq type="default">authconfig-gtk</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>akan-support</id>
+    <name>Akan Support</name>
+    <name xml:lang="as">আকান সমৰ্থন</name>
+    <name xml:lang="bg">Поддръжка на Akan</name>
+    <name xml:lang="bn_IN">আকান ভাষা ব্যবহারের বৈশিষ্ট্য</name>
+    <name xml:lang="cs">Podpora akanštiny</name>
+    <name xml:lang="da">Understøttelse for akansk</name>
+    <name xml:lang="de">Unterstützung für Akan</name>
+    <name xml:lang="el">Υποστήριξη Akan</name>
+    <name xml:lang="en_GB">Akan Support</name>
+    <name xml:lang="es">Soporte para Akan</name>
+    <name xml:lang="et">Akani keele tugi</name>
+    <name xml:lang="fa">پشتیبانی آکان</name>
+    <name xml:lang="fi">Akanin kielituki</name>
+    <name xml:lang="fr">Prise en charge de l'akan</name>
+    <name xml:lang="gu">અકાન આધાર</name>
+    <name xml:lang="he">תמיכה באקאנית</name>
+    <name xml:lang="hi">अकान समर्थन</name>
+    <name xml:lang="hu">Akan támogatás</name>
+    <name xml:lang="it">Supporto lingua Akan</name>
+    <name xml:lang="ja">アカン語のサポート</name>
+    <name xml:lang="kn">ಅಕಾನ್ ಬೆಂಬಲ</name>
+    <name xml:lang="ko">아칸어 지원 </name>
+    <name xml:lang="lv">Akanu valodau atbalsts</name>
+    <name xml:lang="ml">ആഖാന്‍ പിന്തുണ</name>
+    <name xml:lang="mr">एकान समर्थन</name>
+    <name xml:lang="nb">Støtte for akan</name>
+    <name xml:lang="nl">Ondersteuning voor Akan</name>
+    <name xml:lang="or">ଆକାନ ସହାୟତା</name>
+    <name xml:lang="pa">ਅਕਾਨ ਸਹਿਯੋਗ</name>
+    <name xml:lang="pl">Obsługa akan</name>
+    <name xml:lang="pt">Suporte a Akan</name>
+    <name xml:lang="pt_BR">Suporte à Akan</name>
+    <name xml:lang="ru">Поддержка аканского языка</name>
+    <name xml:lang="sk">Podpora Akan</name>
+    <name xml:lang="sv">Stöd för akan</name>
+    <name xml:lang="ta">அகான் துணை</name>
+    <name xml:lang="te">అకాన్ తోడ్పాటు</name>
+    <name xml:lang="tg">Пуштибонии забони аканӣ</name>
+    <name xml:lang="uk">Підтримка аканської мови</name>
+    <name xml:lang="zh_CN">库阿语支持</name>
+    <name xml:lang="zh_TW">迦納文支援</name>
+    <description/>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <langonly>ak</langonly>
+    <packagelist>
+      <packagereq type="default">authconfig-gtk</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>albanian-support</id>
+    <name>Albanian Support</name>
+    <name xml:lang="ar">دعم الألبانية</name>
+    <name xml:lang="as">আল্বানিয়ান ভাষাৰ সমৰ্থন</name>
+    <name xml:lang="ast">Sofitu pal albanés</name>
+    <name xml:lang="bal">آلبانیایی حمایت</name>
+    <name xml:lang="bg">Поддръжка на Албански</name>
+    <name xml:lang="bn_IN">আলবেনিয়ান ভাষা ব্যবহারের বৈশিষ্ট্য</name>
+    <name xml:lang="ca">Suport per a l'albanès</name>
+    <name xml:lang="cs">Podpora albánštiny</name>
+    <name xml:lang="da">Understøttelse af albansk</name>
+    <name xml:lang="de">Unterstützung für Albanisch</name>
+    <name xml:lang="el">Υποστήριξη Αλβανικών</name>
+    <name xml:lang="en_GB">Albanian Support</name>
+    <name xml:lang="es">Soporte para albanés</name>
+    <name xml:lang="et">Albaania keele tugi</name>
+    <name xml:lang="fa">پشتیبانی آلبانیایی</name>
+    <name xml:lang="fi">Albanian kielituki</name>
+    <name xml:lang="fr">Prise en charge de l'albanais</name>
+    <name xml:lang="gu">અલ્બેનિયાઈ આધાર</name>
+    <name xml:lang="he">תמיכה באלבנית</name>
+    <name xml:lang="hi">अल्बानियाई समर्थन</name>
+    <name xml:lang="hu">Albán támogatás</name>
+    <name xml:lang="id">Dukungan Albania</name>
+    <name xml:lang="is">Albönska</name>
+    <name xml:lang="it">Supporto lingua albanese</name>
+    <name xml:lang="ja">アルバニア語のサポート</name>
+    <name xml:lang="kn">ಅಲ್ಬೇನಿಯನ್ ಬೆಂಬಲ</name>
+    <name xml:lang="ko">알바니아어 지원 </name>
+    <name xml:lang="lv">Albāņu valodas atbalsts</name>
+    <name xml:lang="mai">अल्बानियाइ समर्थन</name>
+    <name xml:lang="ml">അല്‍ബേനിയന്‍ പിന്തുണ</name>
+    <name xml:lang="mr">अलबेनीयन समर्थन</name>
+    <name xml:lang="nb">Støtte for albansk</name>
+    <name xml:lang="nds">Unnerstütten för Albanisch</name>
+    <name xml:lang="ne">अल्बानियाली समर्थन</name>
+    <name xml:lang="nl">Ondersteuning voor Albanees</name>
+    <name xml:lang="or">ଆଲବାନିୟାନ ସହାୟତା</name>
+    <name xml:lang="pa">ਅਲਬੇਨੀਅਨ ਸਹਿਯੋਗ</name>
+    <name xml:lang="pl">Obsługa albańskiego</name>
+    <name xml:lang="pt">Suporte a Albanês</name>
+    <name xml:lang="pt_BR">Suporte à Albanês</name>
+    <name xml:lang="ru">Поддержка албанского языка</name>
+    <name xml:lang="sk">Albánska podpora</name>
+    <name xml:lang="sr">Подршка за албански</name>
+    <name xml:lang="sr@Latn">Podrška za albanski</name>
+    <name xml:lang="sr@latin">Podrška za albanski</name>
+    <name xml:lang="sv">Stöd för albanska</name>
+    <name xml:lang="ta">அல்பனியன் துணை</name>
+    <name xml:lang="te">అల్బేనియన్ మద్దతు</name>
+    <name xml:lang="tg">Пуштибонии забони албаниявӣ</name>
+    <name xml:lang="th">การสนับสนุนภาษาแอลเบเนีย</name>
+    <name xml:lang="tr">Arnavutça Desteği</name>
+    <name xml:lang="uk">Підтримка албанської</name>
+    <name xml:lang="zh_CN">阿尔巴尼亚语支持</name>
+    <name xml:lang="zh_TW">阿爾巴尼亞文支援</name>
+    <description/>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <langonly>sq</langonly>
+    <packagelist>
+      <packagereq type="default">authconfig-gtk</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>amazigh-support</id>
+    <name>Amazigh Support</name>
+    <name xml:lang="ar">دعم الأمازيغية</name>
+    <name xml:lang="as">আমাজিগ ভাষাৰ সমৰ্থন</name>
+    <name xml:lang="ast">Sofitu pal amazigh</name>
+    <name xml:lang="bg">Поддръжка на Amazigh</name>
+    <name xml:lang="bn_IN">আমাজিগ ভাষা ব্যবহারের বৈশিষ্ট্য</name>
+    <name xml:lang="ca">Suport per al berber</name>
+    <name xml:lang="cs">Podpora berberštiny</name>
+    <name xml:lang="da">Understøttelse af amazigh</name>
+    <name xml:lang="de">Unterstützung für Berber</name>
+    <name xml:lang="el">Υποστήριξη Amazigh</name>
+    <name xml:lang="en_GB">Amazigh Support</name>
+    <name xml:lang="es">Soporte para amazigh</name>
+    <name xml:lang="et">Berberi keele tugi</name>
+    <name xml:lang="fa">پشتیبانی بربری</name>
+    <name xml:lang="fi">Amazighin kielituki</name>
+    <name xml:lang="fr">Prise en charge du berbère</name>
+    <name xml:lang="gu">અમેઝિઘ આધાર</name>
+    <name xml:lang="he">תמיכה בתמאזיגת</name>
+    <name xml:lang="hi">आमेजिग समर्थन</name>
+    <name xml:lang="hu">Amazig (Berber, Marokkó) támogatás</name>
+    <name xml:lang="is">Amazigh</name>
+    <name xml:lang="it">Supporto lingua amazigh</name>
+    <name xml:lang="ja">アマジグ語のサポート</name>
+    <name xml:lang="kn">ಅಮೇಝಿಗ್ ಬೆಂಬಲ</name>
+    <name xml:lang="ko">아마지그어 지원 </name>
+    <name xml:lang="lv">Amazigh atbalsts</name>
+    <name xml:lang="mai">आमेजिग समर्थन</name>
+    <name xml:lang="ml">അമാസിഗ് പിന്തുണ</name>
+    <name xml:lang="mr">अमाजीग समर्थन</name>
+    <name xml:lang="nb">Støtte for amazigh</name>
+    <name xml:lang="nds">Unnerstütten för Berber</name>
+    <name xml:lang="nl">Ondersteuning voor Amazigh</name>
+    <name xml:lang="or">ଏମେଜି ସହାୟତା</name>
+    <name xml:lang="pa">ਅਮਾਜ਼ਿਘ ਸਹਿਯੋਗ</name>
+    <name xml:lang="pl">Obsługa amazigh</name>
+    <name xml:lang="pt">Suporte a Amazigh</name>
+    <name xml:lang="pt_BR">Suporte à Amazigh</name>
+    <name xml:lang="ru">Поддержка языка амазиг</name>
+    <name xml:lang="sk">Berberská podpora</name>
+    <name xml:lang="sr">Подршка за амазиг</name>
+    <name xml:lang="sr@Latn">Podrška za amazig</name>
+    <name xml:lang="sr@latin">Podrška za amazig</name>
+    <name xml:lang="sv">Stöd för amazigh</name>
+    <name xml:lang="ta">அமேசிக் துணை</name>
+    <name xml:lang="te">అమెజిగ్ మద్దతు</name>
+    <name xml:lang="tg">Пуштибонии забони амазиг</name>
+    <name xml:lang="th">การสนับสนุนภาษาเบอร์เบอร์</name>
+    <name xml:lang="tr">Amazigh Desteği</name>
+    <name xml:lang="uk">Підтримка берберської мови</name>
+    <name xml:lang="zh_CN">阿马齐格语支持</name>
+    <name xml:lang="zh_TW">阿馬茲格文支援</name>
+    <description/>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <langonly>ber</langonly>
+    <packagelist>
+      <packagereq type="default">authconfig-gtk</packagereq>
+    </packagelist>
+  </group>
+  <category>
+    <id>language-support</id>
+    <name>Languages</name>
+    <name xml:lang="ar">اللغات</name>
+    <name xml:lang="as">ভাষা</name>
+    <name xml:lang="ast">LlingÃ¼es</name>
+    <name xml:lang="bal">زبانان</name>
+    <name xml:lang="bg">Езици</name>
+    <name xml:lang="bn">ভাষা</name>
+    <name xml:lang="bn_IN">ভাষা</name>
+    <name xml:lang="bs">Jezici</name>
+    <name xml:lang="ca">Llengües</name>
+    <name xml:lang="cs">Jazyky</name>
+    <name xml:lang="cy">Ieithoedd</name>
+    <name xml:lang="da">Sprog</name>
+    <name xml:lang="de">Sprachen</name>
+    <name xml:lang="el">Γλώσσες</name>
+    <name xml:lang="en_GB">Languages</name>
+    <name xml:lang="es">Idiomas</name>
+    <name xml:lang="et">Keeled</name>
+    <name xml:lang="fa">زبان‌ها</name>
+    <name xml:lang="fi">Kielet</name>
+    <name xml:lang="fr">Langues</name>
+    <name xml:lang="gu">ભાષાઓ</name>
+    <name xml:lang="he">שפות</name>
+    <name xml:lang="hi">भाषा</name>
+    <name xml:lang="hr">Jezici</name>
+    <name xml:lang="hu">Nyelvek</name>
+    <name xml:lang="hy">Լեզուներ</name>
+    <name xml:lang="id">Bahasa</name>
+    <name xml:lang="ilo">Pagsasao</name>
+    <name xml:lang="is">Tungumál</name>
+    <name xml:lang="it">Lingue</name>
+    <name xml:lang="ja">言語</name>
+    <name xml:lang="ka">ენები</name>
+    <name xml:lang="kn">ಭಾಷೆಗಳು</name>
+    <name xml:lang="ko">언어 지원</name>
+    <name xml:lang="lv">Valodas</name>
+    <name xml:lang="mai">भाषासभ</name>
+    <name xml:lang="ml">ഭാഷകള്‍</name>
+    <name xml:lang="mr">भाषा</name>
+    <name xml:lang="ms">Bahasa</name>
+    <name xml:lang="nb">Språk</name>
+    <name xml:lang="ne">भाषा</name>
+    <name xml:lang="nl">Talen</name>
+    <name xml:lang="or">ଭାଷା</name>
+    <name xml:lang="pa">ਭਾਸ਼ਾਵਾਂ</name>
+    <name xml:lang="pl">Języki</name>
+    <name xml:lang="pt">Línguas</name>
+    <name xml:lang="pt_BR">Idiomas</name>
+    <name xml:lang="ro">Limbi</name>
+    <name xml:lang="ru">Языки</name>
+    <name xml:lang="si">භාශාවන්</name>
+    <name xml:lang="sk">Jazyky</name>
+    <name xml:lang="sl">Jeziki</name>
+    <name xml:lang="sq">Gjuhë</name>
+    <name xml:lang="sr">Језици</name>
+    <name xml:lang="sr@Latn">Jezici</name>
+    <name xml:lang="sr@latin">Jezici</name>
+    <name xml:lang="sv">Språkstöd</name>
+    <name xml:lang="ta">மொழிகள்</name>
+    <name xml:lang="te">భాషలు</name>
+    <name xml:lang="tg">Забонҳо</name>
+    <name xml:lang="th">ภาษา</name>
+    <name xml:lang="tr">Diller</name>
+    <name xml:lang="uk">Мови</name>
+    <name xml:lang="zh_CN">语言</name>
+    <name xml:lang="zh_TW">語言</name>
+    <description>These packages provide support for various locales including fonts and input methods.</description>
+    <description xml:lang="am">እነዚህ ጥቅሎች ለተለያዩ ውስጣዊዎች የጽሑፍ ዓይነቶች እና የማስገቢያ ዘዴዎች ተስማሚ የሆነ ድጋፍ ያቀርባሉ።</description>
+    <description xml:lang="ar">هذه الحزم تقدم دعما للغات المحلية بما في ذلك الخطوط وطرق الإدخال.</description>
+    <description xml:lang="as">এই সৰঞ্জাম সমূহে বিভিন্ন অৱস্থানৰ লগত আখৰ আৰু নিবেশ পদ্ধতিৰ সমৰ্থনৰ যোগান ধৰে ।</description>
+    <description xml:lang="ast">Estos paquetes proporcionen sofitu pa delles llingÃ¼es, incluyendo fontes y métodos d'escritura.</description>
+    <description xml:lang="bal">ای بستگان حمایت آریت په هر دابن محلیان په داب فونت و گه دابان ورودی</description>
+    <description xml:lang="bg">Тези пакети осигуряват поддръжката за различни региони и включват шрифтове и методи за въвеждане.</description>
+    <description xml:lang="bn">এই প্যাকেজগুলোতে বিভিন্ন লোকাল-এর (Locale) সমর্থন রয়েছে; এর অংশ হল ফন্ট ও ইনপুট পদ্ধতি (মেথড) ।</description>
+    <description xml:lang="bn_IN">এই প্যাকেজ সংকলনগুলি, ফন্ট ও ইনপুট পদ্ধতিসহ বিভিন্ন লেকেইল ব্যবহারের জন্য সমর্থন উপলব্ধ করে।</description>
+    <description xml:lang="bs">Ovi paketi omogućuju podršku za različite lokalizacije, uključujući i lokalne fontove i tipkovnice</description>
+    <description xml:lang="ca">Aquests paquets proporcionen suport per a diverses localitzacions incloent els tipus de lletra i els mètodes d'entrada.</description>
+    <description xml:lang="cs">Balíčky poskytující podporu pro různé jazykové mutace včetně písem a vstupních metod (jazyky s obrázkovými znaky jako čínština, japonština, korejština a podobně).</description>
+    <description xml:lang="da">Disse pakker giver understøttelse af forskellige lokaliteter inklusiv skrifttyper og inddata-metoder.</description>
+    <description xml:lang="de">Diese Pakete stellen Unterstützung für verschiedene Schriftarten und Eingabemethoden bereit.</description>
+    <description xml:lang="el">Τα πακέτα αυτά παρέχουν υποστήριξη τοποθεσίας με γραμματοσειρές και μεθόδους εισαγωγής κειμένου.</description>
+    <description xml:lang="en_GB">These packages provide support for various locales including fonts and input methods.</description>
+    <description xml:lang="es">Estos paquetes proporcionan soporte para diversos idiomas, incluyendo tipografías y métodos de escritura.</description>
+    <description xml:lang="et">Need paketid loovad võimaluse erinevate lokaatide, sh kirjatüüpide ja sisestusmeetodite kasutamiseks.</description>
+    <description xml:lang="fa">این بسته‌ها از محل‌های مختلفی شامل قلم‌ها و شیوه‌های ورودی   پشتیبانی می‌کنند.</description>
+    <description xml:lang="fi">Tämä paketti tarjoaa tuen useita kirjasimia ja syöttötapoja useille kielille.</description>
+    <description xml:lang="fr">Ces paquets fournissent la prise en charge de la compatibilité pour différentes localisations y compris des polices de caractères et des méthodes de saisie.</description>
+    <description xml:lang="gu">આ પેકેજો ફોન્ટ અને ઈનપુટ પદ્ધતિઓને સમાવીને વિવિધ લોકેલોનો આધાર પૂરો પાડે છે.</description>
+    <description xml:lang="he">חבילות המספקות תמיכה מקומית, כולל גופנים ושיטות קלט מקומיות.</description>
+    <description xml:lang="hi">ये संकुल फ़ॉन्ट व इनपुट विधि के साथ विविध लोकेल के लिये समर्थन उपलब्ध कराता है.</description>
+    <description xml:lang="hr">Ovi paketi omogućuju podršku za različite lokalizacije, uključujući i lokalne fontove i tipkovnice</description>
+    <description xml:lang="hu">E csomagok különféle helyeknek nyújtanak támogatást, például betűkészleteket és beviteli módszereket.</description>
+    <description xml:lang="id">Paket-paket ini menyediakan dukungan untuk berbagai locale termasuk font dan metode input.</description>
+    <description xml:lang="is">Þessir pakkar veita stuðning við ýmis tungumál ásamt letri og innsláttargerðum.</description>
+    <description xml:lang="it">Questi pacchetti forniscono il supporto alla localizzazione in varie lingue, caratteri e metodi di input.</description>
+    <description xml:lang="ja">これらのパッケージでは、フォントや入力メソッドなどの各種ロケールのサポートを提供しています。</description>
+    <description xml:lang="kn">ಈ ಪ್ಯಾಕೇಜ್‍ಗಳು ಲಿಪಿಶೈಲಿ (font) ಹಾಗೂ ಆದಾನಕ್ರಮಗಳನ್ನೊಳಗೊಂಡಂತೆ (input methods) ವಿವಿಧ ಲೊಕ್ಯಾಲ್ ಬೆಂಬಲ ನೀಡುತ್ತವೆ.</description>
+    <description xml:lang="ko">이 패키지는 다양한 로케일 (글꼴 및 입력 방식)을 지원합니다.</description>
+    <description xml:lang="lv">Šīs pakotnes nodrošina dažādu reģionālo iestatījumu (šriftu un ievades metožu) atbalstu</description>
+    <description xml:lang="mai">ई पैकेज फाँट व इनपुट विधिक संग विविध लोकेल क' लेल समर्थन उपलब्ध कराबैछ.</description>
+    <description xml:lang="mk">Овие пакети нудат поддршка за локализација заедно со фонтови и методи за внесување.</description>
+    <description xml:lang="ml">ഫോണ്ടസും ഇന്‍പുട്ട് മെഥേഡും ഉല്‍പ്പടെയുളള വിവിധ ലൊക്കേലുകള്‍ക്കും ഈ പാക്കേജുകള്‍ പിന്തുണ നല്‍കുന്നു.</description>
+    <description xml:lang="mr">ही संकुले फॉन्ट आणि आदान(इनपुट) पद्धतींसह विविध स्थानिकांसाठी समर्थन पुरवतात.</description>
+    <description xml:lang="ms">Pakej ini menyediakan sokongan untuk pelbagai bahasa termasuk font dan kaedah masukan.</description>
+    <description xml:lang="nb">Disse pakkene inneholder støttefunksjoner for ulike localer. Dette inkluderer skrifter og inndatametoder.</description>
+    <description xml:lang="ne">यी प्याकेजले बिभिन्न फन्ट र आगत विधि समाविष्ट लोकेलका लागि समर्थन उपलब्ध गर्दछन् ।</description>
+    <description xml:lang="nl">Deze pakketten bieden ondersteuning voor verschillende taalgebieden, inclusief lettertypen en invoer methoden.</description>
+    <description xml:lang="no">Disse pakkene inneholder støtter for diverse lokale skrifttyper og oppsett.</description>
+    <description xml:lang="or">ଏହି ପ୍ଯାକେଜ ଗୁଡିକ ଅକ୍ଷର ରୂପ ଏବଂ ନିବେଶ ପ୍ରକ୍ରିୟା ମାନଙ୍କ ସହିତ ବିଭିନ୍ନ ମାନଙ୍କୁ ଲୋକେଲ ମାନଙ୍କୁ ସହାୟତା ପ୍ରଦାନ କରିଥାଏ</description>
+    <description xml:lang="pa">ਇਹਨਾਂ ਪੈਕੇਜਾਂ ਵਿੱਚ ਕਈ ਲੋਕੇਲਾਂ ਨੂੰ ਸਹਿਯੋਗ ਦੇਣ ਲਈ ਫੋੰਟ ਅਤੇ ਇੰਪੁੱਟ ਢੰਗ ਸ਼ਾਮਿਲ ਹਨ।</description>
+    <description xml:lang="pl">Te pakiety dostarczają obsługę różnych lokalizacji, w tym czcionki i metody wprowadzania.</description>
+    <description xml:lang="pt">Estes pacotes fornecem suporte a várias localizações, incluindo tipos de letra e método de entrada.</description>
+    <description xml:lang="pt_BR">Estes pacotes oferecem suporte para várias localidades, incluindo fontes e métodos de entrada.</description>
+    <description xml:lang="ro">Aceste pachete oferă suport pentru diverse localizări, acesta incluzând fonturi și metode de introducere.</description>
+    <description xml:lang="ru">Эти пакеты обеспечивают поддержку различных региональных настроек, включая шрифты и метод ввода.</description>
+    <description xml:lang="si">මෙම ඇසුරුම් තුල විවධ අක්‍ෂර සහ භාෂා පහසුකම, අක්‍ෂර යතුරු පුවරුව මඟින් ඇතුල් කරන පිළිවෙල ආදී විවිධ භාෂා සඳහා අවශ්‍ය සියල්ල වැඩසටහන් ඇතුලත් වේ.</description>
+    <description xml:lang="sk">Tieto balíčky poskytujú podporu pre rôzne jazykové mutácie, vrátane písiem a metód vstupu.</description>
+    <description xml:lang="sl">Paketi z podpora različnim lokalizacijam vključno s fonti ter metodami vnosa.</description>
+    <description xml:lang="sq">Këto paketa ofrjnë asistencë për vendore të ndryshme, përfshi gërma dhe metoda dhëniesh teksti.</description>
+    <description xml:lang="sr">Ови пакети пружају подршку разним језицима укључујући фонтове и методе уноса података.</description>
+    <description xml:lang="sr@Latn">Ovi paketi pružaju podršku raznim jezicima uključujući fontove i metode unosa podataka.</description>
+    <description xml:lang="sr@latin">Ovi paketi pružaju podršku raznim jezicima uključujući fontove i metode unosa podataka.</description>
+    <description xml:lang="sv">Dessa paket tillhandahåller stöd för diverse lokaler, inklusive typsnitt och inmatningsmetoder.</description>
+    <description xml:lang="ta">இந்த தொகுப்புகள் பல்வேறு இருப்பிடங்கள் அதாவது எழுத்துரு மற்றும் உள்ளீடு முறைகளின் துணையை தருகிறது.</description>
+    <description xml:lang="te">ఫాంట్స్‍ మరియు ఇన్‌పుట్ పద్దతులను కలుపుకుని అనేక స్థానికాలకు ఈ సంకలనాలు మద్దతునిస్తాయి.</description>
+    <description xml:lang="tg">Ин барномаҳо пуштибониро барои забонҳои гуногун бо ҳарфҳо ва тарзи воридот таъмин мекунанд.</description>
+    <description xml:lang="th">แพกเกจเหล่านี้ทำให้สนับสนุนภาษาต่างๆ ซึ่งประกอบด้วยแบบอักษรและระบบป้อนข้อมูลของแต่ละภาษา</description>
+    <description xml:lang="tr">Bu paketler çeşitli diller için yazı tipi ve girdi desteğini sağlar.</description>
+    <description xml:lang="uk">Ці пакети забезпечують підтримку різних регіональних параметрів, включаючи шрифти та методи вводу.</description>
+    <description xml:lang="ur">  یہ  مجموعات مختلف لوکیلز  اور فوانٹز  کا ساتھ مھیا کرتے ہیں   </description>
+    <description xml:lang="zh_CN">这些软件包提供对各种区域的支持，包括字体和输入法。</description>
+    <description xml:lang="zh_TW">這些套件提供了多種不同的區域設定，包括字型與輸入法。</description>
+    <grouplist>
+      <groupid>afrikaans-support</groupid>
+      <groupid>akan-support</groupid>
+      <groupid>albanian-support</groupid>
+      <groupid>amazigh-support</groupid>
+      <groupid>arabic-support</groupid>
+      <groupid>armenian-support</groupid>
+      <groupid>assamese-support</groupid>
+      <groupid>asturian-support</groupid>
+      <groupid>azerbaijani-support</groupid>
+      <groupid>basque-support</groupid>
+      <groupid>belarusian-support</groupid>
+      <groupid>bengali-support</groupid>
+      <groupid>bhutanese-support</groupid>
+      <groupid>bodo-support</groupid>
+      <groupid>bosnian-support</groupid>
+      <groupid>brazilian-support</groupid>
+      <groupid>breton-support</groupid>
+      <groupid>british-support</groupid>
+      <groupid>bulgarian-support</groupid>
+      <groupid>burmese-support</groupid>
+      <groupid>catalan-support</groupid>
+      <groupid>chichewa-support</groupid>
+      <groupid>chuvash-support</groupid>
+      <groupid>coptic-support</groupid>
+      <groupid>croatian-support</groupid>
+      <groupid>czech-support</groupid>
+      <groupid>danish-support</groupid>
+      <groupid>dogri-support</groupid>
+      <groupid>dutch-support</groupid>
+      <groupid>esperanto-support</groupid>
+      <groupid>estonian-support</groupid>
+      <groupid>ethiopic-support</groupid>
+      <groupid>faroese-support</groupid>
+      <groupid>fijian-support</groupid>
+      <groupid>filipino-support</groupid>
+      <groupid>finnish-support</groupid>
+      <groupid>french-support</groupid>
+      <groupid>frisian-support</groupid>
+      <groupid>friulian-support</groupid>
+      <groupid>gaelic-support</groupid>
+      <groupid>galician-support</groupid>
+      <groupid>georgian-support</groupid>
+      <groupid>german-support</groupid>
+      <groupid>greek-support</groupid>
+      <groupid>gujarati-support</groupid>
+      <groupid>haitian-creole-support</groupid>
+      <groupid>hebrew-support</groupid>
+      <groupid>hiligaynon-support</groupid>
+      <groupid>hindi-support</groupid>
+      <groupid>hungarian-support</groupid>
+      <groupid>icelandic-support</groupid>
+      <groupid>indonesian-support</groupid>
+      <groupid>interlingua-support</groupid>
+      <groupid>inuktitut-support</groupid>
+      <groupid>irish-support</groupid>
+      <groupid>italian-support</groupid>
+      <groupid>japanese-support</groupid>
+      <groupid>kannada-support</groupid>
+      <groupid>kashmiri-support</groupid>
+      <groupid>kashubian-support</groupid>
+      <groupid>kazakh-support</groupid>
+      <groupid>khmer-support</groupid>
+      <groupid>kinyarwanda-support</groupid>
+      <groupid>konkani-support</groupid>
+      <groupid>korean-support</groupid>
+      <groupid>kurdish-support</groupid>
+      <groupid>kyrgyz-support</groupid>
+      <groupid>lao-support</groupid>
+      <groupid>latin-support</groupid>
+      <groupid>latvian-support</groupid>
+      <groupid>lingala-support</groupid>
+      <groupid>lithuanian-support</groupid>
+      <groupid>low-german-support</groupid>
+      <groupid>low-saxon-support</groupid>
+      <groupid>lower-sorbian-support</groupid>
+      <groupid>lule-sami-support</groupid>
+      <groupid>luxembourgish-support</groupid>
+      <groupid>macedonian-support</groupid>
+      <groupid>maithili-support</groupid>
+      <groupid>malagasy-support</groupid>
+      <groupid>malay-support</groupid>
+      <groupid>malayalam-support</groupid>
+      <groupid>maltese-support</groupid>
+      <groupid>manipuri-support</groupid>
+      <groupid>manx-support</groupid>
+      <groupid>maori-support</groupid>
+      <groupid>marathi-support</groupid>
+      <groupid>mongolian-support</groupid>
+      <groupid>mossi-support</groupid>
+      <groupid>nepali-support</groupid>
+      <groupid>northern-sami-support</groupid>
+      <groupid>northern-sotho-support</groupid>
+      <groupid>norwegian-support</groupid>
+      <groupid>occitan-support</groupid>
+      <groupid>oriya-support</groupid>
+      <groupid>oromo-support</groupid>
+      <groupid>persian-support</groupid>
+      <groupid>polish-support</groupid>
+      <groupid>portuguese-support</groupid>
+      <groupid>punjabi-support</groupid>
+      <groupid>quechua-support</groupid>
+      <groupid>romanian-support</groupid>
+      <groupid>russian-support</groupid>
+      <groupid>samoan-support</groupid>
+      <groupid>sanskrit-support</groupid>
+      <groupid>santali-support</groupid>
+      <groupid>sardinian-support</groupid>
+      <groupid>serbian-support</groupid>
+      <groupid>shuswap-support</groupid>
+      <groupid>simplified-chinese-support</groupid>
+      <groupid>sindhi-support</groupid>
+      <groupid>sinhala-support</groupid>
+      <groupid>slovak-support</groupid>
+      <groupid>slovenian-support</groupid>
+      <groupid>somali-support</groupid>
+      <groupid>southern-ndebele-support</groupid>
+      <groupid>southern-sotho-support</groupid>
+      <groupid>spanish-support</groupid>
+      <groupid>swahili-support</groupid>
+      <groupid>swati-support</groupid>
+      <groupid>swedish-support</groupid>
+      <groupid>tagalog-support</groupid>
+      <groupid>tajik-support</groupid>
+      <groupid>tamil-support</groupid>
+      <groupid>telugu-support</groupid>
+      <groupid>tetum-support</groupid>
+      <groupid>thai-support</groupid>
+      <groupid>tibetan-support</groupid>
+      <groupid>tigrinya-support</groupid>
+      <groupid>tonga-support</groupid>
+      <groupid>traditional-chinese-support</groupid>
+      <groupid>tsonga-support</groupid>
+      <groupid>tswana-support</groupid>
+      <groupid>turkish-support</groupid>
+      <groupid>turkmen-support</groupid>
+      <groupid>ukrainian-support</groupid>
+      <groupid>upper-sorbian-support</groupid>
+      <groupid>urdu-support</groupid>
+      <groupid>uzbek-support</groupid>
+      <groupid>venda-support</groupid>
+      <groupid>vietnamese-support</groupid>
+      <groupid>walloon-support</groupid>
+      <groupid>welsh-support</groupid>
+      <groupid>xhosa-support</groupid>
+      <groupid>yiddish-support</groupid>
+      <groupid>zulu-support</groupid>
+    </grouplist>
+  </category>
+  <category>
+    <id>desktops</id>
+    <name>Desktop Environments</name>
+    <name xml:lang="ar">بيئات سطح المكتب</name>
+    <name xml:lang="as">ডেষ্কটপ পৰিবেশসমূহ</name>
+    <name xml:lang="ast">Entornos d'escritoriu</name>
+    <name xml:lang="bal">محیطان دسکتاپ</name>
+    <name xml:lang="bg">Десктоп среди</name>
+    <name xml:lang="bn">ডেস্কটপ এনভায়রণমেন্ট</name>
+    <name xml:lang="bn_IN">ডেস্কটপ পরিবেশ</name>
+    <name xml:lang="bs">Radna okruženja</name>
+    <name xml:lang="ca">Entorns d'escriptori</name>
+    <name xml:lang="cs">Uživatelská prostředí</name>
+    <name xml:lang="cy">Amgylcheddau Penbwrdd</name>
+    <name xml:lang="da">Skrivebordsmiljøer</name>
+    <name xml:lang="de">Arbeitsumgebungen</name>
+    <name xml:lang="el">Επιφάνειες εργασίας</name>
+    <name xml:lang="en_GB">Desktop Environments</name>
+    <name xml:lang="es">Entornos de escritorio</name>
+    <name xml:lang="et">Töölauakeskkonnad</name>
+    <name xml:lang="fa">محیط‌های رومیزی </name>
+    <name xml:lang="fi">Työpöytäympäristöt</name>
+    <name xml:lang="fr">Environnements de bureau</name>
+    <name xml:lang="gu">ડેસ્કટોપ પર્યાવરણો</name>
+    <name xml:lang="he">סביבות שולחן העבודה</name>
+    <name xml:lang="hi">डेस्कटॉप वातावरण</name>
+    <name xml:lang="hr">Radna okruženja</name>
+    <name xml:lang="hu">Asztali környezetek</name>
+    <name xml:lang="id">Lingkungan Desktop</name>
+    <name xml:lang="is">Skjáborðsumhverfi</name>
+    <name xml:lang="it">Ambienti desktop</name>
+    <name xml:lang="ja">デスクトップ環境</name>
+    <name xml:lang="ka">სამუშაო გარემოები</name>
+    <name xml:lang="kn">ಗಣಕ ಪರಿಸರಗಳು</name>
+    <name xml:lang="ko">데스크탑 환경</name>
+    <name xml:lang="lv">Darbvirsmu vides</name>
+    <name xml:lang="mai">डेस्कटाप वातावरण</name>
+    <name xml:lang="ml">ഡസ്ക്ടോപ്പ് എന്‍വയോണ്മെന്റുകള്‍</name>
+    <name xml:lang="mr">कार्यस्थळ वातावरणे</name>
+    <name xml:lang="ms">Persekitaran Desktop</name>
+    <name xml:lang="nb">Skrivebordsmiljøer</name>
+    <name xml:lang="ne">डेस्कटप परिवेश</name>
+    <name xml:lang="nl">Bureaublad omgevingen</name>
+    <name xml:lang="or">ଡେସ୍କଟପ ପରିବେଶ</name>
+    <name xml:lang="pa">ਡੈਸਕਟਾਪ ਇੰਵਾਇਰਨਮੈਂਟ</name>
+    <name xml:lang="pl">Środowiska graficzne</name>
+    <name xml:lang="pt">Ambientes de Trabalho</name>
+    <name xml:lang="pt_BR">Ambientes de trabalho</name>
+    <name xml:lang="ro">Medii pentru Spațiul de lucru</name>
+    <name xml:lang="ru">Графические среды</name>
+    <name xml:lang="si">ඩෙස්ක්ටොප් පසුබිම්</name>
+    <name xml:lang="sk">Pracovné prostredia</name>
+    <name xml:lang="sl">Namizna Okolja</name>
+    <name xml:lang="sq">Mjedise Desktopi</name>
+    <name xml:lang="sr">Радна окружења</name>
+    <name xml:lang="sr@Latn">Radna okruženja</name>
+    <name xml:lang="sr@latin">Radna okruženja</name>
+    <name xml:lang="sv">Skrivbordsmiljöer</name>
+    <name xml:lang="ta">பணிமேடை சூழல்கள்</name>
+    <name xml:lang="te">డెస్క్‍‌టాప్ వాతావారణాలు</name>
+    <name xml:lang="tg">Муҳити мизи корӣ</name>
+    <name xml:lang="th">สภาพแวดล้อมเดสก์ท็อป</name>
+    <name xml:lang="tr">Masaüstü Ortamları</name>
+    <name xml:lang="uk">Графічні середовища</name>
+    <name xml:lang="zh_CN">桌面环境</name>
+    <name xml:lang="zh_TW">桌面環境</name>
+    <description>Desktop environments</description>
+    <description xml:lang="ar">بيئات سطح المكتب</description>
+    <description xml:lang="as">ডেষ্কটপ পৰিবেশসমূহ</description>
+    <description xml:lang="ast">Entornos d'escritoriu</description>
+    <description xml:lang="bal">محیطان دسکتاپ</description>
+    <description xml:lang="bg">Десктоп среди</description>
+    <description xml:lang="bn">ডেস্কটপ এনভায়রনমেন্ট</description>
+    <description xml:lang="bn_IN">ডেস্কটপ পরিবেশ</description>
+    <description xml:lang="bs">Radna okruženja</description>
+    <description xml:lang="ca">Entorns d'escriptori</description>
+    <description xml:lang="cs">Uživatelská prostředí</description>
+    <description xml:lang="cy">Amgylcheddau penbwrdd</description>
+    <description xml:lang="da">Skrivebordsmiljøer</description>
+    <description xml:lang="de">Arbeitsumgebungen</description>
+    <description xml:lang="el">Επιφάνειες εργασίας</description>
+    <description xml:lang="en_GB">Desktop environments</description>
+    <description xml:lang="es">Entornos de escritorio</description>
+    <description xml:lang="et">Töölauakeskkonnad</description>
+    <description xml:lang="fa">محیط‌های رومیزی </description>
+    <description xml:lang="fi">Työpöytäympäristöt</description>
+    <description xml:lang="fr">Environnements de bureau</description>
+    <description xml:lang="gu">ડેસ્કટોપ પર્યાવરણો</description>
+    <description xml:lang="he">סביבות שולחן העבודה</description>
+    <description xml:lang="hi">डेस्कटॉप वातावरण</description>
+    <description xml:lang="hr">Radna okruženja</description>
+    <description xml:lang="hu">Asztali környezetek</description>
+    <description xml:lang="hy">Դեսքթոփի միջավայրներ</description>
+    <description xml:lang="id">Lingkungan Desktop</description>
+    <description xml:lang="is">Skjáborðsumhverfi</description>
+    <description xml:lang="it">Ambienti desktop</description>
+    <description xml:lang="ja">デスクトップ環境</description>
+    <description xml:lang="ka">სამუშაო გარემოები</description>
+    <description xml:lang="kn">ಗಣಕ ಪರಿಸರಗಳು</description>
+    <description xml:lang="ko">데스크탑 환경</description>
+    <description xml:lang="lv">Darbvirsmu vides</description>
+    <description xml:lang="mai">डेस्कटाप वातावरण</description>
+    <description xml:lang="ml">ഡസ്ക്ടോപ്പ് എന്‍വയോണ്മെന്റുകള്‍</description>
+    <description xml:lang="mr">कार्यस्थळ वातावरणे</description>
+    <description xml:lang="ms">Persekitaran desktop</description>
+    <description xml:lang="nb">Skrivebordsmiljøer</description>
+    <description xml:lang="ne">डेस्कटप परिवेश</description>
+    <description xml:lang="nl">Bureaublad omgevingen</description>
+    <description xml:lang="or">ଡେସ୍କଟପ ପରିବେଶ</description>
+    <description xml:lang="pa">ਡੈਸਕਟਾਪ ਇੰਵਾਇਰਨਮੈਂਟ</description>
+    <description xml:lang="pl">Środowiska graficzne</description>
+    <description xml:lang="pt">Ambientes de trabalho</description>
+    <description xml:lang="pt_BR">Ambientes de trabalho</description>
+    <description xml:lang="ro">Medii pentru spațiul de lucru</description>
+    <description xml:lang="ru">Графические среды</description>
+    <description xml:lang="si">ඩෙස්ක්ටොප් පසුබිම්</description>
+    <description xml:lang="sk">Pracovné prostredia</description>
+    <description xml:lang="sl">Namizna okolja</description>
+    <description xml:lang="sq">Mjedise desktopi</description>
+    <description xml:lang="sr">Радна окружења</description>
+    <description xml:lang="sr@Latn">Radna okruženja</description>
+    <description xml:lang="sr@latin">Radna okruženja</description>
+    <description xml:lang="sv">Skrivbordsmiljöer</description>
+    <description xml:lang="ta">பணிமேடை சூழல்கள்</description>
+    <description xml:lang="te">డెస్క్‍‌టాప్ వాతావారణాలు</description>
+    <description xml:lang="tg">Муҳити мизи корӣ</description>
+    <description xml:lang="th">สภาพแวดล้อมเดสก์ท็อป</description>
+    <description xml:lang="tr">Masaüstü ortamları</description>
+    <description xml:lang="uk">Графічні середовища</description>
+    <description xml:lang="zh_CN">桌面环境</description>
+    <description xml:lang="zh_TW">桌面環境</description>
+    <display_order>10</display_order>
+    <grouplist>
+      <groupid>gnome-desktop</groupid>
+      <groupid>kde-desktop</groupid>
+      <groupid>lxde-desktop</groupid>
+      <groupid>meego-netbook</groupid>
+      <groupid>sugar-desktop</groupid>
+      <groupid>window-managers</groupid>
+      <groupid>xfce-desktop</groupid>
+    </grouplist>
+  </category>
+  <category>
+    <id>apps</id>
+    <name>Applications</name>
+    <name xml:lang="af">Toepassings</name>
+    <name xml:lang="am">መጠቀሚያ ፕሮግራሞች</name>
+    <name xml:lang="ar">تطبيقات</name>
+    <name xml:lang="as">অনুপ্ৰয়োগ</name>
+    <name xml:lang="ast">Aplicaciones</name>
+    <name xml:lang="bal">کارمرزیان</name>
+    <name xml:lang="be">Дастасаваньні</name>
+    <name xml:lang="bg">Приложения</name>
+    <name xml:lang="bn">বিবিধ অ্যাপ্লিকেশন</name>
+    <name xml:lang="bn_IN">অ্যাপ্লিকেশন</name>
+    <name xml:lang="bs">Aplikacije</name>
+    <name xml:lang="ca">Aplicacions</name>
+    <name xml:lang="cs">Aplikace</name>
+    <name xml:lang="cy">Cymwysiadau</name>
+    <name xml:lang="da">Programmer</name>
+    <name xml:lang="de">Anwendungen</name>
+    <name xml:lang="el">Εφαρμογές</name>
+    <name xml:lang="en_GB">Applications</name>
+    <name xml:lang="es">Aplicaciones</name>
+    <name xml:lang="et">Rakendused</name>
+    <name xml:lang="fa">برنامه‌ها</name>
+    <name xml:lang="fi">Apuohjelmat</name>
+    <name xml:lang="fr">Applications</name>
+    <name xml:lang="gl">Aplicacións</name>
+    <name xml:lang="gu">કાર્યક્રમો</name>
+    <name xml:lang="he">ישומים</name>
+    <name xml:lang="hi">अनुप्रयोग</name>
+    <name xml:lang="hr">Aplikacije</name>
+    <name xml:lang="hu">Alkalmazások</name>
+    <name xml:lang="hy">ծրագրեր</name>
+    <name xml:lang="id">Aplikasi</name>
+    <name xml:lang="ilo">Dagiti Aplikasion</name>
+    <name xml:lang="is">Forrit</name>
+    <name xml:lang="it">Applicazioni</name>
+    <name xml:lang="ja">アプリケーション</name>
+    <name xml:lang="ka">პროგრამები</name>
+    <name xml:lang="kn">ಅನ್ವಯಗಳು</name>
+    <name xml:lang="ko">응용 프로그램</name>
+    <name xml:lang="lv">Lietotnes</name>
+    <name xml:lang="mai">अनुप्रयोग</name>
+    <name xml:lang="mk">Апликации</name>
+    <name xml:lang="ml">പ്രയോഗങ്ങള്‍</name>
+    <name xml:lang="mr">ॲप्लिकेशन्स्</name>
+    <name xml:lang="ms">Aplikasi</name>
+    <name xml:lang="nb">Programmer</name>
+    <name xml:lang="nds">Anwennen</name>
+    <name xml:lang="ne">अनुप्रयोग</name>
+    <name xml:lang="nl">Toepassingen</name>
+    <name xml:lang="no">Programmer</name>
+    <name xml:lang="nso">Ditirišo</name>
+    <name xml:lang="or">ପ୍ରୟୋଗ</name>
+    <name xml:lang="pa">ਐਪਲੀਕੇਸ਼ਨ</name>
+    <name xml:lang="pl">Aplikacje</name>
+    <name xml:lang="pt">Aplicações</name>
+    <name xml:lang="pt_BR">Aplicações</name>
+    <name xml:lang="ro">Aplicații</name>
+    <name xml:lang="ru">Приложения</name>
+    <name xml:lang="si">වැඩසටහන්</name>
+    <name xml:lang="sk">Aplikácie</name>
+    <name xml:lang="sl">Aplikacije</name>
+    <name xml:lang="sq">Zbatime</name>
+    <name xml:lang="sr">Програми</name>
+    <name xml:lang="sr@Latn">Programi</name>
+    <name xml:lang="sr@latin">Programi</name>
+    <name xml:lang="sv">Program</name>
+    <name xml:lang="ta">பயன்பாடுகள்</name>
+    <name xml:lang="te">అనువర్తనాలు</name>
+    <name xml:lang="tg">Барномаҳо</name>
+    <name xml:lang="th">แอพลิเคชัน</name>
+    <name xml:lang="tr">Uygulamalar</name>
+    <name xml:lang="uk">Програми</name>
+    <name xml:lang="ur">اپلکیشن</name>
+    <name xml:lang="vi">Ứng dụng</name>
+    <name xml:lang="zh_CN">应用程序</name>
+    <name xml:lang="zh_TW">應用程式</name>
+    <name xml:lang="zu">Abayaleli</name>
+    <description>Applications to perform a variety of tasks</description>
+    <description xml:lang="ar">تطبيقات تقوم بمهام منوعة</description>
+    <description xml:lang="as">বিভিন্ন কাৰ্য্যৰ বাবে অনুপ্ৰয়োগ</description>
+    <description xml:lang="ast">Aplicaciones pa una variedá de xeres</description>
+    <description xml:lang="bal">کارمرزیان په اجرای چندین وظیفه</description>
+    <description xml:lang="bg">Приложения за разнообразни задачи</description>
+    <description xml:lang="bn_IN">বিবিধ কর্মে ব্যবহৃত অ্যাপ্লিকেশন</description>
+    <description xml:lang="bs">Aplikacije za izvršavanje raznovrsnih zadataka</description>
+    <description xml:lang="ca">Aplicacions per a realitzar diverses tasques</description>
+    <description xml:lang="cs">Aplikace pro různé úkoly</description>
+    <description xml:lang="da">Programmer til at udføre en række af opgaver</description>
+    <description xml:lang="de">Anwendungen zum Durchführen einer Vielzahl von Aufgaben</description>
+    <description xml:lang="el">Εφαρμογές για μια ποικιλία εργασιών</description>
+    <description xml:lang="en_GB">Applications to perform a variety of tasks</description>
+    <description xml:lang="es">Aplicaciones para una variedad de tareas</description>
+    <description xml:lang="et">Rakendused kõiksugu ülesannete täitmiseks</description>
+    <description xml:lang="fa">برنامه‌هایی برای انجام وظیفه‌های متفاوت</description>
+    <description xml:lang="fi">Sovelluksia moniin tehtäviin</description>
+    <description xml:lang="fr">Applications pour effectuer une variété de tâches</description>
+    <description xml:lang="gu">વિવિધ પ્રકારની ક્રિયાઓ કરવા માટેના કાર્યક્રમો</description>
+    <description xml:lang="he">ישומים למגוון משימות</description>
+    <description xml:lang="hi">कार्य विविधता संपन्न करने के लिये अनुप्रयोग</description>
+    <description xml:lang="hr">Aplikacije za izvršavanje raznovrsnih zadataka</description>
+    <description xml:lang="hu">Alkalmazások számos feladathoz</description>
+    <description xml:lang="id">Aplikasi untuk melakukan beragam tugas</description>
+    <description xml:lang="is">Ýmis forrit sem leysa mörg verkefni af hendi</description>
+    <description xml:lang="it">Applicazioni generiche per vari compiti</description>
+    <description xml:lang="ja">さまざまな作業用アプリケーション</description>
+    <description xml:lang="kn">ವಿವಿಧ ಕಾರ್ಯಗಳನ್ನು  ನಿವ೯ಹಿಸಲು ಬೇಕಾಗುವ ಅನ್ವಯಗಳು</description>
+    <description xml:lang="ko">다양한 작업을 실행하기 위한 응용 프로그램</description>
+    <description xml:lang="lv">Lietotnes dažādiem uzdevumiem</description>
+    <description xml:lang="mai">कार्य विविधता संपन्न करबा क' लेल अनुप्रयोग</description>
+    <description xml:lang="ml">അനവധി പ്രവര്‍ത്തനങ്ങള്‍ക്കായുളള ആപ്ലിക്കേഷനുകള്‍</description>
+    <description xml:lang="mr">विविध कामे पार पाडण्यासाठी ॲप्लिकेशन्स्</description>
+    <description xml:lang="ms">Aplikasi untuk melaksanakan pelbagai tugasan</description>
+    <description xml:lang="nb">Programmer for en rekke forskjellige oppgaver</description>
+    <description xml:lang="ne">कार्यको भिन्नता सम्पादन गर्ने अनुप्रयोग</description>
+    <description xml:lang="nl">Toepassingen om diverse taken uit te voeren</description>
+    <description xml:lang="or">ବିଭିନ୍ନ କାର୍ଯ୍ଯ କରିବା ପାଇଁ ପ୍ରୟୋଗ ମାନ</description>
+    <description xml:lang="pa">ਕਈ ਤਰ੍ਹਾਂ ਦੇ ਕੰਮ ਕਰਨ ਲਈ ਐਪਲੀਕੇਸ਼ਨਾਂ</description>
+    <description xml:lang="pl">Aplikacje do wykonywania różnych zadań</description>
+    <description xml:lang="pt">Aplicações para efectuar uma variedade de tarefas</description>
+    <description xml:lang="pt_BR">Aplicações para realizar uma variedade de tarefas</description>
+    <description xml:lang="ro">Aplicații pentru executarea unor sarcini diverse</description>
+    <description xml:lang="ru">Приложения для выполнения различных задач</description>
+    <description xml:lang="si">විවිධ වූ කාර්යයන් සිදු කිරීම සඳහා අවශ්‍ය වන වැඩසටහන්</description>
+    <description xml:lang="sk">Aplikácie na vykonávanie rôznych úloh</description>
+    <description xml:lang="sl">Programje za različna opravila</description>
+    <description xml:lang="sq">Zbatime për përmbushjen e një sërë detyrash</description>
+    <description xml:lang="sr">Програми за обављање разних послова</description>
+    <description xml:lang="sr@Latn">Programi za obavljanje raznih poslova</description>
+    <description xml:lang="sr@latin">Programi za obavljanje raznih poslova</description>
+    <description xml:lang="sv">Applikationer för utföra en mängd arbetsuppgifter</description>
+    <description xml:lang="ta">பல்வேறு பணிகளை செய்ய பயன்பாடுகள்</description>
+    <description xml:lang="te">ప్రత్యేక పనులు చేయటానికి అనువర్తనాలు</description>
+    <description xml:lang="tg">Барномаҳо барои коркарди масъалаҳои гуногун</description>
+    <description xml:lang="th">โปรแกรมที่สามารถทำงานได้จิปาถะ</description>
+    <description xml:lang="tr">Çeşitli görevler için uygulamalar</description>
+    <description xml:lang="uk">Програми для виконання різних завдань</description>
+    <description xml:lang="zh_CN">执行各种任务的应用程序</description>
+    <description xml:lang="zh_TW">用於多種不同工作的應用程式</description>
+    <display_order>20</display_order>
+    <grouplist>
+      <groupid>authoring-and-publishing</groupid>
+      <groupid>design-suite</groupid>
+      <groupid>editors</groupid>
+      <groupid>education</groupid>
+      <groupid>engineering-and-scientific</groupid>
+      <groupid>font-design</groupid>
+      <groupid>games</groupid>
+      <groupid>graphical-internet</groupid>
+      <groupid>graphics</groupid>
+      <groupid>medical</groupid>
+      <groupid>office</groupid>
+      <groupid>sound-and-video</groupid>
+      <groupid>text-internet</groupid>
+    </grouplist>
+  </category>
+  <category>
+    <id>development</id>
+    <name>Development</name>
+    <name xml:lang="af">Ontwikkeling</name>
+    <name xml:lang="am">እድገት</name>
+    <name xml:lang="ar">تطوير</name>
+    <name xml:lang="as">বিকাশ</name>
+    <name xml:lang="ast">Desendolcu</name>
+    <name xml:lang="bal">پیش روگ</name>
+    <name xml:lang="be">Распрацоўка</name>
+    <name xml:lang="bg">Разработка</name>
+    <name xml:lang="bn">সফটওয়্যার তৈরি</name>
+    <name xml:lang="bn_IN">সফ্টওয়্যার নির্মাণ</name>
+    <name xml:lang="bs">Razvoj</name>
+    <name xml:lang="ca">Desenvolupament</name>
+    <name xml:lang="cs">Vývoj</name>
+    <name xml:lang="cy">Datblygiad</name>
+    <name xml:lang="da">Udvikling</name>
+    <name xml:lang="de">Softwareentwicklung</name>
+    <name xml:lang="el">Ανάπτυξη λογισμικού</name>
+    <name xml:lang="en_GB">Development</name>
+    <name xml:lang="es">Desarrollo</name>
+    <name xml:lang="et">Arendus</name>
+    <name xml:lang="fa">توسعه</name>
+    <name xml:lang="fi">Ohjelmistokehitys</name>
+    <name xml:lang="fr">Développement</name>
+    <name xml:lang="gl">Desenvolvemento</name>
+    <name xml:lang="gu">વિકાસ</name>
+    <name xml:lang="he">פיתוח</name>
+    <name xml:lang="hi">विकास</name>
+    <name xml:lang="hr">Razvoj</name>
+    <name xml:lang="hu">Fejlesztés</name>
+    <name xml:lang="hy">Ծրագրավորում</name>
+    <name xml:lang="id">Pengembangan</name>
+    <name xml:lang="ilo">Panagbukel</name>
+    <name xml:lang="is">Þróun</name>
+    <name xml:lang="it">Programmazione</name>
+    <name xml:lang="ja">開発環境</name>
+    <name xml:lang="ka">პრიოგრამირება</name>
+    <name xml:lang="kn">ವಿಕಾಸನ</name>
+    <name xml:lang="ko">개발용 도구</name>
+    <name xml:lang="lv">Programmēšana</name>
+    <name xml:lang="mai">विकास</name>
+    <name xml:lang="mk">Развој</name>
+    <name xml:lang="ml">ഡെവലപ്പ്മെന്റ്</name>
+    <name xml:lang="mr">विकास</name>
+    <name xml:lang="ms">Pembangunan</name>
+    <name xml:lang="nb">Utviklingsverktøy</name>
+    <name xml:lang="ne">विकास</name>
+    <name xml:lang="nl">Ontwikkeling</name>
+    <name xml:lang="no">Utviklingsverktøy</name>
+    <name xml:lang="nso">Tšwetšopele</name>
+    <name xml:lang="or">ବିକାଶ</name>
+    <name xml:lang="pa">ਡਿਵੈਲਪਮੈਂਟ</name>
+    <name xml:lang="pl">Programowanie</name>
+    <name xml:lang="pt">Desenvolvimento</name>
+    <name xml:lang="pt_BR">Desenvolvimento</name>
+    <name xml:lang="ro">Dezvoltare</name>
+    <name xml:lang="ru">Программирование</name>
+    <name xml:lang="si">ප්‍රවර්ධනය</name>
+    <name xml:lang="sk">Vývoj</name>
+    <name xml:lang="sl">Razvoj</name>
+    <name xml:lang="sq">Zhvillim</name>
+    <name xml:lang="sr">Развој</name>
+    <name xml:lang="sr@Latn">Razvoj</name>
+    <name xml:lang="sr@latin">Razvoj</name>
+    <name xml:lang="sv">Utveckling</name>
+    <name xml:lang="ta">உருவாக்கம்</name>
+    <name xml:lang="te">అభివృద్ధి</name>
+    <name xml:lang="tg">Барноманависӣ</name>
+    <name xml:lang="th">การพัฒนาซอฟต์แวร์</name>
+    <name xml:lang="tr">Geliştirme</name>
+    <name xml:lang="uk">Програмування</name>
+    <name xml:lang="ur">تمیرات</name>
+    <name xml:lang="vi">Phát triển</name>
+    <name xml:lang="zh_CN">开发</name>
+    <name xml:lang="zh_TW">程式開發</name>
+    <name xml:lang="zu">Intuthuko</name>
+    <description>Packages which provide functionality for developing and building applications.</description>
+    <description xml:lang="ar">تقدم الحزم امكانيات تطوير و بناء تطبيقات.</description>
+    <description xml:lang="as">অনুপ্ৰয়োগসমূহ বিকাশিত আৰু নিৰ্মান কৰিব'লৈ যি সৰঞ্জামে সক্ৰিয়তা প্দান কৰি ।</description>
+    <description xml:lang="ast">Paquetes qu'apurren funcionalidá pa desendolcar y construyir aplicaciones.</description>
+    <description xml:lang="bal">بستگانی که په پیشروگ و شرکنگ کارمرزی عمل آرنت.</description>
+    <description xml:lang="bg">Пакети предоставящи функционалност необходима за разработката и създаването на приложения.</description>
+    <description xml:lang="bn">প্যাকেজ যাহা অ্যাপলিকেশন ডেভেলপিং ও বিল্ডিং এর জন্য ফাংশনালিটি প্রদান করে।</description>
+    <description xml:lang="bn_IN">অ্যাপ্লিকেশন ডিভেলপমেন্ট ও বিল্ড করতে সহায়ক প্যাকেজ।</description>
+    <description xml:lang="bs">Paketi koji pružaju funkcionalnosti za razvoj i izgradnju aplikacija</description>
+    <description xml:lang="ca">Paquets que proporcionen funcionalitats per a desenvolupar i muntar aplicacions.</description>
+    <description xml:lang="cs">Balíčky poskytující podporu pro vývoj a kompilaci aplikací.</description>
+    <description xml:lang="da">Pakker som tilbyder funktionalitet til udvikling og bygning af programmer.</description>
+    <description xml:lang="de">Pakete, die Funktionalität für die Entwicklung und die Erstellung von Anwendungen bieten.</description>
+    <description xml:lang="el">Πακέτα τα οποία προσφέρουν λειτουργικότητα για ανάπτυξη και χτίσιμο εφαρμογών.</description>
+    <description xml:lang="en_GB">Packages which provide functionality for developing and building applications.</description>
+    <description xml:lang="es">Paquetes que proveen la funcionalidad para desarrollar y construir aplicaciones.</description>
+    <description xml:lang="et">Rakenduste arendamiseks ja kompileerimiseks vajalik funktsionaalsus.</description>
+    <description xml:lang="fa">بسته‌هایی که وظیفه‌مندی برای توسعه و ساخت برنامه‌ها فراهم می‌کنند</description>
+    <description xml:lang="fi">Paketit, jotka tarjoavat tuen sovellusten kehittämiselle ja kääntämiselle.</description>
+    <description xml:lang="fr">Paquets qui offrent des fonctions de développement et de création d'applications.</description>
+    <description xml:lang="gu">પેકેજો કે જે કાર્યક્રમોના વિકાસ અને બીલ્ડીંગ માટેના વિધેય પૂરા પાડે છે.</description>
+    <description xml:lang="he">חבילות המאפשרות פיתוח ובניית תכנה.</description>
+    <description xml:lang="hi">संकुल जो अनुप्रयोग के विकास और निर्माण के लिये प्रकार्यात्मकता देते हैं.</description>
+    <description xml:lang="hr">Paketi koji pružaju funkcionalnosti za razvoj i izgradnju aplikacija</description>
+    <description xml:lang="hu">Alkalmazások fejlesztését és építését biztosító csomagok.</description>
+    <description xml:lang="id">Paket yang menyediakan fungsionalitas untuk mengembangkan dan membangun aplikasi.</description>
+    <description xml:lang="is">Pakkar sem innihalda virkni til að þróa og smíða hugbúnað.</description>
+    <description xml:lang="it">Pacchetti che fornisco funzionalità di sviluppo e compilazione di applicazioni.</description>
+    <description xml:lang="ja">アプリケーションの開発環境および構築機能を提供するパッケージです。</description>
+    <description xml:lang="kn">ಅನ್ವಯಗಳನ್ನು ವಿಕಸಿಸಲು ಹಾಗೂ ಕಟ್ಟಲು ಅನುವು ಮಾಡಿಕೊಡುವ ಕಾರ್ಯಾತ್ಮಕ ಪ್ಯಾಕೇಜ್‍ಗಳು.</description>
+    <description xml:lang="ko">이 패키지는 응용 프로그램을 개발하기 위한 기능을 제공합니다.</description>
+    <description xml:lang="lv">Pakotnes, kas nodrošina funkcionalitāti lietotņu izstrādei un būvēšanai.</description>
+    <description xml:lang="mai">संकुल जे अनुप्रयोगक विकास आओर निर्माण क' लेल प्रकार्यात्मकता देत अछि.</description>
+    <description xml:lang="ml">പ്രയോഗങ്ങളുടെ പുരോഗതിയ്ക്കും നിര്‍മ്മാണത്തിനും ആവശ്യമായ പ്രവര്‍ത്തനങ്ങള്‍ക്കുളള പാക്കേജുകള്‍.</description>
+    <description xml:lang="mr">संकुले जी ॲप्लिकेशन्स् विकसन आणि बांधणीसाठी कार्यक्षमता पुरवतात.</description>
+    <description xml:lang="ms">Pakej yang menyediakan fungsi untuk membangun dan membina aplikasi.</description>
+    <description xml:lang="nb">Pakker som gir funksjonalitet for utvikling og bygging av programmer.</description>
+    <description xml:lang="ne">अनुप्रयोग विकास गर्न र निर्माण गर्न कार्यात्मकता उपलब्ध गर्ने प्याकेज ।</description>
+    <description xml:lang="nl">Pakketten die functionaliteit bieden voor het ontwikkelen en bouwen van toepassingen.</description>
+    <description xml:lang="or">ପ୍ରୟୋଗ ମାନଙ୍କୁ ବିକାଶ ଏବଂ ନିର୍ମାଣ କରିବା ପାଇଁ ଏହି ପ୍ଯାକେଜ ଗୁଡିକ କାର୍ଯ୍ଯ ପ୍ରଦାନ କରିଥାଏ।</description>
+    <description xml:lang="pa">ਪੈਕੇਜ, ਜੋ ਕਿ ਐਪਲੀਕੇਸ਼ਨ ਡਿਵੈਲਪ ਅਤੇ ਬਿਲਡ ਕਰਨ ਲਈ ਸਹੂਲਤਾਂ ਉਪਲੱਬਧ ਕਰਵਾਉਦੇ ਹਨ।</description>
+    <description xml:lang="pl">Pakiety dostarczające funkcjonalność tworzenia i budowania aplikacji.</description>
+    <description xml:lang="pt">Pacotes que oferecem funcionalidades para desenvolver e criar aplicações.</description>
+    <description xml:lang="pt_BR">Pacotes que oferecem funcionalidades para o desenvolvimento e compilação de aplicações.</description>
+    <description xml:lang="ro">Pachete care oferă funcționalități pentru dezvoltarea și construirea de aplicații.</description>
+    <description xml:lang="ru">Пакеты для разработки и сборки приложений.</description>
+    <description xml:lang="si">වැඩසටහන් නිර්මාණය හා ප්‍රවර්ධනය සඳහා අවශ්‍ය ක්‍රියාකාරකම් මෙම ඇසුරුම් තුල ඇතුලත් වේ</description>
+    <description xml:lang="sk">Balíčky poskytujúce funkcionalitu pre vývoj a zostavovanie aplikácií.</description>
+    <description xml:lang="sl">Paketi za razvoj programja.</description>
+    <description xml:lang="sq">Paketa që ofrojnë funksione për zhvillim dhe ndërtim zbatimesh.</description>
+    <description xml:lang="sr">Пакети који пружају функционалност за развој и изградњу програма.</description>
+    <description xml:lang="sr@Latn">Paketi koji pružaju funkcionalnost za razvoj i izgradnju programa.</description>
+    <description xml:lang="sr@latin">Paketi koji pružaju funkcionalnost za razvoj i izgradnju programa.</description>
+    <description xml:lang="sv">Paket som tillhandahåller funktionalitet för utveckling och skapande av applikationer.</description>
+    <description xml:lang="ta">பயன்பாடுகளை மேம்படுத்தவும், உருவாக்கவும் செயல்பாடுகளை கொடுக்கும் தொகுப்புகள்.</description>
+    <description xml:lang="te">అనువర్తనాల అభివృద్దికి మరియు నిర్మాణంకు కార్యధక్షతను అందిచే సంకలనాలు.</description>
+    <description xml:lang="tg">Барномаҳои барноманависӣ ва эҷодкунии худи барномаҳо</description>
+    <description xml:lang="th">ชุดแพกเกจที่ใช้สำหรับการพัฒนาและสร้างโปรแกรมประยุกต์</description>
+    <description xml:lang="tr">Uygulama geliştirmek ve oluşturmak için gerekli işlevleri sağlayan paketler.</description>
+    <description xml:lang="uk">Пакети, що надають можливість розробляти та збирати програми.</description>
+    <description xml:lang="zh_CN">提供开发和构建应用程序功能的软件包。</description>
+    <description xml:lang="zh_TW">提供開發及建立應用程式功能的套件。</description>
+    <display_order>70</display_order>
+    <grouplist>
+      <groupid>development-libs</groupid>
+      <groupid>development-tools</groupid>
+      <groupid>eclipse</groupid>
+      <groupid>electronic-lab</groupid>
+      <groupid>fedora-packager</groupid>
+      <groupid>gnome-software-development</groupid>
+      <groupid>haskell</groupid>
+      <groupid>java-development</groupid>
+      <groupid>kde-software-development</groupid>
+      <groupid>legacy-software-development</groupid>
+      <groupid>libreoffice-development</groupid>
+      <groupid>milkymist</groupid>
+      <groupid>mingw32</groupid>
+      <groupid>ocaml</groupid>
+      <groupid>perl</groupid>
+      <groupid>robotics-suite</groupid>
+      <groupid>ruby</groupid>
+      <groupid>web-development</groupid>
+      <groupid>x-software-development</groupid>
+      <groupid>xfce-software-development</groupid>
+    </grouplist>
+  </category>
+  <environment>
+    <id>minimal</id>
+    <name>Min install</name>
+    <description>Basic functionality.</description>
+    <display_order>5</display_order>
+    <grouplist>
+      <groupid>core</groupid>
+    </grouplist>
+    <optionlist>
+      <groupid>core</groupid>
+    </optionlist>
+  </environment>
+  <environment>
+    <id>infrastructure-server-environment</id>
+    <name>Infrastructure Server</name>
+    <description>Server for operating network infrastructure services.</description>
+    <display_order>10</display_order>
+    <grouplist>
+      <groupid>base</groupid>
+      <groupid>core</groupid>
+    </grouplist>
+    <optionlist>
+      <groupid>nomenu</groupid>
+      <groupid>noswap</groupid>
+    </optionlist>
+  </environment>
+  <environment>
+    <id>file-print-server-environment</id>
+    <name>File and Print Server</name>
+    <description>File, print, and storage server for enterprises.</description>
+    <display_order>20</display_order>
+    <grouplist>
+      <groupid>base</groupid>
+      <groupid>core</groupid>
+      <groupid>file-server</groupid>
+      <groupid>print-server</groupid>
+    </grouplist>
+    <optionlist>
+      <groupid>backup-server</groupid>
+      <groupid>directory-client</groupid>
+      <groupid>directory-server</groupid>
+      <groupid>dns-server</groupid>
+      <groupid>file-server</groupid>
+    </optionlist>
+  </environment>
+  <environment>
+    <id>web-server-environment</id>
+    <name>Web Server</name>
+    <name xml:lang='af'>Webbediener</name>
+    <name xml:lang='am'>የድር ሰርቨር</name>
+    <name xml:lang='ar'>خادم وٍبْ</name>
+    <name xml:lang='as'>ৱেব চাৰ্ভাৰ।</name>
+    <name xml:lang='bal'>سرور وب</name>
+    <name xml:lang='be'>Паслужнік павуціньня</name>
+    <name xml:lang='bg'>Уеб сървър</name>
+    <name xml:lang='bn'>ওয়েব সার্ভার</name>
+    <name xml:lang='bn_IN'>ওয়েব সার্ভার</name>
+    <name xml:lang='bs'>Internetski poslužitelj</name>
+    <name xml:lang='ca'>Servidor web</name>
+    <name xml:lang='cs'>WWW server</name>
+    <name xml:lang='cy'>Gweinydd Gwe</name>
+    <name xml:lang='da'>Webserver</name>
+    <name xml:lang='de'>Web-Server</name>
+    <name xml:lang='el'>Εξυπηρετητής ιστοσελίδων</name>
+    <name xml:lang='en_GB'>Web Server</name>
+    <name xml:lang='es'>Servidor Web</name>
+    <name xml:lang='et'>Veebiserver</name>
+    <name xml:lang='fa'>کارگزار وب</name>
+    <name xml:lang='fi'>WWW-palvelin</name>
+    <name xml:lang='fr'>Serveur Web</name>
+    <name xml:lang='gl'>Servidor web</name>
+    <name xml:lang='gu'>વેબ સર્વર</name>
+    <name xml:lang='he'>שרת Web.</name>
+    <name xml:lang='hi'>वेब सर्वर</name>
+    <name xml:lang='hr'>Internetski poslužitelj</name>
+    <name xml:lang='hu'>Webkiszolgáló</name>
+    <name xml:lang='hy'>Վեբ սերվեր</name>
+    <name xml:lang='id'>Server Web</name>
+    <name xml:lang='ilo'>Serbidor ti Saput</name>
+    <name xml:lang='is'>Vefþjónn</name>
+    <name xml:lang='it'>Server Web</name>
+    <name xml:lang='ja'>Web サーバー</name>
+    <name xml:lang='ka'>ვებ-სერვერი</name>
+    <name xml:lang='kn'>ಜಾಲ ಪರಿಚಾರಕ</name>
+    <name xml:lang='ko'>웹 서버</name>
+    <name xml:lang='lv'>Interneta serveris</name>
+    <name xml:lang='mai'>वेब सर्वर</name>
+    <name xml:lang='mk'>Веб сервер</name>
+    <name xml:lang='ml'>വെബ് സര്‍വര്‍</name>
+    <name xml:lang='mr'>जाल(वेब) सर्व्हर</name>
+    <name xml:lang='ms'>Pelayan Web</name>
+    <name xml:lang='nb'>Webtjener</name>
+    <name xml:lang='ne'>वेब सर्भर</name>
+    <name xml:lang='nl'>Webserver</name>
+    <name xml:lang='no'>Webtjener</name>
+    <name xml:lang='nso'>Seabi sa Wepe</name>
+    <name xml:lang='or'>ୱେବ ସେବକ</name>
+    <name xml:lang='pa'>ਵੈੱਬ ਸਰਵਰ</name>
+    <name xml:lang='pl'>Serwer WWW</name>
+    <name xml:lang='pt'>Servidor Web</name>
+    <name xml:lang='pt_BR'>Servidor Web</name>
+    <name xml:lang='ro'>Server Web</name>
+    <name xml:lang='ru'>Веб-сервер</name>
+    <name xml:lang='si'>වියුණු සේවා දායකය</name>
+    <name xml:lang='sk'>WWW server</name>
+    <name xml:lang='sl'>Spletni strežnik</name>
+    <name xml:lang='sq'>Shërbyes Web</name>
+    <name xml:lang='sr'>Веб сервер</name>
+    <name xml:lang='sr@Latn'>Veb server</name>
+    <name xml:lang='sr@latin'>Veb server</name>
+    <name xml:lang='sv'>Webbserver</name>
+    <name xml:lang='ta'>இணைய சேவையகம்</name>
+    <name xml:lang='te'>వెబ్ సేవిక</name>
+    <name xml:lang='tg'>Хидматгоҳи Веб</name>
+    <name xml:lang='th'>ตัวให้บริการเว็บ</name>
+    <name xml:lang='tr'>Ağ Sunucusu</name>
+    <name xml:lang='uk'>Веб-сервер</name>
+    <name xml:lang='ur'>سرور (Web)  ويب  </name>
+    <name xml:lang='vi'>Server Web</name>
+    <name xml:lang='zh_CN'>万维网服务器</name>
+    <name xml:lang='zh_TW'>網頁伺服器</name>
+    <name xml:lang='zu'>Umlekeleli we-web</name>
+    <description>Server for serving static and dynamic internet content.</description>
+    <display_order>30</display_order>
+    <grouplist>
+      <groupid>base</groupid>
+      <groupid>core</groupid>
+      <groupid>web-server</groupid>
+    </grouplist>
+    <optionlist>
+      <groupid>backup-client</groupid>
+      <groupid>directory-client</groupid>
+      <groupid>hardware-monitoring</groupid>
+    </optionlist>
+  </environment>
+</comps>

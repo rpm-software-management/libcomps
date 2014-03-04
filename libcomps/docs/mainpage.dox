@@ -1,0 +1,21 @@
+/**
+\mainpage Libcomps documentation
+
+Libcomps is library for comps.xml files manipulation. Supporting reading
+comps.xml files, modifiing content as class-like structure, generating xml
+output and creating whole new class-like structure comps representation.
+This documentation meet only for C part of library.
+
+To explore libcomps capabilities and features covering comps files continue
+reading @link libcomps_objs
+this
+@endlink
+
+To understatning libcomps object management(creating, destroying, copying and
+binding to python objects) read @link comps_obj
+this
+@endlink
+
+*/
+
+

@@ -1,0 +1,308 @@
+CR - Costa Rica
+YE - Yemen
+CX - Christmas Island
+MB - Manitoba
+NC - North Carolina
+MS - Montserrat
+HI - Hawaii
+AS - American Samoa
+LK - Sri Lanka
+MO - Macau
+LV - Latvia
+TG - Togo
+PR - Puerto Rico
+NE - Nebraska
+RW - Rwanda
+HT - Haiti
+NH - New Hampshire
+SD - South Dakota
+TW - Taiwan
+BJ - Benin
+YT - Yukon Territory
+MH - Marshall Islands
+BC - British Columbia
+SH - St. Helena
+CO - Colombia
+KH - Cambodia
+TH - Thailand
+NB - New Brunswick
+NJ - New Jersey
+MR - Mauritania
+IA - Iowa
+RS - Serbia
+AG - Antigua and Barbuda
+LU - Luxembourg
+LB - Lebanon
+SJ - Svalbard and Jan Mayen Islands
+SZ - Swaziland
+QC - Quebec
+MA - Massachusetts
+NC - New Caledonia
+GF - French Guiana
+IM - Isle of Man
+HU - Hungary
+DE - Delaware
+CL - Chile
+IN - Indiana
+BF - Burkina Faso
+SO - Somalia
+TK - Tokelau
+BH - Bahrain
+MD - Maryland
+DK - Denmark
+NU - Niue
+SC - Seychelles
+AM - Armenia
+IN - India
+GD - Grenada
+GG - Guernsey
+AN - Netherlands Antilles
+LI - Liechtenstein
+CZ - Czech Republic
+LY - Libya
+BW - Botswana
+SI - Slovenia
+PR - Puerto Rico
+PH - Philippines
+VA - Vatican City State (Holy See)
+PE - Prince Edward Island
+PA - Panama
+LA - Louisiana
+IO - British Indian Ocean Territory
+FX - France, Metropolitan
+EC - Ecuador
+FR - France
+AC - Ascension Island
+EE - Estonia
+NY - New York
+LR - Liberia
+VC - Saint Vincent and The Grenadines
+GU - Guam
+BS - Bahamas
+SK - Saskatchewan
+MT - Malta
+CY - Cyprus
+NF - Newfoundland
+PY - Paraguay
+IR - Iran
+MM - Myanmar
+GT - Guatemala
+AE - United Arab Emirates
+GA - Georgia
+OH - Ohio
+PW - Palau
+SR - Suriname
+AB - Alberta
+ER - Eritrea
+ZA - South Africa
+DJ - Djibouti
+SE - Sweden
+BE - Belgium
+MV - Maldives
+ML - Mali
+VI - Virgin Islands (US)
+PT - Portugal
+BO - Bolivia
+DM - Dominica
+PN - Pitcairn
+UK - United Kingdom
+IQ - Iraq
+WS - Samoa
+KM - Comoros
+OK - Oklahoma
+NS - Nova Scotia
+ND - North Dakota
+UM - US Minor Outlying Islands
+VT - Vermont
+CO - Colorado
+IT - Italy
+LT - Lithuania
+ON - Ontario
+NR - Nauru
+SC - South Carolina
+VE - Venezuela
+AZ - Azerbaijan
+NV - Nevada
+US - United States
+JP - Japan
+UY - Uruguay
+KE - Kenya
+MT - Montana
+AI - Anguilla
+ME - Montenegro
+KY - Kentucky
+WV - West Virginia
+SM - San Marino
+TZ - Tanzania
+GH - Ghana
+TR - Turkey
+AO - Angola
+BR - Brazil
+BA - Bosnia and Herzegovina
+GQ - Equatorial Guinea
+PF - French Polynesia
+OR - Oregon
+AU - Australia
+NE - Niger
+NL - Netherlands, The
+GI - Gibraltar
+FO - Faroe Islands
+NM - New Mexico
+TP - East Timor
+AK - Alaska
+UG - Uganda
+WA - Washington
+FM - Micronesia
+SA - Saudi Arabia
+GW - Guinea_Bissau
+CA - California
+FI - Finland
+EG - Egypt
+CG - Congo
+GR - Greece
+SV - El Salvador
+MZ - Mozambique
+NG - Nigeria
+UA - Ukraine
+FK - Falkland Islands (Malvinas)
+AD - Andorra
+SL - Sierra Leone
+BV - Bouvet Island
+RO - Romania
+BI - Burundi
+MD - Moldova
+BZ - Belize
+NA - Namibia
+ET - Ethiopia
+LC - Saint Lucia
+AL - Albania
+CM - Cameroon
+MG - Madagascar
+AL - Alabama
+PE - Peru
+DZ - Algeria
+ME - Maine
+WY - Wyoming
+NI - Nicaragua
+BG - Bulgaria
+GY - Guyana
+KR - Korea (South)
+ZM - Zambia
+LS - Lesotho
+MO - Missouri
+AQ - Antarctica
+TC - Turks and Caicos Islands
+GN - Guinea
+IE - Ireland
+CU - Cuba
+LA - Laos
+MX - Mexico
+PM - St. Pierre and Miquelon
+DE - Germany
+CA - Canada
+JM - Jamaica
+BM - Bermuda
+JO - Jordan
+NO - Norway
+FL - Florida
+VA - Virginia
+EH - Western Sahara
+TJ - Tajikistan
+KN - Saint Kitts and Nevis
+ES - Spain
+KG - Kyrgyzstan
+AF - Afghanistan
+MP - Northern Mariana Islands
+GM - Gambia
+VU - Vanuatu
+TN - Tunisia
+YT - Mayotte
+AZ - Arizona
+AW - Aruba
+BN - Brunei Darussalam
+KW - Kuwait
+GA - Gabon
+SY - Syria
+NT - Northwest Territories
+AR - Arkansas
+TM - Turkmenistan
+PL - Poland
+JE - Jersey
+AR - Argentina
+KP - Korea (North)
+CH - Switzerland
+HK - Hong Kong
+AT - Austria
+MU - Mauritius
+IS - Iceland
+CI - Cote D'Ivoire (Ivory Coast)
+SN - Senegal
+GL - Greenland
+WF - Wallis and Futuna Islands
+IL - Israel
+CC - Cocos (Keeling Islands)
+MS - Mississippi
+MN - Minnesota
+BY - Belarus
+OM - Oman
+GS - S. Georgia and S. Sandwich Isls.
+BB - Barbados
+MC - Monaco
+CT - Connecticut
+GE - Georgia
+MW - Malawi
+DC - District of Columbia
+TO - Tonga
+PA - Pennsylvania
+TF - French Southern Territories
+BT - Bhutan
+RE - Reunion
+HM - Heard and McDonald Islands
+VG - Virgin Islands (British)
+CV - Cape Verde
+QA - Qatar
+CN - China
+KS - Kansas
+SD - Sudan
+DO - Dominican Republic
+SB - Solomon Islands
+TT - Trinidad and Tobago
+RU - Russian Federation
+TN - Tennessee
+TD - Chad
+ZW - Zimbabwe
+SK - Slovak Republic
+NP - Nepal
+RI - Rhode Island
+PG - Papua New Guinea
+ID - Idaho
+MK - Macedonia
+SG - Singapore
+BD - Bangladesh
+PK - Pakistan
+UZ - Uzbekistan
+KY - Cayman Islands
+ID - Indonesia
+CK - Cook Islands
+HN - Honduras
+FJ - Fiji
+KZ - Kazakhstan
+MN - Mongolia
+TX - Texas
+IL - Illinois
+ST - Sao Tome and Principe
+NF - Norfolk Island
+NZ - New Zealand
+VN - Viet Nam
+GP - Guadeloupe
+ZR - Zaire
+HR - Croatia (Hrvatska)
+MI - Michigan
+TV - Tuvalu
+MA - Morocco
+UT - Utah
+WI - Wisconsin
+MQ - Martinique
+CF - Central African Republic
+KI - Kiribati
+MY - Malaysia
