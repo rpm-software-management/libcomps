@@ -14,6 +14,7 @@ set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
 set_target_properties(pycomps PROPERTIES PREFIX "_lib")
 #set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_NAME "_libpycomps")
 #add_dependencies(pycomps src-copy)
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 target_link_libraries(pycomps libcomps)
 target_link_libraries(pycomps ${EXPAT_LIBRARIES})

@@ -17,7 +17,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 find_package(Sphinx)
 
 set(pycopy pydocs)
-add_custom_target(pydocs DEPENDS pycomps)
+add_custom_target(pydocs)
+add_dependencies(pydocs pycomps)
 
 include(../pycopy.cmake)
 

@@ -1,4 +1,4 @@
-%global commit 13f2c8dab64f6d8dbdded8266a583c286d5e0b98
+%global commit 365330487c6b63681459cbe2fc29fa80a1660e19
 
 %if 0%{?rhel} && 0%{?rhel} <= 6
 %define python3_build 0
@@ -144,7 +144,7 @@ rm -rf $buildroot
 
 %files -n python-libcomps
 %{_libdir}/python2*
-%exclude %{_libdir}/python2/libcomps/__pycache__
+#%exclude %{_libdir}/python2/libcomps/__pycache__
 
 %if %{python3_build}
 %files -n python3-libcomps
