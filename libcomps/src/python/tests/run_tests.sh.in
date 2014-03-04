@@ -1,4 +1,5 @@
 #!/bin/sh
+export LD_LIBRARY_PATH="@LIBCOMPS_OUT@/:$LD_LIBRARY_PATH"
 @PYTHON_EXECUTABLE@ __test.py
 @PYTHON_EXECUTABLE@ test_libcomps.py
 @PYTHON_EXECUTABLE@ test_merge_comps.py

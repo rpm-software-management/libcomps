@@ -4,6 +4,9 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc-sources/conf.py.in"
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
                      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+
 #include(../pycopy.cmake)
 
 #find_package(Doxygen)
@@ -21,7 +24,9 @@ add_custom_target(pydocs)
 add_dependencies(pydocs pycomps)
 
 include(../pycopy.cmake)
+add_custom_command(TARGET pydocs PRE_BUILD COMMAND set -E $ENV{LD_LIBRARY_PATH} "${LIBCOMPS_OUT}:$ENV{LD_LIBRARY_PATH}")
 
 add_custom_command(TARGET pydocs COMMAND python${pversion} ${SPHINX_EXECUTABLE} -E -b html
                                   "${CMAKE_CURRENT_SOURCE_DIR}/doc-sources/"
-                                  "${CMAKE_CURRENT_BINARY_DIR}/html/")
+                                  "${CMAKE_CURRENT_BINARY_DIR}/html/"
+                                 COMMENT "LDLP $ENV{LD_LIBRARY_PATH}")

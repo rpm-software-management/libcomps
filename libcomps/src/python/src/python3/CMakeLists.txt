@@ -25,8 +25,9 @@ target_link_libraries(pycomps ${PYTHON_LIBRARIES})
 
 add_custom_target(pytest_run COMMAND ./run_tests.sh
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
-                   DEPENDS pycomps py3-copy
                    COMMENT "Running python binding tests")
+add_dependencies(pycomps pycomps py3-copy)
+
 
 INSTALL(FILES ${pycomps_SRCDIR}/__init__.py DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
 #INSTALL(FILES ${pycomps_SRCDIR}/tests/__test.py DESTINATION

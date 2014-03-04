@@ -5,10 +5,15 @@ include (${CMAKE_ROOT}/Modules/CheckFunctionExists.cmake)
 include (${CMAKE_SOURCE_DIR}/version.cmake)
 #set (CMAKE_CXX_COMPILER g++)
 
+set(LIBCOMPS_OUT "${CMAKE_CURRENT_BINARY_DIR}/src")
+
+
 set (CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} --pedantic -std=c99 -Wall -Wextra -g -Wno-missing-field-initializers -O2 -fno-strict-aliasing -g")
 set (CMAKE_C_FLAGS_DEBUG    "${CMAKE_C_FLAGS} -ggdb -O0 -Wall -Wextra")
 
 set (VERSION "${libcomps_VERSION_MAJOR}.${libcomps_VERSION_MINOR}.${libcomps_VERSION_PATCH}")
+#set (libcomps_SOURCE comps_list.c)
+#set (libcomps_HEADERS comps_list.h)
 
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}/src")

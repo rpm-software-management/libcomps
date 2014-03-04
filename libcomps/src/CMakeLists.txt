@@ -21,10 +21,10 @@ set (libcomps_HEADERS comps_doc.h comps_docgroup.h comps_doccategory.h
      comps_utils.h comps_validate.h
      comps_log_codes.h
     )
-
-set(LIBCOMPS_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
-
 add_custom_target(src-copy)
+
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/libcomps_config.h.in"
                 "${PROJECT_SOURCE_DIR}/src/libcomps/libcomps_config.h")

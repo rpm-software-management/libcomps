@@ -2,6 +2,8 @@
 #set (testlist_HEADERS check_list.h check_utils.h)
 add_custom_target(test-copy)
 
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 set (testobjrtree_SOURCE check_objrtree.c check_utils.c)
 set (testobjrtree_HEADERS check_objrtree.h check_utils.h)
 
@@ -72,14 +74,20 @@ foreach(file ${TEST_FILES})
     #file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${file} DESTINATION ./)
 endforeach()
 
-add_custom_target(test_comps_run COMMAND ./test_comps
+add_custom_target(test_comps_run
+                   COMMAND export LD_LIBRARY_PATH="${LIBCOMPS_OUT}/:$LD_LIBRARY_PATH"
+                           && ./test_comps
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS test_comps
                    COMMENT "Running comps test")
 
-add_custom_target(test_parse_run COMMAND ./test_parse
+add_custom_target(test_parse_run
+                   COMMAND export LD_LIBRARY_PATH="${LIBCOMPS_OUT}/:$LD_LIBRARY_PATH"
+                           && ./test_parse
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS test_parse
                    COMMENT "Running comps_parse test")
+target_link_libraries(test_parse_run libcomps)
+target_link_libraries(test_comps_run libcomps)
 
 add_dependencies(ctest test_comps_run test_parse_run)

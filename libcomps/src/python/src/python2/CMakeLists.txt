@@ -15,6 +15,8 @@ set_target_properties(pycomps PROPERTIES PREFIX "_lib")
 #set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_NAME "_libpycomps")
 #add_dependencies(pycomps src-copy)
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+SET(CMAKE_SKIP_BUILD_RPATH  TRUE)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
 target_link_libraries(pycomps libcomps)
 target_link_libraries(pycomps ${EXPAT_LIBRARIES})
@@ -23,7 +25,8 @@ target_link_libraries(pycomps ${PYTHON_LIBRARIES})
 
 set(pycopy pytest_run)
 
-add_custom_target(pytest_run DEPENDS pycomps)
+add_custom_target(pytest_run)
+add_dependencies(pytest_run pycomps)
 
 include(../../pycopy.cmake)
 
