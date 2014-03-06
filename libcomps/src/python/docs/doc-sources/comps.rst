@@ -36,7 +36,7 @@
         * accepting only specified type of object.
           :py:class:`GroupList` devours only :py:class:`Group` instance.
         * accepting string argument in getter/setter items methods
-          as indentificator of objects by id.
+          as identificator of objects by id.
         * run validation procedure on absorbed object so you can't
           append/insert/set invalid :py:class:`Group` object
 
@@ -67,7 +67,7 @@
         * accepting only specified type of object.
           :py:class:`CategoryList` devours only :py:class:`Category` instance.
         * accepting string argument in getter/setter items methods
-          as indentificator of objects by id.
+          as identificator of objects by id.
         * run validation procedure on absorbed object so you can't
           append/insert/set invalid :py:class:`Category` object
 
@@ -98,7 +98,7 @@
         * accepting only specified type of object.
           :py:class:`EnvList` devours only :py:class:`Environment` instance.
         * accepting string argument in getter/setter items methods
-          as indentificator of objects by id.
+          as identificator of objects by id.
         * run validation procedure on absorbed object so you can't
           append/insert/set invalid :py:class:`Environment` object
 
@@ -133,7 +133,7 @@
         * accepting only specified type of object.
           :py:class:`PackageList` devours only :py:class:`Package` instance.
         * accepting string argument in getter/setter items methods
-          as indentificator of package name.
+          as identificator of package name.
         * run validation procedure on absorbed object so you can't
           append/insert/set invalid :py:class:`Package` object
 

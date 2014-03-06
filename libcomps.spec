@@ -1,4 +1,4 @@
-%global commit bc339d97d625ff650db6ef1c5522ae7922dab4f2
+%global commit a756363ce4a0dc7cb9395d2f57315428c22a4efb
 
 %if 0%{?rhel} && 0%{?rhel} <= 6
 %define python3_build 0
@@ -12,7 +12,7 @@
 
 Name:           libcomps
 Version:        0.1.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Comps XML file manipulation library
 
 Group:          Development/Libraries
