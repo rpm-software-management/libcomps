@@ -1088,6 +1088,11 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(c.groups[0].packages[0].type == \
                         libcomps.PACKAGE_TYPE_MANDATORY)
 
+    def test_fobj(self):
+        c = libcomps.Comps()
+        self.assertRaises(TypeError, c.fromxml_f, open("comps/main_def.xml"))
+        
+
 if __name__ == "__main__":
     unittest.main(testRunner = utest.MyRunner)
     #unittest.main()

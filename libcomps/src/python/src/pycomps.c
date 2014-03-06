@@ -226,9 +226,11 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *args, PyObject* kwds) {
     COMPS_DefaultsOptions *options = NULL;
 
     char* keywords[] = {"fname", "options", NULL};
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "s|O&", keywords, &fname,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|O&", keywords, &fname,
                                     __pycomps_dict_to_def_opts, &options)) {
-
+        PyErr_SetString(PyExc_TypeError,
+                    "function accept string and optional xml_options dict");
+        return NULL;
     }
 
     parsed = comps_parse_parsed_create();
@@ -332,9 +334,11 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *args, PyObject *kwds) {
     char* keywords[] = {"str", "options", NULL};
     COMPS_DefaultsOptions *options = NULL;
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "s|O&", keywords, &tmps,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|O&", keywords, &tmps,
                                     __pycomps_dict_to_def_opts, &options)) {
-
+        PyErr_SetString(PyExc_TypeError,
+                    "function accept optional xml_options dict");
+        return NULL;
     }
 
     COMPS_Parsed *parsed;

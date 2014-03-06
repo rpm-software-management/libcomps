@@ -17,7 +17,12 @@ import sys, os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-sys.path.insert(0, os.path.abspath("/root/libcomps-build/src/python/src/python2"))
+import ctypes
+clibcomps = ctypes.cdll.LoadLibrary("/home/jluza/_dmach/libcomps-build/src/libcomps.so.0.1.6")
+os.environ['LD_LIBRARY_PATH'] = "%s" % "/home/jluza/_dmach/libcomps-build/src"
+print os.environ['LD_LIBRARY_PATH'] 
+
+sys.path.insert(0, os.path.abspath("/home/jluza/_dmach/libcomps-build/src/python/src/python2"))
 import libcomps
 
 # -- General configuration -----------------------------------------------------
