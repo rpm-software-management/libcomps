@@ -212,8 +212,8 @@ int check_errors(COMPS_Log *log, COMPS_LogEntry ** known_errors,
             _x = comps_object_tostr(((COMPS_LogEntry*)it->data)->args[x]);
             _y = comps_object_tostr(known_errors[i]->args[x]);
             fail_if(comps_object_cmp(((COMPS_LogEntry*)it->data)->args[x],
-                                     known_errors[i]->args[x]) == 0, "%s != %s",
-                                     _x, _y);
+                                     known_errors[i]->args[x]) == 0, "%d. %s != %s",
+                                     x, _x, _y);
             free(_x);
             free(_y);
         }
@@ -369,7 +369,7 @@ START_TEST(test_comps_parse4)
     //int ret,
     int i;
     //COMPS_List * tmplist;
-    COMPS_LogEntry* known_errors[8];
+    COMPS_LogEntry* known_errors[15];
     fprintf(stderr, "## Running test_parse4\n\n");
 
     known_errors[0] = __log_entry_x(COMPS_ERR_NOPARENT, 3, comps_str("id"),
@@ -385,13 +385,37 @@ START_TEST(test_comps_parse4)
     known_errors[4] = __log_entry_x(COMPS_ERR_NOPARENT, 3,
                                     comps_str("grouplist"),
                                     comps_num(880), comps_num(2));
+
     known_errors[5] = __log_entry_x(COMPS_ERR_NOPARENT, 3,
-                                    comps_str("id"),
-                                    comps_num(1210), comps_num(2));
+                                    comps_str("groupid"),
+                                    comps_num(881), comps_num(4));
     known_errors[6] = __log_entry_x(COMPS_ERR_NOPARENT, 3,
                                     comps_str("groupid"),
+                                    comps_num(882), comps_num(4));
+    known_errors[7] = __log_entry_x(COMPS_ERR_NOPARENT, 3,
+                                    comps_str("groupid"),
+                                    comps_num(883), comps_num(4));
+    known_errors[8] = __log_entry_x(COMPS_ERR_NOPARENT, 3,
+                                    comps_str("groupid"),
+                                    comps_num(884), comps_num(4));
+    known_errors[9] = __log_entry_x(COMPS_ERR_NOPARENT, 3,
+                                    comps_str("groupid"),
+                                    comps_num(885), comps_num(4));
+    known_errors[10] = __log_entry_x(COMPS_ERR_NOPARENT, 3,
+                                    comps_str("groupid"),
+                                    comps_num(886), comps_num(4));
+    known_errors[11] = __log_entry_x(COMPS_ERR_NOPARENT, 3,
+                                    comps_str("groupid"),
+                                    comps_num(887), comps_num(4));
+
+
+    known_errors[12] = __log_entry_x(COMPS_ERR_NOPARENT, 3,
+                                    comps_str("id"),
+                                    comps_num(1210), comps_num(2));
+    known_errors[13] = __log_entry_x(COMPS_ERR_NOPARENT, 3,
+                                    comps_str("groupid"),
                                     comps_num(1228), comps_num(4));
-    known_errors[7] = __log_entry_x(COMPS_ERR_ELEM_ALREADYSET, 3,
+    known_errors[14] = __log_entry_x(COMPS_ERR_ELEM_ALREADYSET, 3,
                                      comps_str("optionlist"),
                                      comps_num(1244), comps_num(4));
 
@@ -403,7 +427,7 @@ START_TEST(test_comps_parse4)
     fail_if(parsed->log->entries->first == NULL);
     check_errors(parsed->log, known_errors, 15);
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 15; i++) {
         comps_log_entry_destroy(known_errors[i]);
     }
     comps_parse_parsed_destroy(parsed);
