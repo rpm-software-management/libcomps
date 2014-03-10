@@ -278,6 +278,7 @@ class Group_Test(BaseObjTestClass, unittest.TestCase):
                   "name": [str],
                   "desc": [str],
                   "uservisible": [bool],
+                  "biarchonly": [bool],
                   "default": [bool],
                   "lang_only": [str],
                   "display_order": [int, bool],
@@ -684,7 +685,7 @@ class COMPSTest(unittest.TestCase):
         c = self.comps.categories[1]
         c.group_ids.append("g2")
         (h, fname) = tempfile.mkstemp()
-        ret = self.comps.xml_f(fname, options={"default_explicit":True})
+        ret = self.comps.xml_f(fname, def_options={"default_explicit":True})
         self.assertTrue(not ret)
 
         comps2 = libcomps.Comps()
@@ -915,19 +916,18 @@ class COMPSTest(unittest.TestCase):
     #@unittest.skip("")
     def test_f21_in(self):
         comps = libcomps.Comps()
-        ret = comps.fromxml_f("comps/comps-f21.xml.in")
+        ret = comps.fromxml_f("comps/comps-f21.xml.in",
+                              options={"default_biarchonly": False})
 
         for i in comps.groups:
-            #print i.id
-            #print i.packages
             for j in i.packages:
                 x = j
-        #for x in comps.get_last_parse_log():
-        #    print x
         self.assertTrue(ret != -1)
-        comps.xml_f("f21-2.xml")
+        comps.xml_f("f21-2.xml")#, def_options={"default_biarchonly": False},
+                                # xml_options={"biarchonly_explicit": False})
         comps2 = libcomps.Comps()
-        comps2.fromxml_f("f21-2.xml")
+        comps2.fromxml_f("f21-2.xml", options={"default_biarchonly": False})
+        self.assertTrue(comps.groups[39] == comps2.groups[39])
         self.assertTrue(comps == comps2)
 
     #@unittest.skip("")
@@ -948,7 +948,7 @@ class COMPSTest(unittest.TestCase):
         elif hasattr(self, "assertItemsEqual"):
             _f = self.assertSequenceEqual
         else:
-           _f = utest.assertSequenceEqual 
+           _f = utest.assertSequenceEqual
 
         _f([id_.name for id_ in env.group_ids],
                               group_ids)
@@ -1094,10 +1094,12 @@ class COMPSTest(unittest.TestCase):
 
     #biarchonly in rhel-4
     def test_biarchonly(self):
-        ORIG = 'biarchonly.xml'
+        ORIG = 'comps/biarchonly.xml'
         comps = libcomps.Comps()
-        comps.fromxml_f(ORIG)
-        self.assertTrue(comps.groups[0].biarchonly == True)
+        comps.fromxml_f(ORIG, options={"default_biarchonly": True})
+        self.assertTrue(comps.groups[0].biarchonly == False)
+        self.assertTrue(comps.groups[1].biarchonly == True)
+        self.assertTrue(comps.groups[2].biarchonly == True)
 
 
 
