@@ -5,6 +5,7 @@
 
 typedef struct COMPS_DefaultsOptions {
     bool default_uservisible;
+    bool default_biarchonly;
     bool default_default;
     int default_pkgtype;
 } COMPS_DefaultsOptions;

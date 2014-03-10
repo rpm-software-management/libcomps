@@ -35,6 +35,7 @@ typedef struct COMPS_XMLOptions {
     bool empty_packages;
     bool empty_grouplist;
     bool empty_optionlist;
+    bool biarchonly_explicit;
     bool uservisible_explicit;
     bool default_explicit;
     bool gid_default_explicit;

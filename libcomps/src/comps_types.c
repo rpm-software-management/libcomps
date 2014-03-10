@@ -30,6 +30,7 @@ COMPS_XMLOptions COMPS_XMLDefaultOptions = {
     .empty_grouplist = false,
     .empty_optionlist = false,
     .uservisible_explicit = false,
+    .biarchonly_explicit = false,
     .default_explicit = false,
     .gid_default_explicit = false,
     .bao_explicit = false,

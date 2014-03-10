@@ -307,13 +307,14 @@ void comps_parse_start_elem_handler(void *userData,
         } else {
             elem->ancestor = LASTELEM;
             for (int x = 0; ELEMINFO->ancestors[x] != COMPS_ELEM_SENTINEL; x++){
-                if (ELEMINFO->ancestors[x] == LASTELEM->type) {
+                if (ELEMINFO->ancestors[x] == LASTELEM->type && \
+                    LASTELEM->valid) {
                     elem->valid = 1;
                     break;
                 }
             }
         }
-    } else {
+    } else if (elem->type != COMPS_ELEM_UNKNOWN){
         elem->valid = 1;
     }
     if (!elem->valid) {

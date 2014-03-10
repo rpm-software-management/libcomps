@@ -48,8 +48,9 @@ char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
                           "empty_blacklist", "empty_whiteout",
                           "empty_packages", "empty_grouplist",
                           "empty_optionlist", "uservisible_explicit",
-                          "default_explicit", "gid_default_explicit",
-                          "bao_explicit", "arch_output", NULL};
+                          "biarchonly_explicit", "default_explicit",
+                          "gid_default_explicit", "bao_explicit",
+                          "arch_output", NULL};
     *options = malloc(sizeof(COMPS_XMLOptions));
     _Bool *props[] = {&(*options)->empty_groups,
                       &(*options)->empty_categories,
@@ -61,6 +62,7 @@ char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
                       &(*options)->empty_grouplist,
                       &(*options)->empty_optionlist,
                       &(*options)->uservisible_explicit,
+                      &(*options)->biarchonly_explicit,
                       &(*options)->default_explicit,
                       &(*options)->gid_default_explicit,
                       &(*options)->bao_explicit,
@@ -89,10 +91,12 @@ char __pycomps_dict_to_def_opts(PyObject* pobj, void *cobj) {
     COMPS_DefaultsOptions ** options = (COMPS_DefaultsOptions**)cobj;
     int x;
     long tmp;
-    const char *keys2[] = {"default_uservisible", "default_default", NULL};
+    const char *keys2[] = {"default_uservisible", "default_biarchonly",
+                           "default_default", NULL};
     const char *keys1[] = {"default_pkgtype", NULL};
     *options = malloc(sizeof(COMPS_DefaultsOptions));
     bool *props2[] = {&(*options)->default_uservisible,
+                      &(*options)->default_biarchonly,
                       &(*options)->default_default};
     int *props1[] = {&(*options)->default_pkgtype};
     **options = COMPS_DDefaultsOptions;
@@ -142,10 +146,13 @@ PyObject* PyCOMPS_toxml_f(PyObject *self, PyObject *args, PyObject *kwds) {
     PyCOMPS *self_comps = (PyCOMPS*)self;
 
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "s|O&O&", keywords, &fname,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|O&O&", keywords, &fname,
                                     __pycomps_dict_to_xml_opts, &xml_options,
                                     __pycomps_dict_to_def_opts, &def_options)) {
-
+        PyErr_SetString(PyExc_TypeError,
+                    "function accept string and optional xml_options dict "
+                    "and def_options dict");
+        return NULL;
     }
 
     if (!self_comps->comps_doc->encoding)
@@ -749,7 +756,7 @@ static PyObject* PyCOMPS_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 static int PyCOMPS_init(PyCOMPS *self, PyObject *args, PyObject *kwds)
 {
     char *enc = "UTF-8";
-    PyObject *c_caps = NULL; /* ignored here */
+    //PyObject *c_caps = NULL; /* ignored here */
     (void)kwds;
     if (!args && !kwds) {
     }
@@ -850,6 +857,7 @@ PyObject* Libcomps_xml_default(PyObject *self) {
                           "empty_blacklist", "empty_whiteout",
                           "empty_packages", "empty_grouplist",
                           "empty_optionlist", "uservisible_explicit",
+                          "biarchonly_explicit",
                           "default_explicit", "gid_default_explicit",
                           "bao_explicit", NULL};
     PyObject *ukey, *val;
@@ -863,6 +871,7 @@ PyObject* Libcomps_xml_default(PyObject *self) {
                       &COMPS_XMLDefaultOptions.empty_grouplist,
                       &COMPS_XMLDefaultOptions.empty_optionlist,
                       &COMPS_XMLDefaultOptions.uservisible_explicit,
+                      &COMPS_XMLDefaultOptions.biarchonly_explicit,
                       &COMPS_XMLDefaultOptions.default_explicit,
                       &COMPS_XMLDefaultOptions.gid_default_explicit,
                       &COMPS_XMLDefaultOptions.bao_explicit};

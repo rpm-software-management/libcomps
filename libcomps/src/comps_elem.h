@@ -34,6 +34,7 @@ typedef enum {COMPS_ELEM_UNKNOWN,
                 COMPS_ELEM_DEFAULT,
                 COMPS_ELEM_LANGONLY,
                 COMPS_ELEM_USERVISIBLE,
+                COMPS_ELEM_BIARCHONLY,  //RHEL-4.9
                 COMPS_ELEM_PACKAGELIST,
                 COMPS_ELEM_PACKAGEREQ,
                 COMPS_ELEM_CATEGORY,
@@ -110,6 +111,7 @@ void comps_elem_idnamedesc_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem);
 void comps_elem_default_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem);
 void comps_elem_langonly_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem);
 void comps_elem_uservisible_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem);
+void comps_elem_biarchonly_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem);
 
 void comps_elem_grouplist_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem);
 void comps_elem_optionlist_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem);

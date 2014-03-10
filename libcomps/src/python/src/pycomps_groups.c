@@ -128,7 +128,7 @@ int PyCOMPSGroup_print(PyObject *self, FILE *f, int flags) {
     COMPS_ObjListIt *it;
     COMPS_HSList *pairlist;
     COMPS_HSListItem *hsit;
-    char *id, *name, *desc, *lang, *def, *uservis, *disp_ord;
+    char *id, *name, *desc, *lang, *def, *uservis, *disp_ord, *biarch;
     COMPS_Object* tmp_prop;
 
     (void)flags;
@@ -154,16 +154,21 @@ int PyCOMPSGroup_print(PyObject *self, FILE *f, int flags) {
     tmp_prop = comps_docgroup_get_uservisible(_group_->group);
     uservis = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
     COMPS_OBJECT_DESTROY(tmp_prop);
+    tmp_prop = comps_docgroup_get_biarchonly(_group_->group);
+    biarch = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
+    COMPS_OBJECT_DESTROY(tmp_prop);
 
     fprintf(f, "<COMPS_Group: id='%s', name='%s', description='%s',  "
-            "default='%s', uservisible='%s', lang_only='%s', display_order=%s ",
-            id, name, desc, def, uservis, lang, disp_ord);
+            "default='%s', uservisible='%s', biarchonly='%s', lang_only='%s', "
+            "display_order=%s ",
+            id, name, desc, def, uservis, biarch, lang, disp_ord);
     free(id);
     free(name);
     free(desc);
     free(lang);
     free(def);
     free(uservis);
+    free(biarch);
     free(disp_ord);
 
     fprintf(f, "name_by_lang={");
@@ -378,6 +383,9 @@ PyGetSetDef PyCOMPSGroup_getset[] = {
     {"uservisible",
      (getter)pycomps_group_boolattr_getter, (setter)pycomps_group_boolattr_setter,
      "Group uservisible attribute", "uservisible"},
+    {"biarchonly",
+     (getter)pycomps_group_boolattr_getter, (setter)pycomps_group_boolattr_setter,
+     "Group uservisible attribute", "biarchonly"},
     {"default",
      (getter)pycomps_group_boolattr_getter, (setter)pycomps_group_boolattr_setter,
      "Group default attribute", "def"},

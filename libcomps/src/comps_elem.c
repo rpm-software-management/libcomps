@@ -95,6 +95,14 @@ const COMPS_ElemInfo COMPS_USERVISIBLE_ElemInfo = {
     .preproc = NULL,//&comps_elem_uservisible_preproc,
     .postproc = &comps_elem_uservisible_postproc
 };
+const COMPS_ElemInfo COMPS_BIARCHONLY_ElemInfo = {
+    .name = "biarchonly",
+    .ancestors = (const COMPS_ElemType[]){COMPS_ELEM_GROUP,
+                                          COMPS_ELEM_SENTINEL},
+    .attributes = (const COMPS_ElemAttrInfo*[]){NULL},
+    .preproc = NULL,//&comps_elem_uservisible_preproc,
+    .postproc = &comps_elem_biarchonly_postproc
+};
 const COMPS_ElemInfo COMPS_PACKAGELIST_ElemInfo = {
     .name = "packagelist",
     .ancestors = (const COMPS_ElemType[]){COMPS_ELEM_GROUP,
@@ -267,6 +275,7 @@ const COMPS_ElemInfo *COMPS_ElemInfos[] = {
     [COMPS_ELEM_DEFAULT] = &COMPS_DEFAULT_ElemInfo,
     [COMPS_ELEM_LANGONLY] = &COMPS_LANGONLY_ElemInfo,
     [COMPS_ELEM_USERVISIBLE] = &COMPS_USERVISIBLE_ElemInfo,
+    [COMPS_ELEM_BIARCHONLY] = &COMPS_BIARCHONLY_ElemInfo,
     [COMPS_ELEM_PACKAGELIST] = &COMPS_PACKAGELIST_ElemInfo,
     [COMPS_ELEM_PACKAGEREQ] = &COMPS_PACKAGEREQ_ElemInfo,
     [COMPS_ELEM_CATEGORY] = &COMPS_CATEGORY_ElemInfo,
@@ -310,6 +319,9 @@ char * comps_elem_get_name(COMPS_ElemType type) {
         break;
         case COMPS_ELEM_USERVISIBLE:
             return "uservisible";
+        break;
+        case COMPS_ELEM_BIARCHONLY:
+            return "biarchonly";
         break;
         case COMPS_ELEM_PACKAGELIST:
             return "packagelist";
@@ -370,6 +382,7 @@ COMPS_ElemType comps_elem_get_type(const char * name) {
     else if (strcmp(name, "description") == 0) type = COMPS_ELEM_DESC;
     else if (strcmp(name, "default") == 0) type = COMPS_ELEM_DEFAULT;
     else if (strcmp(name, "uservisible") == 0) type = COMPS_ELEM_USERVISIBLE;
+    else if (strcmp(name, "biarchonly") == 0) type = COMPS_ELEM_BIARCHONLY;
     else if (strcmp(name, "packagelist") == 0) type = COMPS_ELEM_PACKAGELIST;
     else if (strcmp(name, "packagereq") == 0) type = COMPS_ELEM_PACKAGEREQ;
     else if (strcmp(name, "category") == 0) type = COMPS_ELEM_CATEGORY;
@@ -473,6 +486,14 @@ void comps_elem_group_postproc(COMPS_Parsed* parsed, COMPS_Elem *elem) {
         comps_docgroup_set_uservisible(group,
                                       parsed->def_options->default_uservisible,
                                       0);
+    }
+    COMPS_OBJECT_DESTROY(obj);
+    obj = comps_docgroup_get_biarchonly(group);
+    if (!obj) {
+        comps_docgroup_set_biarchonly(group,
+                                      parsed->def_options->default_biarchonly,
+                                      0);
+        //printf("biarchonly not found\n");
     }
     COMPS_OBJECT_DESTROY(obj);
     COMPS_OBJECT_DESTROY(list);
@@ -782,6 +803,22 @@ void comps_elem_uservisible_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
         comps_docgroup_set_uservisible(last_group, 0, false);
     else if (strcmp(parsed->tmp_buffer, "true") == 0)
         comps_docgroup_set_uservisible(last_group, 1, false);
+    else {
+        comps_log_warning_x(parsed->log, COMPS_ERR_DEFAULT_PARAM, 3,
+                            comps_str(parsed->tmp_buffer),
+                            comps_num(parser_line),
+                            comps_num(parser_col));
+    }
+    COMPS_OBJECT_DESTROY(list);
+    parsed->tmp_buffer = NULL;
+}
+void comps_elem_biarchonly_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
+    (void)elem;
+    COMPS_ObjList *list = comps_doc_groups(parsed->comps_doc);
+    if (strcmp(parsed->tmp_buffer, "false") == 0)
+        comps_docgroup_set_biarchonly(last_group, 0, false);
+    else if (strcmp(parsed->tmp_buffer, "true") == 0)
+        comps_docgroup_set_biarchonly(last_group, 1, false);
     else {
         comps_log_warning_x(parsed->log, COMPS_ERR_DEFAULT_PARAM, 3,
                             comps_str(parsed->tmp_buffer),

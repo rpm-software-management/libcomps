@@ -101,6 +101,13 @@ HEAD_COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, def) /*comps_utils.h macro*/
  */
 HEAD_COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, uservisible) /*comps_utils.h macro*/
 
+/** COMPS_DocGroup biarchonly setter
+ * @param obj COMPS_DocGroup object
+ * @param uservisible COMPS_NUm object representing biarchonly
+ * \warning setter doesn't increment reference counter of biarchonly object
+ */
+HEAD_COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, biarchonly) /*comps_utils.h macro*/
+
 /** COMPS_DocGroup display_order setter
  * @param obj COMPS_DocGroup object
  * @param display_order COMPS_Num object representing display_order
@@ -156,6 +163,13 @@ HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, def) /*comps_utils.h macro*/
  * reference count
  */
 HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, uservisible) /*comps_utils.h macro*/
+
+/** COMPS_DocGroup biarchonly getter
+ * @param obj COMPS_DocGroup object
+ * @return COMPS_Num object representing group biarchonly with incremented
+ * reference count
+ */
+HEAD_COMPS_PROP_GETTER(group, COMPS_DocGroup, biarchonly) /*comps_utils.h macro*/
 
 /** COMPS_DocGroup display_order getter
  * @param obj COMPS_DocGroup object

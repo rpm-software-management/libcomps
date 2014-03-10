@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE comps PUBLIC "-//CentOS//DTD Comps info//EN" "comps.dtd">
+<comps>
+  <group>
+    <id>ISO8859-2-support</id>
+    <name>ISO8859-2 Support</name>
+    <default>false</default>
+    <uservisible>false</uservisible>
+    <biarchonly>false</biarchonly>
+    <packagelist>
+      <packagereq type='mandatory'>fonts-ISO8859-2</packagereq>
+      <packagereq requires='xorg-x11' type='optional'>fonts-ISO8859-2-100dpi</packagereq>
+      <packagereq requires='xorg-x11' type='optional'>fonts-ISO8859-2-75dpi</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>ISO8859-9-support</id>
+    <name>ISO8859-9 Support</name>
+    <default>false</default>
+    <uservisible>false</uservisible>
+    <biarchonly>true</biarchonly>
+    <packagelist>
+      <packagereq requires='xorg-x11' type='optional'>fonts-ISO8859-2-75dpi</packagereq>
+      <packagereq requires='xorg-x11' type='optional'>fonts-xorg-ISO8859-9-100dpi</packagereq>
+      <packagereq requires='xorg-x11' type='optional'>fonts-xorg-ISO8859-9-75dpi</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>ISO8859-15-support</id>
+    <name>ISO8859-15 Support</name>
+    <default>false</default>
+    <uservisible>false</uservisible>
+    <packagelist>
+      <packagereq requires='xorg-x11' type='optional'>fonts-ISO8859-15-75dpi</packagereq>
+      <packagereq requires='xorg-x11' type='optional'>fonts-xorg-ISO8859-15-100dpi</packagereq>
+      <packagereq requires='xorg-x11' type='optional'>fonts-xorg-ISO8859-15-75dpi</packagereq>
+    </packagelist>
+  </group>
+</comps>

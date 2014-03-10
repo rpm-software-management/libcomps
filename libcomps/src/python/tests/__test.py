@@ -1091,7 +1091,15 @@ class COMPSTest(unittest.TestCase):
     def test_fobj(self):
         c = libcomps.Comps()
         self.assertRaises(TypeError, c.fromxml_f, open("comps/main_def.xml"))
-        
+
+    #biarchonly in rhel-4
+    def test_biarchonly(self):
+        ORIG = 'biarchonly.xml'
+        comps = libcomps.Comps()
+        comps.fromxml_f(ORIG)
+        self.assertTrue(comps.groups[0].biarchonly == True)
+
+
 
 if __name__ == "__main__":
     unittest.main(testRunner = utest.MyRunner)

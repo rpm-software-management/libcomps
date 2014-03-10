@@ -56,6 +56,7 @@ COMPS_STRPROP_SETTER(group, COMPS_DocGroup, name) /*comps_utils.h macro*/
 COMPS_STRPROP_SETTER(group, COMPS_DocGroup, desc) /*comps_utils.h macro*/
 COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, def) /*comps_utils.h macro*/
 COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, uservisible) /*comps_utils.h macro*/
+COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, biarchonly) /*comps_utils.h macro*/
 COMPS_NUMPROP_SETTER(group, COMPS_DocGroup, display_order) /*comps_utils.h macro*/
 COMPS_STRPROP_SETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
 
@@ -65,6 +66,7 @@ COMPS_PROP_GETTER(group, COMPS_DocGroup, name) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(group, COMPS_DocGroup, desc) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(group, COMPS_DocGroup, def) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(group, COMPS_DocGroup, uservisible) /*comps_utils.h macro*/
+COMPS_PROP_GETTER(group, COMPS_DocGroup, biarchonly) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(group, COMPS_DocGroup, display_order) /*comps_utils.h macro*/
 COMPS_PROP_GETTER(group, COMPS_DocGroup, langonly) /*comps_utils.h macro*/
 
@@ -122,10 +124,9 @@ signed char comps_docgroup_cmp_u(COMPS_Object *group1, COMPS_Object *group2) {
     #define _group1 ((COMPS_DocGroup*)group1)
     #define _group2 ((COMPS_DocGroup*)group2)
 
-    //printf("group cmp start\n");
     if (!comps_object_cmp((COMPS_Object*)_group1->properties,
                           (COMPS_Object*)_group2->properties)) {
-        //printf("Group properties cmp fail\n");
+        printf("Group properties cmp fail\n");
         return 0;
     }
     //printf("group cmp properties pass\n");
@@ -264,20 +265,21 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
     COMPS_HSListItem *hsit;
 
     static char* props[] = {"id", "name", "name", "desc",
-                            "desc", "def", "uservisible", "display_order",
-                            "langonly"};
+                            "desc", "def", "uservisible", "biachonly",
+                            "display_order", "langonly"};
     static size_t type[] =   {0, 0, offsetof(COMPS_DocGroup, name_by_lang),
                               0, offsetof(COMPS_DocGroup, desc_by_lang), 0,
-                              0, 0, 0};
+                              0, 0, 0, 0};
     static char* aliases[] = {NULL, NULL, NULL, "description", "description",
-                              "default", NULL, NULL, NULL};
+                              "default", NULL, NULL, NULL, NULL};
     static bool explicit[] = {true, true, true, true, true, false, false,
-                              true, true};
+                              false, true, true};
     const char *str_true = "true";
     const char *str_false = "false";
     const char *default_val[] = {NULL, NULL, NULL, NULL, NULL,
                            def_options->default_default?str_true:str_false,
                            def_options->default_uservisible?str_true:str_false,
+                           def_options->default_biarchonly?str_true:str_false,
                            NULL, NULL};
 
     static char*(*tostrf[])(COMPS_Object*) = {&comps_object_tostr,
@@ -287,12 +289,14 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                                                &comps_object_tostr,
                                                &__comps_num2boolstr,
                                                &__comps_num2boolstr,
+                                               &__comps_num2boolstr,
                                                &comps_object_tostr,
                                                &comps_object_tostr};
     char *str;
     int ret;
     explicit[5] = xml_options->default_explicit;
     explicit[6] = xml_options->uservisible_explicit;
+    explicit[7] = xml_options->biarchonly_explicit;
     if (group->packages->len == 0 && !xml_options->empty_groups) {
         obj = comps_docgroup_get_id(group);
         comps_log_error(log, COMPS_ERR_PKGLIST_EMPTY, 1, obj);
@@ -307,7 +311,7 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
         COMPS_XMLRET_CHECK
         COMPS_OBJECT_DESTROY(obj);
     }
-    for (int i=0; i<9; i++) {
+    for (int i=0; i<10; i++) {
         //printf("%s\n", props[i]);
         if (!type[i]) {
             obj = comps_objdict_get_x(group->properties, props[i]);
