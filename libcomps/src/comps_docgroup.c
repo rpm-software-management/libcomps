@@ -265,7 +265,7 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
     COMPS_HSListItem *hsit;
 
     static char* props[] = {"id", "name", "name", "desc",
-                            "desc", "def", "uservisible", "biachonly",
+                            "desc", "def", "uservisible", "biarchonly",
                             "display_order", "langonly"};
     static size_t type[] =   {0, 0, offsetof(COMPS_DocGroup, name_by_lang),
                               0, offsetof(COMPS_DocGroup, desc_by_lang), 0,
