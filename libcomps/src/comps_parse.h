@@ -44,6 +44,10 @@ typedef struct COMPS_Parsed {
     XML_Parser parser;
     const char *enc;
     COMPS_DefaultsOptions *def_options;
+
+    COMPS_Str *doctype_name;
+    COMPS_Str *doctype_sysid;
+    COMPS_Str *doctype_pubid;
 } COMPS_Parsed;
 
 COMPS_Parsed* comps_parse_parsed_create();
@@ -62,6 +66,11 @@ void comps_parse_start_elem_handler(void *userData,
 void comps_parse_char_data_handler(void *userData,
                             const XML_Char *s,
                             int len);
+void comps_parse_start_doctype(void *userData,
+                               const XML_Char *doctypeName,
+                               const XML_Char *sysid,
+                               const XML_Char *pubid,
+                               int standalone);
 
 signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f,
                              COMPS_DefaultsOptions *options);

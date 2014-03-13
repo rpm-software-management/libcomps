@@ -72,6 +72,11 @@
 #define COMPS_OBJECT_INCREF(obj)\
     comps_object_incref(((COMPS_Object*)obj))
 
+#define COMPS_OBJECT_REPLACE(oldobj, TYPE, new_obj)\
+    COMPS_OBJECT_DESTROY(oldobj);\
+    oldobj = (TYPE*)COMPS_OBJECT_INCREF(new_obj);
+
+
 #define COMPS_CAST_CONSTR void (*)(COMPS_Object*, COMPS_Object**)
 #define COMPS_CAST_DESTR void (*)(COMPS_Object*)
 

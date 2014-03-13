@@ -695,6 +695,7 @@ START_TEST(test_doc_defaults) {
 
     comps_doc_add_group(doc, g);
     tmp = comps2xml_str(doc, NULL, NULL);
+    //printf("tmp %s\n", tmp);
     parsed = comps_parse_parsed_create();
     comps_parse_parsed_init(parsed, "UTF-8", 1);
     comps_parse_str(parsed, tmp, NULL);

@@ -1102,7 +1102,7 @@ class COMPSTest(unittest.TestCase):
         self.assertTrue(comps.groups[2].biarchonly == True)
         xmlstr = comps.toxml_str(xml_options={"biarchonly_explicit": True})
         comps2 = libcomps.Comps()
-        comps2.fromxml_str(xmlstr)
+        comps2.fromxml_str(xmlstr, options={"default_biarchonly": True})
         self.assertTrue(comps == comps2)
 
 

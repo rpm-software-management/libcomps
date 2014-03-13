@@ -55,6 +55,7 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
     XML_SetElementHandler(parsed->parser, &comps_parse_start_elem_handler,
                               &comps_parse_end_elem_handler);
     XML_SetCharacterDataHandler(parsed->parser, &comps_parse_char_data_handler);
+    XML_SetStartDoctypeDeclHandler(parsed->parser, &comps_parse_start_doctype);
 
     parsed->enc = encoding;
     parsed->elem_stack = comps_hslist_create();
@@ -65,6 +66,9 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
     parsed->log = COMPS_OBJECT_CREATE(COMPS_Log, NULL);
     parsed->log->std_out = log_stdout;
     parsed->comps_doc = NULL;
+    parsed->doctype_name = NULL;
+    parsed->doctype_sysid = NULL;
+    parsed->doctype_pubid = NULL;
     parsed->fatal_error = 0;
     if (parsed->elem_stack == NULL || parsed->text_buffer == NULL) {
         if (!parsed->elem_stack)
@@ -88,22 +92,30 @@ void comps_parse_parsed_reinit(COMPS_Parsed *parsed) {
     XML_SetElementHandler(parsed->parser, &comps_parse_start_elem_handler,
                                           &comps_parse_end_elem_handler);
     XML_SetCharacterDataHandler(parsed->parser, &comps_parse_char_data_handler);
+    XML_SetStartDoctypeDeclHandler(parsed->parser, &comps_parse_start_doctype);
+
+
     XML_SetUserData(parsed->parser, parsed);
     comps_hslist_clear(parsed->elem_stack);
     comps_hslist_clear(parsed->text_buffer);
     comps_hslist_clear(parsed->log->entries);
     COMPS_OBJECT_DESTROY(parsed->comps_doc);
-    //comps_doc_destroy(&parsed->comps_doc);
+    COMPS_OBJECT_DESTROY(parsed->doctype_name);
+    COMPS_OBJECT_DESTROY(parsed->doctype_sysid);
+    COMPS_OBJECT_DESTROY(parsed->doctype_pubid);
+    parsed->doctype_name = NULL;
+    parsed->doctype_sysid = NULL;
+    parsed->doctype_pubid = NULL;
 }
 
 void comps_parse_parsed_destroy(COMPS_Parsed *parsed) {
     comps_hslist_destroy(&parsed->elem_stack);
     comps_hslist_destroy(&parsed->text_buffer);
     COMPS_OBJECT_DESTROY(parsed->log);
-    //if (parsed->log)
-    //    comps_log_destroy(parsed->log);
     COMPS_OBJECT_DESTROY(parsed->comps_doc);
-    //comps_doc_destroy(&parsed->comps_doc);
+    COMPS_OBJECT_DESTROY(parsed->doctype_name);
+    COMPS_OBJECT_DESTROY(parsed->doctype_sysid);
+    COMPS_OBJECT_DESTROY(parsed->doctype_pubid);
     XML_ParserFree(parsed->parser);
     free(parsed);
 }
@@ -111,6 +123,18 @@ void comps_parse_parsed_destroy(COMPS_Parsed *parsed) {
 void empty_xmlGenericErrorFunc(void * ctx, const char * msg, ...) {
     (void) ctx;
     (void) msg;
+}
+
+void comps_parse_start_doctype(void *userData,
+                               const XML_Char *doctypeName,
+                               const XML_Char *sysid,
+                               const XML_Char *pubid,
+                               int standalone) {
+    #define parsed ((COMPS_Parsed*)userData)
+    parsed->doctype_name = comps_str(doctypeName);
+    parsed->doctype_sysid = comps_str(sysid);
+    parsed->doctype_pubid = comps_str(pubid);
+    #undef parsed
 }
 
 int comps_parse_validate_dtd(char *filename, char *dtd_file) {
@@ -152,6 +176,27 @@ int comps_parse_validate_dtd(char *filename, char *dtd_file) {
         return ret;
 }
 
+void __comps_after_parse(COMPS_Parsed *parsed) {
+    if (parsed->doctype_name) {
+        parsed->comps_doc->doctype_name = (COMPS_Str*)
+                                  COMPS_OBJECT_INCREF(parsed->doctype_name);
+    } else {
+        parsed->comps_doc->doctype_name = comps_str(comps_default_doctype_name);
+    }
+    if (parsed->doctype_sysid) {
+        parsed->comps_doc->doctype_sysid = (COMPS_Str*)
+                                  COMPS_OBJECT_INCREF(parsed->doctype_sysid);
+    } else {
+        parsed->comps_doc->doctype_sysid = comps_str(comps_default_doctype_sysid);
+    }
+    if (parsed->doctype_pubid) {
+        parsed->comps_doc->doctype_pubid = (COMPS_Str*)
+                                  COMPS_OBJECT_INCREF(parsed->doctype_pubid);
+    } else {
+        parsed->comps_doc->doctype_pubid = comps_str(comps_default_doctype_pubid);
+    }
+}
+
 signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f,
                              COMPS_DefaultsOptions *options) {
     void *buff;
@@ -189,6 +234,8 @@ signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f,
         if (bytes_read == 0) break;
     }
     fclose(f);
+    __comps_after_parse(parsed);
+
     if (parsed->fatal_error == 0 && parsed->log->entries->first == NULL)
         return 0;
     else if (parsed->fatal_error != 1)
@@ -212,6 +259,8 @@ signed char comps_parse_str(COMPS_Parsed *parsed, char *str,
                                             XML_GetErrorCode(parsed->parser))));
         parsed->fatal_error = 1;
     }
+    __comps_after_parse(parsed);
+
     if (parsed->fatal_error == 0 && parsed->log->entries->first == NULL)
         return 0;
     else if (parsed->fatal_error != 1)

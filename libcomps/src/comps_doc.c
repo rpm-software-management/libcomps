@@ -21,6 +21,7 @@
 #include "comps_set.h"
 //#include "comps_types.h"
 #include "comps_utils.h"
+#include "comps_default.h"
 
 #include <stdio.h>
 #include <assert.h>
@@ -37,20 +38,29 @@ void comps_doc_create(COMPS_Doc* doc, COMPS_Object **args) {
     } else {
         doc->encoding = NULL;
     }
+    doc->doctype_name = comps_str(comps_default_doctype_name);
+    doc->doctype_sysid = comps_str(comps_default_doctype_sysid);
+    doc->doctype_pubid = comps_str(comps_default_doctype_pubid);
 }
 COMPS_CREATE_u(doc, COMPS_Doc)
 
 void comps_doc_copy(COMPS_Doc *doc_dst, COMPS_Doc *doc_src) {
-    doc_dst->encoding = (COMPS_Str*) comps_object_copy((COMPS_Object*)doc_src->encoding);
-    doc_dst->objects = (COMPS_ObjDict*) comps_object_copy((COMPS_Object*)doc_src->objects);
+    doc_dst->encoding = (COMPS_Str*) COMPS_OBJECT_COPY(doc_src->encoding);
+    doc_dst->doctype_name = (COMPS_Str*) COMPS_OBJECT_COPY(doc_src->doctype_name);
+    doc_dst->doctype_sysid = (COMPS_Str*) COMPS_OBJECT_COPY(doc_src->doctype_sysid);
+    doc_dst->doctype_pubid = (COMPS_Str*) COMPS_OBJECT_COPY(doc_src->doctype_pubid);
+    doc_dst->objects = (COMPS_ObjDict*) COMPS_OBJECT_COPY(doc_src->objects);
 }
 COMPS_COPY_u(doc, COMPS_Doc)
 
 void comps_doc_destroy(COMPS_Doc *doc) {
     if (doc != NULL) {
-    COMPS_OBJECT_DESTROY(doc->log);
-    COMPS_OBJECT_DESTROY((COMPS_Object*)doc->objects);
-    COMPS_OBJECT_DESTROY((COMPS_Object*)doc->encoding);
+        COMPS_OBJECT_DESTROY(doc->log);
+        COMPS_OBJECT_DESTROY(doc->objects);
+        COMPS_OBJECT_DESTROY(doc->encoding);
+        COMPS_OBJECT_DESTROY(doc->doctype_name);
+        COMPS_OBJECT_DESTROY(doc->doctype_sysid);
+        COMPS_OBJECT_DESTROY(doc->doctype_pubid);
     }
 }
 COMPS_DESTROY_u(doc, COMPS_Doc)
@@ -62,8 +72,16 @@ signed char comps_doc_cmp_u(COMPS_Object *obj1, COMPS_Object *obj2) {
     #define _doc1_ ((COMPS_Doc*)obj1)
     #define _doc2_ ((COMPS_Doc*)obj2)
  
-    if (!comps_object_cmp((COMPS_Object*)_doc1_->encoding,
-                          (COMPS_Object*)_doc2_->encoding)) {
+    if (!COMPS_OBJECT_CMP(_doc1_->encoding, _doc2_->encoding)) {
+        return 0;
+    }
+    if (!COMPS_OBJECT_CMP(_doc1_->doctype_name, _doc2_->doctype_name)) {
+        return 0;
+    }
+    if (!COMPS_OBJECT_CMP(_doc1_->doctype_sysid, _doc2_->doctype_sysid)) {
+        return 0;
+    }
+    if (!COMPS_OBJECT_CMP(_doc1_->doctype_pubid, _doc2_->doctype_pubid)) {
         return 0;
     }
     tmp1 = (COMPS_Object*) comps_doc_categories(_doc1_);
@@ -92,7 +110,6 @@ signed char comps_doc_cmp_u(COMPS_Object *obj1, COMPS_Object *obj2) {
     COMPS_OBJECT_DESTROY(tmp1);
     COMPS_OBJECT_DESTROY(tmp2);
     if (!ret) {
-        printf("envs cmp fail\n");
         return ret;
     }
 
@@ -102,7 +119,6 @@ signed char comps_doc_cmp_u(COMPS_Object *obj1, COMPS_Object *obj2) {
     COMPS_OBJECT_DESTROY(tmp1);
     COMPS_OBJECT_DESTROY(tmp2);
     if (!ret) {
-        //printf("langpacks cmp fail\n");
         return ret;
     }
 
@@ -162,8 +178,9 @@ signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect,
     char *str;
     signed char genret;
 
-    //doc->log->redirect2output = stdoutredirect;
+    doc->log->std_out = stdoutredirect;
     xmlTextWriterPtr writer = xmlNewTextWriterDoc(&xmldoc, 0);
+
     if ((COMPS_Object*)doc->encoding) {
         str = comps_object_tostr((COMPS_Object*)doc->encoding);
         retc = xmlTextWriterStartDocument(writer, NULL, str, NULL);
@@ -171,9 +188,9 @@ signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect,
     } else {
         retc = xmlTextWriterStartDocument(writer, NULL, "UTF-8", NULL);
     }
-    doc->log->std_out = stdoutredirect;
     if (retc<0)
         comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
+
     if (!xml_options)
         xml_options = &COMPS_XMLDefaultOptions;
     if (!def_options)
@@ -200,8 +217,7 @@ char* comps2xml_str(COMPS_Doc *doc, COMPS_XMLOptions *xml_options,
     xmlDocPtr xmldoc;
     const char *xmlstr;
     signed char genret;
-    char *str;
-    char *ret;
+    char *str, *ret;
     int retc;
 
     xmlBuffer *xmlbuff = xmlBufferCreate();
@@ -216,6 +232,7 @@ char* comps2xml_str(COMPS_Doc *doc, COMPS_XMLOptions *xml_options,
         retc = xmlTextWriterStartDocument(writer, NULL, "UTF-8", NULL);
     }
     if (retc<0) comps_log_error(doc->log, COMPS_ERR_XMLGEN, 0);
+
     if (!xml_options)
         xml_options = &COMPS_XMLDefaultOptions;
     if (!def_options)
@@ -260,18 +277,6 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
     COMPS_ObjList *groups = comps_doc_groups(c1);
     COMPS_ObjList *categories = comps_doc_categories(c1);
     COMPS_ObjList *envs = comps_doc_environments(c1);
-    /*COMPS_ObjList* (*getter[])(COMPS_Doc*) = {&comps_doc_groups,
-                                              &comps_doc_categories,
-                                              &comps_doc_environments};
-    void (*adder[])(COMPS_Doc*, COMPS_Object*) = {
-            (void (*)(COMPS_Doc*, COMPS_Object*))&comps_doc_add_group,
-            (void (*)(COMPS_Doc*, COMPS_Object*))&comps_doc_add_category,
-            (void (*)(COMPS_Doc*, COMPS_Object*))&comps_doc_add_environment};
-    COMPS_Object* (*_union[])(COMPS_Object*, COMPS_Object*) = {
-                                                 &comps_docgroup_union,
-                                                 &comps_doccategory_union,
-                                                 &comps_docenv_union};
-    */
 
     void *tmpdata;
     res = COMPS_OBJECT_CREATE(COMPS_Doc, (COMPS_Object*[]){(COMPS_Object*)
@@ -515,10 +520,10 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
     int retc;
     signed char ret = 0, tmpret;
 
-    retc = xmlTextWriterWriteDTD(writer, BAD_CAST "comps",
-                                         BAD_CAST "-//Red Hat, Inc.//DTD Comps"
-                                                  " info//EN",
-                                         BAD_CAST "comps.dtd", NULL);
+    retc = xmlTextWriterStartDTD(writer, (const xmlChar*)doc->doctype_name->val,
+                                  (const xmlChar*)doc->doctype_pubid->val,
+                                  (const xmlChar*)doc->doctype_sysid->val);
+    xmlTextWriterEndDTD(writer);
     if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) return -1;
 
     retc = xmlTextWriterStartElement(writer, BAD_CAST "comps");
@@ -685,6 +690,25 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
     retc = xmlTextWriterEndElement(writer);
     if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) return -1;
     return ret;
+}
+
+COMPS_Str* comps_doc_doctype_name_get(COMPS_Doc* doc) {
+    return (COMPS_Str*)COMPS_OBJECT_INCREF(doc->doctype_name);
+}
+COMPS_Str* comps_doc_doctype_pubid_get(COMPS_Doc* doc) {
+    return (COMPS_Str*)COMPS_OBJECT_INCREF(doc->doctype_pubid);
+}
+COMPS_Str* comps_doc_doctype_sysid_get(COMPS_Doc* doc) {
+    return (COMPS_Str*)COMPS_OBJECT_INCREF(doc->doctype_sysid);
+}
+void comps_doc_doctype_name_set(COMPS_Doc* doc, COMPS_Str *val) {
+    COMPS_OBJECT_REPLACE(doc->doctype_name, COMPS_Str, val);
+}
+void comps_doc_doctype_sysid_set(COMPS_Doc* doc, COMPS_Str *val) {
+    COMPS_OBJECT_REPLACE(doc->doctype_name, COMPS_Str, val);
+}
+void comps_doc_doctype_pubid_set(COMPS_Doc* doc, COMPS_Str *val) {
+    COMPS_OBJECT_REPLACE(doc->doctype_name, COMPS_Str, val);
 }
 
 

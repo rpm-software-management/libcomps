@@ -201,6 +201,9 @@ typedef struct {
     /**< COMPS_Log object to store log messages evoked
      * by parsing and xml generating */
     COMPS_Str *encoding;   /**< comps.xml document encoding */
+    COMPS_Str *doctype_name;
+    COMPS_Str *doctype_sysid;
+    COMPS_Str *doctype_pubid;
     } COMPS_Doc;
 COMPS_Object_TAIL(COMPS_Doc);
 
@@ -416,6 +419,13 @@ char* comps2xml_str(COMPS_Doc *doc, COMPS_XMLOptions *options,
 COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2);
 
 COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches);
+
+COMPS_Str* comps_doc_doctype_name_get(COMPS_Doc* doc);
+COMPS_Str* comps_doc_doctype_pubid_get(COMPS_Doc* doc);
+COMPS_Str* comps_doc_doctype_sysid_get(COMPS_Doc* doc);
+void comps_doc_doctype_name_set(COMPS_Doc* doc, COMPS_Str *val);
+void comps_doc_doctype_sysid_set(COMPS_Doc* doc, COMPS_Str *val);
+void comps_doc_doctype_pubid_set(COMPS_Doc* doc, COMPS_Str *val);
 
 //extern COMPS_ObjectInfo COMPS_Doc_ObjInfo;
 extern COMPS_ValRuleGeneric* COMPS_Doc_ValidateRules[];
