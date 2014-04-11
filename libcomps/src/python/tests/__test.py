@@ -222,6 +222,14 @@ class BaseObjTestClass(object):
             _d = dict([(k,v) for k,v in _iteritems(_dict)])
             self.assertTrue(_d == _d1)
 
+    def test_hash(self):
+        s = set()
+        for x in range(6):
+            s.add(self.obj_constructor(**self.obj_data[x/2]))
+        self.assertTrue(len(s) == 3)
+        self.assertTrue(hash(self.obj_constructor(**self.obj_data[0])) ==\
+                        hash(self.obj_constructor(**self.obj_data[0])))
+
 #@unittest.skip(" ")
 class Category_Test(BaseObjTestClass, unittest.TestCase):
     obj_type = libcomps.Category
@@ -601,6 +609,15 @@ class PackageTest(unittest.TestCase):
         pkg = libcomps.Package("kernel-3.2", libcomps.PACKAGE_TYPE_MANDATORY)
         self.assertEqual(pkg.name, "kernel-3.2")
         self.assertEqual(pkg.type, libcomps.PACKAGE_TYPE_MANDATORY)
+
+    def test_hash(self):
+        pkg1 = libcomps.Package("kernel-3.2", libcomps.PACKAGE_TYPE_MANDATORY)
+        pkg2 = libcomps.Package("kernel-3.2", libcomps.PACKAGE_TYPE_MANDATORY)
+        pkg3 = libcomps.Package("kernel-3.1", libcomps.PACKAGE_TYPE_MANDATORY)
+        self.assertTrue(pkg1 == pkg2)
+        self.assertTrue(hash(pkg1) == hash(pkg2))
+        self.assertTrue(pkg2 != pkg3)
+        self.assertTrue(hash(pkg2) != hash(pkg3))
 
 #@unittest.skip("skip")
 class DictTest(unittest.TestCase):

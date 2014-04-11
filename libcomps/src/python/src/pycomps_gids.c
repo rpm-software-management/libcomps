@@ -21,7 +21,7 @@
 
 void PyCOMPSGID_dealloc(PyCOMPS_GID *self)
 {
-    COMPS_OBJECT_DESTROY(self->gid);
+    COMPS_OBJECT_DESTROY(self->c_obj);
     Py_TYPE(self)->tp_free((PyObject*)self);
     self = NULL;
 }
@@ -35,7 +35,7 @@ PyObject* PyCOMPSGID_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (PyCOMPS_GID*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->gid = COMPS_OBJECT_CREATE(COMPS_DocGroupId, NULL);
+        self->c_obj = COMPS_OBJECT_CREATE(COMPS_DocGroupId, NULL);
     }
     return (PyObject*) self;
 }
@@ -72,15 +72,15 @@ int PyCOMPSGID_init(PyCOMPS_GID *self, PyObject *args, PyObject *kwds)
                                         "s|O&", keywords, &name,
                                         &pycomps_p2c_bool_convert, &def
                                            )) {
-            comps_docgroupid_set_name(((PyCOMPS_GID*)self)->gid, name, 1);
-            comps_docgroupid_set_default(((PyCOMPS_GID*)self)->gid, def);
+            comps_docgroupid_set_name(((PyCOMPS_GID*)self)->c_obj, name, 1);
+            comps_docgroupid_set_default(((PyCOMPS_GID*)self)->c_obj, def);
             return 0;
         } else {
             return -1;
         }
     } else {
-        self->gid->name = NULL;
-        self->gid->def = 0;
+        self->c_obj->name = NULL;
+        self->c_obj->def = 0;
         return 0;
     }
     return -1;
@@ -88,7 +88,7 @@ int PyCOMPSGID_init(PyCOMPS_GID *self, PyObject *args, PyObject *kwds)
 
 PyObject* PyCOMPSGID_get_default(PyCOMPS_GID *self, void *closure) {
     (void) closure;
-    char def = self->gid->def;
+    char def = self->c_obj->def;
         return Py_BuildValue("O&", &pycomps_c2p_bool_convert, &def);
     Py_RETURN_NONE;
 }
@@ -100,16 +100,15 @@ int PyCOMPSGID_set_default(PyCOMPS_GID *self, PyObject *value, void *closure){
         return -1;
     }
     if (value == Py_True)
-        self->gid->def = 1;
+        self->c_obj->def = 1;
     else
-        self->gid->def = 0;
+        self->c_obj->def = 0;
     return 0;
 }
 
 __COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroupId) DocGroupId_NameClosure = {
     .get_f = &comps_docgroupid_get_name,
     .set_f = &comps_docgroupid_set_name,
-    .c_offset = offsetof(PyCOMPS_GID, gid)
 };
 
 PyGetSetDef gid_getset[] = {
@@ -127,7 +126,7 @@ PyGetSetDef gid_getset[] = {
 PyObject* PyCOMPSGID_str(PyObject *self) {
     char *x;
     PyObject *ret;
-    x = comps_object_tostr((COMPS_Object*)((PyCOMPS_GID*)self)->gid);
+    x = comps_object_tostr((COMPS_Object*)((PyCOMPS_GID*)self)->c_obj);
     ret = PyUnicode_FromString(x);
     free(x);
     return ret;
@@ -138,8 +137,8 @@ int PyCOMPSGID_print(PyObject *self, FILE *f, int flags) {
     char *name;
 
     (void) flags;
-    def = (((PyCOMPS_GID*)self)->gid->def)?"true":"false";
-    name = comps_object_tostr((COMPS_Object*)((PyCOMPS_GID*)self)->gid->name);
+    def = (((PyCOMPS_GID*)self)->c_obj->def)?"true":"false";
+    name = comps_object_tostr((COMPS_Object*)((PyCOMPS_GID*)self)->c_obj->name);
     fprintf(f, "<COPMS_GroupId name='%s' default='%s'>", name, def);
     free(name);
     return 0;
@@ -174,11 +173,11 @@ PyObject* PyCOMPSGID_cmp(PyObject *self, PyObject *other, int op) {
                         Py_TYPE(self)->tp_name);
         return NULL;
     } else {
-        gid2 = ((PyCOMPS_GID*)other)->gid;
+        gid2 = ((PyCOMPS_GID*)other)->c_obj;
     }
     CMP_NONE_CHECK(op, self, other)
 
-    ret = COMPS_OBJECT_CMP((COMPS_Object*)((PyCOMPS_GID*)self)->gid,
+    ret = COMPS_OBJECT_CMP((COMPS_Object*)((PyCOMPS_GID*)self)->c_obj,
                            (COMPS_Object*)gid2);
     if (created) {
         COMPS_OBJECT_DESTROY(gid2);
@@ -200,7 +199,7 @@ int pycomps_gid_validate(COMPS_Object *obj) {
 }
 
 PyObject* PyCOMPSGID_validate(PyCOMPS_GID *gid) {
-    if (pycomps_gid_validate((COMPS_Object*)gid->gid))
+    if (pycomps_gid_validate((COMPS_Object*)gid->c_obj))
         return NULL;
     else
         Py_RETURN_NONE;
@@ -256,7 +255,7 @@ PyTypeObject PyCOMPS_GIDType = {
     PyCOMPSGID_new,                 /* tp_new */};
 
 COMPS_Object* comps_gids_in(PyObject *item) {
-    return comps_object_incref((COMPS_Object*)((PyCOMPS_GID*)item)->gid);
+    return comps_object_incref((COMPS_Object*)((PyCOMPS_GID*)item)->c_obj);
 }
 
 COMPS_Object* comps_gids_str_in(PyObject *item) {
@@ -268,8 +267,8 @@ PyObject* comps_gids_out(COMPS_Object *cobj) {
     PyCOMPS_GID *ret;
     ret = (PyCOMPS_GID*)PyCOMPSGID_new(&PyCOMPS_GIDType, NULL, NULL);
     PyCOMPSGID_init(ret, NULL, NULL);
-    COMPS_OBJECT_DESTROY(ret->gid);
-    ret->gid = (COMPS_DocGroupId*)cobj;
+    COMPS_OBJECT_DESTROY(ret->c_obj);
+    ret->c_obj = (COMPS_DocGroupId*)cobj;
     return (PyObject*)ret;
 }
 

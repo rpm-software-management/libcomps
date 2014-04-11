@@ -25,6 +25,7 @@
 #include <Python.h>
 #include "structmember.h"
 
+
 #if PY_MAJOR_VERSION >= 3
     #define PYINIT_FUNC PyInit__libpycomps
 #else

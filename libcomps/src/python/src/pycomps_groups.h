@@ -33,7 +33,7 @@
 
 typedef struct {
     PyObject_HEAD
-    COMPS_DocGroup *group;
+    COMPS_DocGroup *c_obj;
     PyObject *p_packages;
     PyObject *p_name_by_lang;
     PyObject *p_desc_by_lang;
@@ -41,7 +41,7 @@ typedef struct {
 
 typedef struct {
     PyObject_HEAD
-    COMPS_DocGroupPackage * package;
+    COMPS_DocGroupPackage * c_obj;
 } PyCOMPS_Package;
 
 __H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroup) /*pycomps_utils.h macro*/

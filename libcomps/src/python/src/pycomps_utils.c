@@ -205,7 +205,7 @@ PyObject* __PyCOMPS_get_ids(PyObject *self, void *closure) {
                                                           NULL, NULL);
         _closure_->type->tp_init((PyObject*)ret, NULL, NULL);
         COMPS_OBJECT_DESTROY(ret->list);
-        c_obj = (COMPS_Object*) GET_FROM(self, _closure_->c_offset);
+        c_obj = ((PyCompsObject*)self)->c_obj;
         ret->list = (COMPS_ObjList*)
                     comps_object_incref((COMPS_Object*)_closure_->get_f(c_obj));
     } else {
@@ -229,7 +229,7 @@ int __PyCOMPS_set_ids(PyObject *self, PyObject *value, void *closure) {
         return -1;
     }
     COMPS_Object * c_obj;
-    c_obj = (COMPS_Object*) GET_FROM(self, _closure_->c_offset);
+    c_obj = ((PyCompsObject*)self)->c_obj;
 
     _closure_->set_f(c_obj, ((PyCOMPS_Sequence*)value)->list);
     pobj = (PyCOMPS_Sequence*)GET_FROM(self, _closure_->p_offset);
@@ -252,7 +252,7 @@ PyObject* __PyCOMPS_get_dict(PyObject *self, void *closure) {
         ret->it_info = _closure_->dict_info;
         //_closure_->dict_type->tp_init((PyObject*)ret, NULL, NULL);
         COMPS_OBJECT_DESTROY(ret->dict);
-        c_obj = (COMPS_Object*) GET_FROM(self, _closure_->c_offset);
+        c_obj = ((PyCompsObject*)self)->c_obj;
         dict = (COMPS_ObjDict*) GET_FROM(c_obj, _closure_->dict_offset);
         ret->dict = (COMPS_ObjDict*)comps_object_incref((COMPS_Object*)dict);
     } else {
@@ -284,7 +284,7 @@ int __PyCOMPS_set_dict(PyObject *self, PyObject *value, void *closure) {
         return -1;
     }*/
 
-    c_obj = (COMPS_Object*) GET_FROM(self, _closure_->c_offset);
+    c_obj = ((PyCompsObject*)self)->c_obj;
     dict = (COMPS_ObjDict*) GET_FROM(c_obj, _closure_->dict_offset);
     COMPS_OBJECT_DESTROY(dict);
     comps_object_incref((COMPS_Object*)((PyCOMPS_Dict*)value)->dict);
@@ -302,7 +302,7 @@ int __PyCOMPS_set_strattr(PyObject *self, PyObject *val, void *closure) {
     #define _closure_ ((__PyCOMPS_StrPropGetSetClosure*)closure)
     char *tmp = NULL;
     COMPS_Object *obj;
-    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    obj = ((PyCompsObject*)self)->c_obj;
     if (val == Py_None) {
         _closure_->set_f(obj, NULL, 0);
         return 0;
@@ -321,7 +321,7 @@ PyObject* __PyCOMPS_get_strattr(PyObject *self, void *closure) {
     PyObject *ret;
     char *x;
 
-    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    obj = ((PyCompsObject*)self)->c_obj;
     tmp_prop = _closure_->get_f(obj);
 
     if (tmp_prop) {
@@ -339,7 +339,7 @@ int __PyCOMPS_set_numattr(PyObject *self, PyObject *val, void *closure) {
     #define _closure_ ((__PyCOMPS_NumPropGetSetClosure*)closure)
     long tmp;
     COMPS_Object *obj;
-    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    obj = ((PyCompsObject*)self)->c_obj;
     if (val == Py_None) {
         _closure_->set_f(obj, 1, true);
         return 0;
@@ -358,7 +358,7 @@ PyObject* __PyCOMPS_get_numattr(PyObject *self, void *closure) {
     COMPS_Object* tmp_prop, *obj;
     PyObject *ret;
 
-    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    obj = ((PyCompsObject*)self)->c_obj;
     tmp_prop = _closure_->get_f(obj);
     if (tmp_prop) {
         ret = PyINT_FROM_LONG(((COMPS_Num*)tmp_prop)->val);
@@ -376,7 +376,7 @@ int __PyCOMPS_set_boolattr(PyObject *self, PyObject *val, void *closure) {
         PyErr_SetString(PyExc_TypeError, "Not bool object");
         return -1;
     }
-    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
+    obj = ((PyCompsObject*)self)->c_obj;
     if (val == Py_True) {
         _closure_->set_f(obj, 1, false);
     } else {
@@ -390,17 +390,17 @@ PyObject* __PyCOMPS_get_boolattr(PyObject *self, void *closure) {
     #define _closure_ ((__PyCOMPS_NumPropGetSetClosure*)closure)
     COMPS_Object* tmp_prop, *obj;
 
-    obj = (COMPS_Object*)GET_FROM(self, _closure_->c_offset);
-    printf("bool getter\n");
+    obj = ((PyCompsObject*)self)->c_obj;
+    //printf("bool getter\n");
     tmp_prop = _closure_->get_f(obj);
     if (tmp_prop) {
-        printf("bool getter:%d\n", ((COMPS_Num*)tmp_prop)->val);
+        //printf("bool getter:%d\n", ((COMPS_Num*)tmp_prop)->val);
         if (((COMPS_Num*)tmp_prop)->val) {
-            printf("true\n");
+            //printf("true\n");
             COMPS_OBJECT_DESTROY(tmp_prop);
             Py_RETURN_TRUE;
         } else {
-            printf("false\n");
+            //printf("false\n");
             COMPS_OBJECT_DESTROY(tmp_prop);
             Py_RETURN_FALSE;
         }

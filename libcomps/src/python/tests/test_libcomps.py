@@ -19,6 +19,7 @@ except ImportError:
 class TestLibcomps(unittest.TestCase):
 
     def setUp(self):
+        print (dir(libcomps))
         self.comps = libcomps.Comps()
         self.comps.fromxml_f("comps/comps-f21.xml")
         self.tmp_dir = tempfile.mkdtemp()

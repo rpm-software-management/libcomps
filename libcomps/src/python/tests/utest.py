@@ -22,10 +22,10 @@ import unittest
 import traceback
 def assertSequenceEqual(seq1, seq2):
     if len(seq1) != len(seq2):
-        raise AssertionError, "%s != %s" % (seq1, seq2)
+        raise (AssertionError, "%s != %s" % (seq1, seq2))
     for x,y in zip(seq1,seq2):
         if x != y:
-            raise AssertionError, "%s != %s" % (seq1, seq2)
+            raise (AssertionError, "%s != %s" % (seq1, seq2))
         
 
 class MyResult(unittest.TestResult):
@@ -44,9 +44,9 @@ class MyResult(unittest.TestResult):
 
     def __init__(self, stream, descriptions, verbosity):
         self.stream = stream
-	try:
+        try:
         	super(MyResult, self).__init__(stream, descriptions, verbosity)
-	except TypeError:
+        except TypeError:
         	super(MyResult, self).__init__()
         self.last_cls = None
         self.fail = False

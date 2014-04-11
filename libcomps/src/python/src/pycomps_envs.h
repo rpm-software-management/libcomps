@@ -40,7 +40,7 @@
 
 typedef struct {
     PyObject_HEAD
-    COMPS_DocEnv *env;
+    COMPS_DocEnv *c_obj;
     PyObject *p_group_list;
     PyObject *p_option_list;
     PyObject *p_name_by_lang;

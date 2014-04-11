@@ -29,13 +29,13 @@ PyObject* PyCOMPSEnv_union(PyObject *self, PyObject *other) {
         PyErr_SetString(PyExc_TypeError, "Not Environment instance");
         return NULL;
     }
-    e = comps_docenv_union(((PyCOMPS_Env*)self)->env,
-                           ((PyCOMPS_Env*)other)->env);
+    e = comps_docenv_union(((PyCOMPS_Env*)self)->c_obj,
+                           ((PyCOMPS_Env*)other)->c_obj);
 
     res = PyCOMPSEnv_new(&PyCOMPS_EnvType, NULL, NULL);
     PyCOMPSEnv_init((PyCOMPS_Env*)res, NULL, NULL);
-    COMPS_OBJECT_DESTROY(((PyCOMPS_Env*)res)->env);
-    ((PyCOMPS_Env*)res)->env = e;
+    COMPS_OBJECT_DESTROY(((PyCOMPS_Env*)res)->c_obj);
+    ((PyCOMPS_Env*)res)->c_obj = e;
     return res;
 }
 
@@ -47,7 +47,7 @@ void PyCOMPSEnv_dealloc(PyObject *self)
     Py_XDECREF(_env_->p_option_list);
     Py_XDECREF(_env_->p_name_by_lang);
     Py_XDECREF(_env_->p_desc_by_lang);
-    COMPS_OBJECT_DESTROY(_env_->env);
+    COMPS_OBJECT_DESTROY(_env_->c_obj);
     Py_TYPE(self)->tp_free((PyObject*)self);
     #undef _env_
 }
@@ -61,7 +61,7 @@ PyObject* PyCOMPSEnv_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     self = (PyCOMPS_Env*) type->tp_alloc(type, 0);
     if (self != NULL) {
-        self->env = COMPS_OBJECT_CREATE(COMPS_DocEnv, NULL);
+        self->c_obj = COMPS_OBJECT_CREATE(COMPS_DocEnv, NULL);
         self->p_group_list = NULL;
         self->p_option_list = NULL;
         self->p_name_by_lang = NULL;
@@ -85,11 +85,11 @@ int PyCOMPSEnv_init(PyCOMPS_Env *self, PyObject *args, PyObject *kwds)
     }
     else if (PyArg_ParseTupleAndKeywords(args, kwds, "|sssi", kwlist,
                                     &id, &name, &desc, &disp_ord)) {
-        comps_docenv_set_id(self->env, id, 1);
-        comps_docenv_set_name(self->env, name, 1);
-        comps_docenv_set_desc(self->env, desc, 1);
+        comps_docenv_set_id(self->c_obj, id, 1);
+        comps_docenv_set_name(self->c_obj, name, 1);
+        comps_docenv_set_desc(self->c_obj, desc, 1);
         if (disp_ord != -1)
-            comps_docenv_set_display_order(self->env, disp_ord, false);
+            comps_docenv_set_display_order(self->c_obj, disp_ord, false);
         return 0;
     } else {
         return -1;
@@ -103,7 +103,7 @@ int PyCOMPSEnv_print(PyObject *self, FILE *f, int flags) {
     char *id, *name, *desc, *display_order;
     COMPS_Object *tmp_prop;
 
-    #define _env_ ((PyCOMPS_Env*)self)->env
+    #define _env_ ((PyCOMPS_Env*)self)->c_obj
     (void)flags;
 
     tmp_prop = (COMPS_Object*)comps_docenv_get_id(_env_);
@@ -193,7 +193,7 @@ PyObject* PyCOMPSEnv_str(PyObject *self) {
     char *x;
     COMPS_Object *id;
     PyObject *ret;
-    id = comps_docenv_get_id(((PyCOMPS_Env*)self)->env);
+    id = comps_docenv_get_id(((PyCOMPS_Env*)self)->c_obj);
     x = comps_object_tostr(id);
     ret = PyUnicode_FromFormat("%s", x);
     free(x);
@@ -205,7 +205,7 @@ PyObject* PyCOMPSEnv_repr(PyObject *self) {
     char *x;
     COMPS_Object *id;
     PyObject *ret;
-    id = comps_docenv_get_id(((PyCOMPS_Env*)self)->env);
+    id = comps_docenv_get_id(((PyCOMPS_Env*)self)->c_obj);
     x = comps_object_tostr(id);
     ret = PyUnicode_FromFormat("<libcomps.Environment object '%s' at %p>", x, self);
     free(x);
@@ -223,8 +223,8 @@ PyObject* PyCOMPSEnv_cmp(PyObject *self, PyObject *other, int op) {
         return NULL;
     }
     CMP_NONE_CHECK(op, self, other)
-    ret = COMPS_OBJECT_CMP((COMPS_Object*)((PyCOMPS_Env*)self)->env,
-                           (COMPS_Object*)((PyCOMPS_Env*)other)->env);
+    ret = COMPS_OBJECT_CMP((COMPS_Object*)((PyCOMPS_Env*)self)->c_obj,
+                           (COMPS_Object*)((PyCOMPS_Env*)other)->c_obj);
     if (op == Py_EQ) {
         if (!ret) Py_RETURN_FALSE;
     } else {
@@ -242,7 +242,7 @@ int pycomps_env_validate(COMPS_Object *obj) {
 }
 
 PyObject* PyCOMPSEnv_validate(PyCOMPS_Env *env) {
-    if (pycomps_env_validate((COMPS_Object*)env->env))
+    if (pycomps_env_validate((COMPS_Object*)env->c_obj))
         return NULL;
     else
         Py_RETURN_NONE;
@@ -266,29 +266,24 @@ PyMethodDef PyCOMPSEnv_methods[] = {
 __COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_IdClosure = {
     .get_f = &comps_docenv_get_id,
     .set_f = &comps_docenv_set_id,
-    .c_offset = offsetof(PyCOMPS_Env, env)
 };
 
 __COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_NameClosure = {
     .get_f = &comps_docenv_get_name,
     .set_f = &comps_docenv_set_name,
-    .c_offset = offsetof(PyCOMPS_Env, env)
 };
 
 __COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_DescClosure = {
     .get_f = &comps_docenv_get_desc,
     .set_f = &comps_docenv_set_desc,
-    .c_offset = offsetof(PyCOMPS_Env, env)
 };
 
 __COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_DispOrdClosure = {
     .get_f = &comps_docenv_get_display_order,
     .set_f = &comps_docenv_set_display_order,
-    .c_offset = offsetof(PyCOMPS_Env, env)
 };
 
 __COMPS_DICT_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_NameByLangClosure = {
-    .c_offset = offsetof(PyCOMPS_Env, env),
     .p_offset = offsetof(PyCOMPS_Env, p_name_by_lang),
     .dict_offset = offsetof(COMPS_DocEnv, name_by_lang),
     .dict_info = &PyCOMPS_StrDictInfo,
@@ -296,7 +291,6 @@ __COMPS_DICT_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_NameByLangClosure = {
 };
 
 __COMPS_DICT_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_DescByLangClosure = {
-    .c_offset = offsetof(PyCOMPS_Env, env),
     .p_offset = offsetof(PyCOMPS_Env, p_desc_by_lang),
     .dict_offset = offsetof(COMPS_DocEnv, desc_by_lang),
     .dict_info = &PyCOMPS_StrDictInfo,
@@ -307,7 +301,6 @@ __COMPS_LIST_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_GroupIdsClosure = {
     .get_f = &comps_docenv_group_list,
     .set_f = &comps_docenv_set_group_list,
     .p_offset = offsetof(PyCOMPS_Env, p_group_list),
-    .c_offset = offsetof(PyCOMPS_Env, env),
     .type = &PyCOMPS_GIDsType
 };
 
@@ -315,7 +308,6 @@ __COMPS_LIST_GETSET_CLOSURE(COMPS_DocEnv) DocEnv_OptionIdsClosure = {
     .get_f = &comps_docenv_option_list,
     .set_f = &comps_docenv_set_option_list,
     .p_offset = offsetof(PyCOMPS_Env, p_option_list),
-    .c_offset = offsetof(PyCOMPS_Env, env),
     .type = &PyCOMPS_GIDsType
 };
 
@@ -397,15 +389,15 @@ PyTypeObject PyCOMPS_EnvType = {
 
 
 COMPS_Object* comps_envs_in(PyObject *item) {
-    return comps_object_incref((COMPS_Object*)((PyCOMPS_Env*)item)->env);
+    return comps_object_incref((COMPS_Object*)((PyCOMPS_Env*)item)->c_obj);
 }
 
 PyObject* comps_envs_out(COMPS_Object *cobj) {
     PyCOMPS_Env *ret;
     ret = (PyCOMPS_Env*)PyCOMPSEnv_new(&PyCOMPS_EnvType, NULL, NULL);
     PyCOMPSEnv_init(ret, NULL, NULL);
-    COMPS_OBJECT_DESTROY(ret->env);
-    ret->env = (COMPS_DocEnv*)cobj;
+    COMPS_OBJECT_DESTROY(ret->c_obj);
+    ret->c_obj = (COMPS_DocEnv*)cobj;
     return (PyObject*)ret;
 }
 

@@ -32,7 +32,7 @@
 
 typedef struct {
     PyObject_HEAD
-    COMPS_DocCategory *cat;
+    COMPS_DocCategory *c_obj;
     PyObject *p_group_ids;
     PyObject *p_name_by_lang;
     PyObject *p_desc_by_lang;

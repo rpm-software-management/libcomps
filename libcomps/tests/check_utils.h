@@ -21,5 +21,12 @@
 #define CHECK_UTILS_H
 
 #include <stdio.h>
+#include "../src/comps_doc.h"
+
+const char * pkg_type2str(COMPS_PackageType type);
+void print_package(COMPS_Object *obj);
+void print_gid(COMPS_Object *obj);
+void print_group(COMPS_Object *obj);
+void print_category(COMPS_Object *obj);
 
 #endif

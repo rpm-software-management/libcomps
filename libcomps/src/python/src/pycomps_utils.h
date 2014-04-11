@@ -31,17 +31,20 @@
 #include "libcomps/comps_objlist.h"
 #include "libcomps/comps_utils.h"
 
+typedef struct PyCompsObject {
+    PyObject_HEAD
+    COMPS_Object *c_obj;
+} PyCompsObject;
+
 typedef struct {
     COMPS_Object* (*get_f)(COMPS_Object*);
     void (*set_f)(COMPS_Object*, int, bool);
-    size_t c_offset;
     char deleteable;
 } __PyCOMPS_NumPropGetSetClosure;
 
 typedef struct {
     COMPS_Object* (*get_f)(COMPS_Object*);
     void (*set_f)(COMPS_Object*, char*, char);
-    size_t c_offset;
     char deleteable;
 } __PyCOMPS_StrPropGetSetClosure;
 
@@ -50,12 +53,10 @@ typedef struct {
     PyTypeObject *type;
     void (*set_f)(COMPS_Object*, COMPS_ObjList*);
     size_t p_offset;
-    size_t c_offset;
 } __PyCOMPS_ListGetSetClosure;
 
 typedef struct {
     size_t p_offset;
-    size_t c_offset;
     size_t dict_offset;
     PyCOMPS_ItemInfo *dict_info;
     PyTypeObject *dict_type;
@@ -65,7 +66,6 @@ typedef struct {
 typedef struct {\
     COMPS_Object* (*get_f)(C_TYPE*);\
     void (*set_f)(C_TYPE*, int, bool);\
-    size_t c_offset;\
     char deleteable;\
 } CONCAT(CONCAT(PyCOMPS_, C_TYPE), _NumPropGetSetClosure);
 
@@ -76,7 +76,6 @@ typedef struct {\
 typedef struct {\
     COMPS_Object* (*get_f)(C_TYPE*);\
     void (*set_f)(C_TYPE*, char*, char);\
-    size_t c_offset;\
     char deleteable;\
 } CONCAT(CONCAT(PyCOMPS_, C_TYPE), _StrPropGetSetClosure);
 
@@ -89,7 +88,6 @@ typedef struct {\
     PyTypeObject *type;\
     void (*set_f)(C_TYPE*, COMPS_ObjList*);\
     size_t p_offset;\
-    size_t c_offset;\
 } CONCAT(CONCAT(PyCOMPS_, C_TYPE), _ListGetSetClosure);
 
 #define __COMPS_LIST_GETSET_CLOSURE(C_TYPE)\
@@ -98,7 +96,6 @@ typedef struct {\
 #define __H_COMPS_DICT_GETSET_CLOSURE(C_TYPE)\
 typedef struct {\
     size_t p_offset;\
-    size_t c_offset;\
     size_t dict_offset;\
     PyCOMPS_ItemInfo *dict_info;\
     PyTypeObject *dict_type;\

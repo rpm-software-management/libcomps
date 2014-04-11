@@ -18,15 +18,13 @@
  */
 
 #include "pycomps_hash.h"
+#include "pycomps_utils.h"
 
 long PyCOMPS_hash(PyObject *self) {
-    PyObject * str;
     char *cstr = NULL;
     long crc;
 
-    str = Py_TYPE(self)->tp_str(self);
-    __pycomps_PyUnicode_AsString(str, &cstr);
-    Py_DECREF(str);
+    cstr = comps_object_tostr(((PyCompsObject*)self)->c_obj);
     crc = crc32(0, cstr, strlen(cstr));
     free(cstr);
     return crc;

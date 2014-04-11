@@ -33,7 +33,7 @@
 
 typedef struct {
     PyObject_HEAD
-    COMPS_DocGroupId *gid;
+    COMPS_DocGroupId *c_obj;
 } PyCOMPS_GID;
 
 __H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroupId) /*pycomps_utils.h macro*/

@@ -24,102 +24,7 @@
 #include "../src/comps_parse.h"
 #include "../src/comps_validate.h"
 
-char * pkg_type2str(COMPS_PackageType type) {
-    switch(type) {
-        case COMPS_PACKAGE_DEFAULT:
-            return "default";
-        case COMPS_PACKAGE_OPTIONAL:
-            return "optional";
-        case COMPS_PACKAGE_MANDATORY:
-            return "mandatory";
-        case COMPS_PACKAGE_CONDITIONAL:
-            return "conditional";
-        case COMPS_PACKAGE_UNKNOWN:
-            return "unknown";
-        break;
-    }
-    return NULL;
-}
-
-void print_package(COMPS_Object *obj) {
-    char *str;
-    str = comps_object_tostr((COMPS_Object*)
-                             ((COMPS_DocGroupPackage*)obj)->name);
-    printf("%s type=", str);
-    free(str);
-    printf("%s\n", pkg_type2str(((COMPS_DocGroupPackage*)obj)->type));
-}
-
-void print_gid(COMPS_Object *obj) {
-    char *str;
-    str = comps_object_tostr((COMPS_Object*)
-                             ((COMPS_DocGroupId*)obj)->name);
-    printf("%s default=", str);
-    free(str);
-    printf("%s\n",(((COMPS_DocGroupId*)obj)->def)?"true":"false");
-}
-
-void print_group(COMPS_Object *obj) {
-    char *id, *name, *desc;
-    int disp_ord, def, uservis;
-    COMPS_Object *prop;
-
-    prop = comps_docgroup_get_id((COMPS_DocGroup*)obj);
-    id = (prop)?comps_object_tostr(prop):"NULL";
-    prop = comps_docgroup_get_name((COMPS_DocGroup*)obj);
-    name = (prop)?comps_object_tostr(prop):"NULL";
-    prop = comps_docgroup_get_desc((COMPS_DocGroup*)obj);
-    desc = (prop)?comps_object_tostr(prop):"NULL";
-    prop = comps_docgroup_get_display_order((COMPS_DocGroup*)obj);
-    disp_ord = (prop)?((COMPS_Num*)prop)->val:0;
-    prop = comps_docgroup_get_uservisible((COMPS_DocGroup*)obj);
-    uservis = (prop)?((COMPS_Num*)prop)->val:0;
-    prop = comps_docgroup_get_def((COMPS_DocGroup*)obj);
-    def = (prop)?((COMPS_Num*)prop)->val:0;
-    
-    printf("id: %s\n", id);
-    printf("name: %s\n", name);
-    printf("desc: %s\n", desc);
-    printf("default: %d\n", def);
-    printf("uservisible: %d\n", uservis);
-    printf("display_order: %d\n", disp_ord);
-    COMPS_ObjListIt *it = ((COMPS_DocGroup*)obj)->packages->first;
-    while (comps_objlist_walk(&it, &prop)) {
-        print_package(prop);
-    }
-    printf("-------------------------------------\n");
-}
-
-void print_category(COMPS_Object *obj) {
-    char *id, *name, *desc;
-    int disp_ord;
-    COMPS_Object *prop;
-
-    prop = comps_doccategory_get_id((COMPS_DocCategory*)obj);
-    id = (prop)?comps_object_tostr(prop):NULL;
-    COMPS_OBJECT_DESTROY(prop);
-    prop = comps_doccategory_get_name((COMPS_DocCategory*)obj);
-    name = (prop)?comps_object_tostr(prop):NULL;
-    COMPS_OBJECT_DESTROY(prop);
-    prop = comps_doccategory_get_desc((COMPS_DocCategory*)obj);
-    desc = (prop)?comps_object_tostr(prop):NULL;
-    COMPS_OBJECT_DESTROY(prop);
-    prop = comps_doccategory_get_display_order((COMPS_DocCategory*)obj);
-    disp_ord = (prop)?((COMPS_Num*)prop)->val:0;
-    COMPS_OBJECT_DESTROY(prop);
-    
-    printf("id: %s\n", id);
-    printf("name: %s\n", name);
-    printf("desc: %s\n", desc);
-    printf("display_order: %d\n", disp_ord);
-    free(id);
-    free(name);
-    free(desc);
-    COMPS_ObjListIt * it = ((COMPS_DocCategory*)obj)->group_ids->first;
-    while (comps_objlist_walk(&it, &prop)) {
-        print_gid(prop);
-    }
-}
+#include "check_utils.h"
 
 START_TEST(test_comps_doc_basic)
 {
@@ -546,13 +451,6 @@ START_TEST(test_comps_doc_xml)
     COMPS_OBJECT_DESTROY(doc);
 }
 END_TEST
-
-void* str_clonner(void *str) {
-    void *ret;
-    ret = malloc(sizeof(char) * (strlen((char*)str)+1));
-    memcpy(ret, str, sizeof(char) * (strlen((char*)str)+1));
-    return ret;
-}
 
 START_TEST(test_comps_doc_union)
 {
