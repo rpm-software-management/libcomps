@@ -99,7 +99,8 @@ def build_chlog(tags ,top='HEAD'):
     f = open("chcommits", "r")
     chcommits = set([x.strip() for x in f])
     f.close()
-
+    
+    print len(chcommits)
     log = []
     for tag in tags:
         head = log_for_commits([tag], _format="%ct%n%cn <%ce>%n%B")
