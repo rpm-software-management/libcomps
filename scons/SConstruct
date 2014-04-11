@@ -1,0 +1,30 @@
+# vim: set ft=python:
+import json
+import os
+import os.path
+import sys
+
+env = Environment(CC = 'gcc',
+                  CCFLAGS = '-O2 --pedantic -Wall --std=c99 -Wextra ' +
+                            '-Wno-missing-field-initializers -fno-strict-aliasing -g',
+                  CPPPATH=["/usr/include/", "/usr/include/libxml2/"])
+
+PROJECT_DIR = os.getcwd()
+
+#env.VariantDir("build", "libcomps/src/")
+
+
+libcomps = SConscript(os.path.join(PROJECT_DIR, 'scons/libcomps.scons'),
+                 exports=['env', "PROJECT_DIR"])
+
+#libcomps_test = SConscript(os.path.join(PROJECT_DIR, 'scons/libcomps_tests.scons'),
+#                 exports=['env', "PROJECT_DIR"])
+
+libpycomps = SConscript(os.path.join(PROJECT_DIR, 'scons/libpycomps2.scons'),
+                 exports=['env', "PROJECT_DIR"])
+
+libpycomps = SConscript(os.path.join(PROJECT_DIR, 'scons/libpycomps3.scons'),
+                 exports=['env', "PROJECT_DIR"])
+
+libpycomps = SConscript(os.path.join(PROJECT_DIR, 'scons/libpycomps_tests.scons'),
+                 exports=['env', "PROJECT_DIR"])

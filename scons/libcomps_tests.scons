@@ -1,0 +1,85 @@
+# vim: set ft=python:
+import os
+import glob
+import shutil
+import sys
+
+Import("PROJECT_DIR", "env", "libcomps", "libcomps_include_path")
+
+local_env = env.Clone(CPP_PATH=[libcomps_include_path])
+
+local_env.Alias('libcomps', libcomps)
+
+c_tests_path = "build_tests"
+local_env.VariantDir(c_tests_path,
+                     "../libcomps/tests/", duplicate=0)
+
+c_tests = {"testobjrtree": {"files": "check_objrtree.c check_utils.c",
+                             "libs": ["comps", "check"]},
+           "testrtree": {"files":  "check_rtree.c check_utils.c",
+                         "libs": ["comps", "check"]},
+           "testbrtree": {"files": "check_brtree.c check_utils.c",
+                          "libs": ["comps", "check"]},
+           "testparse": {"files": "check_parse.c check_utils.c",
+                         "libs": ["comps", "expat", "check"]},
+           "testcomps": {"files": "check_comps.c",
+                         "libs": ["comps", "check"]},
+           "testvalidate": {"files": "check_validate.c",
+                            "libs": ["comps", "check"]}
+            }
+
+print >> sys.stderr, [x for x in local_env.Dictionary().keys() if "LIB" in x]
+print >> sys.stderr, os.path.relpath(os.path.dirname(libcomps.data[0].abspath), os.getcwd())
+print >> sys.stderr, os.path.dirname(libcomps.data[0].abspath)
+#local_env.Append(LIBPATH=[os.path.dirname(libcomps.data[0].abspath)])
+run_env = local_env.Clone()
+run_env.PrependENVPath('LD_LIBRARY_PATH', os.path.dirname(libcomps.data[0].abspath))
+run_env.PrependENVPath('PYTHON_PATH', os.path.dirname(libcomps.data[0].abspath))
+
+#def PhonyTarget(target, action):
+#        phony = Environment(ENV = os.environ,
+#                            BUILDERS = { 'phony' : Builder(action = action) })
+#        AlwaysBuild(phony.phony(target = target, source = 'SConstruct'))
+
+
+test_files = glob.glob("../libcomps/tests/*.xml") +\
+             glob.glob("../libcomps/tests/*.dtd") +\
+             glob.glob("../libcomps/tests/*.txt")
+
+test_files_target = "c_tests_files/"
+test_files_dst = []
+for f in test_files:
+    test_files_dst.append(os.path.join(test_files_target, os.path.basename(f)))
+    env.Command(test_files_dst[-1], f, Copy("$TARGET", "$SOURCE"))
+
+
+tests = []
+
+for target, values in c_tests.iteritems():
+    tests.append({})
+    tests[-1]["objs"] = []
+    tests[-1]["out"] = None
+    tests[-1]["run"] = None
+
+    for x in Split(values["files"]):
+        tests[-1]["objs"].append(run_env.Object(os.path.join(c_tests_path, x)))
+
+    tests[-1]["out"] = run_env.Program("c_tests/%s" % target,
+                                          tests[-1]["objs"],
+                                          LIBS=values["libs"],
+                                          LIBPATH=["lib_comps/"])
+    #ctests_env.Alias(target, tests[-1]["out"])
+    local_env.Depends(tests[-1]["out"], env.Alias("libcomps"))
+
+    tests[-1]["run"] = run_env.Command(tests[-1]["out"][0].path,
+                                          [tests[-1]["out"]],
+                                           tests[-1]["out"][0].abspath,
+                                          chdir=os.path.join("scons/",
+                                                             test_files_target))
+    local_env.Depends(tests[-1]["run"], test_files_target)
+    local_env.AlwaysBuild(tests[-1]["run"])
+
+    local_env.Alias("run_%s" % target, tests[-1]["run"])
+    local_env.Depends("ctests_run", "run_%s" % target)
+
+AlwaysBuild("ctests_run")
