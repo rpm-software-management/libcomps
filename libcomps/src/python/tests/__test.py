@@ -618,6 +618,7 @@ class PackageTest(unittest.TestCase):
         self.assertTrue(hash(pkg1) == hash(pkg2))
         self.assertTrue(pkg2 != pkg3)
         self.assertTrue(hash(pkg2) != hash(pkg3))
+        self.assertTrue(len(set([pkg1,pkg2,pkg3])) == 2)
 
 #@unittest.skip("skip")
 class DictTest(unittest.TestCase):
