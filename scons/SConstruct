@@ -4,6 +4,7 @@ import os
 import os.path
 import sys
 
+
 env = Environment(CC = 'gcc',
                   CCFLAGS = '-O2 --pedantic -Wall --std=c99 -Wextra ' +
                             '-Wno-missing-field-initializers -fno-strict-aliasing -g',
