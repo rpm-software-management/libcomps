@@ -11,7 +11,7 @@ reading @link libcomps_objs
 this
 @endlink
 
-To understatning libcomps object management(creating, destroying, copying and
+To understand libcomps object management(creating, destroying, copying and
 binding to python objects) read @link comps_obj
 this
 @endlink

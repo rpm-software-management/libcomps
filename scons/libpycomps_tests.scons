@@ -4,37 +4,27 @@ import os.path
 import glob
 import sys
 
-Import("PROJECT_DIR", "env", "libcomps", "libpycomps2",
-       "libpycomps3", "PYCOMPS2_OUT", "PYCOMPS3_OUT")
+Import("SCONS_ROOT", "env", "libcomps", "libcomps_path", "libpycomps2",
+       "libpycomps3")
 
 local_env = env.Clone()
 local_env.Alias('libpycomps2', libpycomps2)
 local_env.Alias('libpycomps3', libpycomps3)
 
-TESTS_DIR2 = "./libcomps/src/python/tests/"
-TESTS_DIR = "../libcomps/src/python/tests/"
+print >> sys.stderr, libpycomps2
+print >> sys.stderr, libpycomps3
+
+TESTS_DIR2 = "libcomps/src/python/tests/"
+TESTS_DIR = os.path.join(SCONS_ROOT, "../libcomps/src/python/tests/")
 TESTS = """test_libcomps.py test_merge_comps.py __test.py utest.py"""
 TESTS_FILES = glob.glob(os.path.join(TESTS_DIR, "comps/*.xml"))
 
-TEST_TGT = "../libpycomps_tests"
+TEST_TGT = os.path.join(SCONS_ROOT, env["LIBPYCOMPS_TESTS"])
 
-c_tests = {"testobjrtree": {"files": "check_objrtree.c check_utils.c",
-                             "libs": ["comps", "check"]},
-           "testrtree": {"files":  "check_rtree.c check_utils.c",
-                         "libs": ["comps", "check"]},
-           "testbrtree": {"files": "check_brtree.c check_utils.c",
-                          "libs": ["comps", "check"]},
-           "testparse": {"files": "check_parse.c check_utils.c",
-                         "libs": ["comps", "expat", "check"]},
-           "testcomps": {"files": "check_comps.c",
-                         "libs": ["comps", "check"]},
-           "testvalidate": {"files": "check_validate.c",
-                            "libs": ["comps", "check"]}
-            }
 PPATH = os.sep.join(os.path.dirname(libpycomps2.data[0].abspath).split(os.sep)[:-1])
 pytests2_env = local_env.Clone(
         ENV={"LD_LIBRARY_PATH": [os.path.dirname(libpycomps2.data[0].abspath),
-                                 os.path.dirname(libcomps.data[0].abspath)],
+                                 libcomps_path],
              "PATH": os.environ["PATH"],
              "PYTHONPATH": PPATH},
         LIBS=["_libpycomps"],
@@ -43,7 +33,7 @@ pytests2_env = local_env.Clone(
 PPATH = os.sep.join(os.path.dirname(libpycomps3.data[0].abspath).split(os.sep)[:-1])
 pytests3_env = local_env.Clone(
         ENV={"LD_LIBRARY_PATH":[os.path.dirname(libpycomps3.data[0].abspath),
-                                 os.path.dirname(libcomps.data[0].abspath)],
+                                libcomps_path],
              "PATH": os.environ["PATH"],
              "PYTHONPATH": PPATH},
         LIBS=["_libpycomps"],
@@ -51,33 +41,35 @@ pytests3_env = local_env.Clone(
 
 
 PPATH = os.sep.join(os.path.dirname(libpycomps2.data[0].abspath).split(os.sep)[:-1])
-
 tests2 = []
 
 for test in TESTS.split():
-    print >> sys.stderr, "PYCOMPS_TEST", PPATH 
     abs_test = os.path.abspath(os.path.join(os.path.abspath(TESTS_DIR), test))
-    tests2.append(pytests2_env.Command("test2_%s" % test, os.path.join(TESTS_DIR, test),
-        "(export PYTHONPATH=$PYTHONPATH:%s/; python2 %s)" % (str(PPATH), test),
-        chdir=TESTS_DIR2))
-    pytests2_env.Alias("run2_%s" % test, tests2[-1])
-    pytests2_env.Depends("run2_%s" % test, local_env.Alias("libpycomps2"))
-    pytests2_env.Depends("pytests2_run", "run2_%s" % test)
+    tests2.append(pytests2_env.Command("test2_%s" % test, abs_test,
+        "(export PYTHONPATH=$PYTHONPATH:%s/; python2 $SOURCE)" % (str(PPATH)),
+        chdir=os.path.join(SCONS_ROOT, TESTS_DIR)))
+    pytests2_env.Depends(tests2[-1], libpycomps2)
+    #pytests2_env.Depends("pytests2_run", tests2[-1])
 
-AlwaysBuild("pytests2_run")
+#AlwaysBuild("pytests2_run")
 
 PPATH = os.sep.join(os.path.dirname(libpycomps3.data[0].abspath).split(os.sep)[:-1])
 
 tests3 = []
 
 for test in TESTS.split():
-    print >> sys.stderr, "PYCOMPS_TEST", PPATH 
     abs_test = os.path.abspath(os.path.join(os.path.abspath(TESTS_DIR), test))
     tests3.append(pytests3_env.Command("test3_%s" % test, os.path.join(TESTS_DIR, test),
         "(export PYTHONPATH=$PYTHONPATH:%s/; python3 %s)" % (str(PPATH), test),
-        chdir=TESTS_DIR2))
-    pytests3_env.Alias("run3_%s" % test, tests3[-1])
-    pytests3_env.Depends("run3_%s" % test, local_env.Alias("libpycomps3"))
-    pytests3_env.Depends("pytests3_run", "run3_%s" % test)
+        chdir=os.path.join(SCONS_ROOT, TESTS_DIR)))
+    pytests3_env.Depends(tests3[-1], libpycomps3)
+    #pytests3_env.Depends("pytests3_run", "run3_%s" % test)
 
-AlwaysBuild("pytests3_run")
+#AlwaysBuild("pytests3_run")
+
+local_env.Alias("pytests2_run", tests2)
+local_env.Alias("pytests3_run", tests3)
+pytests2_run = tests2
+pytests3_run = tests3
+Export("pytests2_run")
+Export("pytests3_run")

@@ -1,0 +1,36 @@
+# vim: set ft=python:
+import os
+import glob
+import shutil
+import sys
+import string
+
+Import("SCONS_ROOT", "env", "libcomps", "libcomps_include_path",
+       "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
+       "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
+       "INSTALL_INC_PATH", "INSTALL_USR_PATH")
+
+local_env = Environment()
+#import pprint
+#pprint.pprint(env._dict)
+
+local_env.Alias('libcomps', libcomps)
+
+f = open(os.path.join(SCONS_ROOT, "../libcomps/docs/Doxyfile.user.in"))
+tmpl = string.Template(f.read())
+_str = tmpl.safe_substitute({"PROJECT_SOURCE_DIR": os.path.join(SCONS_ROOT, "../libcomps"),
+                       "libcomps_MAJOR_VERSION": env["libcomps_VERSION_MAJOR"],
+                       "libcomps_RELEASE": env["libcomps_RELEASE"],
+                       "libcomps_MINOR_VERSION": env["libcomps_VERSION_MINOR"],
+                       "libcomps_PATCH_VERSION": env["libcomps_VERSION_PATCH"],
+                       "DOC_OUTPUT": "libcomps-docs/"})
+
+f2 = open(os.path.join(SCONS_ROOT,"doxyfile.user"), "w")
+f2.write(_str)
+
+doc = local_env.Command("docs", os.path.join(SCONS_ROOT, "doxyfile.user"),
+                        "doxygen $SOURCE")
+
+libcomps_docs_install = local_env.Install(INSTALL_USR_PATH, doc)
+
+local_env.Export("libcomps_docs_install")

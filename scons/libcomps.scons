@@ -1,14 +1,23 @@
-# vim: set ft=javascript:
+# vim: set ft=python:
 import json
 import os.path
+import glob
 
-Import("PROJECT_DIR", "env")
+Import("SCONS_ROOT", "env", #"libcomps_VERSION_MAJOR","libcomps_VERSION_MINOR",
+                            # "libcomps_RELEASE", "libcomps_VERSION_PATCH",
+                             "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
+                             "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
+                             "INSTALL_INC_PATH")
+
+libcomps_VERSION_MAJOR = env["libcomps_VERSION_MAJOR"]
+libcomps_VERSION_MINOR = env["libcomps_VERSION_MINOR"]
+libcomps_RELEASE = env["libcomps_RELEASE"]
+libcomps_VERSION_PATCH = env["libcomps_VERSION_PATCH"]
 
 local_env = env.Clone()
 
 local_env.VariantDir("build_libcomps",
-                     "../libcomps/src/", duplicate=0)
-print PROJECT_DIR
+                     os.path.join(SCONS_ROOT, "../libcomps/src/"), duplicate=0)
 
 comps_files = """ comps_doc.c comps_docgroup.c comps_doccategory.c
                   comps_docenv.c comps_docpackage.c comps_docgroupid.c
@@ -23,15 +32,31 @@ comps_files = """ comps_doc.c comps_docgroup.c comps_doccategory.c
                   comps_types.c
 """
 comps_files_fullp = ["build_libcomps/%s" % x for x in comps_files.split() if x]
-libcomps_include_path = os.path.abspath("../libcomps/src/")
+libcomps_include_path = os.path.abspath(os.path.join(SCONS_ROOT,
+                                                     "../libcomps/src/"))
 
-version = json.load(open(os.path.join(PROJECT_DIR, "version.json")))
-libcomps = local_env.SharedLibrary("lib_comps/comps",
+libcomps_build = local_env.SharedLibrary("lib_comps/comps",
                        comps_files_fullp,
-                       SHLIB_VERSION="%s.%s.%s" % (version["libcomps_VERSION_MAJOR"],
-                                                   version["libcomps_VERSION_MINOR"],
-                                                   version["libcomps_VERSION_PATCH"]),
-                       #SHLIBSUFFIX = '.so.$SHLIB_VERSION',
+                       SHLIB_VERSION="%s.%s.%s" % (libcomps_VERSION_MAJOR,
+                                                   libcomps_VERSION_MINOR,
+                                                   libcomps_VERSION_PATCH),
+                       SHLIBSUFFIX = '.so.$SHLIB_VERSION',
                        LIBS=["expat", "libxml2"],
                        )
-Export("libcomps", "libcomps_include_path")
+
+libcomps_link = env.Command('lib_comps/libcomps.so',
+                            libcomps_build, 'ln -s ${SOURCE.file} $TARGET')
+
+libcomps = [libcomps_build, libcomps_link]
+
+HEADS = glob.glob(os.path.join(SCONS_ROOT, "../libcomps/src/*.h"))
+libcomps_install = [local_env.Install(INSTALL_LIB64_PATH, libcomps),
+                    local_env.Install(os.path.join(INSTALL_INC_PATH,
+                                                   "libcomps"), HEADS)]
+
+local_env.Depends(libcomps_link, libcomps_build)
+local_env.Depends(libcomps_install, [libcomps, libcomps_link])
+
+libcomps_path = os.path.dirname(libcomps_build.data[0].abspath)
+
+Export("libcomps", "libcomps_install", "libcomps_include_path", "libcomps_path")

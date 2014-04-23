@@ -1,0 +1,64 @@
+# vim: set ft=python:
+import sys
+import os
+
+colors = {}
+colors['cyan']   = '\033[0;96m'
+colors['purple'] = '\033[0;95m'
+colors['blue']   = '\033[0;94m'
+colors['green']  = '\033[0;92m'
+colors['yellow'] = '\033[0;93m'
+colors['red']    = '\033[0;91m'
+colors['white']  = '\033[0;37m'
+
+colors['cyan_bold']   = '\033[1;96m'
+colors['purple_bold'] = '\033[1;95m'
+colors['blue_bold']   = '\033[1;94m'
+colors['green_bold']  = '\033[1;92m'
+colors['yellow_bold'] = '\033[1;93m'
+colors['red_bold']    = '\033[1;91m'
+colors['white_bold']  = '\033[1;37m'
+colors['end']    = '\033[0m'
+
+#If the output is not a terminal, remove the colors
+if not sys.stdout.isatty():
+   for key, value in colors.iteritems():
+      colors[key] = ''
+
+compile_source_message = '%sCompiling %s==> %s$SOURCE%s\ncccom:$CCCOM $CCFLAGS' % \
+   (colors['green'], colors['white_bold'], colors['green'], colors['end'])
+
+compile_shared_source_message = '%sCompiling shared %s==> %s$SOURCE%s\n' %\
+                                (colors['green'], colors['white_bold'],
+                                 colors['green'], colors['end']) +\
+                                '$CCCOM $CCCFLAGS'
+
+link_program_message = '%sLinking Program %s==> %s$TARGET%s' % \
+   (colors['blue_bold'], colors['white_bold'], colors['blue_bold'], colors['end'])
+
+link_library_message = '%sLinking Static Library %s==> %s$TARGET%s' % \
+   (colors['blue_bold'], colors['white_bold'], colors['blue_bold'], colors['end'])
+
+link_shared_library_message = '%sLinking Shared Library %s==> %s$TARGET%s' % \
+   (colors['blue_bold'], colors['white_bold'], colors['blue_bold'], colors['end'])
+
+copy_message = '%sCopying %s $SOURCE %s ==> %s$TARGET%s' % \
+   (colors['yellow_bold'], colors["blue"],
+    colors['white_bold'], colors['blue'], colors['end'])
+
+color_env = Environment(
+  CXXCOMSTR = compile_source_message,
+  CCCOMSTR = compile_source_message,
+  SHCCCOMSTR = compile_shared_source_message,
+  SHCXXCOMSTR = compile_shared_source_message,
+  ARCOMSTR = link_library_message,
+  #RANLIBCOMSTR = ranlib_library_message,
+  SHLINKCOMSTR = link_shared_library_message,
+  LINKCOMSTR = link_program_message,
+  #JARCOMSTR = java_library_message,
+  #JAVACCOMSTR = compile_source_message
+  COPYSTR = copy_message
+)
+
+Export('color_env')
+

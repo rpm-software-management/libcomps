@@ -3,29 +3,116 @@ import json
 import os
 import os.path
 import sys
+SConscriptChdir(0)
+SCONS_ROOT = os.path.dirname((lambda x:x).func_code.co_filename)
 
+colors = SConscript(os.path.join(SCONS_ROOT, 'colors.scons'))
 
-env = Environment(CC = 'gcc',
-                  CCFLAGS = '-O2 --pedantic -Wall --std=c99 -Wextra ' +
-                            '-Wno-missing-field-initializers -fno-strict-aliasing -g',
-                  CPPPATH=["/usr/include/", "/usr/include/libxml2/"])
+CacheDir('./cache/')
+Decider('MD5')
 
-PROJECT_DIR = os.getcwd()
+Import("color_env")
 
-#env.VariantDir("build", "libcomps/src/")
+env = color_env.Clone(CC = 'gcc',
+                      CCFLAGS = '-O2 --pedantic -Wall --std=c99 -Wextra ' +
+                                '-Wno-missing-field-initializers'+
+                                ' -fno-strict-aliasing -g',
+                      CPPPATH=["/usr/include/", "/usr/include/libxml2/"])
 
+configure = SConscript(os.path.join(SCONS_ROOT, 'configure.scons'),
+                 exports=['env', "SCONS_ROOT"])
 
-libcomps = SConscript(os.path.join(PROJECT_DIR, 'scons/libcomps.scons'),
-                 exports=['env', "PROJECT_DIR"])
+Import("INSTALL_LIB_PATH", "INSTALL_LIB64_PATH", "INSTALL_BIN_PATH",
+       "INSTALL_SHARE_PATH", "INSTALL_INC_PATH", "INSTALL_USR_PATH")
 
-#libcomps_test = SConscript(os.path.join(PROJECT_DIR, 'scons/libcomps_tests.scons'),
-#                 exports=['env', "PROJECT_DIR"])
+libcomps_build = SConscript(os.path.join(SCONS_ROOT, 'libcomps.scons'),
+                 exports=['env', "SCONS_ROOT", #"LIBCOMPS_BUILD",
+                          "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
+                          "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
+                          "INSTALL_INC_PATH", "INSTALL_USR_PATH"],
+                 variant_dir=env["LIBCOMPS_BUILD"])
 
-libpycomps = SConscript(os.path.join(PROJECT_DIR, 'scons/libpycomps2.scons'),
-                 exports=['env', "PROJECT_DIR"])
+libcomps_test = SConscript(os.path.join(SCONS_ROOT, "libcomps_tests.scons"),
+                 exports=['env', "SCONS_ROOT", #"LIBCOMPS_TESTS",
+                          "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
+                          "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
+                          "INSTALL_INC_PATH", "INSTALL_USR_PATH"],
+                 variant_dir=env["LIBCOMPS_TESTS"])
 
-libpycomps = SConscript(os.path.join(PROJECT_DIR, 'scons/libpycomps3.scons'),
-                 exports=['env', "PROJECT_DIR"])
+libpycomps2_build = SConscript(os.path.join(SCONS_ROOT, 'libpycomps2.scons'),
+                 exports=['env', "SCONS_ROOT",
+                          "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
+                          "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
+                          "INSTALL_INC_PATH", "INSTALL_USR_PATH"],
+                 variant_dir=env["LIBPYCOMPS2_BUILD"])
 
-libpycomps = SConscript(os.path.join(PROJECT_DIR, 'scons/libpycomps_tests.scons'),
-                 exports=['env', "PROJECT_DIR"])
+libpycomps3_build = SConscript(os.path.join(SCONS_ROOT, 'libpycomps3.scons'),
+                 exports=['env', "SCONS_ROOT",
+                          "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
+                          "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
+                          "INSTALL_INC_PATH", "INSTALL_USR_PATH"],
+                 variant_dir=env["LIBPYCOMPS3_BUILD"])
+
+libpycomps_tests = SConscript(os.path.join(SCONS_ROOT, 'libpycomps_tests.scons'),
+                    exports=['env', "SCONS_ROOT", #"LIBPYCOMPS_TESTS",
+                          "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
+                          "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
+                          "INSTALL_INC_PATH", "INSTALL_USR_PATH"],
+                    variant_dir=env["LIBPYCOMPS_TESTS"])
+
+libcomps_docs = SConscript(os.path.join(SCONS_ROOT, 'libcomps_docs.scons'),
+                 exports=['env', "SCONS_ROOT",
+                          "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
+                          "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
+                          "INSTALL_INC_PATH"],
+                 variant_dir=env["LIBCOMPS_DOCS_BUILD"])
+
+libpycomps_docs = SConscript(os.path.join(SCONS_ROOT, 'libpycomps_docs.scons'),
+                  exports=['env', "SCONS_ROOT",
+                          "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
+                          "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
+                          "INSTALL_INC_PATH"],
+                  variant_dir=env["LIBPYCOMPS_DOCS_BUILD"])
+
+Import("libcomps", "libpycomps2", "libpycomps3", "ctests_run",
+       "pytests2_run", "pytests3_run")
+Import("libcomps_install", "libpycomps2_install", "libpycomps3_install",
+       "libcomps_docs_install", "libpycomps_docs_install")
+
+CMD_TARGETS = {"ALL": ["libcomps", "ctests_run",
+                       "libpycomps2", "pytests2_run",
+                       "libpycomps3", "pytests3_run",
+                       "libcomps-docs", "libpycomps-docs"],
+               "PYTHON2": ["libcomps", "ctests_run",
+                           "libpycomps2", "pytests2_run"],
+               "PYTHON3": ["libcomps", "ctests_run",
+                           "libpycomps3", "pytests3_run"],
+               "DOCS": ["libcomps-docs", "libpycomps-docs"],
+               "LIBCOMPS": ["libcomps", "ctests_run"],
+               "INSTALL": [],
+            }
+INSTALL_TGTS = {"libcomps": libcomps_install,
+                "libpycomps2": libpycomps2_install,
+                "libpycomps3": libpycomps3_install,
+                "libcomps-docs": libcomps_docs_install,
+                "libpycomps-docs": libpycomps_docs_install,
+                }
+
+for key, val in CMD_TARGETS.iteritems():
+    env.Alias(key, val)
+
+def_tgts = set()
+for x in COMMAND_LINE_TARGETS:
+    if x in CMD_TARGETS:
+        def_tgts.update(CMD_TARGETS[x])
+
+for x in def_tgts:
+    Default(x)
+
+install_tgts = []
+if "INSTALL" in COMMAND_LINE_TARGETS:
+    for x in list(def_tgts):
+        if x in INSTALL_TGTS:
+            install_tgts.append(INSTALL_TGTS[x])
+            Default(INSTALL_TGTS[x])
+    env.Alias("INSTALL", install_tgts)
