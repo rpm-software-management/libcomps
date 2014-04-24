@@ -27,9 +27,9 @@ PYCOMPS_SRCS = """pycomps.c pycomps_sequence.c pycomps_envs.c
 local_env = env.Clone(CCFLAGS = '-O2 --pedantic -Wall --std=c99 -Wextra ' +\
                             '-Wno-missing-field-initializers ' +\
                             '-fno-strict-aliasing -g',
-                      LIBS = [env["PYTHON2_LIBNAME"], env["LIBS"], "comps"],
+                      LIBS = [env["PYTHON2_LIB"], env.get("LIBS"), "comps"],
                       LIBPATH = [env["PYTHON2_LIBPATH"], libcomps_path],
-                      CPPPATH = [env["PYTHON2_CPPPATH"], env["CPPPATH"],
+                      CPPPATH = [env["PYTHON2_INCPATH"], env["CPPPATH"],
                                  libcomps_include_path])
 
 local_env.VariantDir(PATH_TO_TGTS , PATH_TO_SRCS, duplicate=0)

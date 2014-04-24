@@ -1,0 +1,93 @@
+# vim: set ft=python:
+import sys
+import subprocess
+import shlex
+import string
+import json
+import os.path
+Import("env", "color_env", "SCONS_ROOT")
+
+def check_python(conf, major):
+    code ="import distutils;"+\
+          "import distutils.sysconfig as sysconfig;"+\
+          "import json;"+\
+          "LDVERSION = sysconfig.get_config_var('LDVERSION');"+\
+          "VERSION = sysconfig.get_config_var('VERSION');"+\
+          "VERSION = LDVERSION if LDVERSION else VERSION;"+\
+          "obj = {'PYTHON${MAJOR}_VERSION': sysconfig.get_python_version(),"+\
+                 "'PYTHON${MAJOR}_INCPATH': sysconfig.get_python_inc(),"+\
+                 "'PYTHON${MAJOR}_LIBPATH': sysconfig.get_config_var('LIBDEST'),"+\
+                 "'PYTHON${MAJOR}_LIB': 'python' + VERSION};"+\
+          "print(json.dumps(obj));"
+    tmpl = string.Template(code)
+    code = tmpl.substitute({"MAJOR": major})
+    conf.Message("Checking for python%d" % major)
+    command = "python%d -c \"%s\"" % (major, code)
+    args = shlex.split(command)
+    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p.wait()
+    if p.returncode:
+        print >> sys.stderr, p.stderr.read()
+        conf.Result("no")
+    pyconf = json.loads(p.stdout.read())
+    for k,v in pyconf.iteritems():
+        conf.env[k] = v
+    conf.Result("yes")
+
+
+LIBS_NEEDED = ["libxml2", "expat"]
+PROJECT_NAME = "libcomps"
+INSTALL_LIB_PATH = "$PREFIX/lib"
+INSTALL_LIB32_PATH = "$PREFIX/lib"
+INSTALL_LIB64_PATH = "$PREFIX/lib64"
+INSTALL_INC_PATH = "$PREFIX/include"
+INSTALL_BIN_PATH = "$PREFIX/bin"
+INSTALL_SHARE_PATH = "$PREFIX/share"
+
+env["PROJECT_NAME"] = PROJECT_NAME
+env["LIBCOMPS_BUILD"] = "libcomps-build"
+env["LIBPYCOMPS2_BUILD"] = "libpycomps2-build"
+env["LIBPYCOMPS3_BUILD"] = "libpycomps3-build"
+env["LIBCOMPS_DOCS_BUILD"] = "libcomps-doc-build"
+env["LIBPYCOMPS_DOCS_BUILD"] = "libpycomps-doc-build"
+env["LIBCOMPS_TESTS"] = "libcomps-tests"
+env["LIBPYCOMPS_TESTS"] = "libpycomps-tests"
+
+cache = CacheDir('./cache/')
+opts = Variables('%s.conf' % PROJECT_NAME)
+opts.Add(PathVariable('PREFIX', 'Directory to install under',
+                      '/usr', PathVariable.PathIsDir))
+opts.Update(env)
+opts.Save("%s.conf" % PROJECT_NAME, env)
+
+DISTCLEAN = ["cache", "%s.conf" % PROJECT_NAME, ".sconsign.dblite",
+                                                  ".sconf_temp"]
+Clean("distclean", DISTCLEAN)
+
+f = open(os.path.join(SCONS_ROOT, "../version.json"))
+version = json.load(f)
+f.close()
+for k,v in version.iteritems():
+    env[k] = v
+
+conf = Configure(env, custom_tests={"check_python": check_python})
+conf.check_python(2)
+conf.check_python(3)
+
+if not env.GetOption('clean'):
+    err = 0
+    if not conf.CheckCXX():
+        print('!! Your compiler and/or environment is not correctly configured.')
+        err = 1
+    for x in LIBS_NEEDED:
+        if not conf.CheckLib(x):
+            print >> sys.stderr ,"You need %s to compile %s" % (x, PROJECT_NAME)
+            err = 1
+    if err:
+       Exit(1)
+
+    env = conf.Finish()
+
+Export("PROJECT_NAME", "INSTALL_LIB_PATH", "INSTALL_LIB32_PATH",
+       "INSTALL_LIB64_PATH", "INSTALL_INC_PATH", "INSTALL_BIN_PATH",
+       "INSTALL_SHARE_PATH")

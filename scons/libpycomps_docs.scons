@@ -9,7 +9,7 @@ Import("SCONS_ROOT", "env", "libcomps", "libpycomps2", "libcomps_include_path",
        "libcomps_path",
        "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
        "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
-       "INSTALL_INC_PATH", "INSTALL_USR_PATH")
+       "INSTALL_INC_PATH")
 
 local_env = Environment()
 
@@ -38,9 +38,11 @@ f2.write(_str)
 #print "SCONS_ROOT", SCONS_ROOT
 doc = local_env.Command("pydocs", os.path.join(SCONS_ROOT,
                                "../libcomps/src/python/docs/doc-sources/"),
-                        "sphinx-build -E -b html $SOURCE libpycomps-docs")
+            "sphinx-build -E -b html $SOURCE %s" % env["LIBPYCOMPS_DOCS_BUILD"])
 
-libpycomps_docs_install = local_env.Install(INSTALL_USR_PATH, doc)
+libpycomps_docs_install = local_env.Install(os.path.join(INSTALL_SHARE_PATH,
+                                                         env["PROJECT_NAME"],
+                                                         "python"), doc)
 
 #local_env.Depends(libipycomps_doc_install, doc)
 

@@ -16,7 +16,10 @@ libcomps_VERSION_PATCH = env["libcomps_VERSION_PATCH"]
 
 local_env = env.Clone()
 
-local_env.VariantDir("build_libcomps",
+TGTS_DIR = "os_files"
+TGTS_DIR_FORM = "os_files/%s"
+
+local_env.VariantDir(TGTS_DIR,
                      os.path.join(SCONS_ROOT, "../libcomps/src/"), duplicate=0)
 
 comps_files = """ comps_doc.c comps_docgroup.c comps_doccategory.c
@@ -31,7 +34,7 @@ comps_files = """ comps_doc.c comps_docgroup.c comps_doccategory.c
                   comps_log_codes.c
                   comps_types.c
 """
-comps_files_fullp = ["build_libcomps/%s" % x for x in comps_files.split() if x]
+comps_files_fullp = [TGTS_DIR_FORM % x for x in comps_files.split() if x]
 libcomps_include_path = os.path.abspath(os.path.join(SCONS_ROOT,
                                                      "../libcomps/src/"))
 

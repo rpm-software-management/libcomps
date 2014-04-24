@@ -1,0 +1,33 @@
+/** \page libcomps_objs Libcomps objects
+ Libcomps object-like reprensentation is covered in COMPS_Doc COMPS_Object
+ derivate.
+ COMPS_Doc contains all parts of comps.xml document accesible
+ through comps_doc getters and setters
+ @see comps_obj.h
+
+
+ COMPS_Doc object contain theese sub-objects representing part of comps.xml documents
+
+ - categories accesible through:
+    -# comps_doc_categories
+    -# comps_doc_set_categories
+    -# comps_doc_add_category 
+    @see COMPS_DocCategory
+
+ - groups accesible through:
+    -# comps_doc_groups
+    -# comps_doc_set_groups
+    -# comps_doc_add_group 
+    @see COMPS_DocGroup
+
+ - environments accesible through:
+    -# comps_doc_environments
+    -# comps_doc_set_environments
+    -# comps_doc_add_environment 
+    @see COMPS_DocEnvironment
+
+ categories, groups and environments are COMPS_ObjList objects
+ @see COMPS_ObjList @see comps_doc.h
+
+
+*/

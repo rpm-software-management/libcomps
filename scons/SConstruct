@@ -8,7 +8,7 @@ SCONS_ROOT = os.path.dirname((lambda x:x).func_code.co_filename)
 
 colors = SConscript(os.path.join(SCONS_ROOT, 'colors.scons'))
 
-CacheDir('./cache/')
+#CacheDir('./cache/')
 Decider('MD5')
 
 Import("color_env")
@@ -17,48 +17,54 @@ env = color_env.Clone(CC = 'gcc',
                       CCFLAGS = '-O2 --pedantic -Wall --std=c99 -Wextra ' +
                                 '-Wno-missing-field-initializers'+
                                 ' -fno-strict-aliasing -g',
-                      CPPPATH=["/usr/include/", "/usr/include/libxml2/"])
+                      CPPPATH=["/usr/include/", "/usr/include/libxml2/"],
+                      tools=["textfile"])
 
 configure = SConscript(os.path.join(SCONS_ROOT, 'configure.scons'),
                  exports=['env', "SCONS_ROOT"])
 
 Import("INSTALL_LIB_PATH", "INSTALL_LIB64_PATH", "INSTALL_BIN_PATH",
-       "INSTALL_SHARE_PATH", "INSTALL_INC_PATH", "INSTALL_USR_PATH")
+       "INSTALL_SHARE_PATH", "INSTALL_INC_PATH")
 
 libcomps_build = SConscript(os.path.join(SCONS_ROOT, 'libcomps.scons'),
                  exports=['env', "SCONS_ROOT", #"LIBCOMPS_BUILD",
                           "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
                           "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
-                          "INSTALL_INC_PATH", "INSTALL_USR_PATH"],
+                          "INSTALL_INC_PATH"],
                  variant_dir=env["LIBCOMPS_BUILD"])
+Clean(".", env["LIBCOMPS_BUILD"])
 
 libcomps_test = SConscript(os.path.join(SCONS_ROOT, "libcomps_tests.scons"),
                  exports=['env', "SCONS_ROOT", #"LIBCOMPS_TESTS",
                           "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
                           "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
-                          "INSTALL_INC_PATH", "INSTALL_USR_PATH"],
+                          "INSTALL_INC_PATH"],
                  variant_dir=env["LIBCOMPS_TESTS"])
+Clean(".", env["LIBCOMPS_TESTS"])
 
 libpycomps2_build = SConscript(os.path.join(SCONS_ROOT, 'libpycomps2.scons'),
                  exports=['env', "SCONS_ROOT",
                           "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
                           "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
-                          "INSTALL_INC_PATH", "INSTALL_USR_PATH"],
+                          "INSTALL_INC_PATH"],
                  variant_dir=env["LIBPYCOMPS2_BUILD"])
+Clean(".", env["LIBPYCOMPS2_BUILD"])
 
 libpycomps3_build = SConscript(os.path.join(SCONS_ROOT, 'libpycomps3.scons'),
                  exports=['env', "SCONS_ROOT",
                           "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
                           "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
-                          "INSTALL_INC_PATH", "INSTALL_USR_PATH"],
+                          "INSTALL_INC_PATH"],
                  variant_dir=env["LIBPYCOMPS3_BUILD"])
+Clean(".", env["LIBPYCOMPS3_BUILD"])
 
 libpycomps_tests = SConscript(os.path.join(SCONS_ROOT, 'libpycomps_tests.scons'),
                     exports=['env', "SCONS_ROOT", #"LIBPYCOMPS_TESTS",
                           "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
                           "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
-                          "INSTALL_INC_PATH", "INSTALL_USR_PATH"],
+                          "INSTALL_INC_PATH"],
                     variant_dir=env["LIBPYCOMPS_TESTS"])
+Clean(".", env["LIBPYCOMPS_TESTS"])
 
 libcomps_docs = SConscript(os.path.join(SCONS_ROOT, 'libcomps_docs.scons'),
                  exports=['env', "SCONS_ROOT",
@@ -66,6 +72,7 @@ libcomps_docs = SConscript(os.path.join(SCONS_ROOT, 'libcomps_docs.scons'),
                           "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
                           "INSTALL_INC_PATH"],
                  variant_dir=env["LIBCOMPS_DOCS_BUILD"])
+Clean(".", env["LIBCOMPS_DOCS_BUILD"])
 
 libpycomps_docs = SConscript(os.path.join(SCONS_ROOT, 'libpycomps_docs.scons'),
                   exports=['env', "SCONS_ROOT",
@@ -73,6 +80,7 @@ libpycomps_docs = SConscript(os.path.join(SCONS_ROOT, 'libpycomps_docs.scons'),
                           "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
                           "INSTALL_INC_PATH"],
                   variant_dir=env["LIBPYCOMPS_DOCS_BUILD"])
+Clean(".", env["LIBPYCOMPS_DOCS_BUILD"])
 
 Import("libcomps", "libpycomps2", "libpycomps3", "ctests_run",
        "pytests2_run", "pytests3_run")
@@ -82,12 +90,12 @@ Import("libcomps_install", "libpycomps2_install", "libpycomps3_install",
 CMD_TARGETS = {"ALL": ["libcomps", "ctests_run",
                        "libpycomps2", "pytests2_run",
                        "libpycomps3", "pytests3_run",
-                       "libcomps-docs", "libpycomps-docs"],
+                       "libcomps_docs", "libpycomps_docs"],
                "PYTHON2": ["libcomps", "ctests_run",
                            "libpycomps2", "pytests2_run"],
                "PYTHON3": ["libcomps", "ctests_run",
                            "libpycomps3", "pytests3_run"],
-               "DOCS": ["libcomps-docs", "libpycomps-docs"],
+               "DOCS": ["libcomps_docs", "libpycomps_docs"],
                "LIBCOMPS": ["libcomps", "ctests_run"],
                "INSTALL": [],
             }

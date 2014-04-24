@@ -15,8 +15,8 @@ Import("SCONS_ROOT", "color_env", "env",
 FORM_PATH_TO_SRCS = os.path.join(SCONS_ROOT, "../libcomps/src/python/src/%s")
 PATH_TO_SRCS = os.path.join(SCONS_ROOT, "../libcomps/src/python/src/")
 
-FORM_PATH_TO_TGTS = "build_libpycomps2/%s.os"
-PATH_TO_TGTS = "build_libpycomps2"
+FORM_PATH_TO_TGTS = "os_files/%s.os"
+PATH_TO_TGTS = "os_files"
 
 PYCOMPS_SRCS = """pycomps.c pycomps_sequence.c pycomps_envs.c
                    pycomps_categories.c pycomps_groups.c pycomps_gids.c
@@ -27,9 +27,9 @@ PYCOMPS_SRCS = """pycomps.c pycomps_sequence.c pycomps_envs.c
 local_env = env.Clone(CCFLAGS = '-O2 --pedantic -Wall --std=c99 -Wextra ' +\
                             '-Wno-missing-field-initializers ' +\
                             '-fno-strict-aliasing -g',
-                      LIBS = [env["PYTHON3_LIBNAME"], env["LIBS"], "comps"],
+                      LIBS = [env["PYTHON3_LIB"], env.get("LIBS"), "comps"],
                       LIBPATH = [env["PYTHON3_LIBPATH"], libcomps_path],
-                      CPPPATH = [env["PYTHON3_CPPPATH"], env["CPPPATH"],
+                      CPPPATH = [env["PYTHON3_INCPATH"], env["CPPPATH"],
                                  libcomps_include_path])
 
 local_env.VariantDir(PATH_TO_TGTS , PATH_TO_SRCS, duplicate=0)
