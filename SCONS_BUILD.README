@@ -1,0 +1,37 @@
+HOWTO BUILD LIBCOMPS WITH SCONS
+
+
+$ mkdir <your_favorite_build_directory_name>
+$ cd <your_favorite_build_directory_name>
+
+How to build all the stuff:
+
+$ <path_to_scons_build.sh>/scons_build.sh
+
+Stackable build targets can be build like this:
+
+- build only c libcomps library:
+$ <path_to_scons_build.sh>/scons_build.sh LIBCOMPS
+
+- and also want to run tests for it:
+$ <path_to_scons_build.sh>/scons_build.sh LIBCOMPS TESTS
+
+- build libcomps c library and python2 library:
+- (LIBCOMPS target doesn't have to be explicitly specifed due python libcomps
+   library depends on it)
+$ <path_to_scons_build.sh>/scons_build.sh PYTHON2
+
+- build libcomps c library and python3 library:
+$ <path_to_scons_build.sh>/scons_build.sh PYTHON3
+
+- build libcomps docs:
+$ <path_to_scons_build.sh>/scons_build.sh DOCS
+
+To clean all build stuff run this:
+$ <path_to_scons_build.sh>/scons_build.sh -c
+
+If you want clean only specified target, add TARGET after '-c'. Like this:
+$ <path_to_scons_build.sh>/scons_build.sh -c PYTHON
+
+!! Notice that cleaning specied target cleans only that target and dependencies of
+it will remain untouched.
