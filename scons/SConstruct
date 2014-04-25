@@ -83,39 +83,55 @@ libpycomps_docs = SConscript(os.path.join(SCONS_ROOT, 'libpycomps_docs.scons'),
 Clean(".", env["LIBPYCOMPS_DOCS_BUILD"])
 
 Import("libcomps", "libpycomps2", "libpycomps3", "ctests_run",
-       "pytests2_run", "pytests3_run")
+       "pytests2_run", "pytests3_run", "libcomps_docs_tgt",
+       "libpycomps_docs_tgt")
 Import("libcomps_install", "libpycomps2_install", "libpycomps3_install",
-       "libcomps_docs_install", "libpycomps_docs_install")
+       "libcomps_docs_install_tgt", "libpycomps_docs_install_tgt")
+print libcomps_docs_tgt
 
 CMD_TARGETS = {"ALL": ["libcomps", "ctests_run",
                        "libpycomps2", "pytests2_run",
                        "libpycomps3", "pytests3_run",
-                       "libcomps_docs", "libpycomps_docs"],
+                       "libcomps_docs_tgt", "libpycomps_docs_tgt"],
                "PYTHON2": ["libcomps", "ctests_run",
                            "libpycomps2", "pytests2_run"],
                "PYTHON3": ["libcomps", "ctests_run",
                            "libpycomps3", "pytests3_run"],
-               "DOCS": ["libcomps_docs", "libpycomps_docs"],
+               "DOCS": ["libcomps_docs_tgt", "libpycomps_docs_tgt"],
                "LIBCOMPS": ["libcomps", "ctests_run"],
                "INSTALL": [],
             }
+
+CLEAN_TARGETS = {"ctests_run": env["LIBCOMPS_TESTS"],
+                 "libcomps": env["LIBCOMPS_BUILD"],
+                 "pytests2_run": env["LIBPYCOMPS_TESTS"],
+                 "pytests3_run": env["LIBPYCOMPS_TESTS"],
+                 "libpycomps2": env["LIBPYCOMPS2_BUILD"],
+                 "libpycomps3": env["LIBPYCOMPS3_BUILD"],
+                 "libcomps_docs_tgt": env["LIBCOMPS_DOCS_BUILD"],
+                 "libpycomps_docs_tgt": env["LIBPYCOMPS_DOCS_BUILD"]
+                }
+
 INSTALL_TGTS = {"libcomps": libcomps_install,
                 "libpycomps2": libpycomps2_install,
                 "libpycomps3": libpycomps3_install,
-                "libcomps-docs": libcomps_docs_install,
-                "libpycomps-docs": libpycomps_docs_install,
+                "libcomps-docs": libcomps_docs_install_tgt,
+                "libpycomps-docs": libpycomps_docs_install_tgt,
                 }
 
 for key, val in CMD_TARGETS.iteritems():
     env.Alias(key, val)
 
+env.Alias('dist-clean', "ALL")
+
 def_tgts = set()
 for x in COMMAND_LINE_TARGETS:
     if x in CMD_TARGETS:
         def_tgts.update(CMD_TARGETS[x])
-
 for x in def_tgts:
     Default(x)
+for x in def_tgts:
+    Clean(x, CLEAN_TARGETS[x])
 
 install_tgts = []
 if "INSTALL" in COMMAND_LINE_TARGETS:

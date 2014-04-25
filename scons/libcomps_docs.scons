@@ -1,56 +1,17 @@
 # vim: set ft=python:
 import os
+import os.path
 import glob
 import shutil
 import sys
 import string
-
-
-def decide_if_changed(dependency, target, prev_ni):
-    if dependency.get_timestamp() != prev_ni.timestamp:
-        dep = str(dependency)
-        tgt = str(target)
-        if specific_part_of_file_has_changed(dep, tgt):
-            print "-- %s CHANGED --" % dependecy
-            return True
-    print "-- %s NOT CHANGED --" % dependency
-    return False
-#Decider(decide_if_changed)
-
-class MyTemplate(string.Template):
-    idpattern = "\@[_a-z][_a-z0-9.]*\@"
-    def __init__(self, *args, **kwargs):
-        super(MyTemplate, self).__init__(*args, **kwargs)
-        #self.idpattern = re.compile("[_a-z][_a-z0-9.]*")
-
-def substitute(env, target, source, subs={}):
-    print "----Runnning substitution----"
-    print source[0].changed()
-    if not source[0].changed() and target[0].exists():
-        return None
-    print "modified source"
-    f = open(source[0].path)
-    tmpl = MyTemplate(f.read())
-    _str = tmpl.substitute(subs)
-    f2 = open(target[0].path, "w")
-    f2.write(_str)
-    f2.close()
-    return None
 
 Import("SCONS_ROOT", "env", "libcomps", "libcomps_include_path",
        "INSTALL_LIB_PATH", "INSTALL_LIB64_PATH",
        "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
        "INSTALL_INC_PATH")
 
-substitute_builder = Builder(action=substitute)
-
-local_env = Environment(BUILDERS={"substitute": substitute_builder},
-                        tools=["textfile"])
-#Decider(decide_if_changed)
-#local_env.Decider("timestamp-newer")
-#import pprint
-#pprint.pprint(env._dict)
-
+local_env = Environment(tools=["textfile"])
 
 subs = {"@PROJECT_SOURCE_DIR@": os.path.join(SCONS_ROOT, "../libcomps"),
         "@libcomps_MAJOR_VERSION@": env["libcomps_VERSION_MAJOR"],
@@ -60,32 +21,19 @@ subs = {"@PROJECT_SOURCE_DIR@": os.path.join(SCONS_ROOT, "../libcomps"),
         "@DOC_OUTPUT@": env["LIBCOMPS_DOCS_BUILD"]}
 
 local_env.Alias('libcomps', libcomps)
-#sbs = local_env.Substfile(os.path.join("doxyfile.user"),
-#                os.path.join(SCONS_ROOT, "../libcomps/docs/Doxyfile.user.in"),
-#                SUBST_DICT = subs)
-                
-#sbs = local_env.Command()
-sbs = local_env.substitute(os.path.join("doxyfile.user"),
-                    os.path.join(SCONS_ROOT, "../libcomps/docs/Doxyfile.user.in"),
-                    subs=subs)
+sbs = local_env.Substfile(os.path.join("doxyfile.user"),
+                os.path.join(SCONS_ROOT, "../libcomps/docs/Doxyfile.user.in"),
+                SUBST_DICT = subs)
+env.Precious(sbs)
 
-#f = open(os.path.join(SCONS_ROOT, "../libcomps/docs/Doxyfile.user.in"))
-#tmpl = string.Template(f.read())
-#_str = tmpl.safe_substitute({"PROJECT_SOURCE_DIR": os.path.join(SCONS_ROOT, "../libcomps"),
-#                       "libcomps_MAJOR_VERSION": env["libcomps_VERSION_MAJOR"],
-#                       "libcomps_RELEASE": env["libcomps_RELEASE"],
-#                       "libcomps_MINOR_VERSION": env["libcomps_VERSION_MINOR"],
-#                       "libcomps_PATCH_VERSION": env["libcomps_VERSION_PATCH"],
-#                       "DOC_OUTPUT": env["LIBCOMPS_DOCS_BUILD"]})
-#
-#f2 = open(os.path.join(SCONS_ROOT,"doxyfile.user"), "w")
-#f2.write(_str)
-
-doc = local_env.Command("docs", "doxyfile.user",
+libcomps_docs_tgt = local_env.Command("docs", "doxyfile.user",
                         "doxygen $SOURCE")
-local_env.Depends(doc, sbs)
+local_env.Depends(libcomps_docs_tgt, sbs)
 
-libcomps_docs_install = local_env.Install(os.path.join(INSTALL_SHARE_PATH,
-                                                       env["PROJECT_NAME"]),doc)
+libcomps_docs_install_tgt = local_env.Install(os.path.join(INSTALL_SHARE_PATH,
+                                                       env["PROJECT_NAME"]),sbs)
 
-local_env.Export("libcomps_docs_install")
+local_env.Alias("libcomps_docs_tgt", libcomps_docs_tgt)
+local_env.Alias("libcomps_docs_install_tgt", libcomps_docs_install_tgt)
+local_env.Export("libcomps_docs_install_tgt")
+local_env.Export("libcomps_docs_tgt")

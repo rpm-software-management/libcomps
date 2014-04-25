@@ -6,12 +6,8 @@ import shutil
 import sys
 
 Import("SCONS_ROOT", "env", "libcomps", "libcomps_include_path", "libcomps_path")
-       #"LIBCOMPS_TESTS")
 
 local_env = env.Clone(CPP_PATH=[libcomps_include_path])
-
-#import pprint
-#pprint.pprint(local_env._dict)
 
 local_env.Alias('libcomps', libcomps)
 
@@ -19,12 +15,12 @@ c_tests_path = "build_tests"
 local_env.VariantDir(c_tests_path,
                      os.path.join(SCONS_ROOT,"../libcomps/tests/"), duplicate=0)
 
-c_tests = {"testobjrtree": {"files": "check_objrtree.c check_utils.c",
-                             "libs": ["comps", "check"]},
-           "testrtree": {"files":  "check_rtree.c check_utils.c",
-                         "libs": ["comps", "check"]},
-           "testbrtree": {"files": "check_brtree.c check_utils.c",
-                          "libs": ["comps", "check"]},
+c_tests = {#"testobjrtree": {"files": "check_objrtree.c check_utils.c",
+           #                  "libs": ["comps", "check"]},
+           #"testrtree": {"files":  "check_rtree.c check_utils.c",
+           #              "libs": ["comps", "check"]},
+           #"testbrtree": {"files": "check_brtree.c check_utils.c",
+           #               "libs": ["comps", "check"]},
            "testparse": {"files": "check_parse.c check_utils.c",
                          "libs": ["comps", "expat", "check"]},
            "testcomps": {"files": "check_comps.c",
@@ -33,10 +29,8 @@ c_tests = {"testobjrtree": {"files": "check_objrtree.c check_utils.c",
                             "libs": ["comps", "check"]}
             }
 
-print "LIBCOMPS_PATH", libcomps_path
 run_env = local_env.Clone()
 run_env.PrependENVPath('LD_LIBRARY_PATH', libcomps_path)
-#run_env.PrependENVPath('PYTHON_PATH', os.path.dirname(libcomps.data[0].abspath))
 
 test_files = glob.glob(os.path.join(SCONS_ROOT, "../libcomps/tests/*.xml")) +\
              glob.glob(os.path.join(SCONS_ROOT, "../libcomps/tests/*.dtd")) +\
@@ -67,7 +61,6 @@ for target, values in c_tests.iteritems():
                                           LIBS=values["libs"],
                                           LIBPATH=[libcomps_path])
     local_env.Depends(tests[-1]["out"], libcomps)
-    #local_env.Depends(tests[-1]["out"], test_files_target)
 
     tests[-1]["run"] = run_env.Command("run_%s" % tests[-1]["out"][0].path,
                                        [tests[-1]["out"]],
@@ -75,10 +68,8 @@ for target, values in c_tests.iteritems():
                                        chdir=os.path.join(env["LIBCOMPS_TESTS"],
                                                           test_files_target))
     local_env.Depends(tests[-1]["run"], test_files_target)
-    local_env.AlwaysBuild(tests[-1]["run"])
 
     local_env.Alias("run_%s" % target, tests[-1]["run"])
-    #local_env.Depends("run_%s" % target, "ctests_copy")
     local_env.Depends("ctests_run", "run_%s" % target)
 
 ctests_run = [x["run"] for x in tests]

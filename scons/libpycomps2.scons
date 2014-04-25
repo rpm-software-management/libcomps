@@ -40,13 +40,13 @@ for x in PYCOMPS_SRCS.split():
     if x:
         pycomps_files_targets.append(FORM_PATH_TO_TGTS % x.split(".")[0])
 
-pycopy2 = env.CopyAs(os.path.join("_libpycomps", "__init__.py"),
+pycopy2 = env.CopyAs(os.path.join("libcomps", "__init__.py"),
                       os.path.join(SCONS_ROOT, "__init__.py"))
 
 for t,s in zip(pycomps_files_targets, pycomps_files_fullp):
     so = local_env.SharedObject(t, s)
 
-libpycomps2 = local_env.SharedLibrary(os.path.join("_libpycomps", "_libpycomps"),
+libpycomps2 = local_env.SharedLibrary(os.path.join("libcomps", "_libpycomps"),
                          pycomps_files_targets,
                         SHLIBPREFIX="")
 

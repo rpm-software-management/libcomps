@@ -11,42 +11,73 @@ Import("SCONS_ROOT", "env", "libcomps", "libpycomps2", "libcomps_include_path",
        "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
        "INSTALL_INC_PATH")
 
-local_env = Environment()
+local_env = Environment(tools=["textfile"],
+        ENV={"LD_LIBRARY_PATH": [libcomps_path]})
 
 local_env.Alias('libcomps2', libcomps)
 
-f = open(os.path.join(SCONS_ROOT,
-                      "../libcomps/src/python/docs/doc-sources/conf.py.in"))
-tmpl = string.Template(f.read())
-_str = tmpl.safe_substitute({"PROJECT_SOURCE_DIR": os.path.join(SCONS_ROOT,
-                                                                "../libcomps"),
-                       "libcomps_MAJOR_VERSION":env["libcomps_VERSION_MAJOR"],
-                       "libcomps_RELEASE":env["libcomps_RELEASE"],
-                       "libcomps_MINOR_VERSION": env["libcomps_VERSION_MINOR"],
-                       "libcomps_PATCH_VERSION": env["libcomps_VERSION_PATCH"],
-                       "VERSION": "%s.%s.%s" % (env["libcomps_VERSION_MAJOR"],
-                                                env["libcomps_VERSION_MINOR"],
-                                                env["libcomps_VERSION_PATCH"]),
-                        "LIBCOMPS_OUT": libcomps_path,
-                        "PYCOMPS_LIB_PATH": libpycomps2.data[0].abspath,
-                        "CMAKE_PROJECT_NAME": env["PROJECT_NAME"]})
+subs = {"@PROJECT_SOURCE_DIR@": os.path.join(SCONS_ROOT, "../libcomps"),
+        "@libcomps_MAJOR_VERSION@":env["libcomps_VERSION_MAJOR"],
+        "@libcomps_RELEASE@":env["libcomps_RELEASE"],
+        "@libcomps_MINOR_VERSION@": env["libcomps_VERSION_MINOR"],
+        "@libcomps_PATCH_VERSION@": env["libcomps_VERSION_PATCH"],
+        "@VERSION@": "%s.%s.%s" % (env["libcomps_VERSION_MAJOR"],
+                                env["libcomps_VERSION_MINOR"],
+                                env["libcomps_VERSION_PATCH"]),
+        "@LIBCOMPS_OUT@": libcomps_path,
+        "@PYCOMPS_LIB_PATH@": os.path.dirname(libpycomps2.data[0].abspath),
+        "@CMAKE_PROJECT_NAME@": env["PROJECT_NAME"]}
 
-f2 = open(os.path.join(SCONS_ROOT,
-                       "../libcomps/src/python/docs/doc-sources/conf.py.in"),
-                      "w")
-f2.write(_str)
-#print "SCONS_ROOT", SCONS_ROOT
-doc = local_env.Command("pydocs", os.path.join(SCONS_ROOT,
+local_env.Alias('libcomps', libcomps)
+local_env.Alias('libpycomps2', libpycomps2)
+
+sbs = local_env.Substfile(
+                os.path.join(SCONS_ROOT,
+                          "../libcomps/src/python/docs/doc-sources/conf.py"),
+                os.path.join(SCONS_ROOT,
+                          "../libcomps/src/python/docs/doc-sources/conf.py.in"),
+                SUBST_DICT = subs)
+env.Precious(sbs)
+
+#f = open(os.path.join(SCONS_ROOT,
+#                      "../libcomps/src/python/docs/doc-sources/conf.py.in"))
+#tmpl = string.Template(f.read())
+#_str = tmpl.safe_substitute({"PROJECT_SOURCE_DIR": os.path.join(SCONS_ROOT,
+#                                                                "../libcomps"),
+#                       "libcomps_MAJOR_VERSION":env["libcomps_VERSION_MAJOR"],
+#                       "libcomps_RELEASE":env["libcomps_RELEASE"],
+#                       "libcomps_MINOR_VERSION": env["libcomps_VERSION_MINOR"],
+#                       "libcomps_PATCH_VERSION": env["libcomps_VERSION_PATCH"],
+#                       "VERSION": "%s.%s.%s" % (env["libcomps_VERSION_MAJOR"],
+#                                                env["libcomps_VERSION_MINOR"],
+#                                                env["libcomps_VERSION_PATCH"]),
+#                        "LIBCOMPS_OUT": libcomps_path,
+#                        "PYCOMPS_LIB_PATH": libpycomps2.data[0].abspath,
+#                        "CMAKE_PROJECT_NAME": env["PROJECT_NAME"]})
+#
+#f2 = open(os.path.join(SCONS_ROOT,
+#                       "../libcomps/src/python/docs/doc-sources/conf.py.in"),
+ #                     "w")
+#f2.write(_str)
+PPATH = os.sep.join(os.path.dirname(libpycomps2.data[0].abspath).split(os.sep)[:-1])
+
+libpycomps_docs_tgt = local_env.Command("pydocs", os.path.join(SCONS_ROOT,
                                "../libcomps/src/python/docs/doc-sources/"),
-            "sphinx-build -E -b html $SOURCE %s" % env["LIBPYCOMPS_DOCS_BUILD"])
+    "(export PYTHONPATH=$PYTHONPATH:%s/; sphinx-build -E -b html $SOURCE %s)" %\
+            (str(PPATH), env["LIBPYCOMPS_DOCS_BUILD"]))
 
-libpycomps_docs_install = local_env.Install(os.path.join(INSTALL_SHARE_PATH,
+local_env.Alias("libpycomps_docs_tgt", libpycomps_docs_tgt)
+
+libpycomps_docs_install_tgt = local_env.Install(os.path.join(INSTALL_SHARE_PATH,
                                                          env["PROJECT_NAME"],
-                                                         "python"), doc)
+                                                         "python"),
+                                                libpycomps_docs_tgt)
+local_env.Alias(libpycomps_docs_install_tgt, "libpycomps_docs_install_tgt")
 
-#local_env.Depends(libipycomps_doc_install, doc)
+local_env.Depends(libpycomps_docs_install_tgt, libpycomps_docs_tgt)
 
-local_env.Export("libpycomps_docs_install")
+local_env.Export("libpycomps_docs_tgt")
+local_env.Export("libpycomps_docs_install_tgt")
 
-local_env.Depends("pydocs", libpycomps2)
-local_env.Depends("pydocs", libcomps)
+local_env.Depends(libpycomps_docs_tgt, libpycomps2)
+local_env.Depends(libpycomps_docs_tgt, libcomps)

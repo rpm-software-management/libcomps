@@ -49,9 +49,6 @@ for test in TESTS.split():
         "(export PYTHONPATH=$PYTHONPATH:%s/; python2 $SOURCE)" % (str(PPATH)),
         chdir=os.path.join(SCONS_ROOT, TESTS_DIR)))
     pytests2_env.Depends(tests2[-1], libpycomps2)
-    #pytests2_env.Depends("pytests2_run", tests2[-1])
-
-#AlwaysBuild("pytests2_run")
 
 PPATH = os.sep.join(os.path.dirname(libpycomps3.data[0].abspath).split(os.sep)[:-1])
 
@@ -63,9 +60,6 @@ for test in TESTS.split():
         "(export PYTHONPATH=$PYTHONPATH:%s/; python3 %s)" % (str(PPATH), test),
         chdir=os.path.join(SCONS_ROOT, TESTS_DIR)))
     pytests3_env.Depends(tests3[-1], libpycomps3)
-    #pytests3_env.Depends("pytests3_run", "run3_%s" % test)
-
-#AlwaysBuild("pytests3_run")
 
 local_env.Alias("pytests2_run", tests2)
 local_env.Alias("pytests3_run", tests3)

@@ -62,7 +62,9 @@ opts.Save("%s.conf" % PROJECT_NAME, env)
 
 DISTCLEAN = ["cache", "%s.conf" % PROJECT_NAME, ".sconsign.dblite",
                                                   ".sconf_temp"]
-Clean("distclean", DISTCLEAN)
+
+#env.Alias("distclean", DISTCLEAN)
+env.Clean("distclean", DISTCLEAN)
 
 f = open(os.path.join(SCONS_ROOT, "../version.json"))
 version = json.load(f)
