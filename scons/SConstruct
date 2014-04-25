@@ -93,12 +93,11 @@ CMD_TARGETS = {"ALL": ["libcomps", "ctests_run",
                        "libpycomps2", "pytests2_run",
                        "libpycomps3", "pytests3_run",
                        "libcomps_docs_tgt", "libpycomps_docs_tgt"],
-               "PYTHON2": ["libcomps", "ctests_run",
-                           "libpycomps2", "pytests2_run"],
-               "PYTHON3": ["libcomps", "ctests_run",
-                           "libpycomps3", "pytests3_run"],
+               "PYTHON2": ["libcomps", "libpycomps2",],
+               "PYTHON3": ["libcomps", "libpycomps3"],
                "DOCS": ["libcomps_docs_tgt", "libpycomps_docs_tgt"],
                "LIBCOMPS": ["libcomps", "ctests_run"],
+               "TESTS": [],
                "INSTALL": [],
             }
 
@@ -118,18 +117,38 @@ INSTALL_TGTS = {"libcomps": libcomps_install,
                 "libcomps-docs": libcomps_docs_install_tgt,
                 "libpycomps-docs": libpycomps_docs_install_tgt,
                 }
+TESTS_TGTS = {"libcomps": "ctests_run",
+              "libpycomps2": "pytests2_run",
+              "libpycomps3": "pytests3_run",
+             }
+
 
 for key, val in CMD_TARGETS.iteritems():
     env.Alias(key, val)
 
 env.Alias('dist-clean', "ALL")
 
+if "TESTS" in COMMAND_LINE_TARGETS:
+    run_tests = True
+else:
+    run_tests = False
+
+print run_tests
+
 def_tgts = set()
 for x in COMMAND_LINE_TARGETS:
     if x in CMD_TARGETS:
         def_tgts.update(CMD_TARGETS[x])
+
+RUN_TESTS_TGTS = []
 for x in def_tgts:
     Default(x)
+    if run_tests and TESTS_TGTS.get(x):
+        Default(TESTS_TGTS[x])
+        RUN_TESTS_TGTS.append(TESTS_TGTS[x])
+
+env.Alias("TESTS", RUN_TESTS_TGTS)
+
 for x in def_tgts:
     Clean(x, CLEAN_TARGETS[x])
 
