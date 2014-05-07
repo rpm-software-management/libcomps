@@ -80,6 +80,7 @@ libpycomps_docs = SConscript(os.path.join(SCONS_ROOT, 'libpycomps_docs.scons'),
                           "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
                           "INSTALL_INC_PATH"],
                   variant_dir=env["LIBPYCOMPS_DOCS_BUILD"])
+                  #duplicate=False)
 Clean(".", env["LIBPYCOMPS_DOCS_BUILD"])
 
 Import("libcomps", "libpycomps2", "libpycomps3", "ctests_run",
@@ -96,7 +97,7 @@ CMD_TARGETS = {"ALL": ["libcomps", "ctests_run",
                "PYTHON2": ["libcomps", "libpycomps2",],
                "PYTHON3": ["libcomps", "libpycomps3"],
                "DOCS": ["libcomps_docs_tgt", "libpycomps_docs_tgt"],
-               "LIBCOMPS": ["libcomps", "ctests_run"],
+               "LIBCOMPS": ["libcomps"],
                "TESTS": [],
                "INSTALL": [],
             }
@@ -114,8 +115,8 @@ CLEAN_TARGETS = {"ctests_run": env["LIBCOMPS_TESTS"],
 INSTALL_TGTS = {"libcomps": libcomps_install,
                 "libpycomps2": libpycomps2_install,
                 "libpycomps3": libpycomps3_install,
-                "libcomps-docs": libcomps_docs_install_tgt,
-                "libpycomps-docs": libpycomps_docs_install_tgt,
+                "libcomps_docs_tgt": libcomps_docs_install_tgt,
+                "libpycomps_docs_tgt": libpycomps_docs_install_tgt,
                 }
 TESTS_TGTS = {"libcomps": "ctests_run",
               "libpycomps2": "pytests2_run",
@@ -133,7 +134,7 @@ if "TESTS" in COMMAND_LINE_TARGETS:
 else:
     run_tests = False
 
-print run_tests
+#print run_tests
 
 def_tgts = set()
 for x in COMMAND_LINE_TARGETS:
@@ -155,7 +156,16 @@ for x in def_tgts:
 install_tgts = []
 if "INSTALL" in COMMAND_LINE_TARGETS:
     for x in list(def_tgts):
+        #print x
         if x in INSTALL_TGTS:
+            #print "found", x
             install_tgts.append(INSTALL_TGTS[x])
-            Default(INSTALL_TGTS[x])
+            #Default(INSTALL_TGTS[x])
+            #for tgt in INSTALL_TGTS[x]:
+            #    for y in tgt:
+            #        print y
+
+    #print "install_tgts", [x for tgt in install_tgts for x in tgt]
     env.Alias("INSTALL", install_tgts)
+
+#print "DEFAULT_TARGETS is", map(str, DEFAULT_TARGETS)

@@ -29,8 +29,8 @@ local_env = env.Clone(CCFLAGS = '-O2 --pedantic -Wall --std=c99 -Wextra ' +\
                             '-fno-strict-aliasing -g',
                       LIBS = [env["PYTHON3_LIB"], env.get("LIBS"), "comps"],
                       LIBPATH = [env["PYTHON3_LIBPATH"], libcomps_path],
-                      CPPPATH = [env["PYTHON3_INCPATH"], env["CPPPATH"],
-                                 libcomps_include_path])
+                      CPPPATH = [libcomps_include_path,
+                                 env["PYTHON3_INCPATH"], env["CPPPATH"]])
 
 local_env.VariantDir(PATH_TO_TGTS , PATH_TO_SRCS, duplicate=0)
 
@@ -50,16 +50,16 @@ libpycomps3 = local_env.SharedLibrary(os.path.join("libcomps", "_libpycomps"),
                          pycomps_files_targets,
                         SHLIBPREFIX="")
 
-libpycomps3_install = [local_env.Install(os.path.join(INSTALL_LIB64_PATH,
-                                            "python-" + env["PYTHON3_VERSION"],
-                                                     "site_packages",
-                                                     "libcomps"),
+if "PYTHON3_SITE" in env:
+    PYTHON3_SITE = env["PYTHON3_SITE"]
+else:
+    PYTHON3_SITE = os.path.join(INSTALL_LIB64_PATH,
+                                "python" + env["PYTHON3_VERSION"])
+
+libpycomps3_install = [local_env.Install(os.path.join(PYTHON3_SITE, "libycomps"),
                                          libpycomps3),
-                       local_env.Install(os.path.join(INSTALL_LIB64_PATH,
-                                            "python-" + env["PYTHON3_VERSION"],
-                                                     "site_packages",
-                                                     "libcomps"),
-                                         os.path.join("_libpycomps",
+                       local_env.Install(os.path.join(PYTHON3_SITE, "libycomps"),
+                                         os.path.join("libcomps",
                                                       "__init__.py"))]
 
 local_env.Depends(libpycomps3_install, libpycomps3)

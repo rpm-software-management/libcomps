@@ -14,8 +14,8 @@ local_env.Alias('libpycomps3', libpycomps3)
 print >> sys.stderr, libpycomps2
 print >> sys.stderr, libpycomps3
 
-TESTS_DIR2 = "libcomps/src/python/tests/"
-TESTS_DIR = os.path.join(SCONS_ROOT, "../libcomps/src/python/tests/")
+TESTS_DIR2 = os.path.abspath("libcomps/src/python/tests/")
+TESTS_DIR = os.path.realpath(os.path.join(SCONS_ROOT, "../libcomps/src/python/tests/"))
 TESTS = """test_libcomps.py test_merge_comps.py __test.py utest.py"""
 TESTS_FILES = glob.glob(os.path.join(TESTS_DIR, "comps/*.xml"))
 
@@ -44,9 +44,9 @@ PPATH = os.sep.join(os.path.dirname(libpycomps2.data[0].abspath).split(os.sep)[:
 tests2 = []
 
 for test in TESTS.split():
-    abs_test = os.path.abspath(os.path.join(os.path.abspath(TESTS_DIR), test))
+    abs_test = os.path.join(os.path.abspath(TESTS_DIR), test)
     tests2.append(pytests2_env.Command("test2_%s" % test, abs_test,
-        "(export PYTHONPATH=$PYTHONPATH:%s/; python2 $SOURCE)" % (str(PPATH)),
+        "(export PYTHONPATH=$PYTHONPATH:%s/; python2 $SOURCE.abspath)" % (str(PPATH)),
         chdir=os.path.join(SCONS_ROOT, TESTS_DIR)))
     pytests2_env.Depends(tests2[-1], libpycomps2)
 
@@ -55,9 +55,9 @@ PPATH = os.sep.join(os.path.dirname(libpycomps3.data[0].abspath).split(os.sep)[:
 tests3 = []
 
 for test in TESTS.split():
-    abs_test = os.path.abspath(os.path.join(os.path.abspath(TESTS_DIR), test))
+    abs_test = os.path.join(os.path.abspath(TESTS_DIR), test)
     tests3.append(pytests3_env.Command("test3_%s" % test, os.path.join(TESTS_DIR, test),
-        "(export PYTHONPATH=$PYTHONPATH:%s/; python3 %s)" % (str(PPATH), test),
+        "(export PYTHONPATH=$PYTHONPATH:%s/; python3 $SOURCE.abspath)" % (str(PPATH)),
         chdir=os.path.join(SCONS_ROOT, TESTS_DIR)))
     pytests3_env.Depends(tests3[-1], libpycomps3)
 

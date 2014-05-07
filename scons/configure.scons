@@ -34,15 +34,13 @@ def check_python(conf, major):
         conf.env[k] = v
     conf.Result("yes")
 
-
 LIBS_NEEDED = ["libxml2", "expat"]
 PROJECT_NAME = "libcomps"
-INSTALL_LIB_PATH = "$PREFIX/lib"
-INSTALL_LIB32_PATH = "$PREFIX/lib"
-INSTALL_LIB64_PATH = "$PREFIX/lib64"
-INSTALL_INC_PATH = "$PREFIX/include"
-INSTALL_BIN_PATH = "$PREFIX/bin"
-INSTALL_SHARE_PATH = "$PREFIX/share"
+
+#for x in [INSTALL_LIB_PATH, INSTALL_LIB32_PATH, INSTALL_LIB64_PATH,
+#          INSTALL_INC_PATH, INSTALL_BIN_PATH, INSTALL_SHARE_PATH]:
+#    if not Dir(x).exists():
+#        Execute(Mkdir(x))
 
 env["PROJECT_NAME"] = PROJECT_NAME
 env["LIBCOMPS_BUILD"] = "libcomps-build"
@@ -56,7 +54,44 @@ env["LIBPYCOMPS_TESTS"] = "libpycomps-tests"
 cache = CacheDir('./cache/')
 opts = Variables('%s.conf' % PROJECT_NAME)
 opts.Add(PathVariable('PREFIX', 'Directory to install under',
-                      '/usr', PathVariable.PathIsDir))
+                      '/usr', PathVariable.PathIsDirCreate))
+opts.Add(PathVariable('LIBDIR', 'Directory to install library under',
+                      '/usr/lib', PathVariable.PathIsDirCreate))
+opts.Add(PathVariable('INCDIR', 'Directory to install header files under',
+                      '/usr/include', PathVariable.PathIsDirCreate))
+opts.Add(PathVariable('SHAREDIR', 'Directory to install data files under',
+                      '/usr/share', PathVariable.PathIsDirCreate))
+
+INSTALL_BIN_PATH = "$PREFIX/bin"
+if "LIBDIR" in opts.args:
+    INSTALL_LIB_PATH = "$LIBDIR"
+    INSTALL_LIB32_PATH = "$LIBDIR"
+    INSTALL_LIB64_PATH = "$LIBDIR"
+else:
+    INSTALL_LIB_PATH = "$PREFIX/lib"
+    INSTALL_LIB32_PATH = "$PREFIX/lib64"
+    INSTALL_LIB64_PATH = "$PREFIX/lib32"
+
+if "INCDIR" in opts.args:
+    INSTALL_INC_PATH = "$INCDIR"
+else:
+    INSTALL_INC_PATH = "$PREFIX/include"
+
+if "SHAREDIR" in opts.args:
+    INSTALL_SHARE_PATH = "$SHAREDIR"
+else:
+    INSTALL_SHARE_PATH = "$PREFIX/share"
+
+if "PYTHON2_SITE" in opts.args:
+    PYTHON2_SITE = "$PYTHON2_SITE"
+else:
+    PYTHON2_SITE = None
+
+if "PYTHON3_SITE" in opts.args:
+    PYTHON3_SITE = "$PYTHON3_SITE"
+else:
+    PYTHON3_SITE = None
+
 opts.Update(env)
 opts.Save("%s.conf" % PROJECT_NAME, env)
 

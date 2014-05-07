@@ -11,7 +11,7 @@ Import("SCONS_ROOT", "env", "libcomps", "libcomps_include_path",
        "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
        "INSTALL_INC_PATH")
 
-local_env = Environment(tools=["textfile"])
+local_env = env.Clone(tools=["textfile"])
 
 subs = {"@PROJECT_SOURCE_DIR@": os.path.join(SCONS_ROOT, "../libcomps"),
         "@libcomps_MAJOR_VERSION@": env["libcomps_VERSION_MAJOR"],
@@ -26,13 +26,25 @@ sbs = local_env.Substfile(os.path.join("doxyfile.user"),
                 SUBST_DICT = subs)
 env.Precious(sbs)
 
-libcomps_docs_tgt = local_env.Command("docs", "doxyfile.user",
-                        "doxygen $SOURCE")
+#mkdocs = local_env.Command("docs", [], Mkdir("${TARGET.abspath}"))
+#local_env.VariantDir(".", "docs", duplicate=0)
+
+#print "MKDOCS", mkdocs[0].abspath
+
+#print "DOC_TARGET", os.path.join(SCONS_ROOT, "libcomps"
+#                                                  "/libcomps-doc-build/docs")
+libcomps_docs_tgt = local_env.Command("docs",
+                                      "doxyfile.user",
+                                      "(cd docs; doxygen ${SOURCE.file})",
+                                      chdir=1,
+                                      )
 local_env.Depends(libcomps_docs_tgt, sbs)
 
 libcomps_docs_install_tgt = local_env.Install(os.path.join(INSTALL_SHARE_PATH,
-                                                       env["PROJECT_NAME"]),sbs)
+                                                       "doc/", env["PROJECT_NAME"]),
+                                      os.path.join("libcomps-doc-build/html"))
 
+#local_env.Depends(libcomps_docs_tgt, mkdocs)
 local_env.Alias("libcomps_docs_tgt", libcomps_docs_tgt)
 local_env.Alias("libcomps_docs_install_tgt", libcomps_docs_install_tgt)
 local_env.Export("libcomps_docs_install_tgt")

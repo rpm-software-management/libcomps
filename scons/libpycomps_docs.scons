@@ -11,7 +11,7 @@ Import("SCONS_ROOT", "env", "libcomps", "libpycomps2", "libcomps_include_path",
        "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
        "INSTALL_INC_PATH")
 
-local_env = Environment(tools=["textfile"],
+local_env = env.Clone(tools=["textfile"],
         ENV={"LD_LIBRARY_PATH": [libcomps_path]})
 
 local_env.Alias('libcomps2', libcomps)
@@ -61,20 +61,26 @@ env.Precious(sbs)
 #f2.write(_str)
 PPATH = os.sep.join(os.path.dirname(libpycomps2.data[0].abspath).split(os.sep)[:-1])
 
-libpycomps_docs_tgt = local_env.Command("pydocs", os.path.join(SCONS_ROOT,
+libpycomps_docs_tgt = local_env.Command("tgt", os.path.join(SCONS_ROOT,
                                "../libcomps/src/python/docs/doc-sources/"),
-    "(export PYTHONPATH=$PYTHONPATH:%s/; sphinx-build -E -b html $SOURCE %s)" %\
-            (str(PPATH), env["LIBPYCOMPS_DOCS_BUILD"]))
+    "(export PYTHONPATH=$PYTHONPATH:%s/; sphinx-build -E -b html ${SOURCE.abspath} %s)" %\
+            (str(PPATH), os.path.join(env["LIBPYCOMPS_DOCS_BUILD"], "python-docs")))
 
-local_env.Alias("libpycomps_docs_tgt", libpycomps_docs_tgt)
+#print "LIBPYCOMPS TGT", libpycomps_docs_tgt[0].abspath
 
 libpycomps_docs_install_tgt = local_env.Install(os.path.join(INSTALL_SHARE_PATH,
-                                                         env["PROJECT_NAME"],
-                                                         "python"),
-                                                libpycomps_docs_tgt)
-local_env.Alias(libpycomps_docs_install_tgt, "libpycomps_docs_install_tgt")
+                                                         env["PROJECT_NAME"]),
+                                                os.path.join(".", "python-docs"))
+#print "INSTALL SHARE PATH", INSTALL_SHARE_PATH
+#libpycomps_docs_install_tgt = ["x"]
+
+#print "INSTALL TGT", libpycomps_docs_install_tgt[0]
+
 
 local_env.Depends(libpycomps_docs_install_tgt, libpycomps_docs_tgt)
+
+local_env.Alias("libpycomps_docs_install_tgt", libpycomps_docs_install_tgt)
+local_env.Alias("libpycomps_docs_tgt", libpycomps_docs_tgt)
 
 local_env.Export("libpycomps_docs_tgt")
 local_env.Export("libpycomps_docs_install_tgt")

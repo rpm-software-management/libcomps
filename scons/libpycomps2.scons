@@ -15,8 +15,8 @@ Import("SCONS_ROOT", "color_env", "env",
 FORM_PATH_TO_SRCS = os.path.join(SCONS_ROOT, "../libcomps/src/python/src/%s")
 PATH_TO_SRCS = os.path.join(SCONS_ROOT, "../libcomps/src/python/src/")
 
-FORM_PATH_TO_TGTS = "build_libpycomps2/%s.os"
-PATH_TO_TGTS = "build_libpycomps2"
+FORM_PATH_TO_TGTS = "os_files/%s.os"
+PATH_TO_TGTS = "os_files"
 
 PYCOMPS_SRCS = """pycomps.c pycomps_sequence.c pycomps_envs.c
                    pycomps_categories.c pycomps_groups.c pycomps_gids.c
@@ -29,8 +29,8 @@ local_env = env.Clone(CCFLAGS = '-O2 --pedantic -Wall --std=c99 -Wextra ' +\
                             '-fno-strict-aliasing -g',
                       LIBS = [env["PYTHON2_LIB"], env.get("LIBS"), "comps"],
                       LIBPATH = [env["PYTHON2_LIBPATH"], libcomps_path],
-                      CPPPATH = [env["PYTHON2_INCPATH"], env["CPPPATH"],
-                                 libcomps_include_path])
+                      CPPPATH = [libcomps_include_path, env["PYTHON2_INCPATH"], env["CPPPATH"],
+                                 ])
 
 local_env.VariantDir(PATH_TO_TGTS , PATH_TO_SRCS, duplicate=0)
 
@@ -50,19 +50,22 @@ libpycomps2 = local_env.SharedLibrary(os.path.join("libcomps", "_libpycomps"),
                          pycomps_files_targets,
                         SHLIBPREFIX="")
 
-libpycomps2_install = [local_env.Install(os.path.join(INSTALL_LIB64_PATH,
-                                            "python-" + env["PYTHON2_VERSION"],
-                                                     "site_packages",
-                                                     "libcomps"),
+if "PYTHON2_SITE" in env:
+    PYTHON2_SITE = env["PYTHON2_SITE"]
+else:
+    PYTHON2_SITE = os.path.join(INSTALL_LIB64_PATH,
+                                "python" + env["PYTHON2_VERSION"])
+
+libpycomps2_install = [local_env.Install(os.path.join(PYTHON2_SITE, "libycomps"),
                                          libpycomps2),
-                       local_env.Install(os.path.join(INSTALL_LIB64_PATH,
-                                            "python-" + env["PYTHON2_VERSION"],
-                                                     "site_packages",
-                                                     "libcomps"),
-                                         os.path.join("_libpycomps",
+                       local_env.Install(os.path.join(PYTHON2_SITE, "libycomps"),
+                                         os.path.join("libcomps",
                                                       "__init__.py"))]
 
+print "INSTALL TGT", libpycomps2_install
+
 local_env.Depends(libpycomps2_install, libpycomps2)
+#libpycomps2_install = []
 local_env.Export("libpycomps2_install")
 
 local_env.Depends(libpycomps2, libcomps)

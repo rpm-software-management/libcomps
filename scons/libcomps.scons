@@ -35,8 +35,9 @@ comps_files = """ comps_doc.c comps_docgroup.c comps_doccategory.c
                   comps_types.c
 """
 comps_files_fullp = [TGTS_DIR_FORM % x for x in comps_files.split() if x]
-libcomps_include_path = os.path.abspath(os.path.join(SCONS_ROOT,
-                                                     "../libcomps/src/"))
+libcomps_include_path = env.Dir("libcomps-inc").abspath
+#os.path.abspath(os.path.join(SCONS_ROOT,
+#                                                     "../libcomps/src/"))
 
 libcomps_build = local_env.SharedLibrary("lib_comps/comps",
                        comps_files_fullp,
@@ -53,10 +54,24 @@ libcomps_link = env.Command('lib_comps/libcomps.so',
 libcomps = [libcomps_build, libcomps_link]
 
 HEADS = glob.glob(os.path.join(SCONS_ROOT, "../libcomps/src/*.h"))
-libcomps_install = [local_env.Install(INSTALL_LIB64_PATH, libcomps),
+#print "libcomps heads:", HEADS
+heads_links = []
+for x in HEADS:
+    heads_links.append(env.Command(os.path.join(libcomps_include_path,
+                                                "libcomps",
+                                                os.path.basename(x)),
+                                  os.path.realpath(x),
+                                  'ln -s ${SOURCE.abspath} $TARGET'))
+
+print "INSTALL_INC_PATH", INSTALL_INC_PATH
+print os.path.join(INSTALL_INC_PATH, "libcomps")
+libcomps_install = [local_env.Install(INSTALL_LIB64_PATH,
+                                      libcomps),
                     local_env.Install(os.path.join(INSTALL_INC_PATH,
                                                    "libcomps"), HEADS)]
+#libcomps_install = []
 
+local_env.Depends(libcomps, heads_links)
 local_env.Depends(libcomps_link, libcomps_build)
 local_env.Depends(libcomps_install, [libcomps, libcomps_link])
 

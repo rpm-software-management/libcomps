@@ -1,3 +1,5 @@
+# vim: set ft=spec:
+
 %global commit ${GITREVLONG}
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
@@ -25,8 +27,10 @@ BuildRequires:  expat-devel
 #%if 0%{?rhel} == 6
 #BuildRequires:  cmake28
 #%else
-BuildRequires:  cmake
+#BuildRequires:  cmake
 #%endif
+BuildRequires:  scons
+
 
 %description
 Libcomps is library for structure-like manipulation with content of
@@ -83,42 +87,32 @@ Python3 bindings for libcomps library
 %prep
 %setup -qn %{name}-%{commit}
 
-%if %python3_build == 1
-rm -rf py3
-mkdir ../py3
-cp -a . ../py3/
-mv ../py3 ./
-%endif
+#%if %python3_build == 1
+#rm -rf py3
+#mkdir ../py3
+#cp -a . ../py3/
+#mv ../py3 ./
+#%endif
 
 %build
-%cmake -DPYTHON_DESIRED:STRING=2 libcomps/
-make %{?_smp_mflags}
-make %{?_smp_mflags} docs
-make %{?_smp_mflags} pydocs
+./scons_build.sh PYTHON2 DOCS
 
 %if %python3_build == 1
-pushd py3
-%cmake -DPYTHON_DESIRED:STRING=3 libcomps/
-make %{?_smp_mflags}
-popd
+./scons_build.sh PYTHON3
 %endif
 
 
 %check
-make test
-%if %{python3_build}
-pushd py3
-make pytest
-popd
+./scons_build.sh PYTHON2 TESTS
+%if %python3_build == 1
+./scons_build.sh PYTHON3 TESTS
 %endif
 
 %install
-make install DESTDIR=%{buildroot}
-
+./scons_build.sh PREFIX=%{buildroot}%{_prefix} LIBDIR=%{buildroot}%{_libdir} INCDIR=%{buildroot}%{_includedir} SHAREDIR=%{buildroot}%{_datadir} PYTHON2_SITE=%{python2_sitearch} PYTHON2 INSTALL
+#./scons_build.sh PREFIX=%{buildroot}%{_prefix} LIBDIR=%_libdir LIBCOMPS INSTALL --warn=all
 %if %{python3_build}
-pushd py3
-make install DESTDIR=%{buildroot}
-popd
+./scons_build.sh PREFIX=%{buildroot}%{_prefix} LIBDIR=%{buildroot}%{_libdir} INCDIR=%{buildroot}%{_includedir} SHAREDIR=%{buildroot}%{_datadir} PYTHON3_SITE=%{python3_sitearch} PYTHON3 INSTALL
 %endif
 
 %clean
@@ -137,10 +131,10 @@ rm -rf $buildroot
 %{_includedir}/*
 
 %files doc
-%doc docs/libcomps-docs/html
+%doc libcomps-doc-build/libcomps-doc-build/html
 
 %files -n python-libcomps-doc
-%doc src/python/docs/html
+%doc libpycomps-doc-build/python-docs
 
 %files -n python-libcomps
 %{_libdir}/python2*

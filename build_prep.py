@@ -5,6 +5,7 @@ import pprint
 import string
 import json
 from datetime import date
+import argparse
 
 def is_commit_tag(commit):
     p = subprocess.Popen(['git', 'describe',
@@ -127,16 +128,32 @@ if __name__ == "__main__":
     vfp = open("version.json", "r")
     version = json.load(vfp)
     vfp.close()
-    
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--stash", action="store_true",
+                        help="make stash archive instead of regular commit")
+    parser.add_argument("commit", type=str, default="HEAD", nargs="?",
+                                  help="commit hash or tag")
+    args = parser.parse_args()
+
     subs = {}
-    try:
-        top_commit = tag_to_commit(sys.argv[1])
-        subs["GITREVLONG"] = tag_to_commit(sys.arv[1])
-    except IndexError:
-        top_commit = tag_to_commit("HEAD")
-        subs["GITREVLONG"] = tag_to_commit(top_commit)
-
-
+    if not args.stash:
+        try:
+            top_commit = tag_to_commit(sys.argv[1])
+            subs["GITREVLONG"] = tag_to_commit(sys.argv[1])
+        except IndexError:
+            top_commit = tag_to_commit("HEAD")
+            subs["GITREVLONG"] = tag_to_commit(top_commit)
+    else:
+        p = subprocess.Popen(['git', 'stash', 'create'],
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p.wait()
+        stashid = p.stdout.readline().strip()
+        if not stashid:
+            print "No local changes. Use build_prep without --stash parameter"
+            sys.exit(1)
+        top_commit = stashid
+        subs["GITREVLONG"] = tag_to_commit(stashid)
 
     subs.update(version)
     tags = git_tags_chrono()
