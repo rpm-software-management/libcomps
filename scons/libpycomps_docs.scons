@@ -11,8 +11,7 @@ Import("SCONS_ROOT", "env", "libcomps", "libpycomps2", "libcomps_include_path",
        "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
        "INSTALL_INC_PATH")
 
-local_env = env.Clone(tools=["textfile"],
-        ENV={"LD_LIBRARY_PATH": [libcomps_path]})
+local_env = env.Clone(ENV={"LD_LIBRARY_PATH": [libcomps_path]})
 
 local_env.Alias('libcomps2', libcomps)
 

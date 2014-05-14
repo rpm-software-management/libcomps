@@ -1,15 +1,22 @@
 # vim: set ft=python:
-import json
 import os
 import os.path
 import sys
-SConscriptChdir(0)
+import imp
+
 SCONS_ROOT = os.path.dirname((lambda x:x).func_code.co_filename)
+
+cwd = os.getcwd()
+os.chdir(os.path.realpath(os.path.join(SCONS_ROOT, "tools")))
+(f, path, desc) = imp.find_module("textfile", ["."])
+os.chdir(cwd)
+textfile = imp.load_module("textfile", f, path, desc)
+
+
+SConscriptChdir(0)
 
 colors = SConscript(os.path.join(SCONS_ROOT, 'colors.scons'))
 
-#CacheDir('./cache/')
-Decider('MD5')
 
 Import("color_env")
 
@@ -17,14 +24,23 @@ env = color_env.Clone(CC = 'gcc',
                       CCFLAGS = '-O2 --pedantic -Wall --std=c99 -Wextra ' +
                                 '-Wno-missing-field-initializers'+
                                 ' -fno-strict-aliasing -g',
-                      CPPPATH=["/usr/include/", "/usr/include/libxml2/"],
-                      tools=["textfile"])
+                      CPPPATH=["/usr/include/", "/usr/include/libxml2/"])
+textfile.generate(env)
+
 
 configure = SConscript(os.path.join(SCONS_ROOT, 'configure.scons'),
                  exports=['env', "SCONS_ROOT"])
 
 Import("INSTALL_LIB_PATH", "INSTALL_LIB64_PATH", "INSTALL_BIN_PATH",
        "INSTALL_SHARE_PATH", "INSTALL_INC_PATH")
+
+if "PYTHON2" in COMMAND_LINE_TARGETS and not env["python2_found"]:
+    print >> sys.stderr, "Python2 is required"
+    Exit(1)
+
+if "PYTHON3" in COMMAND_LINE_TARGETS and not env["python3_found"]:
+    print >> sys.stderr, "Python3 is required"
+    Exit(1)
 
 libcomps_build = SConscript(os.path.join(SCONS_ROOT, 'libcomps.scons'),
                  exports=['env', "SCONS_ROOT", #"LIBCOMPS_BUILD",

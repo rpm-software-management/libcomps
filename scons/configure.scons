@@ -3,14 +3,24 @@ import sys
 import subprocess
 import shlex
 import string
-import json
+import pickle
 import os.path
+import os
+
+import imp
 Import("env", "color_env", "SCONS_ROOT")
+
+cwd = os.getcwd()
+os.chdir(os.path.realpath(os.path.join(SCONS_ROOT, "..", "buildutils")))
+(f, path, desc) = imp.find_module("version", ["."])
+os.chdir(cwd)
+
+version = imp.load_module("version", f, path, desc)
 
 def check_python(conf, major):
     code ="import distutils;"+\
           "import distutils.sysconfig as sysconfig;"+\
-          "import json;"+\
+          "import pickle;"+\
           "LDVERSION = sysconfig.get_config_var('LDVERSION');"+\
           "VERSION = sysconfig.get_config_var('VERSION');"+\
           "VERSION = LDVERSION if LDVERSION else VERSION;"+\
@@ -18,21 +28,32 @@ def check_python(conf, major):
                  "'PYTHON${MAJOR}_INCPATH': sysconfig.get_python_inc(),"+\
                  "'PYTHON${MAJOR}_LIBPATH': sysconfig.get_config_var('LIBDEST'),"+\
                  "'PYTHON${MAJOR}_LIB': 'python' + VERSION};"+\
-          "print(json.dumps(obj));"
+          "print(obj);"
     tmpl = string.Template(code)
     code = tmpl.substitute({"MAJOR": major})
     conf.Message("Checking for python%d" % major)
     command = "python%d -c \"%s\"" % (major, code)
     args = shlex.split(command)
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    p.wait()
+    try:
+        p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p.wait()
+    except OSError:
+        conf.Result("no")
+        return False
     if p.returncode:
         print >> sys.stderr, p.stderr.read()
         conf.Result("no")
-    pyconf = json.loads(p.stdout.read())
+    _str = p.stdout.read().strip()
+    #print ""
+    #print _str
+
+    #pyconf = pickle.loads(_str.strip())
+    pyconf = eval(_str)
     for k,v in pyconf.iteritems():
         conf.env[k] = v
+    conf.env["python%d_found" % major] = True
     conf.Result("yes")
+    return True
 
 LIBS_NEEDED = ["libxml2", "expat"]
 PROJECT_NAME = "libcomps"
@@ -52,6 +73,8 @@ env["LIBCOMPS_TESTS"] = "libcomps-tests"
 env["LIBPYCOMPS_TESTS"] = "libpycomps-tests"
 
 cache = CacheDir('./cache/')
+Decider('MD5')
+
 opts = Variables('%s.conf' % PROJECT_NAME)
 opts.Add(PathVariable('PREFIX', 'Directory to install under',
                       '/usr', PathVariable.PathIsDirCreate))
@@ -101,15 +124,31 @@ DISTCLEAN = ["cache", "%s.conf" % PROJECT_NAME, ".sconsign.dblite",
 #env.Alias("distclean", DISTCLEAN)
 env.Clean("distclean", DISTCLEAN)
 
-f = open(os.path.join(SCONS_ROOT, "../version.json"))
-version = json.load(f)
-f.close()
-for k,v in version.iteritems():
-    env[k] = v
+version = version.version_load(os.path.realpath(os.path.join(SCONS_ROOT,
+                                                             "..",
+                                                             "version.cfg")))
+#f = open(os.path.join(SCONS_ROOT, "../version.json"))
+#version = json.load(f)
+#f.close()
+#for k,v in version.iteritems():
+#    env[k] = v
+env["libcomps_VERSION_MAJOR"] = version["MAJOR"]
+env["libcomps_VERSION_MINOR"] = version["MINOR"]
+env["libcomps_VERSION_PATCH"] = version["PATCH"]
+env["libcomps_RELEASE"] = version["RELEASE"]
 
 conf = Configure(env, custom_tests={"check_python": check_python})
-conf.check_python(2)
-conf.check_python(3)
+if not conf.check_python(2):
+    conf.env["python2_found"] = False
+else:
+    conf.env["python2_found"] = True
+if not conf.check_python(3):
+    conf.env["python3_found"] = False
+else:
+    conf.env["python3_found"] = True
+conf.check_python(4)
+
+#print dir(conf)
 
 if not env.GetOption('clean'):
     err = 0

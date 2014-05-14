@@ -1,10 +1,10 @@
 # vim: set ft=python:
 import sys
-import json
+#import json
 import os.path
 import distutils.sysconfig as sysconfig
 
-import json
+#import json
 
 Import("SCONS_ROOT", "color_env", "env",
        "libcomps", "libcomps_include_path", "libcomps_path",

@@ -11,7 +11,7 @@ Import("SCONS_ROOT", "env", "libcomps", "libcomps_include_path",
        "INSTALL_BIN_PATH", "INSTALL_SHARE_PATH",
        "INSTALL_INC_PATH")
 
-local_env = env.Clone(tools=["textfile"])
+local_env = env.Clone()
 
 subs = {"@PROJECT_SOURCE_DIR@": os.path.join(SCONS_ROOT, "../libcomps"),
         "@libcomps_MAJOR_VERSION@": env["libcomps_VERSION_MAJOR"],

@@ -1,133 +1,17 @@
 #!/bin/env python
 import subprocess
 import sys
-import pprint
+#import pprint
 import string
-import json
-from datetime import date
+#import json
+#from datetime import date
 import argparse
 
-def is_commit_tag(commit):
-    p = subprocess.Popen(['git', 'describe',
-                          '--tags', "--exact-match", "%s"%commit],
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    p.wait()
-    if p.returncode is 0:
-        return p.stdout.readline().strip()
-    else:
-        return None
-
-def tag_to_commit(tag):
-    p = subprocess.Popen(['git', 'rev-parse', "%s^{commit}"%tag],
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    p.wait()
-    if p.returncode:
-        return None
-    x = p.stdout.readline().strip()
-    return x
-
-def commits_date(commits):
-    dates = []
-    for c in commits:
-        p = subprocess.Popen(['git', 'log', '-1', "--format=%at", "%s"%c],
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        p.wait()
-        dates.append(int(p.stdout.read()))
-    return dates
-
-def git_tags_chrono():
-    p = subprocess.Popen(['git', 'tag'], stdout=subprocess.PIPE)
-    p.wait()
-    if p.returncode:
-        return None
-    tags = [x.strip() for x in p.stdout]
-    dates = [commits_date([t]) for t in tags]
-    return [z[0] for z in sorted(zip(tags, dates), key=lambda x: x[1])]
-
-def git_tags():
-    p = subprocess.Popen(['git', 'tag'], stdout=subprocess.PIPE)
-    if p.returncode:
-        return None
-    tags = [x.strip() for x in p.stdout]
-    return tags
-
-def commits_for_tag(tags, tag):
-    index = tags.index(tag)
-    #print index
-    if index == 0:
-        prev = None
-    else:
-        prev = tags[index-1]
-        prev = tag_to_commit(prev)
-    tag = tag_to_commit(tag)
-    #print prev
-
-    commits = []
-    p = subprocess.Popen(['git', 'rev-list', '--all'], stdout=subprocess.PIPE)
-    start = False
-    for x in p.stdout:
-        x = x.strip()
-        #print x,tag
-        if not start and x == tag:
-            start = True
-            #print "start true"
-        if start:
-            commits.append(x)
-        if x == prev:
-            break
-    return commits
-
-def log_for_commits(commits, _format=None):
-    log = []
-    if not _format:
-        _args = ['git', 'log', '-1']
-    else:
-        _args = ['git', 'log', '-1', '--format=%s'%_format]
-    for x in commits:
-        #print x
-        p = subprocess.Popen(_args + [x], stdout=subprocess.PIPE)
-        log.append([x.rstrip("\n") for x in p.stdout])
-    return log
-
-def format_chlog_msg(msg):
-    msg = filter(lambda x: x != "", msg)
-    for x in range(0, len(msg)):
-        if not msg[x].startswith("- "):
-            msg[x] = "- "+msg[x]
-    return msg
-
-def build_chlog(tags ,top='HEAD'):
-    f = open("chcommits", "r")
-    chcommits = set([x.strip() for x in f])
-    f.close()
-    
-    log = []
-    for tag in tags:
-        head = log_for_commits([tag], _format="%ct%n%cn <%ce>%n%B")
-        head = ["*"]+head[0]
-        head_body = head[3:]
-        head = head[:3]
-        head[1] = date.fromtimestamp(int(head[1])).strftime("%a %b %d %Y")
-        head.append("-".join(tag.split("-")[1:]))
-        #print head
-
-        commits = commits_for_tag(tags, tag)
-        loc_chcommits = list(chcommits & set(commits))
-        loc_log = log_for_commits(loc_chcommits, _format="%B")
-        _log = [" ".join(head)]
-        _log.append("\n".join(format_chlog_msg(head_body)))
-        for x in loc_log:
-            _log.append("\n".join(format_chlog_msg(x)))
-        _log.append("")
-        #print _log
-
-        log.append("\n".join(_log))
-    return reversed(log)
+from buildutils.version import *
+import buildutils.chlog as chlog
 
 if __name__ == "__main__":
-    vfp = open("version.json", "r")
-    version = json.load(vfp)
-    vfp.close()
+    version = version_load("version.cfg")
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--stash", action="store_true",
@@ -139,11 +23,11 @@ if __name__ == "__main__":
     subs = {}
     if not args.stash:
         try:
-            top_commit = tag_to_commit(sys.argv[1])
-            subs["GITREVLONG"] = tag_to_commit(sys.argv[1])
+            top_commit = chlog.tag_to_commit(sys.argv[1])
+            subs["GITREVLONG"] = chlog.tag_to_commit(sys.argv[1])
         except IndexError:
-            top_commit = tag_to_commit("HEAD")
-            subs["GITREVLONG"] = tag_to_commit(top_commit)
+            top_commit = chlog.tag_to_commit("HEAD")
+            subs["GITREVLONG"] = chlog.tag_to_commit(top_commit)
     else:
         p = subprocess.Popen(['git', 'stash', 'create'],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -153,13 +37,14 @@ if __name__ == "__main__":
             print "No local changes. Use build_prep without --stash parameter"
             sys.exit(1)
         top_commit = stashid
-        subs["GITREVLONG"] = tag_to_commit(stashid)
+        subs["GITREVLONG"] = chlog.tag_to_commit(stashid)
 
-    subs.update(version)
-    tags = git_tags_chrono()
-    subs["CHANGELOG"] = "\n".join(build_chlog(tags, top_commit))
+    subs["libcomps_RELEASE"] = version["RELEASE"]
+    #subs.update(version)
+    tags = chlog.git_tags_chrono()
+    subs["CHANGELOG"] = "\n".join(chlog.build_chlog(tags, top_commit))
 
-    tag = is_commit_tag(top_commit)
+    tag = chlog.is_commit_tag(top_commit)
     if not tag:
         subs["SOURCE_URL_PATH"] = "archive/%{commit}/libcomps-%{commit}.tar.gz"
         archive_name = "libcomps-%s.tar.gz"%(top_commit,)
@@ -167,9 +52,9 @@ if __name__ == "__main__":
         subs["SOURCE_URL_PATH"] = tags[-1]+".tar.gz"
         archive_name = "%s.tar.gz"%(tag,)
 
-    subs["VERSION"] = "%s.%s.%s" % (subs["libcomps_VERSION_MAJOR"],
-                                    subs["libcomps_VERSION_MINOR"],
-                                    subs["libcomps_VERSION_PATCH"])
+    subs["VERSION"] = "%s.%s.%s" % (version["MAJOR"],
+                                    version["MINOR"],
+                                    version["PATCH"])
     spec = open("libcomps.spec.in", "r")
     specstr_in = spec.read()
     spec.close()

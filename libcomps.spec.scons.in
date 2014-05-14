@@ -11,6 +11,7 @@
 %define python3_build 1
 %endif
 
+%define __prelink_undo_cmd %{nil}
 
 Name:           libcomps
 Version:        ${VERSION}
@@ -110,8 +111,7 @@ Python3 bindings for libcomps library
 
 %install
 ./scons_build.sh PREFIX=%{buildroot}%{_prefix} LIBDIR=%{buildroot}%{_libdir} INCDIR=%{buildroot}%{_includedir} SHAREDIR=%{buildroot}%{_datadir} PYTHON2_SITE=%{python2_sitearch} PYTHON2 INSTALL
-#./scons_build.sh PREFIX=%{buildroot}%{_prefix} LIBDIR=%_libdir LIBCOMPS INSTALL --warn=all
-%if %{python3_build}
+%if %python3_build == 1
 ./scons_build.sh PREFIX=%{buildroot}%{_prefix} LIBDIR=%{buildroot}%{_libdir} INCDIR=%{buildroot}%{_includedir} SHAREDIR=%{buildroot}%{_datadir} PYTHON3_SITE=%{python3_sitearch} PYTHON3 INSTALL
 %endif
 
