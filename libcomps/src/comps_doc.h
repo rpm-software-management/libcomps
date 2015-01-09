@@ -417,6 +417,7 @@ char* comps2xml_str(COMPS_Doc *doc, COMPS_XMLOptions *options,
  * @param c2 COMPS_Doc object
  */
 COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2);
+COMPS_Doc* comps_doc_intersect(COMPS_Doc *c1, COMPS_Doc *c2);
 
 COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches);
 
