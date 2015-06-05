@@ -453,14 +453,13 @@ COMPS_Doc* comps_doc_intersect(COMPS_Doc *c1, COMPS_Doc *c2) {
 }
 
 COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
-                                                 char *desc, char *lang) {
+                                    char *desc, char *lang, int flags) {
     COMPS_ObjListIt *it;
     COMPS_ObjList *ret;
     unsigned int matched, matched_max;
     matched_max = 0;
     COMPS_ObjList *groups = comps_doc_groups(doc);
-    COMPS_Object *tmp_prop;
-    COMPS_Str *objid, *objname, *objdesc;
+    COMPS_Str *objid, *objname, *objdesc, *tmp_prop;
     objid = comps_str(id);
     objname = comps_str(name);
     objdesc = comps_str(desc);
@@ -474,25 +473,28 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
 
     for (it = (groups)?groups->first:NULL; it != NULL; it = it->next) {
         matched = 0;
-        tmp_prop = comps_docgroup_get_id(group);
-        if (id && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objid)) {
+        tmp_prop = (COMPS_Str*)comps_docgroup_get_id(group);
+        if (id && tmp_prop && comps_str_fnmatch(tmp_prop, id, flags)) {
             matched++;
         }
         COMPS_OBJECT_DESTROY(tmp_prop);
-        tmp_prop = comps_docgroup_get_name(group);
-        if (name && !lang && COMPS_OBJECT_CMP(tmp_prop, objname))
+        tmp_prop = (COMPS_Str*)comps_docgroup_get_name(group);
+        if (name && !lang && tmp_prop && comps_str_fnmatch(tmp_prop, name, flags))
             matched++;
-        else if (lang != NULL) {
-            tmp_prop = comps_objdict_get(group->name_by_lang, lang);
-            if (COMPS_OBJECT_CMP(objname, tmp_prop)) matched++;
+        else if (name && lang != NULL) {
+            COMPS_OBJECT_DESTROY(tmp_prop);
+            tmp_prop = (COMPS_Str*)comps_objdict_get(group->name_by_lang, lang);
+            //printf("tmp_prop %s\n", tmp_prop->val);
+            if (tmp_prop && comps_str_fnmatch(tmp_prop, name, flags)) matched++;
         }
         COMPS_OBJECT_DESTROY(tmp_prop);
-        tmp_prop = comps_docgroup_get_desc(group);
-        if (desc && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objdesc) == 1)
+        tmp_prop = (COMPS_Str*)comps_docgroup_get_desc(group);
+        if (desc && tmp_prop && comps_str_fnmatch(tmp_prop, desc, flags) == 1)
             matched++;
-        else if (lang != NULL) {
-            tmp_prop = comps_objdict_get(group->desc_by_lang, lang);
-            if (COMPS_OBJECT_CMP(tmp_prop, objdesc)) matched++;
+        else if (desc && lang != NULL) {
+            COMPS_OBJECT_DESTROY(tmp_prop);
+            tmp_prop = (COMPS_Str*)comps_objdict_get(group->desc_by_lang, lang);
+            if (tmp_prop && comps_str_fnmatch(tmp_prop, desc, flags)) matched++;
         }
         if (matched == matched_max) {
             comps_objlist_append(ret, (COMPS_Object*)group);
@@ -508,14 +510,14 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
 }
 
 COMPS_ObjList* comps_doc_get_categories(COMPS_Doc *doc, char *id, char *name,
-                                        char *desc, char *lang) {
+                                        char *desc, char *lang, int flags) {
     COMPS_ObjListIt *it;
     COMPS_ObjList *ret;
     unsigned int matched, matched_max;
     matched_max = 0;
     COMPS_ObjList *categories = comps_doc_categories(doc);
-    COMPS_Object *tmp_prop;
-    COMPS_Str *objid, *objname, *objdesc;
+    //COMPS_Object *tmp_prop;
+    COMPS_Str *objid, *objname, *objdesc, *tmp_prop;
     objid = comps_str(id);
     objname = comps_str(name);
     objdesc = comps_str(desc);
@@ -529,25 +531,27 @@ COMPS_ObjList* comps_doc_get_categories(COMPS_Doc *doc, char *id, char *name,
 
     for (it = (categories)?categories->first:NULL; it != NULL; it = it->next) {
         matched = 0;
-        tmp_prop = comps_doccategory_get_id(category);
-        if (id && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objid)) {
+        tmp_prop = (COMPS_Str*)comps_doccategory_get_id(category);
+        if (id && tmp_prop && comps_str_fnmatch(tmp_prop, id, flags)) {
             matched++;
         }
         COMPS_OBJECT_DESTROY(tmp_prop);
-        tmp_prop = comps_doccategory_get_name(category);
-        if (name && !lang && COMPS_OBJECT_CMP(tmp_prop, objname))
+        tmp_prop = (COMPS_Str*)comps_doccategory_get_name(category);
+        if (name && !lang && tmp_prop && comps_str_fnmatch(tmp_prop, name, flags))
             matched++;
-        else if (lang != NULL) {
-            tmp_prop = comps_objdict_get(category->name_by_lang, lang);
-            if (COMPS_OBJECT_CMP(objname, tmp_prop)) matched++;
+        else if (name && lang != NULL) {
+            COMPS_OBJECT_DESTROY(tmp_prop);
+            tmp_prop = (COMPS_Str*)comps_objdict_get(category->name_by_lang, lang);
+            if (tmp_prop && comps_str_fnmatch(tmp_prop, name, flags)) matched++;
         }
         COMPS_OBJECT_DESTROY(tmp_prop);
-        tmp_prop = comps_doccategory_get_desc(category);
-        if (desc && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objdesc) == 1)
+        tmp_prop = (COMPS_Str*)comps_doccategory_get_desc(category);
+        if (desc && !lang && tmp_prop && comps_str_fnmatch(tmp_prop, desc, flags))
             matched++;
-        else if (lang != NULL) {
-            tmp_prop = comps_objdict_get(category->desc_by_lang, lang);
-            if (COMPS_OBJECT_CMP(tmp_prop, objdesc)) matched++;
+        else if (desc && lang != NULL) {
+            COMPS_OBJECT_DESTROY(tmp_prop);
+            tmp_prop = (COMPS_Str*)comps_objdict_get(category->desc_by_lang, lang);
+            if (tmp_prop && comps_str_fnmatch(tmp_prop, desc, flags)) matched++;
         }
         if (matched == matched_max) {
             comps_objlist_append(ret, (COMPS_Object*)category);
@@ -563,14 +567,14 @@ COMPS_ObjList* comps_doc_get_categories(COMPS_Doc *doc, char *id, char *name,
 }
 
 COMPS_ObjList* comps_doc_get_envs(COMPS_Doc *doc, char *id, char *name,
-                                  char *desc, char *lang) {
+                                  char *desc, char *lang, int flags) {
     COMPS_ObjListIt *it;
     COMPS_ObjList *ret;
     unsigned int matched, matched_max;
     matched_max = 0;
     COMPS_ObjList *envs = comps_doc_environments(doc);
-    COMPS_Object *tmp_prop;
-    COMPS_Str *objid, *objname, *objdesc;
+    //COMPS_Object *tmp_prop;
+    COMPS_Str *objid, *objname, *objdesc, *tmp_prop;
     objid = comps_str(id);
     objname = comps_str(name);
     objdesc = comps_str(desc);
@@ -584,25 +588,27 @@ COMPS_ObjList* comps_doc_get_envs(COMPS_Doc *doc, char *id, char *name,
 
     for (it = (envs)?envs->first:NULL; it != NULL; it = it->next) {
         matched = 0;
-        tmp_prop = comps_docenv_get_id(env);
-        if (id && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objid)) {
+        tmp_prop = (COMPS_Str*)comps_docenv_get_id(env);
+        if (id && tmp_prop && comps_str_fnmatch(tmp_prop, id, flags)) {
             matched++;
         }
         COMPS_OBJECT_DESTROY(tmp_prop);
-        tmp_prop = comps_docenv_get_name(env);
-        if (name && !lang && COMPS_OBJECT_CMP(tmp_prop, objname))
+        tmp_prop = (COMPS_Str*)comps_docenv_get_name(env);
+        if (name && !lang && tmp_prop && comps_str_fnmatch(tmp_prop, name, flags))
             matched++;
-        else if (lang != NULL) {
-            tmp_prop = comps_objdict_get(env->name_by_lang, lang);
-            if (COMPS_OBJECT_CMP(objname, tmp_prop)) matched++;
+        else if (name && lang != NULL) {
+            COMPS_OBJECT_DESTROY(tmp_prop);
+            tmp_prop = (COMPS_Str*)comps_objdict_get(env->name_by_lang, lang);
+            if (tmp_prop && comps_str_fnmatch(tmp_prop, name, flags)) matched++;
         }
         COMPS_OBJECT_DESTROY(tmp_prop);
-        tmp_prop = comps_docenv_get_desc(env);
-        if (desc && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objdesc) == 1)
+        tmp_prop = (COMPS_Str*)comps_docenv_get_desc(env);
+        if (desc && !lang && tmp_prop && comps_str_fnmatch(tmp_prop, desc, flags))
             matched++;
-        else if (lang != NULL) {
-            tmp_prop = comps_objdict_get(env->desc_by_lang, lang);
-            if (COMPS_OBJECT_CMP(tmp_prop, objdesc)) matched++;
+        else if (desc && lang != NULL) {
+            COMPS_OBJECT_DESTROY(tmp_prop);
+            tmp_prop = (COMPS_Str*)comps_objdict_get(env->desc_by_lang, lang);
+            if (tmp_prop && comps_str_fnmatch(tmp_prop, desc, flags)) matched++;
         }
         if (matched == matched_max) {
             comps_objlist_append(ret, (COMPS_Object*)env);

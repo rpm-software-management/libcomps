@@ -541,16 +541,18 @@ PyObject* PyCOMPS_filter_arches(PyObject *self, PyObject *other) {
 PyObject* PyCOMPS_groups_match(PyObject *self, PyObject *args, PyObject *kwds) {
 
     PyObject *ret;
+    int flags=0;
     char *id = NULL, *name = NULL, *desc = NULL, *lang = NULL;
-    char *keywords[] = {"id", "name", "desc", "lang", NULL};
+    char *keywords[] = {"id", "name", "desc", "lang", "flags", NULL};
     COMPS_ObjList * list;
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "|ssss", keywords, &id, &name,
-                                    &desc, &lang)) {
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|ssssi", keywords, &id, &name,
+                                    &desc, &lang, &flags)) {
     } else {
         return NULL;
     }
-    list = comps_doc_get_groups(((PyCOMPS*)self)->comps_doc, id, name, desc, lang);
+    list = comps_doc_get_groups(((PyCOMPS*)self)->comps_doc,
+                                id, name, desc, lang, flags);
     ret = PyCOMPSSeq_new(&PyCOMPS_GroupsType, NULL, NULL);
     Py_TYPE(ret)->tp_init(ret, NULL, NULL);
     COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)ret)->list);
@@ -561,16 +563,18 @@ PyObject* PyCOMPS_groups_match(PyObject *self, PyObject *args, PyObject *kwds) {
 PyObject* PyCOMPS_categories_match(PyObject *self, PyObject *args, PyObject *kwds) {
 
     PyObject *ret;
+    int flags=0;
     char *id = NULL, *name = NULL, *desc = NULL, *lang = NULL;
-    char *keywords[] = {"id", "name", "desc", "lang", NULL};
+    char *keywords[] = {"id", "name", "desc", "lang", "flags", NULL};
     COMPS_ObjList * list;
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "|ssss", keywords, &id, &name,
-                                    &desc, &lang)) {
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|ssssi", keywords, &id, &name,
+                                    &desc, &lang, &flags)) {
     } else {
         return NULL;
     }
-    list = comps_doc_get_categories(((PyCOMPS*)self)->comps_doc, id, name, desc, lang);
+    list = comps_doc_get_categories(((PyCOMPS*)self)->comps_doc,
+                                    id, name, desc, lang, flags);
     ret = PyCOMPSSeq_new(&PyCOMPS_CatsType, NULL, NULL);
     Py_TYPE(ret)->tp_init(ret, NULL, NULL);
     COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)ret)->list);
@@ -581,16 +585,18 @@ PyObject* PyCOMPS_categories_match(PyObject *self, PyObject *args, PyObject *kwd
 PyObject* PyCOMPS_envs_match(PyObject *self, PyObject *args, PyObject *kwds) {
 
     PyObject *ret;
+    int flags = 0;
     char *id = NULL, *name = NULL, *desc = NULL, *lang = NULL;
-    char *keywords[] = {"id", "name", "desc", "lang", NULL};
+    char *keywords[] = {"id", "name", "desc", "lang", "flags", NULL};
     COMPS_ObjList * list;
 
-    if (PyArg_ParseTupleAndKeywords(args, kwds, "|ssss", keywords, &id, &name,
-                                    &desc, &lang)) {
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|ssssi", keywords, &id, &name,
+                                    &desc, &lang, &flags)) {
     } else {
         return NULL;
     }
-    list = comps_doc_get_envs(((PyCOMPS*)self)->comps_doc, id, name, desc, lang);
+    list = comps_doc_get_envs(((PyCOMPS*)self)->comps_doc,
+                              id, name, desc, lang, flags);
     ret = PyCOMPSSeq_new(&PyCOMPS_EnvsType, NULL, NULL);
     Py_TYPE(ret)->tp_init(ret, NULL, NULL);
     COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)ret)->list);
@@ -1097,6 +1103,8 @@ PYINIT_FUNC(void) {
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_CONDITIONAL", COMPS_PACKAGE_CONDITIONAL);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_MANDATORY", COMPS_PACKAGE_MANDATORY);
     PyModule_AddIntConstant(m, "PACKAGE_TYPE_UNKNOWN", COMPS_PACKAGE_UNKNOWN);
+
+    PyModule_AddIntConstant(m, "MATCH_IGNORECASE", FNM_CASEFOLD);
 
     init_exceptions();
     Py_INCREF(PyCOMPSExc_ParserError);

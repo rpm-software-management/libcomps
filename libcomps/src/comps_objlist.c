@@ -253,7 +253,7 @@ int comps_objlist_insert_at(COMPS_ObjList *objlist,
 
 int comps_objlist_remove_at(COMPS_ObjList *objlist, unsigned int atpos) {
     int pos;
-    COMPS_ObjListIt *it, *itprev=NULL, *removed;
+    COMPS_ObjListIt *it, *itprev=NULL, *removed=NULL;
     if (!objlist) return 0;
 
     for (it = objlist->first, pos=0;

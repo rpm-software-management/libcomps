@@ -91,7 +91,7 @@ START_TEST(test_comps_doc_basic)
     g = (COMPS_DocGroup*)tmplist->first->comps_obj;
     COMPS_OBJECT_DESTROY(tmplist);
 
-    tmplist = comps_doc_get_groups(doc, "g1", NULL, NULL, NULL);
+    tmplist = comps_doc_get_groups(doc, "g1", NULL, NULL, NULL, 0);
     fail_if(tmplist->len == 0, "Group with id 'g1' should be in groups, but"
                                "cant get it");
     g = (COMPS_DocGroup*)tmplist->first->comps_obj;

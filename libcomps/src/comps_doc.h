@@ -382,11 +382,11 @@ HEAD_COMPS_DOC_ADDOBJMDICT(whiteout) /*comps_doc.h macro*/
 /**@}*/
 
 COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
-                                                 char *desc, char *lang);
+                                    char *desc, char *lang, int flags);
 COMPS_ObjList* comps_doc_get_categories(COMPS_Doc *doc, char *id, char *name,
-                                                 char *desc, char *lang);
+                                        char *desc, char *lang, int flags);
 COMPS_ObjList* comps_doc_get_envs(COMPS_Doc *doc, char *id, char *name,
-                                                 char *desc, char *lang);
+                                  char *desc, char *lang, int flags);
 
 //char* comps_doc_xml_str(COMPS_Doc* doc, char *enc, COMPS_Log *log);
 

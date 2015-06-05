@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <fnmatch.h>
 
 COMPS_Object * comps_object_create(COMPS_ObjectInfo *obj_info, COMPS_Object **args){
     COMPS_Object *obj;
@@ -177,6 +178,12 @@ void comps_str_set(COMPS_Str *str, char *s) {
     free(str->val);
     str->val = malloc(sizeof(char) * ((strlen(s)+1)));
     strcpy(str->val, s);
+}
+signed char comps_str_fnmatch(COMPS_Str *str, char *pattern, int flags) {
+    return fnmatch(pattern, str->val, flags) == 0;
+}
+signed char comps_str_fnmatch_o(COMPS_Str *str, COMPS_Str *pattern, int flags) {
+    return fnmatch(pattern->val, str->val, flags) == 0;
 }
 
 COMPS_ObjectInfo COMPS_Num_ObjInfo = {

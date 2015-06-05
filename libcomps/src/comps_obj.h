@@ -229,4 +229,18 @@ void comps_str_set(COMPS_Str *str, char *s);
 //extern COMPS_ObjectInfo COMPS_Num_ObjInfo;
 //extern COMPS_ObjectInfo COMPS_Str_ObjInfo;
 
+/** Return non-zero if str match the pattern by fnmatch
+ *
+ * @param str source string. COMPS_Str object
+ * @param pattern match pattern
+ */
+signed char comps_str_fnmatch(COMPS_Str *str, char *pattern, int flags);
+
+/** Return non-zero if str match the pattern by fnmatch
+ *
+ * @param str source string. COMPS_Str object
+ * @param pattern COMPS_Str match pattern
+ */
+signed char comps_str_fnmatch_o(COMPS_Str *str, COMPS_Str *pattern, int flags);
+
 #endif
