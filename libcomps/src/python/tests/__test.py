@@ -1123,10 +1123,86 @@ class COMPSTest(unittest.TestCase):
         comps2.fromxml_str(xmlstr, options={"default_biarchonly": True})
         self.assertTrue(comps == comps2)
 
+    def test_match(self):
+        comps = libcomps.Comps()
+        ret = comps.fromxml_f("comps/comps-rawhide.xml")
+        self.assertTrue(ret != -1)
+        self.assertTrue(len(comps.groups_match(id="base")) == 0)
+        self.assertTrue(len(comps.groups_match(id="base-x")) == 1)
+        self.assertTrue(len(comps.groups_match(name="base-x")) == 1)
+        self.assertTrue(len(comps.groups_match(desc="Local X.org display server")) == 1)
+        self.assertTrue(len(comps.groups_match(id="base-x", name="base-x")) == 1)
+        self.assertTrue(len(comps.groups_match(id="base-x",
+                                              name="base-x",
+                                              desc="Local X.org display server")) == 1)
+        self.assertTrue(len(comps.groups_match(id="base-x",
+                                              name="base-x",
+                                              desc="Lokaler X.org-Displayserver")) == 0)
+        self.assertTrue(len(comps.groups_match(id="base-x",
+                                              name="base-x",
+                                              desc="Lokaler X.org-Displayserver",
+                                              lang="de")) == 1)
+        self.assertTrue(len(comps.groups_match(id="base-x",
+                                              name="base-x",
+                                              desc="Lokaler X.org-Displayserver",
+                                              lang="es")) == 0)
+
+        self.assertTrue(len(comps.categories_match(id="gnome-desktop")) == 0)
+        self.assertTrue(len(comps.categories_match(id="gnome-desktop-environment")) == 1)
+        self.assertTrue(len(comps.categories_match(name="GNOME Desktop")) == 1)
+        self.assertTrue(len(comps.categories_match(desc="GNOME is a highly intuitive and user friendly desktop environment.")) == 1)
+        self.assertTrue(len(comps.categories_match(id="gnome-desktop-environment", name="GNOME Desktop")) == 1)
+        self.assertTrue(len(comps.categories_match(id="gnome-desktop-environment",
+                                              name="GNOME Desktop",
+                                              desc="GNOME is a highly intuitive and user friendly desktop environment.")) == 1)
+        self.assertTrue(len(comps.categories_match(id="gnome-desktop-environment",
+                                              name="GNOME Desktop",
+                                              desc="GNOME es un entorno de escritorio muy intuitivo y amigable")) == 0)
+        self.assertTrue(len(comps.categories_match(id="gnome-desktop-environment",
+                                              name="Escritorio GNOME",
+                                              desc="GNOME es un entorno de escritorio muy intuitivo y amigable",
+                                              lang="es")) == 1)
+        self.assertTrue(len(comps.categories_match(id="gnome-desktop-environment",
+                                              name="GNOME Desktop",
+                                              desc="Lokaler X.org-Displayserver",
+                                              lang="ja")) == 0)
+
+        self.assertTrue(len(comps.environments_match(id="minimal")) == 0)
+        self.assertTrue(len(comps.environments_match(id="minimal-environment")) == 1)
+        self.assertTrue(len(comps.environments_match(name="Minimal Install")) == 1)
+        self.assertTrue(len(comps.environments_match(desc="Basic functionality.")) == 1)
+        self.assertTrue(len(comps.environments_match(id="minimal-environment", name="Minimal Install")) == 1)
+        self.assertTrue(len(comps.environments_match(id="minimal-environment",
+                                              name="Minimal Install",
+                                              desc="Basic functionality.")) == 1)
+        self.assertTrue(len(comps.environments_match(id="minimal-environment",
+                                              name="Minimal Install",
+                                              desc="Basis functionaliteit.")) == 0)
+        self.assertTrue(len(comps.environments_match(id="minimal-environment",
+                                              name="Minimale installatie",
+                                              desc="Basis functionaliteit.",
+                                              lang="nl")) == 1)
+        self.assertTrue(len(comps.environments_match(id="minimal-environment",
+                                              name="Minimale installatie",
+                                              desc="Basis functionaliteit.",
+                                              lang="es")) == 0)
 
 
 if __name__ == "__main__":
-    unittest.main(testRunner = utest.MyRunner)
+    if len(sys.argv)>1:
+        suite = unittest.TestSuite()
+        for test in sys.argv[1:]:
+            if "." in test:
+                cls, test_func = test.split(".")
+                suite.addTest(globals()[cls](test_func))
+            else:
+                for attr in dir(globals()[test]):
+                    if attr.startswith("test") and\
+                       hasattr(getattr(globals()[test], attr), "__call__"):
+                        suite.addTest(globals()[test](attr))
+            utest.MyRunner().run(suite)
+    else:
+        unittest.main(testRunner = utest.MyRunner)
     #unittest.main()
     #suite = unittest.TestLoader().loadTestsFromTestCase(Category_Test)
     #ret = MyRunner(verbosity=2).run(suite)
