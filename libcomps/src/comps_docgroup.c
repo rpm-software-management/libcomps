@@ -413,8 +413,8 @@ char* comps_docgroup_tostr_u(COMPS_Object* group) {
     strcat(ret, desc_by_lang_str);
     free(desc_by_lang_str);
     strcat(ret, ", ");
-    //strcat(ret, group_packages_str);
-    //free(group_packages_str);
+    strcat(ret, group_packages_str);
+    free(group_packages_str);
     strcat(ret, ">");
     return ret;
     #undef _group_
