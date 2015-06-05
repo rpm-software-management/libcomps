@@ -507,6 +507,116 @@ COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
     #undef group
 }
 
+COMPS_ObjList* comps_doc_get_categories(COMPS_Doc *doc, char *id, char *name,
+                                        char *desc, char *lang) {
+    COMPS_ObjListIt *it;
+    COMPS_ObjList *ret;
+    unsigned int matched, matched_max;
+    matched_max = 0;
+    COMPS_ObjList *categories = comps_doc_categories(doc);
+    COMPS_Object *tmp_prop;
+    COMPS_Str *objid, *objname, *objdesc;
+    objid = comps_str(id);
+    objname = comps_str(name);
+    objdesc = comps_str(desc);
+
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
+    #define category ((COMPS_DocCategory*)it->comps_obj)
+
+    if (id != NULL) matched_max++;
+    if (name != NULL) matched_max++;
+    if (desc != NULL) matched_max++;
+
+    for (it = (categories)?categories->first:NULL; it != NULL; it = it->next) {
+        matched = 0;
+        tmp_prop = comps_doccategory_get_id(category);
+        if (id && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objid)) {
+            matched++;
+        }
+        COMPS_OBJECT_DESTROY(tmp_prop);
+        tmp_prop = comps_doccategory_get_name(category);
+        if (name && !lang && COMPS_OBJECT_CMP(tmp_prop, objname))
+            matched++;
+        else if (lang != NULL) {
+            tmp_prop = comps_objdict_get(category->name_by_lang, lang);
+            if (COMPS_OBJECT_CMP(objname, tmp_prop)) matched++;
+        }
+        COMPS_OBJECT_DESTROY(tmp_prop);
+        tmp_prop = comps_doccategory_get_desc(category);
+        if (desc && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objdesc) == 1)
+            matched++;
+        else if (lang != NULL) {
+            tmp_prop = comps_objdict_get(category->desc_by_lang, lang);
+            if (COMPS_OBJECT_CMP(tmp_prop, objdesc)) matched++;
+        }
+        if (matched == matched_max) {
+            comps_objlist_append(ret, (COMPS_Object*)category);
+        }
+        COMPS_OBJECT_DESTROY(tmp_prop);
+    }
+    COMPS_OBJECT_DESTROY(objid);
+    COMPS_OBJECT_DESTROY(objname);
+    COMPS_OBJECT_DESTROY(objdesc);
+    COMPS_OBJECT_DESTROY(categories);
+    return ret;
+    #undef category
+}
+
+COMPS_ObjList* comps_doc_get_envs(COMPS_Doc *doc, char *id, char *name,
+                                  char *desc, char *lang) {
+    COMPS_ObjListIt *it;
+    COMPS_ObjList *ret;
+    unsigned int matched, matched_max;
+    matched_max = 0;
+    COMPS_ObjList *envs = comps_doc_environments(doc);
+    COMPS_Object *tmp_prop;
+    COMPS_Str *objid, *objname, *objdesc;
+    objid = comps_str(id);
+    objname = comps_str(name);
+    objdesc = comps_str(desc);
+
+    ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
+    #define env ((COMPS_DocEnv*)it->comps_obj)
+
+    if (id != NULL) matched_max++;
+    if (name != NULL) matched_max++;
+    if (desc != NULL) matched_max++;
+
+    for (it = (envs)?envs->first:NULL; it != NULL; it = it->next) {
+        matched = 0;
+        tmp_prop = comps_docenv_get_id(env);
+        if (id && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objid)) {
+            matched++;
+        }
+        COMPS_OBJECT_DESTROY(tmp_prop);
+        tmp_prop = comps_docenv_get_name(env);
+        if (name && !lang && COMPS_OBJECT_CMP(tmp_prop, objname))
+            matched++;
+        else if (lang != NULL) {
+            tmp_prop = comps_objdict_get(env->name_by_lang, lang);
+            if (COMPS_OBJECT_CMP(objname, tmp_prop)) matched++;
+        }
+        COMPS_OBJECT_DESTROY(tmp_prop);
+        tmp_prop = comps_docenv_get_desc(env);
+        if (desc && tmp_prop && COMPS_OBJECT_CMP(tmp_prop, objdesc) == 1)
+            matched++;
+        else if (lang != NULL) {
+            tmp_prop = comps_objdict_get(env->desc_by_lang, lang);
+            if (COMPS_OBJECT_CMP(tmp_prop, objdesc)) matched++;
+        }
+        if (matched == matched_max) {
+            comps_objlist_append(ret, (COMPS_Object*)env);
+        }
+        COMPS_OBJECT_DESTROY(tmp_prop);
+    }
+    COMPS_OBJECT_DESTROY(objid);
+    COMPS_OBJECT_DESTROY(objname);
+    COMPS_OBJECT_DESTROY(objdesc);
+    COMPS_OBJECT_DESTROY(envs);
+    return ret;
+    #undef env
+}
+
 static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                                  COMPS_XMLOptions *xml_options,
                                  COMPS_DefaultsOptions *def_options) {

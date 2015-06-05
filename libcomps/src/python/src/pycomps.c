@@ -538,6 +538,66 @@ PyObject* PyCOMPS_filter_arches(PyObject *self, PyObject *other) {
     return (PyObject*)doc;
 }
 
+PyObject* PyCOMPS_groups_match(PyObject *self, PyObject *args, PyObject *kwds) {
+
+    PyObject *ret;
+    char *id = NULL, *name = NULL, *desc = NULL, *lang = NULL;
+    char *keywords[] = {"id", "name", "desc", "lang", NULL};
+    COMPS_ObjList * list;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|ssss", keywords, &id, &name,
+                                    &desc, &lang)) {
+    } else {
+        return NULL;
+    }
+    list = comps_doc_get_groups(((PyCOMPS*)self)->comps_doc, id, name, desc, lang);
+    ret = PyCOMPSSeq_new(&PyCOMPS_GroupsType, NULL, NULL);
+    Py_TYPE(ret)->tp_init(ret, NULL, NULL);
+    COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)ret)->list);
+    ((PyCOMPS_Sequence*)ret)->list = list;
+    return ret;
+}
+
+PyObject* PyCOMPS_categories_match(PyObject *self, PyObject *args, PyObject *kwds) {
+
+    PyObject *ret;
+    char *id = NULL, *name = NULL, *desc = NULL, *lang = NULL;
+    char *keywords[] = {"id", "name", "desc", "lang", NULL};
+    COMPS_ObjList * list;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|ssss", keywords, &id, &name,
+                                    &desc, &lang)) {
+    } else {
+        return NULL;
+    }
+    list = comps_doc_get_categories(((PyCOMPS*)self)->comps_doc, id, name, desc, lang);
+    ret = PyCOMPSSeq_new(&PyCOMPS_CatsType, NULL, NULL);
+    Py_TYPE(ret)->tp_init(ret, NULL, NULL);
+    COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)ret)->list);
+    ((PyCOMPS_Sequence*)ret)->list = list;
+    return ret;
+}
+
+PyObject* PyCOMPS_envs_match(PyObject *self, PyObject *args, PyObject *kwds) {
+
+    PyObject *ret;
+    char *id = NULL, *name = NULL, *desc = NULL, *lang = NULL;
+    char *keywords[] = {"id", "name", "desc", "lang", NULL};
+    COMPS_ObjList * list;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|ssss", keywords, &id, &name,
+                                    &desc, &lang)) {
+    } else {
+        return NULL;
+    }
+    list = comps_doc_get_envs(((PyCOMPS*)self)->comps_doc, id, name, desc, lang);
+    ret = PyCOMPSSeq_new(&PyCOMPS_EnvsType, NULL, NULL);
+    Py_TYPE(ret)->tp_init(ret, NULL, NULL);
+    COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)ret)->list);
+    ((PyCOMPS_Sequence*)ret)->list = list;
+    return ret;
+}
+
 PyObject* PyCOMPS_validate(PyCOMPS *comps) {
     #define _result_ ((COMPS_ValErrResult*)result)
     COMPS_ValGenResult *result;
@@ -701,6 +761,12 @@ PyDoc_STRVAR(PyCOMPS_arch_filter__doc__,
              ":return: new :py:class:`libcomps.Comps` instace");
 
 static PyMethodDef PyCOMPS_methods[] = {
+    {"groups_match", (PyCFunction)PyCOMPS_groups_match, METH_VARARGS | METH_KEYWORDS,
+    PyCOMPS_validate__doc__},
+    {"categories_match", (PyCFunction)PyCOMPS_categories_match, METH_KEYWORDS,
+    PyCOMPS_validate__doc__},
+    {"environments_match", (PyCFunction)PyCOMPS_envs_match, METH_KEYWORDS,
+    PyCOMPS_validate__doc__},
     {"validate", (PyCFunction)PyCOMPS_validate, METH_NOARGS,
     PyCOMPS_validate__doc__},
     {"validate_nf", (PyCFunction)PyCOMPS_validate_nf, METH_NOARGS,
