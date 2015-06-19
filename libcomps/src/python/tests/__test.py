@@ -1187,6 +1187,22 @@ class COMPSTest(unittest.TestCase):
                                               desc="Basis functionaliteit.",
                                               lang="es")) == 0)
 
+    def test_group_packages_match(self):
+        comps = libcomps.Comps()
+        ret = comps.fromxml_f("comps/comps-rawhide.xml")
+        group = comps.groups_match(id="assamese-support")[0]
+        default_packages = group.packages_match(type=libcomps.PACKAGE_TYPE_DEFAULT)
+        mandatory_packages = group.packages_match(type=libcomps.PACKAGE_TYPE_MANDATORY)
+        conditional_packages = group.packages_match(type=libcomps.PACKAGE_TYPE_CONDITIONAL)
+        self.assertTrue(len(default_packages) == 1)
+        for x in default_packages:
+            self.assertTrue(x.type == libcomps.PACKAGE_TYPE_DEFAULT)
+        self.assertTrue(len(mandatory_packages) == 3)
+        for x in mandatory_packages:
+            self.assertTrue(x.type == libcomps.PACKAGE_TYPE_MANDATORY)
+        self.assertTrue(len(conditional_packages) == 1)
+        for x in conditional_packages:
+            self.assertTrue(x.type == libcomps.PACKAGE_TYPE_CONDITIONAL)
 
 if __name__ == "__main__":
     if len(sys.argv)>1:

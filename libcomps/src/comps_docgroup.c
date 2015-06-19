@@ -89,6 +89,7 @@ void comps_docgroup_add_package(COMPS_DocGroup *group,
     comps_objlist_append_x(group->packages, (COMPS_Object*)package);
 }
 
+
 COMPS_ObjList* comps_docgroup_get_packages(COMPS_DocGroup *group, char *name,
                                        COMPS_PackageType type) {
     COMPS_ObjListIt *it;

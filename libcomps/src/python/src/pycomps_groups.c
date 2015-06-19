@@ -304,9 +304,16 @@ PyDoc_STRVAR(PyCOMPS_group_validate__doc__,
              ":return: None if validation successful\n\n"
              ":raises ValueError: on first occured error");
 
+PyDoc_STRVAR(PyCOMPS_group_packages_match__doc__,
+             "Return list of packages matching selected criteria\n\n"
+             ":return: List of packages\n\n");
+
 PyMethodDef PyCOMPSGroup_methods[] = {
     {"validate", (PyCFunction)PyCOMPSGroup_validate, METH_NOARGS,
-    PyCOMPS_group_validate__doc__},
+     PyCOMPS_group_validate__doc__},
+    {"packages_match", (PyCFunction)PyCOMPSGroup_packages_match,
+     METH_VARARGS | METH_KEYWORDS,
+     PyCOMPS_group_packages_match__doc__},
     {NULL}  /* Sentinel */
 };
 
@@ -505,6 +512,50 @@ COMPS_ObjList* comps_groups_union(COMPS_ObjList *groups1,
     comps_set_destroy(&set);
     return ret;
 }
+char __pycomps_pkg_type_check(PyObject* pobj, void *cobj) {
+    long cint;
+    if (!PyInt_Check(pobj)) {
+        cobj = NULL;
+        return 0;
+    }
+    cint = PyInt_AsLong(pobj);
+    switch(cint) {
+        case COMPS_PACKAGE_DEFAULT:
+        case COMPS_PACKAGE_OPTIONAL:
+        case COMPS_PACKAGE_CONDITIONAL:
+        case COMPS_PACKAGE_MANDATORY:
+        case COMPS_PACKAGE_UNKNOWN:
+            (*(int*)cobj) = cint;
+            return 1;
+        break;
+        default:
+            return 0;
+        break;
+    }
+}
+
+PyObject* PyCOMPSGroup_packages_match(PyObject *self, PyObject *args, PyObject *kwds) {
+
+    PyObject *ret;
+    int type=-1;
+    char *name = NULL;
+    char *keywords[] = {"name", "type", NULL};
+    COMPS_ObjList * list;
+
+    if (PyArg_ParseTupleAndKeywords(args, kwds, "|sO&", keywords, &name,
+                                    __pycomps_pkg_type_check, &type)){
+    } else {
+        return NULL;
+    }
+    list = comps_docgroup_get_packages(((PyCOMPS_Group*)self)->c_obj, name, type);
+    ret = PyCOMPSSeq_new(&PyCOMPS_PacksType, NULL, NULL);
+    Py_TYPE(ret)->tp_init(ret, NULL, NULL);
+    COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)ret)->list);
+    ((PyCOMPS_Sequence*)ret)->list = list;
+    return ret;
+}
+
+
 
 PyObject* PyCOMPSGroups_union(PyObject *self, PyObject *other) {
     PyCOMPS_Sequence *res;

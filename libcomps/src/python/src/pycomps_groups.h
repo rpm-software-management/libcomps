@@ -65,7 +65,8 @@ int PyCOMPSGroup_set_name_by_lang(PyCOMPS_Group *self, PyObject *value,
 PyObject* PyCOMPSGroup_get_desc_by_lang(PyCOMPS_Group *self, void *closure);
 int PyCOMPSGroup_set_desc_by_lang(PyCOMPS_Group *self, PyObject *value,
                                                        void *closure);
-
+PyObject* PyCOMPSGroup_packages_match(PyObject *self, PyObject *args,
+                                      PyObject *kwds);
 
 PyObject * PyCOMPSGroups_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int PyCOMPSGroups_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds);
