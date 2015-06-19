@@ -277,6 +277,7 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
     COMPS_ObjList *groups = comps_doc_groups(c1);
     COMPS_ObjList *categories = comps_doc_categories(c1);
     COMPS_ObjList *envs = comps_doc_environments(c1);
+    COMPS_ObjDict *langpacks, *d1, *d2;
 
     void *tmpdata;
     res = COMPS_OBJECT_CREATE(COMPS_Doc, (COMPS_Object*[]){(COMPS_Object*)
@@ -365,6 +366,14 @@ COMPS_Doc* comps_doc_union(COMPS_Doc *c1, COMPS_Doc *c2) {
         comps_doc_add_environment(res, hsit->data);
     }
     comps_set_destroy(&set);
+
+    d1 = comps_doc_langpacks(c1);
+    d2 = comps_doc_langpacks(c2);
+    langpacks = comps_objdict_union(d1,d2);
+    COMPS_OBJECT_DESTROY(d1);
+    COMPS_OBJECT_DESTROY(d2);
+    comps_doc_set_langpacks(res, langpacks);
+    COMPS_OBJECT_DESTROY(langpacks);
     return res;
 }
 

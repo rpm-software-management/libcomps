@@ -101,6 +101,7 @@ COMPS_ObjRTree * comps_objrtree_clone(COMPS_ObjRTree *rt) {
     to_clone = comps_hslist_create();
     comps_hslist_init(to_clone, NULL, NULL, NULL);
     ret = COMPS_OBJECT_CREATE(COMPS_ObjRTree, NULL);
+    ret->len = rt->len;
 
     for (it = rt->subnodes->first; it != NULL; it = it->next) {
         rtdata = comps_objrtree_data_create(

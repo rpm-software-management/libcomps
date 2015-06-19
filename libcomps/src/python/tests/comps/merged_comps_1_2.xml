@@ -52,4 +52,32 @@
       <groupid>core</groupid>
     </optionlist>
   </environment>
+  <langpacks>
+    <match name="LabPlot-doc" install="LabPlot-doc-%s"/>
+    <match name="aspell" install="aspell-%s"/>
+    <match name="autocorr-en" install="autocorr-%s"/>
+    <match name="calligra-core" install="calligra-l10n-%s"/>
+    <match name="childsplay" install="childsplay-alphabet_sounds_%s"/>
+    <match name="drascula" install="drascula-%s"/>
+    <match name="eclipse-platform" install="eclipse-nls-%s"/>
+    <match name="firefox" install="firefox-langpack-%s"/>
+    <match name="gcompris" install="gcompris-sound-%s"/>
+    <match name="gimp-help" install="gimp-help-%s"/>
+    <match name="gnome-getting-started-docs" install="gnome-getting-started-docs-%s"/>
+    <match name="hunspell" install="hunspell-%s"/>
+    <match name="hyphen" install="hyphen-%s"/>
+    <match name="LabPlot-doc" install="LabPlot-doc-%s"/>
+    <match name="aspell" install="aspell-%s"/>
+    <match name="autocorr-en" install="autocorr-%s"/>
+    <match name="calligra-core" install="calligra-l10n-%s"/>
+    <match name="childsplay" install="childsplay-alphabet_sounds_%s"/>
+    <match name="drascula" install="drascula-%s"/>
+    <match name="eclipse-platform" install="eclipse-nls-%s"/>
+    <match name="firefox" install="firefox-langpack-%s"/>
+    <match name="gcompris" install="gcompris-sound-%s"/>
+    <match name="gimp-help" install="gimp-help-%s"/>
+    <match name="gnome-getting-started-docs" install="gnome-getting-started-docs-%s"/>
+    <match name="hunspell" install="hunspell-%s"/>
+    <match name="hyphen" install="hyphen-%s"/>
+  </langpacks>
 </comps>

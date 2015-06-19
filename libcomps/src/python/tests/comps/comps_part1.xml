@@ -46,4 +46,19 @@
     </optionlist>
   </environment>
 
+  <langpacks>
+    <match name="kdelibs" install="kde-l10n-%s"/>
+    <match name="kdelibs3" install="kde-i18n-%s"/>
+    <match name="kicad-doc" install="kicad-doc-%s"/>
+    <match name="libreoffice-core" install="libreoffice-langpack-%s"/>
+    <match name="man-pages" install="man-pages-%s"/>
+    <match name="moodle" install="moodle-%s"/>
+    <match name="mythes" install="mythes-%s"/>
+    <match name="nqc-doc" install="nqc-doc-%s"/>
+    <match name="sagemath-doc" install="sagemath-doc-%s"/>
+    <match name="stardict" install="stardict-dic-%s"/>
+    <match name="tagainijisho-common" install="tagainijisho-dic-%s"/>
+    <match name="tesseract" install="tesseract-langpack-%s"/>
+    <match name="tkgate" install="tkgate-%s"/>
+  </langpacks>
 </comps>

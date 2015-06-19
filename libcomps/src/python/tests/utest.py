@@ -39,8 +39,7 @@ class MyResult(unittest.TestResult):
     separator2 = "-" * 70
 
     def colored(self, color, string):
-        return '\x1b[%sm%s\x1b[%sm' % (";".join(map(str, color["1"])), string,
-                                       ";".join(map(str, color["2"])))
+        return '\x1b[%sm%s\x1b[m' % (";".join(map(str, color["1"])), string)
 
     def __init__(self, stream, descriptions, verbosity):
         self.stream = stream

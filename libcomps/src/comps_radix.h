@@ -85,4 +85,5 @@ COMPS_RTreePair * comps_rtree_pair_create(char * key, void * data,
 void comps_rtree_pair_destroy(COMPS_RTreePair * pair);
 void comps_rtree_pair_destroy_v(void * pair);
 
+void comps_rtree_print(COMPS_HSList * hl, unsigned  deep);
 #endif
