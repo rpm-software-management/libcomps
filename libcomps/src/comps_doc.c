@@ -41,6 +41,7 @@ void comps_doc_create(COMPS_Doc* doc, COMPS_Object **args) {
     doc->doctype_name = comps_str(comps_default_doctype_name);
     doc->doctype_sysid = comps_str(comps_default_doctype_sysid);
     doc->doctype_pubid = comps_str(comps_default_doctype_pubid);
+    doc->lang = NULL;
 }
 COMPS_CREATE_u(doc, COMPS_Doc)
 
@@ -168,6 +169,8 @@ COMPS_DOC_ADDOBJMDICT(blacklist,  blacklist) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJMDICT(whiteout)      /*comps_doc.h macro*/
 COMPS_DOC_SETOBJMDICT(whiteout) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJMDICT(whiteout,  whiteout) /*comps_doc.h macro*/
+
+COMPS_DOC_SETPROP(lang,  COMPS_Str) /*comps_doc.h macro*/
 
 
 signed char comps2xml_f(COMPS_Doc * doc, char *filename, char stdoutredirect,
@@ -884,6 +887,11 @@ COMPS_Doc* comps_doc_arch_filter(COMPS_Doc *source, COMPS_ObjList *arches) {
     COMPS_OBJECT_DESTROY(list);
     return ret;
 }
+
+/*COMPS_Doc* comps_doc_set_lang(COMPS_Doc *comps, const char * lang) {
+    COMPS_OBJECT_DESTROY(comps->lang);
+    comps->lang = comps_str(lang);
+}*/
 
 COMPS_ValGenResult* comps_doc_listobjs_validate(COMPS_Object *object,
                                                 COMPS_Object *objlist,

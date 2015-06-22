@@ -189,8 +189,40 @@
                                                             char *key,\
                                                             COMPS_Str *obj);
 /** <@hideinititalizer */
-/** @endcond*/
 
+#define COMPS_DOC_GETPROP(OBJ,TYPE) CONCAT(TYPE,CONCAT(* ,CONCAT(comps_doc_, OBJ)))\
+                                                           (COMPS_Doc *doc){\
+    TYPE *ret;\
+    ret = (COMPS_Str*)comps_objdict_get(doc->objects, #OBJ);\
+    if (!ret) {\
+        ret = COMPS_OBJECT_CREATE(TYPE, NULL);\
+        comps_objdict_set_x(doc->objects, #OBJ, (COMPS_Object*)ret);\
+        ret = (TYPE*)comps_object_incref((COMPS_Object*)ret);\
+    }\
+    return ret;\
+}
+/** <@hideinititalizer */
+
+#define HEAD_COMPS_DOC_GETPROP(OBJ, TYPE) CONCAT(TYPE,CONCAT(*,CONCAT(comps_doc_, OBJS)))\
+                                                           (COMPS_Doc *doc);
+/** <@hideinititalizer */
+
+
+#define COMPS_DOC_SETPROP(OBJ, TYPE) void CONCAT(comps_doc_set_, OBJ)\
+                                                       (COMPS_Doc *doc,\
+                                                        TYPE *value){\
+    comps_objdict_set(doc->objects, #OBJ, (COMPS_Object*)value);\
+}
+
+/** <@hideinititalizer */
+
+
+#define HEAD_COMPS_DOC_SETPROP(OBJ, TYPE) void CONCAT(comps_doc_set_, OBJ)\
+                                                   (COMPS_Doc *doc,\
+                                                    TYPE *value);
+
+/** <@hideinititalizer */
+/** @endcond*/
 
 /** COMPS_Object derivate containing whole comps.xml document.
  */
@@ -204,6 +236,7 @@ typedef struct {
     COMPS_Str *doctype_name;
     COMPS_Str *doctype_sysid;
     COMPS_Str *doctype_pubid;
+    COMPS_Str *lang;
     } COMPS_Doc;
 COMPS_Object_TAIL(COMPS_Doc);
 
@@ -379,7 +412,21 @@ HEAD_COMPS_DOC_ADDOBJMDICT(blacklist) /*comps_doc.h macro*/
  */
 HEAD_COMPS_DOC_ADDOBJMDICT(whiteout) /*comps_doc.h macro*/
 
+
+
+/** whiteout adder to whitetout multi-dict in COMPS_Doc
+ * @param doc COMPS_Doc instance
+ * @param obj COMPS_Str language value
+ * Set language to comps object and all subobjects
+ */
+
+HEAD_COMPS_DOC_SETPROP(lang, COMPS_Str) /*comps_doc.h macro*/
+
 /**@}*/
+
+/** \defgroup COMPS_Doc_filters COMPS_Doc filters
+ * @{
+ */
 
 COMPS_ObjList* comps_doc_get_groups(COMPS_Doc *doc, char *id, char *name,
                                     char *desc, char *lang, int flags);
@@ -387,6 +434,8 @@ COMPS_ObjList* comps_doc_get_categories(COMPS_Doc *doc, char *id, char *name,
                                         char *desc, char *lang, int flags);
 COMPS_ObjList* comps_doc_get_envs(COMPS_Doc *doc, char *id, char *name,
                                   char *desc, char *lang, int flags);
+
+/**@}*/
 
 //char* comps_doc_xml_str(COMPS_Doc* doc, char *enc, COMPS_Log *log);
 
