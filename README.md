@@ -48,8 +48,11 @@ for documentation build:
         make
 
 ### Building rpm package
-1.  run build\_prep.sh for .spec file substitution and tarball creation:
-            sh build_prep.sh
+1.  run build\_prep.py for .spec file substitution and tarball creation:
+            python build_prep.py
+    or run the following code in Python:
+            import build_prep
+            build_prep.prepare()
 2.  copy libcomps.spec and libcomps-(git_commit_rev).tar.xz to SPECS and
     SOURCES dirs
             cp libcomps-*.tar.xz <PATH_TO_YOUR_RPMBUILD_SOURCES_DIR>/

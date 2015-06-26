@@ -123,20 +123,13 @@ def build_chlog(tags ,top='HEAD'):
         log.append("\n".join(_log))
     return reversed(log)
 
-if __name__ == "__main__":
+def prepare(ref='HEAD'):
     vfp = open("version.json", "r")
     version = json.load(vfp)
     vfp.close()
     
     subs = {}
-    try:
-        top_commit = tag_to_commit(sys.argv[1])
-        subs["GITREVLONG"] = tag_to_commit(sys.arv[1])
-    except IndexError:
-        top_commit = tag_to_commit("HEAD")
-        subs["GITREVLONG"] = tag_to_commit(top_commit)
-
-
+    top_commit = subs["GITREVLONG"] = tag_to_commit(ref)
 
     subs.update(version)
     tags = git_tags_chrono()
@@ -166,3 +159,6 @@ if __name__ == "__main__":
                           archive_name])#,
                          #stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p.wait()
+
+if __name__ == "__main__":
+    prepare(next(iter(sys.argv[1:]), 'HEAD'))
