@@ -518,7 +518,7 @@ char __pycomps_pkg_type_check(PyObject* pobj, void *cobj) {
         cobj = NULL;
         return 0;
     }
-    cint = PyInt_AsLong(pobj);
+    cint = PyINT_ASLONG(pobj);
     switch(cint) {
         case COMPS_PACKAGE_DEFAULT:
         case COMPS_PACKAGE_OPTIONAL:
