@@ -514,7 +514,7 @@ COMPS_ObjList* comps_groups_union(COMPS_ObjList *groups1,
 }
 char __pycomps_pkg_type_check(PyObject* pobj, void *cobj) {
     long cint;
-    if (!PyInt_Check(pobj)) {
+    if (!PyINT_CHECK(pobj)) {
         cobj = NULL;
         return 0;
     }
