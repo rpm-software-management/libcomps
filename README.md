@@ -16,6 +16,7 @@ for automatic build system:
 
 for libcomps library:
 
+*   zlib    http://www.zlib.net/
 *   libxml2 http://www.xmlsoft.org/
 *   expat   http://expat.sourceforge.net/
 *   gcc     http://gcc.gnu.org/

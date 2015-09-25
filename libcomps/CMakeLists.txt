@@ -22,12 +22,14 @@ include_directories("${PROJECT_SOURCE_DIR}/src")
 FIND_LIBRARY(CHECK_LIBRARY NAMES check)
 FIND_LIBRARY(EXPAT_LIBRARY NAMES expat)
 
+find_package(ZLIB REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(EXPAT REQUIRED)
 
 include_directories(${CHECK_INCLUDE_DIR})
 include_directories(${EXPAT_INCLUDE_DIR})
 include_directories(${LIBXML2_INCLUDE_DIR})
+include_directories(${ZLIB_INCLUDE_DIRS})
 
 #add_custom_target(pytest DEPENDS pytest_run)
 #add_custom_target(ctest DEPENDS test_comps_run test_parse_run)

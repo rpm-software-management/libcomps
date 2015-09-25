@@ -27,6 +27,7 @@ BuildRequires:  gcc
 BuildRequires:  libxml2-devel
 BuildRequires:  check-devel
 BuildRequires:  expat-devel
+BuildRequires:  zlib-devel
 
 %description
 Libcomps is library for structure-like manipulation with content of
