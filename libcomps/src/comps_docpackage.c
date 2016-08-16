@@ -24,7 +24,7 @@ static void comps_docpackage_create(COMPS_DocGroupPackage* package, COMPS_Object
     package->name = NULL;
     package->requires = NULL;
     package->basearchonly = NULL;
-    package->arches = NULL;
+    package->arches = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
     package->type = COMPS_PACKAGE_UNKNOWN;
 }
 COMPS_CREATE_u(docpackage, COMPS_DocGroupPackage)
