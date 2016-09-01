@@ -352,8 +352,7 @@ COMPS_DocCategory* comps_doccategory_arch_filter(COMPS_DocCategory *source,
     for (COMPS_ObjListIt *it = source->group_ids->first;
          it != NULL; it = it->next) {
         arches2 = comps_docgroupid_arches((COMPS_DocGroupId*)it->comps_obj);
-        if (!arches2) continue;
-        if (__comps_objlist_intersected(arches, arches2)) {
+        if ((!arches2) || (__comps_objlist_intersected(arches, arches2))) {
             comps_doccategory_add_groupid(ret, (COMPS_DocGroupId*)
                                           comps_object_copy(it->comps_obj));
         }

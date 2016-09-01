@@ -434,7 +434,7 @@ COMPS_DocGroup* comps_docgroup_arch_filter(COMPS_DocGroup *source,
     for (COMPS_ObjListIt *it = source->packages->first;
          it != NULL; it = it->next) {
         arches2 = comps_docpackage_arches((COMPS_DocGroupPackage*)it->comps_obj);
-        if (__comps_objlist_intersected(arches, arches2)) {
+        if ((!arches2) || (__comps_objlist_intersected(arches, arches2))) {
             comps_docgroup_add_package(ret, (COMPS_DocGroupPackage*)
                                             comps_object_copy(it->comps_obj));
         }
