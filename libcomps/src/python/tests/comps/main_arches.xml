@@ -11,7 +11,7 @@
       <packagereq arch="x86 s390">pkg4</packagereq>
       <packagereq arch="x86_64 x86">pkg5</packagereq>
       <packagereq arch="x86_64 x86">pkg6</packagereq>
-      <packagereq arch="x86_64 x86">pkg7</packagereq>
+      <packagereq>pkg7</packagereq>
     </packagelist>
   </group>
   <group arch="x86_64">
@@ -28,6 +28,13 @@
       <packagereq arch="x86_64 x86">pkg7</packagereq>
     </packagelist>
   </group>
+  <group>
+   <id>group4</id>
+   <name>group4</name>
+    <packagelist>
+      <packagereq arch="x86_64 x86">pkg1</packagereq>
+    </packagelist>
+  </group>
   <category arch="x86_64 x86 s390">
    <id>cat1</id>
    <name>cat1</name>
@@ -38,6 +45,7 @@
       <groupid arch="x86_64 x86 s390">g4</groupid>
       <groupid arch="x86_64 s390">g5</groupid>
       <groupid arch="x86 s390">g6</groupid>
+      <groupid>g7</groupid>
     </grouplist>
   </category>
   <category arch="x86_64">
@@ -54,6 +62,13 @@
       <groupid arch="x86_64 x86">g1</groupid>
     </grouplist>
   </category>
+    <category>
+   <id>cat4</id>
+   <name>cat4</name>
+    <grouplist>
+      <groupid>g1</groupid>
+    </grouplist>
+  </category>
   <environment arch="x86_64 x86 s390">
    <id>env1</id>
    <name>env1</name>
@@ -63,6 +78,7 @@
       <groupid arch="x86">g3</groupid>
       <groupid arch="x86 s390">g4</groupid>
       <groupid arch="x86_64">g5</groupid>
+      <groupid>g6</groupid>
     </grouplist>
     <optionlist>
       <groupid arch="x86_64 x86 s390">o1</groupid>
@@ -70,6 +86,7 @@
       <groupid arch="x86 x86_64">o3</groupid>
       <groupid arch="x86 s390">o4</groupid>
       <groupid arch="x86_64">o5</groupid>
+      <groupid>o6</groupid>
     </optionlist>
   </environment>
   <environment arch="x86_64">
@@ -85,6 +102,16 @@
   <environment arch="x86_64 s390">
    <id>env3</id>
    <name>env3</name>
+    <grouplist>
+      <groupid arch="x86_64 s390">g1</groupid>
+    </grouplist>
+    <optionlist>
+      <groupid arch="x86_64">o5</groupid>
+    </optionlist>
+  </environment>
+  <environment>
+   <id>env4</id>
+   <name>env4</name>
     <grouplist>
       <groupid arch="x86_64 s390">g1</groupid>
     </grouplist>
