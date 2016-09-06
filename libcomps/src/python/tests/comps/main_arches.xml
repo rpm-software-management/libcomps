@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE comps PUBLIC "-//Red Hat, Inc.//DTD Comps info//EN" "comps.dtd">
 <comps>
-  <group arch="x86_64 x86 s390">
+  <group arch="x86_64,x86,s390">
    <id>group1</id>
    <name>group1</name>
     <packagelist>
@@ -35,7 +35,7 @@
       <packagereq arch="x86_64 x86">pkg1</packagereq>
     </packagelist>
   </group>
-  <category arch="x86_64 x86 s390">
+  <category arch="x86_64,x86 s390">
    <id>cat1</id>
    <name>cat1</name>
     <grouplist>
@@ -69,11 +69,11 @@
       <groupid>g1</groupid>
     </grouplist>
   </category>
-  <environment arch="x86_64 x86 s390">
+  <environment arch="x86_64,x86,s390">
    <id>env1</id>
    <name>env1</name>
     <grouplist>
-      <groupid arch="x86_64 x86">g1</groupid>
+      <groupid arch="x86_64,x86">g1</groupid>
       <groupid arch="x86_64 s390">g2</groupid>
       <groupid arch="x86">g3</groupid>
       <groupid arch="x86 s390">g4</groupid>
@@ -81,7 +81,7 @@
       <groupid>g6</groupid>
     </grouplist>
     <optionlist>
-      <groupid arch="x86_64 x86 s390">o1</groupid>
+      <groupid arch="x86_64,x86 s390">o1</groupid>
       <groupid arch="s390">o2</groupid>
       <groupid arch="x86 x86_64">o3</groupid>
       <groupid arch="x86 s390">o4</groupid>

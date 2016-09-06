@@ -438,10 +438,10 @@ COMPS_ObjList * __comps_split_arches(char *arches) {
     COMPS_ObjList *list;
     char *pch;
     list = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
-    pch = strtok(arches, " ");
+    pch = strtok(arches, " ,");
     while (pch != NULL) {
         comps_objlist_append_x(list, (COMPS_Object*)comps_str(pch));
-        pch = strtok(NULL, " ");
+        pch = strtok(NULL, " ,");
     }
     return list;
 }
