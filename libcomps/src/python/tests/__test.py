@@ -1029,9 +1029,9 @@ class COMPSTest(unittest.TestCase):
         comps.fromxml_f("comps/main_arches.xml")
         filtered = comps.arch_filter(["x86"])
         g1_pkgs = ["pkg3", "pkg4", "pkg5", "pkg6", "pkg7"]
-        c1_gids = ["g1", "g3", "g4", "g6"]
-        e1_gids = ["g1", "g3", "g4"]
-        e1_oids = ["o1", "o3", "o4"]
+        c1_gids = ["g1", "g3", "g4", "g6", "g7"]
+        e1_gids = ["g1", "g3", "g4", "g6"]
+        e1_oids = ["o1", "o3", "o4", "o6"]
         x = 0
         for pkg in filtered.groups[0].packages:
             self.assertTrue(g1_pkgs[x] == pkg.name)
@@ -1048,12 +1048,21 @@ class COMPSTest(unittest.TestCase):
         for oid in filtered.environments[0].option_ids:
             self.assertTrue(e1_oids[x] == oid.name)
             x +=1
-        empty_comps = libcomps.Comps()
+        test_comps = libcomps.Comps()
+        env1 = libcomps.Environment(id='env4', name='env4')
+        env1.option_ids.append("o5")
+        group1 = libcomps.Group(id='group4', name='group4')
+        group1.biarchonly = False
+        group_id = libcomps.GroupId(name='g1')
+        c1 = libcomps.Category(id='cat4', name='cat4')
+        c1.group_ids.append(group_id)
+        test_comps.environments.append(env1)
+        test_comps.groups.append(group1)
+        test_comps.categories.append(c1)
         comps3 = comps.arch_filter(["unknown"])
-        self.assertTrue(empty_comps == comps3)
+        self.assertTrue(test_comps == comps3)
 
         comps4 = comps.arch_filter(["x86", "x86_64", "s390"])
-        comps4.environments[2].option_ids.append("o5")
         self.assertTrue(comps == comps4)
 
         s = comps.toxml_str(xml_options = {"arch_output":True})

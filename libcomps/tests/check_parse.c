@@ -529,24 +529,24 @@ START_TEST(test_arch)
     COMPS_Str *str;
     int x;
     COMPS_ObjListIt *it;
-    char *grps[3][4] = {{"group1", "group3", NULL, NULL},
-                       {"group1", "group2", "group3", NULL},
-                       {"group3", NULL, NULL, NULL}};
+    char *grps[3][5] = {{"group1", "group3", "group4", NULL, NULL},
+                       {"group1", "group2", "group3", "group4", NULL},
+                       {"group3", "group4", NULL, NULL, NULL}};
     char *g1_pkgs[3][8] = {{"pkg3", "pkg4", "pkg5", "pkg6", "pkg7", NULL, NULL, NULL},
-                        {"pkg3", "pkg4", NULL, NULL, NULL, NULL, NULL, NULL},
+                        {"pkg3", "pkg4", "pkg7", NULL, NULL, NULL, NULL, NULL},
                         {"pkg1", "pkg2", "pkg3", "pkg4", "pkg5", "pkg6", "pkg7",
                          NULL}};
 
-    char *cats[3][4] = {{"cat1", NULL, NULL, NULL},
-                       {"cat1", "cat2", NULL, NULL},
-                       {"cat3", NULL, NULL, NULL}};
-    char *c1_gids[3][8] = {{"g1", "g3", "g4", "g6", NULL, NULL, NULL, NULL},
-                           {"g1", "g2", "g4", "g5", NULL, NULL, NULL, NULL},
-                           {"g4", "g5", "g6", NULL, NULL, NULL, NULL, NULL}};
+    char *cats[3][5] = {{"cat1", "cat4", NULL, NULL, NULL},
+                       {"cat1", "cat2", "cat4", NULL, NULL},
+                       {"cat3", "cat4", NULL, NULL, NULL}};
+    char *c1_gids[3][9] = {{"g1", "g3", "g4", "g6", "g7", NULL, NULL, NULL, NULL},
+                           {"g1", "g2", "g4", "g5", "g7", NULL, NULL, NULL, NULL},
+                           {"g4", "g5", "g6", "g7", NULL, NULL, NULL, NULL, NULL}};
 
-    char *envs[3][4] = {{"env1", NULL, NULL, NULL},
-                       {"env1", "env2", "env3", NULL},
-                       {"env1", "env2", NULL, NULL}};
+    char *envs[3][5] = {{"env1", "env4", NULL, NULL, NULL},
+                       {"env1", "env2", "env3", "env4", NULL},
+                       {"env1", "env2", "env4", NULL, NULL}};
     char *e1_gids[3][8] = {{"g1", "g3", "g4", NULL, NULL, NULL, NULL, NULL},
                            {"g1", "g2", "g5", NULL, NULL, NULL, NULL, NULL},
                            {"g2", "g4", NULL, NULL, NULL,NULL, NULL, NULL}};
@@ -571,7 +571,7 @@ START_TEST(test_arch)
     COMPS_OBJECT_DESTROY(arches);
 
     list = comps_doc_groups(doc2);
-    ck_assert(list->len == 2);
+    ck_assert(list->len == 3);
     for (it = list->first, x=0; it != NULL; it = it->next, x++) {
         g = (COMPS_DocGroup*)it->comps_obj;
         str = (COMPS_Str*)comps_docgroup_get_id(g);
@@ -591,7 +591,7 @@ START_TEST(test_arch)
     COMPS_OBJECT_DESTROY(list);
 
     list = comps_doc_categories(doc2);
-    ck_assert(list->len == 1);
+    ck_assert(list->len == 2);
     for (it = list->first, x=0; it != NULL; it = it->next, x++) {
         g = (COMPS_DocCategory*)it->comps_obj;
         str = (COMPS_Str*)comps_doccategory_get_id(g);
@@ -611,7 +611,7 @@ START_TEST(test_arch)
     COMPS_OBJECT_DESTROY(list);
 
     list = comps_doc_environments(doc2);
-    ck_assert(list->len == 1);
+    ck_assert(list->len == 2);
     for (it = list->first, x=0; it != NULL; it = it->next, x++) {
         g = (COMPS_DocEnv*)it->comps_obj;
         str = (COMPS_Str*)comps_docenv_get_id(g);
