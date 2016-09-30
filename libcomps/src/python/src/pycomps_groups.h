@@ -30,6 +30,7 @@
 #include "pycomps_ids.h"
 #include "pycomps_dict.h"
 #include "pycomps_23macros.h"
+#include "pycomps_mdict.h"
 
 typedef struct {
     PyObject_HEAD
@@ -42,6 +43,7 @@ typedef struct {
 typedef struct {
     PyObject_HEAD
     COMPS_DocGroupPackage * c_obj;
+    PyObject *p_arches;
 } PyCOMPS_Package;
 
 __H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroup) /*pycomps_utils.h macro*/
@@ -51,6 +53,7 @@ __H_COMPS_DICT_GETSET_CLOSURE(COMPS_DocGroup) /*pycomps_utils.h macro*/
 
 __H_COMPS_STRPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) /*pycomps_utils.h macro*/
 __H_COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) /*pycomps_utils.h macro*/
+__H_COMPS_LIST_GETSET_CLOSURE(COMPS_DocGroupPackage) /*pycomps_utils.h macro*/
 
 COMPS_ObjList* comps_groups_union(COMPS_ObjList *groups1,
                                   COMPS_ObjList *groups2);
