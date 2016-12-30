@@ -1,3 +1,4 @@
+include(GNUInstallDirs)
 set (libcomps_SOURCES comps_doc.c comps_docgroup.c comps_doccategory.c
                       comps_docenv.c comps_docpackage.c comps_docgroupid.c
      comps_obj.c comps_mm.c
@@ -53,7 +54,7 @@ add_dependencies(libcomps src-copy)
 IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
     SET (LIB_SUFFIX "64")
 ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
-set (LIB_INST_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
+set (LIB_INST_DIR ${CMAKE_INSTALL_LIBDIR})
 
 
 install (FILES ${libcomps_HEADERS} DESTINATION include/libcomps)
