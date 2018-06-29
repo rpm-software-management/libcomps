@@ -1,12 +1,6 @@
 :mod:`libcomps` - Libcomps objects
 ==================================
 
-.. |FEDORA_IMG| image:: fedora_logo.png
-    :height: 70
-    :width: 200
-    :scale: 30
-    :alt: Fedora
-
 .. automodule:: libcomps
 
     .. autoexception: ParserError
@@ -21,7 +15,7 @@
 
             :members: blacklist, langpacks, whiteout
 
-            are |FEDORA_IMG| objects only
+            are Fedora objects only
 
     libcomps.GroupList
     ------------------
