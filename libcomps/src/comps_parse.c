@@ -166,14 +166,12 @@ int comps_parse_validate_dtd(char *filename, char *dtd_file) {
     if (!ret) {
         err = xmlGetLastError();
         printf("%s\n", err->message);
+        ret = -err->code;
     }
     xmlFreeDoc(fptr);
     xmlFreeDtd(dtd_ptr);
     xmlFreeValidCtxt(vctxt);
-    if (!ret)
-        return -err->code;
-    else
-        return ret;
+    return ret;
 }
 
 void __comps_after_parse(COMPS_Parsed *parsed) {

@@ -257,13 +257,17 @@ PyObject* list_get_slice(PyObject *self, PyObject *key) {
 
     clen = 0;
     it = ((PyCOMPS_Sequence*)self)->list->first;
+    if (!it)
+        return (PyObject*)result;
     for (i=0 ; i<istart; it=it->next, i++);
     while (clen != ilen) {
         comps_objlist_append(result->list, it->comps_obj);
         clen+=1;
-        for (i=0 ; i<istep && it != NULL; it=it->next,  i++);
-        if (!it) it = ((PyCOMPS_Sequence*)self)->list->first;
-        for (; i<istep; it=it->next, i++);
+        i = 0;
+        do {
+            for (; i<istep && it != NULL; it=it->next, i++);
+            if (!it) it = ((PyCOMPS_Sequence*)self)->list->first;
+        } while (i < istep);
     }
     return (PyObject*)result;
 }
