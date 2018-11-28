@@ -38,10 +38,10 @@ inline char __comps_strcmp(void *s1, void *s2) {
 
 inline int __comps_xml_prop(char *key, char *val,
                              xmlTextWriterPtr writer) {
-    int retc, x;
-    retc = (x=xmlTextWriterStartElement(writer, BAD_CAST key)<0)?x:retc;
-    retc = (x=xmlTextWriterWriteString(writer, BAD_CAST val)<0)?x:retc;
-    retc = (x=xmlTextWriterEndElement(writer)<0)?x:retc;
+    int retc;
+    retc = xmlTextWriterStartElement(writer, BAD_CAST key) >= 0 ? 1 : 0;
+    retc &= xmlTextWriterWriteString(writer, BAD_CAST val) >= 0 ? 1 : 0;
+    retc &= xmlTextWriterEndElement(writer) >= 0 ? 1 : 0;
     return retc;
 }
 
