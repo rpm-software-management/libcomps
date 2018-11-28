@@ -540,8 +540,10 @@ void comps_objrtree_unset(COMPS_ObjRTree * rt, const char * key) {
                 break;
             }
         }
-        if (!found)
+        if (!found) {
+            comps_hslist_destroy(&path);
             return;
+        }
         rtdata = (COMPS_ObjRTreeData*)it->data;
 
         for (x=1; ;x++) {
@@ -591,7 +593,10 @@ void comps_objrtree_unset(COMPS_ObjRTree * rt, const char * key) {
             return;
         }
         else if (ended == 1) offset+=x;
-        else return;
+        else {
+            comps_hslist_destroy(&path);
+            return;
+        }
         if ((relation = malloc(sizeof(struct Relation))) == NULL) {
             comps_hslist_destroy(&path);
             return;

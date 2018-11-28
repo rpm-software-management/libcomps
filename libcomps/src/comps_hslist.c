@@ -71,7 +71,7 @@ void comps_hslist_insert_after(COMPS_HSList * hslist, COMPS_HSListItem *item,
     COMPS_HSListItem * it;
     void * ndata;
 
-    if (hslist == NULL && item == NULL)
+    if (hslist == NULL || item == NULL)
         return;
     if ((it = malloc(sizeof(*it))) == NULL)
         return;
@@ -206,6 +206,7 @@ void comps_hslist_destroy(COMPS_HSList ** hslist) {
 void comps_hslist_remove(COMPS_HSList * hslist,
                               COMPS_HSListItem * it) {
     COMPS_HSListItem *itx, *itprev=NULL;
+    if (it == NULL) return;
     for (itx = hslist->first; itx != NULL && itx != it; itx = itx->next) {
         itprev = itx;
     }

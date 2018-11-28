@@ -40,7 +40,10 @@ inline COMPS_BRTreeData * __comps_brtree_data_create(COMPS_BRTree *brt,
     if ((brtd = malloc(sizeof(COMPS_BRTreeData))) == NULL)
         return NULL;
     brtd->key = brt->key_clone(key, keylen);
-    if (!brtd->key) return NULL;
+    if (!brtd->key) {
+        free(brtd);
+        return NULL;
+    }
 
     brtd->data = data;
     if (data != NULL) {
@@ -305,7 +308,6 @@ void comps_brtree_set(COMPS_BRTree * brt, void * key, void * data)
                 it->next = NULL;
                 ((COMPS_BRTreeData*)subnodes->last->data)->subnodes->last->next = it;
                 ((COMPS_BRTreeData*)subnodes->last->data)->subnodes->last = it;
-                len = brt->key_len(brtdata->key)-x;
                 newkey = brt->subkey(brtdata->key, x, brt->key_len(brtdata->key));
                 brt->key_destroy(brtdata->key);
                 brtdata->key = newkey;
@@ -415,8 +417,10 @@ void comps_brtree_unset(COMPS_BRTree * brt, void * key) {
                 break;
             }
         }
-        if (!found)
+        if (!found) {
+            comps_hslist_destroy(&path);
             return;
+        }
         brtdata = (COMPS_BRTreeData*)it->data;
         x = brt->key_cmp(brtdata->key, key, 1, offset+1, len, &ended);
         if (ended == 3) {
@@ -459,7 +463,10 @@ void comps_brtree_unset(COMPS_BRTree * brt, void * key) {
             return;
         }
         else if (ended == 1) offset+=x;
-        else return;
+        else {
+            comps_hslist_destroy(&path);
+            return;
+        }
         if ((relation = malloc(sizeof(struct Relation))) == NULL) {
             comps_hslist_destroy(&path);
             return;
