@@ -204,7 +204,7 @@ COMPS_DocEnv* comps_docenv_union(COMPS_DocEnv *e1, COMPS_DocEnv *e2) {
         if ((data = comps_set_data_at(set, (void*)it->comps_obj)) != NULL) {
             index = comps_objlist_index(res->option_list, (COMPS_Object*)data);
             comps_objlist_remove_at(res->option_list, index);
-            ret = comps_objlist_insert_at_x(res->option_list, index,
+            comps_objlist_insert_at_x(res->option_list, index,
                                       comps_object_copy(it->comps_obj));
         } else {
             comps_docenv_add_optionid(res, (COMPS_DocGroupId*)
@@ -314,11 +314,11 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
         return 1;
     }
     ret = xmlTextWriterStartElement(writer, BAD_CAST "environment");
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     if (xml_options->arch_output) {
         obj = (COMPS_Object*)comps_docenv_arches(env);
         ret = __comps_xml_arch(obj, writer);
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
         COMPS_OBJECT_DESTROY(obj);
     }
     for (int i=0; i<6; i++) {
@@ -365,27 +365,27 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
     }
     if (env->group_list->len || xml_options->empty_grouplist) {
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
         for (it = env->group_list->first; it != NULL; it = it->next) {
             comps_docgroupid_xml((COMPS_DocGroupId*)(COMPS_DocGroupId*)it->comps_obj,
                                  writer, log, xml_options, def_options);
         }
         ret = xmlTextWriterEndElement(writer);
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
     }
 
     if (env->option_list->len || xml_options->empty_optionlist) {
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"optionlist");
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
         for (it = env->option_list->first; it != NULL; it = it->next) {
             comps_docgroupid_xml((COMPS_DocGroupId*)(COMPS_DocGroupId*)it->comps_obj,
                                  writer, log, xml_options, def_options);
         }
         ret = xmlTextWriterEndElement(writer);
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
     }
     ret = xmlTextWriterEndElement(writer);
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     return 0;
 }
 

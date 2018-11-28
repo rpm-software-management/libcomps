@@ -109,13 +109,13 @@ signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
     (void)def_options;
 
     ret = xmlTextWriterStartElement(writer, BAD_CAST "groupid");
+    COMPS_XMLRET_CHECK()
     if (options->arch_output) {
         COMPS_Object *obj = (COMPS_Object*)groupid->arches;
         //printf("obj %d\n", obj);
         ret = __comps_xml_arch(obj, writer);
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
     }
-    COMPS_XMLRET_CHECK
     if (options->gid_default_explicit) {
         if (groupid->def)
             ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
@@ -123,7 +123,7 @@ signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
         else
             ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
                                               BAD_CAST "false");
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
     } else if (groupid->def != default_def) {
         if (groupid->def)
             ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "default",
@@ -134,10 +134,10 @@ signed char comps_docgroupid_xml(COMPS_DocGroupId *groupid,
     }
     str = comps_object_tostr((COMPS_Object*)groupid->name);
     ret = xmlTextWriterWriteString(writer, BAD_CAST str);
-    COMPS_XMLRET_CHECK
     free(str);
+    COMPS_XMLRET_CHECK()
     ret = xmlTextWriterEndElement(writer);
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     return 0;
 }
 

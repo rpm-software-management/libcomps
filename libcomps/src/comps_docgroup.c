@@ -305,11 +305,11 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
         return 1;
     }
     ret = xmlTextWriterStartElement(writer, BAD_CAST "group");
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     if (xml_options->arch_output) {
         obj = (COMPS_Object*)comps_docgroup_arches(group);
         ret = __comps_xml_arch(obj, writer);
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
         COMPS_OBJECT_DESTROY(obj);
     }
     for (int i=0; i<10; i++) {
@@ -344,33 +344,33 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
             for (hsit = pairlist->first; hsit != NULL; hsit = hsit->next) {
                 ret = xmlTextWriterStartElement(writer,
                             (const xmlChar*)((aliases[i])?aliases[i]:props[i]));
-                COMPS_XMLRET_CHECK
+                COMPS_XMLRET_CHECK(comps_hslist_destroy(&pairlist))
 
                 ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "xml:lang",
                             (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
-                COMPS_XMLRET_CHECK
+                COMPS_XMLRET_CHECK(comps_hslist_destroy(&pairlist))
                 str = tostrf[i](((COMPS_ObjRTreePair*)hsit->data)->data);
                 ret = xmlTextWriterWriteString(writer, (xmlChar*)str);
-                COMPS_XMLRET_CHECK
+                COMPS_XMLRET_CHECK(comps_hslist_destroy(&pairlist))
                 free(str);
                 ret = xmlTextWriterEndElement(writer);
-                COMPS_XMLRET_CHECK
+                COMPS_XMLRET_CHECK(comps_hslist_destroy(&pairlist))
             }
             comps_hslist_destroy(&pairlist);
         }
     }
     if (group->packages->len || xml_options->empty_packages) {
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"packagelist");
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
         for (it = group->packages->first; it != NULL; it = it->next) {
             comps_docpackage_xml((COMPS_DocGroupPackage*)it->comps_obj,
                                  writer, log, xml_options, def_options);
         }
         ret = xmlTextWriterEndElement(writer);
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
     }
     ret = xmlTextWriterEndElement(writer);
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     return 0;
 }
 
