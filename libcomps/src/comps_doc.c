@@ -734,7 +734,6 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
     if (mdict && mdict->len) {
         retc = xmlTextWriterStartElement(writer, BAD_CAST "blacklist");
         if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
-            COMPS_OBJECT_DESTROY(dict);
             return -1;
         }
         hslist = comps_objmrtree_pairs(mdict);
@@ -744,7 +743,6 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                  it != NULL; it = it->next) {
                 retc = xmlTextWriterStartElement(writer, BAD_CAST "package");
                 if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
-                    COMPS_OBJECT_DESTROY(dict);
                     comps_hslist_destroy(&hslist);
                     return -1;
                 }
@@ -757,7 +755,6 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
 
                 retc = xmlTextWriterEndElement(writer);
                 if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
-                    COMPS_OBJECT_DESTROY(dict);
                     comps_hslist_destroy(&hslist);
                     return -1;
                 }
@@ -767,7 +764,6 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
 
         retc = xmlTextWriterEndElement(writer);
         if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
-            COMPS_OBJECT_DESTROY(dict);
             return -1;
         }
     }
@@ -786,7 +782,6 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                  it != NULL; it = it->next) {
                 retc = xmlTextWriterStartElement(writer, BAD_CAST "ignoredep");
                 if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
-                    COMPS_OBJECT_DESTROY(dict);
                     comps_hslist_destroy(&hslist);
                     return -1;
                 }
@@ -800,7 +795,6 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
 
                 retc = xmlTextWriterEndElement(writer);
                 if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
-                    COMPS_OBJECT_DESTROY(dict);
                     comps_hslist_destroy(&hslist);
                     return -1;
                 }
@@ -810,7 +804,6 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
 
         retc = xmlTextWriterEndElement(writer);
         if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
-            COMPS_OBJECT_DESTROY(dict);
             return -1;
         }
     }
