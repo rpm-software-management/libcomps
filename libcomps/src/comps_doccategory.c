@@ -230,12 +230,12 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
         return 1;
     }
     ret = xmlTextWriterStartElement(writer, BAD_CAST "category");
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     if (xml_options->arch_output) {
         obj = (COMPS_Object*)comps_doccategory_arches(category);
         ret = __comps_xml_arch(obj, writer);
         COMPS_OBJECT_DESTROY(obj);
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
     }
     for (int i=0; i<6; i++) {
         if (!type[i]) {
@@ -281,16 +281,16 @@ signed char comps_doccategory_xml(COMPS_DocCategory *category,
     }
     if (category->group_ids->len || xml_options->empty_grouplist) {
         ret = xmlTextWriterStartElement(writer, (xmlChar*)"grouplist");
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
         for (it = category->group_ids->first; it != NULL; it = it->next) {
             comps_docgroupid_xml((COMPS_DocGroupId*)(COMPS_DocGroupId*)it->comps_obj,
                                  writer, log, xml_options, def_options);
         }
         ret = xmlTextWriterEndElement(writer);
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
     }
     ret = xmlTextWriterEndElement(writer);
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     return 0;
 }
 

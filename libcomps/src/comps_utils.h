@@ -172,7 +172,8 @@ void CONCAT(CONCAT(comps_, OBJ), _set_arches)(OBJTYPE *obj,\
                                               COMPS_ObjList *list);
 
 
-#define COMPS_XMLRET_CHECK if (ret == -1) {\
+#define COMPS_XMLRET_CHECK(free_code) if (ret == -1) {\
+    free_code;\
     comps_log_error(log, COMPS_ERR_XMLGEN, 0);\
     return -1;\
 }

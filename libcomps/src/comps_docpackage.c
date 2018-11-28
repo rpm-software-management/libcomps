@@ -150,11 +150,11 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
     (void)def_options;
 
     ret = xmlTextWriterStartElement(writer, BAD_CAST "packagereq");
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     if (xml_options->arch_output) {
         COMPS_Object *obj = (COMPS_Object*)pkg->arches;
         ret = __comps_xml_arch(obj, writer);
-        COMPS_XMLRET_CHECK
+        COMPS_XMLRET_CHECK()
     }
     if (pkg->type == COMPS_PACKAGE_OPTIONAL)
         str = "optional";
@@ -172,7 +172,7 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
                                             BAD_CAST str);
         free(str);
     }
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     if (xml_options->bao_explicit) {
         if (pkg->basearchonly) {
             ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
@@ -192,13 +192,13 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
             }
         }
     }
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     str = comps_object_tostr((COMPS_Object*)pkg->name);
     ret = xmlTextWriterWriteString(writer, (xmlChar*)str);
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     free(str);
     ret = xmlTextWriterEndElement(writer);
-    COMPS_XMLRET_CHECK
+    COMPS_XMLRET_CHECK()
     return 0;
 }
 
