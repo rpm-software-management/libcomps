@@ -54,10 +54,14 @@ COMPS_ObjRTree * load_acrodict(char *filename) {
     if (!rt) return NULL;
 
     f = fopen(filename, "r");
-    if (!f) return NULL;
+    if (!f) {
+        COMPS_OBJECT_DESTROY(rt);
+        return NULL;
+    }
     while (!feof(f)) {
         memset(buffer, 0, 100);
         if (!fgets(buffer, 100, f))
+            fclose(f);
             return rt;
         buffer[strlen(buffer)-1] =0;
         //printf("buffer:%s\n", buffer);

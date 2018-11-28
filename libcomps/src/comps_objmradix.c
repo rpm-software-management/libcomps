@@ -585,7 +585,10 @@ void comps_objmrtree_unset(COMPS_ObjMRTree * rt, const char * key) {
             return;
         }
         else if (ended == 1) offset+=x;
-        else return;
+        else {
+            comps_hslist_destroy(&path);
+            return;
+        }
         if ((relation = malloc(sizeof(struct Relation))) == NULL) {
             comps_hslist_destroy(&path);
             return;

@@ -73,7 +73,7 @@ int PyCOMPSDict_init(PyCOMPS_Dict *self, PyObject *args, PyObject *kwds)
 PyObject* PyCOMPSDict_str(PyObject *self) {
     COMPS_HSList *pairlist;
     COMPS_HSListItem *it;
-    PyObject *ret, *tmp, *tmp2, *tmpkey, *tmpval;
+    PyObject *ret, *tmp = NULL, *tmp2 = NULL, *tmpkey = NULL, *tmpval = NULL;
     ret = PyUnicode_FromString("{");
     pairlist = comps_objdict_pairs(((PyCOMPS_Dict*)self)->dict);
     char *tmpstr;
@@ -83,14 +83,14 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
         tmpkey = __pycomps_lang_decode(((COMPS_ObjRTreePair*)it->data)->key);
         if (!tmpkey) {
             PyErr_SetString(PyExc_TypeError, "key convert error");
-            return NULL;
+            goto out;
         }
         tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
         tmpval = __pycomps_lang_decode(tmpstr);
         free(tmpstr);
         if (!tmpval) {
             PyErr_SetString(PyExc_TypeError, "val convert error");
-            return NULL;
+            goto out;
         }
         tmp2 = PyUnicode_FromFormat("%U = '%U', ", tmpkey, tmpval);
         ret = PyUnicode_Concat(ret, tmp2);
@@ -102,14 +102,14 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
     tmp = ret;
     tmpkey = __pycomps_lang_decode(((COMPS_RTreePair*)it->data)->key);
     if (!tmpkey) {
-        return NULL;
+        goto out;
     }
     tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
     tmpval = __pycomps_lang_decode(tmpstr);
     free(tmpstr);
     if (!tmpval) {
         //PyErr_SetString(PyExc_TypeError, "val convert error");
-        return NULL;
+        goto out;
     }
     tmp2 = PyUnicode_FromFormat("%U = '%U'", tmpkey, tmpval);
     ret = PyUnicode_Concat(ret, tmp2);
@@ -126,6 +126,14 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
 
     comps_hslist_destroy(&pairlist);
     return ret;
+
+    out:
+    Py_XDECREF(tmp);
+    Py_XDECREF(tmp2);
+    Py_XDECREF(tmpkey);
+    Py_XDECREF(tmpval);
+    comps_hslist_destroy(&pairlist);
+    return NULL;
 }
 
 int PyCOMPSDict_print(PyObject *self, FILE *f, int flags) {
@@ -155,8 +163,12 @@ int PyCOMPSDict_print(PyObject *self, FILE *f, int flags) {
 
 PyObject* PyCOMPSDict_cmp(PyObject *self, PyObject *other, int op) {
     char ret;
-    if (other == NULL || (Py_TYPE(other) != Py_TYPE(self) &&
-                          !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self)))) {
+    if (other == NULL) {
+        PyErr_Format(PyExc_TypeError, "Get NULL as Dict subclass");
+        return NULL;
+    }
+    if ((Py_TYPE(other) != Py_TYPE(self) &&
+         !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self)))) {
         PyErr_Format(PyExc_TypeError, "Not Dict subclass, %s",
                                       Py_TYPE(other)->tp_name);
         return NULL;
@@ -190,8 +202,12 @@ PyObject* PyCOMPSDict_copy(PyObject *self) {
     return ret;
 }
 PyObject* PyCOMPSDict_update(PyObject *self, PyObject *other) {
-    if (other == NULL || (Py_TYPE(other) != Py_TYPE(self) &&
-                          !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self)))) {
+    if (other == NULL) {
+        PyErr_Format(PyExc_TypeError, "Get NULL as Dict subclass");
+        return NULL;
+    }
+    if ((Py_TYPE(other) != Py_TYPE(self) &&
+         !PyType_IsSubtype(Py_TYPE(other), Py_TYPE(self)))) {
         PyErr_Format(PyExc_TypeError, "Not %s type or subclass, %s",
                      Py_TYPE(self)->tp_name, Py_TYPE(other)->tp_name);
         return NULL;

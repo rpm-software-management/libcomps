@@ -915,7 +915,12 @@ COMPS_Elem* comps_elem_create(const char * s, const char ** attrs,
     if (attrs != NULL) {
         for (; *attrs != NULL; attrs += 2) {
             val = malloc((strlen(*(attrs+1))+1)*sizeof(char));
-            if (val == NULL) return NULL;
+            if (val == NULL) {
+                comps_dict_destroy(elem->attrs);
+                free(elem->name);
+                free(elem);
+                return NULL;
+            }
             memcpy(val, *(attrs+1), sizeof(char) * (strlen(*(attrs+1))+1));
             comps_dict_set(elem->attrs, (char*)*attrs, val);
         }

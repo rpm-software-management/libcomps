@@ -96,11 +96,16 @@ COMPS_RTree * load_acrodict(char *filename) {
     if (!rt) return NULL;
 
     f = fopen(filename, "r");
-    if (!f) return NULL;
+    if (!f) {
+        comps_rtree_destroy(rt);
+        return NULL;
+    }
     while (!feof(f)) {
         memset(buffer, 0, 100);
-        if (!fgets(buffer, 100, f))
+        if (!fgets(buffer, 100, f)) {
+            fclose(f);
             return rt;
+        }
         buffer[strlen(buffer)-1] =0;
         //printf("buffer:%s\n", buffer);
         pch = strrchr(buffer, '-');
@@ -114,6 +119,7 @@ COMPS_RTree * load_acrodict(char *filename) {
             printf("%s\n", ((COMPS_RTreeData*)it->data)->key);
         }*/
     }
+    fclose(f);
     return rt;
 }
 
