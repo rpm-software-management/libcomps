@@ -64,11 +64,6 @@ START_TEST(test_comps_parse1)
     const char* cats_names[] = {"category 1", "category 2"};
     const int cats_gids[] = {1, 2};
 
-    const char* envs_ids[] = {"env 1"};
-    const char* envs_names[] = {"environment 1"};
-    const char* env_gids[][3] = {{"a", "b", "c"}};
-    const char* env_opids[][2] = {{" option 1 ", " option 2 "}};
-
     int ret;
     COMPS_Object *tmpobj, *tmpobj2;
     char *tmpstr;
@@ -305,13 +300,11 @@ START_TEST(test_comps_parse3)
 {
     FILE *fp;
     //char *err_log,
-    char *tmp_ch;
     COMPS_Parsed *parsed;
     COMPS_ObjListIt *it;
     int i;
     COMPS_ObjList *tmplist;
     COMPS_LogEntry* known_errors[3];
-    char *str;
     COMPS_Object *tmpobj;
 
     fprintf(stderr, "## Running test_parse3\n\n");
@@ -525,7 +518,6 @@ START_TEST(test_arch)
     COMPS_DocGroup *g;
     COMPS_DocCategory *c;
     COMPS_DocEnv *e;
-    COMPS_DocGroupPackage *p;
     COMPS_Str *str;
     int x;
     COMPS_ObjListIt *it;
