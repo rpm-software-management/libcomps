@@ -58,10 +58,8 @@ void comps_objlist_destroy(COMPS_ObjList *objlist) {
     COMPS_ObjListIt *oldit, *it = objlist->first;
     COMPS_Object **obj= NULL;
 
-    oldit = it;
-    for (; comps_objlist_walk(&it, obj); oldit = it) {
+    for (oldit = it; comps_objlist_walk(&it, obj); oldit = it) {
         comps_objlist_it_destroy(oldit);
-        oldit = it;
     }
     if (oldit)
         comps_objlist_it_destroy(oldit);
@@ -143,7 +141,7 @@ int comps_objlist_walk_r(COMPS_ObjListIt *start,
 }
 
 static int __comps_objlist_append(COMPS_ObjList *objlist, COMPS_ObjListIt *objit) {
-    if (!objlist) return 0;
+    if (!objlist || !objit) return 0;
     if (objlist->first == NULL) {
         objlist->first = objit;
         objlist->last = objit;
@@ -215,12 +213,10 @@ int __comps_objlist_insert_at(COMPS_ObjList *objlist,
         if (!objlist->last) {
             objlist->last = newit;
         }
-        objlist->len++;
     } else if (pos == objlist->len){
         newit->next = NULL;
         objlist->last->next = newit;
         objlist->last = newit;
-        objlist->len++;
     } else {
         i = 0;
         oldit = NULL;
@@ -230,8 +226,8 @@ int __comps_objlist_insert_at(COMPS_ObjList *objlist,
         }
         newit->next = oldit->next;
         oldit->next = newit; 
-        objlist->len++;
     }
+    objlist->len++;
     return 1;
 }
 int comps_objlist_insert_at_x(COMPS_ObjList *objlist,
@@ -253,7 +249,7 @@ int comps_objlist_insert_at(COMPS_ObjList *objlist,
 
 int comps_objlist_remove_at(COMPS_ObjList *objlist, unsigned int atpos) {
     int pos;
-    COMPS_ObjListIt *it, *itprev=NULL, *removed=NULL;
+    COMPS_ObjListIt *it, *itprev = NULL;
     if (!objlist) return 0;
 
     for (it = objlist->first, pos=0;
@@ -261,31 +257,20 @@ int comps_objlist_remove_at(COMPS_ObjList *objlist, unsigned int atpos) {
          it = it->next, pos++) {
         itprev = it;
     }
-    if (atpos == 0 && objlist->first) {
-        removed = objlist->first;
-        objlist->first = objlist->first->next;
-        if (objlist->last == removed) {
-            objlist->last = NULL;
-        }
-    } else if (pos != (int)(atpos))
+    if (!it)
         return 0;
-    if (itprev) {
-        removed = it;
-        if (itprev->next)
-            itprev->next = itprev->next->next;
-        else
-            itprev->next = NULL;
-        if (removed == objlist->last) {
-            objlist->last = itprev;
-        }
-    }
-    comps_objlist_it_destroy(removed);
+    if (itprev)
+        itprev->next = it->next;
+    else
+        objlist->first = it->next;
+    if (it == objlist->last)
+        objlist->last = itprev;
+    comps_objlist_it_destroy(it);
     objlist->len--;
     return 1;
 }
 
 int comps_objlist_remove(COMPS_ObjList *objlist, COMPS_Object *obj) {
-    //int pos;
     COMPS_ObjListIt *it, *itprev = NULL;
     if (!objlist) return 0;
 
@@ -293,23 +278,15 @@ int comps_objlist_remove(COMPS_ObjList *objlist, COMPS_Object *obj) {
          it = it->next) {
         itprev = it;
     }
-    if (it == NULL)
+    if (!it)
         return 0;
-
-    if (itprev == NULL && it->comps_obj == obj) {
-        if (objlist->last == objlist->first)
-            objlist->last = NULL;
-        objlist->first = objlist->first->next;
-        comps_object_destroy(it->comps_obj);
-        free(it);
-    } else {
+    if (itprev)
         itprev->next = it->next;
-        comps_object_destroy(it->comps_obj);
-        free(it);
-        if (it == objlist->last) {
-            objlist->last = itprev;
-        }
-    }
+    else
+        objlist->first = it->next;
+    if (it == objlist->last)
+        objlist->last = itprev;
+    comps_objlist_it_destroy(it);
     objlist->len--;
     return 1;
 }
@@ -366,6 +343,8 @@ COMPS_ObjList* comps_objlist_sublist_indexed(COMPS_ObjList *objlist,
     for (it = objlist->first, pos=0;
          it != NULL && pos != start;
          it = it->next, pos++);
+    if (!it)
+        return ret;
     for (; it->next != NULL && pos != end; it = it->next, pos++) {
         comps_objlist_append(ret, it->comps_obj);
     }
@@ -387,6 +366,8 @@ COMPS_ObjList* comps_objlist_sublist_indexed_step(COMPS_ObjList *objlist,
     for (it = objlist->first;
          it != NULL && pos != start;
          it = it->next, pos++);
+    if (!it)
+        return ret;
     for (; it->next != NULL && pos != end; it = it->next, pos++, stepc++) {
         if (stepc == step) {
             step = 0;
@@ -471,12 +452,12 @@ char* comps_objlist_tostr_u(COMPS_Object* list) {
     const int sep_len = strlen(", ");
 
     COMPS_ObjListIt *it = ((COMPS_ObjList*)list)->first;
-    for (; it != ((COMPS_ObjList*)list)->last; it = it->next, i++) {
-        tmps = comps_object_tostr(it->comps_obj);
-        items[i] = tmps;
-        total_strlen += sep_len + strlen(tmps);
-    }
     if (it) {
+        for (; it != ((COMPS_ObjList*)list)->last; it = it->next, i++) {
+            tmps = comps_object_tostr(it->comps_obj);
+            items[i] = tmps;
+            total_strlen += sep_len + strlen(tmps);
+        }
         tmps = comps_object_tostr(it->comps_obj);
         items[i] = tmps;
         total_strlen += strlen(tmps);
@@ -488,14 +469,14 @@ char* comps_objlist_tostr_u(COMPS_Object* list) {
     ret[0]=0;
     strcat(ret, "[");
     //total2 += strlen("[");
-    for (i = 0; i < (int)(((COMPS_ObjList*)list)->len-1); i++) {
-        strcat(ret, items[i]);
-        //total2 += strlen(items[i]);
-        strcat(ret, ", ");
-        //total2 += strlen(", ");
-        free(items[i]);
-    }
     if (((COMPS_ObjList*)list)->len) {
+        for (i = 0; i < (int)(((COMPS_ObjList*)list)->len-1); i++) {
+            strcat(ret, items[i]);
+            //total2 += strlen(items[i]);
+            strcat(ret, ", ");
+            //total2 += strlen(", ");
+            free(items[i]);
+        }
         strcat(ret, items[i]);
         //total2 += strlen(items[i]);
         free(items[i]);

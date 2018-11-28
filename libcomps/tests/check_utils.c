@@ -108,9 +108,9 @@ void print_category(COMPS_Object *obj) {
     disp_ord = (prop)?((COMPS_Num*)prop)->val:0;
     COMPS_OBJECT_DESTROY(prop);
     
-    printf("id: %s\n", id);
-    printf("name: %s\n", name);
-    printf("desc: %s\n", desc);
+    printf("id: %s\n", id ? id : "(null)");
+    printf("name: %s\n", name ? name : "(null)");
+    printf("desc: %s\n", desc ? desc : "(null)");
     printf("display_order: %d\n", disp_ord);
     free(id);
     free(name);

@@ -108,10 +108,7 @@ char comps_set_add(COMPS_Set * set, void *item) {
             return 0;
         }
     }
-    if (set->data_constructor)
-        comps_hslist_append(set->data, item, 1);
-    else
-        comps_hslist_append(set->data, item, 1);
+    comps_hslist_append(set->data, item, 1);
     return 1;
 }
 
