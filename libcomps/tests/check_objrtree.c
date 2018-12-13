@@ -60,9 +60,10 @@ COMPS_ObjRTree * load_acrodict(char *filename) {
     }
     while (!feof(f)) {
         memset(buffer, 0, 100);
-        if (!fgets(buffer, 100, f))
+        if (!fgets(buffer, 100, f)) {
             fclose(f);
             return rt;
+        }
         buffer[strlen(buffer)-1] =0;
         //printf("buffer:%s\n", buffer);
         pch = strrchr(buffer, '-');
