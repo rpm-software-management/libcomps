@@ -697,7 +697,6 @@ void comps_objrtree_unite(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2) {
     struct Pair {
         COMPS_HSList * subnodes;
         char * key;
-        char added;
     } *pair, *parent_pair;
 
     pair = malloc(sizeof(struct Pair));
@@ -716,7 +715,6 @@ void comps_objrtree_unite(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2) {
         //printf("key-part:%s\n", parent_pair->key);
         free(it);
 
-        //pair->added = 0;
         for (it = tmp_subnodes->first; it != NULL; it=it->next) {
             pair = malloc(sizeof(struct Pair));
             pair->subnodes = ((COMPS_ObjRTreeData*)it->data)->subnodes;
