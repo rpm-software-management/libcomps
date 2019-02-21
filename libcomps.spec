@@ -151,7 +151,7 @@ pushd build-py3
 popd
 %endif
 
-%if 0%{?rhel} && 0%{?rhel} <= 7
+%if %{undefined ldconfig_scriptlets}
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 %else
