@@ -169,6 +169,5 @@ set(GITARG archive ${GITREV} "--format=tar.gz" "--prefix=libcomps-${GITREVLONG}/
 set(GITCMD "git")
 execute_process(COMMAND ${GITCMD} ${GITARG} OUTPUT_FILE ${archive_name})
 
-configure_file(libcomps.spec.in libcomps.spec)
 configure_file(libcomps.pc.in libcomps.pc @ONLY)
 
