@@ -57,7 +57,11 @@ BuildArch:      noarch
 BuildRequires:  python3-sphinx
 %endif
 %if %{with python2}
+%if 0%{?rhel} && 0%{?rhel} <= 7
+BuildRequires:  python-sphinx
+%else
 BuildRequires:  python2-sphinx
+%endif
 %endif
 
 %description -n python-%{name}-doc
