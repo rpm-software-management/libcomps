@@ -13,8 +13,8 @@
 %endif
 
 Name:           libcomps
-Version:        0.1.10
-Release:        2%{?dist}
+Version:        0.1.11
+Release:        1%{?dist}
 Summary:        Comps XML file manipulation library
 
 License:        GPLv2+
