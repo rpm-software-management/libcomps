@@ -1,6 +1,6 @@
 project(libcomps)
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.0.2)
 include (${CMAKE_ROOT}/Modules/CheckFunctionExists.cmake)
 include (${CMAKE_SOURCE_DIR}/version.cmake)
 #set (CMAKE_CXX_COMPILER g++)
