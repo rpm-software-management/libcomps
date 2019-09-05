@@ -61,6 +61,8 @@ configure_file("${PROJECT_SOURCE_DIR}/../libcomps.pc.in" "${CMAKE_CURRENT_BINARY
 
 install (FILES ${libcomps_HEADERS} DESTINATION include/libcomps)
 install (TARGETS libcomps LIBRARY DESTINATION ${LIB_INST_DIR})
+install (FILES "${CMAKE_CURRENT_BINARY_DIR}/libcomps.pc"
+         DESTINATION "${LIB_INST_DIR}/pkgconfig/")
 
 add_subdirectory(python)
 
