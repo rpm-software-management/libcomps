@@ -1,6 +1,6 @@
-prefix=/usr/local
+prefix=@CMAKE_INSTALL_PREFIX@
 includedir=${prefix}/include
-libdir=${prefix}/lib@LIB_SUFFIX@
+libdir=@CMAKE_INSTALL_FULL_LIBDIR@
 
 Name: libcomps
 Description: alternative for yum.libcomps written in C
