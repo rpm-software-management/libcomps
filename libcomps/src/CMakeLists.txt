@@ -57,6 +57,8 @@ ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
 set (LIB_INST_DIR ${CMAKE_INSTALL_LIBDIR})
 
 
+configure_file("${PROJECT_SOURCE_DIR}/../libcomps.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/libcomps.pc" @ONLY)
+
 install (FILES ${libcomps_HEADERS} DESTINATION include/libcomps)
 install (TARGETS libcomps LIBRARY DESTINATION ${LIB_INST_DIR})
 
