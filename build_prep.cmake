@@ -168,6 +168,3 @@ exec_program("git" ARGS rev-parse ${TOP_COMMIT} OUTPUT_VARIABLE GITREVLONG)
 set(GITARG archive ${GITREV} "--format=tar.gz" "--prefix=libcomps-${GITREVLONG}/")
 set(GITCMD "git")
 execute_process(COMMAND ${GITCMD} ${GITARG} OUTPUT_FILE ${archive_name})
-
-configure_file(libcomps.pc.in libcomps.pc @ONLY)
-
