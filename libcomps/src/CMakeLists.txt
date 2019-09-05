@@ -51,9 +51,6 @@ set_target_properties(libcomps PROPERTIES SOVERSION ${VERSION})
 
 add_dependencies(libcomps src-copy)
 
-IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
-    SET (LIB_SUFFIX "64")
-ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
 set (LIB_INST_DIR ${CMAKE_INSTALL_LIBDIR})
 
 

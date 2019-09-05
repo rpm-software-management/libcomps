@@ -155,10 +155,6 @@ foreach(tag ${tags})
     set(last_tag ${tag_out})
 endforeach(tag ${tags})
 
-IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
-    SET (LIB_SUFFIX "64")
-ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
-
 set(VERSION ${libcomps_VERSION_MAJOR}.${libcomps_VERSION_MINOR}.${libcomps_VERSION_PATCH})
 
 exec_program("git" ARGS rev-parse --short ${TOP_COMMIT} OUTPUT_VARIABLE GITREV)
