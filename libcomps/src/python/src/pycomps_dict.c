@@ -78,7 +78,7 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
     pairlist = comps_objdict_pairs(((PyCOMPS_Dict*)self)->dict);
     char *tmpstr;
 
-    for (it = pairlist->first; it != pairlist->last; it = it->next) {
+    for (it = pairlist->first; it != NULL; it = it->next) {
         tmp = ret;
         tmpkey = __pycomps_lang_decode(((COMPS_ObjRTreePair*)it->data)->key);
         if (!tmpkey) {
@@ -99,24 +99,6 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
         Py_XDECREF(tmpkey);
         Py_XDECREF(tmpval);
     }
-    tmp = ret;
-    tmpkey = __pycomps_lang_decode(((COMPS_RTreePair*)it->data)->key);
-    if (!tmpkey) {
-        goto out;
-    }
-    tmpstr = comps_object_tostr(((COMPS_ObjRTreePair*)it->data)->data);
-    tmpval = __pycomps_lang_decode(tmpstr);
-    free(tmpstr);
-    if (!tmpval) {
-        //PyErr_SetString(PyExc_TypeError, "val convert error");
-        goto out;
-    }
-    tmp2 = PyUnicode_FromFormat("%U = '%U'", tmpkey, tmpval);
-    ret = PyUnicode_Concat(ret, tmp2);
-    Py_XDECREF(tmp);
-    Py_XDECREF(tmp2);
-    Py_XDECREF(tmpkey);
-    Py_XDECREF(tmpval);
     
     tmp = ret;
     tmp2 = PyUnicode_FromString("}");
