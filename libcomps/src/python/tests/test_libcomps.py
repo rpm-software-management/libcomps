@@ -153,6 +153,16 @@ class TestLibcomps(unittest.TestCase):
         #print self.comps.xml_str()
         self.comps.fromxml_str(self.comps.xml_str())
 
+    def test_empty_by_lang_tags(self):
+        self.comps = libcomps.Comps()
+        self.comps.fromxml_f("comps/comps_empty_by_lang_tags.xml")
+        for group in self.comps.groups:
+            self.assertEqual("{}", str(group.name_by_lang))
+            self.assertEqual("{}", str(group.desc_by_lang))
+
+        for category in self.comps.categories:
+            self.assertEqual("{}", str(category.name_by_lang))
+            self.assertEqual("{}", str(category.desc_by_lang))
 
 if __name__ == "__main__":
     unittest.main(testRunner = utest.MyRunner)
