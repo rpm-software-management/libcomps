@@ -170,6 +170,7 @@ popd
 
 %files devel
 %{_libdir}/%{name}.so
+%{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/%{name}/
 
 %files doc
