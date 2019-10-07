@@ -225,7 +225,7 @@ class BaseObjTestClass(object):
     def test_hash(self):
         s = set()
         for x in range(6):
-            s.add(self.obj_constructor(**self.obj_data[x/2]))
+            s.add(self.obj_constructor(**self.obj_data[int(x/2)]))
         self.assertTrue(len(s) == 3)
         self.assertTrue(hash(self.obj_constructor(**self.obj_data[0])) ==\
                         hash(self.obj_constructor(**self.obj_data[0])))

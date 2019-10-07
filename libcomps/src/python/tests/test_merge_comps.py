@@ -7,10 +7,10 @@ import utest
 
 try:
     import _libpycomps as libcomps
-    print "local tests"
+    print("local tests")
 except ImportError:
     import libcomps
-    print "global tests"
+    print("global tests")
 
 
 class TestMergeComps(unittest.TestCase):
