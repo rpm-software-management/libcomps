@@ -12,8 +12,10 @@ OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
 include_directories(${PYTHON_INCLUDE_PATH})
 include_directories(${LIBCOMPS_INCLUDE_PATH})
 
+if(ENABLE_TESTS)
 configure_file(${pycomps_TESTSDIR}/run_tests.sh.in
                ./libcomps/run_tests.sh)
+endif()
 
 include(../../pycopy.cmake)
 
@@ -28,9 +30,11 @@ target_link_libraries(pycomps ${EXPAT_LIBRARIES})
 target_link_libraries(pycomps ${LIBXML2_LIBRARIES})
 target_link_libraries(pycomps ${PYTHON_LIBRARIES})
 
+if(ENABLE_TESTS)
 add_custom_target(pytest_run COMMAND ./run_tests.sh
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
                    COMMENT "Running python binding tests")
+endif()
 add_dependencies(pycomps pycomps py3-copy)
 
 

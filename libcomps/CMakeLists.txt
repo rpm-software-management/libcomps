@@ -5,6 +5,9 @@ include (${CMAKE_ROOT}/Modules/CheckFunctionExists.cmake)
 include (${CMAKE_SOURCE_DIR}/version.cmake)
 #set (CMAKE_CXX_COMPILER g++)
 
+OPTION (ENABLE_TESTS "Build test?" ON)
+OPTION (ENABLE_DOCS "Build docs?" ON)
+
 set(LIBCOMPS_OUT "${CMAKE_CURRENT_BINARY_DIR}/src")
 
 
@@ -19,7 +22,9 @@ include_directories("${PROJECT_BINARY_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}/src")
 #include_directories("${PROJECT_SOURCE_DIR}/src/libcomps")
 
+if(ENABLE_TESTS)
 FIND_LIBRARY(CHECK_LIBRARY NAMES check)
+endif()
 FIND_LIBRARY(EXPAT_LIBRARY NAMES expat)
 
 find_package(ZLIB REQUIRED)
@@ -38,12 +43,18 @@ include_directories(${ZLIB_INCLUDE_DIRS})
 #                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
 #                   COMMENT "Running python binding tests")
 
+if(ENABLE_TESTS)
 add_custom_target(pytest)
 add_custom_target(ctest)
 add_custom_target(test)
 add_dependencies(test ctest)
 add_dependencies(test pytest)
+endif()
 
 add_subdirectory (src)
+if(ENABLE_TESTS)
 add_subdirectory (tests)
+endif()
+if(ENABLE_DOCS)
 add_subdirectory (docs EXCLUDE_FROM_ALL)
+endif()

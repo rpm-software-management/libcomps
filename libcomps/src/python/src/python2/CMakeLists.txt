@@ -28,18 +28,22 @@ target_link_libraries(pycomps ${EXPAT_LIBRARIES})
 target_link_libraries(pycomps ${LIBXML2_LIBRARIES})
 target_link_libraries(pycomps ${PYTHON_LIBRARIES})
 
+if(ENABLE_TESTS)
 set(pycopy pytest_run)
 
 add_custom_target(pytest_run)
 add_dependencies(pytest_run pycomps)
+endif()
 
 include(../../pycopy.cmake)
 
+if(ENABLE_TESTS)
 add_custom_command(TARGET pytest_run COMMAND ./run_tests.sh
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
                    COMMENT "Running python binding tests")
 
 add_dependencies(pytest pytest_run)
+endif()
 
 INSTALL(FILES ${pycomps_SRCDIR}/__init__.py DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
 #INSTALL(FILES ${pycomps_SRCDIR}/tests/__test.py DESTINATION
