@@ -53,3 +53,6 @@ INSTALL(FILES ${pycomps_SRCDIR}/__init__.py DESTINATION ${PYTHON_INSTALL_DIR}/li
 #INSTALL(FILES ${pycomps_SRCDIR}/tests/main_comps2.xml DESTINATION
 #              ${PYTHON_INSTALL_DIR}/libcomps/)
 INSTALL (TARGETS pycomps LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
+
+# Version has to be passed as last argument.
+INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/../setup_for_python_metadata.py install_egg_info --install-dir \$ENV{DESTDIR}/${PYTHON_INSTALL_DIR} ${VERSION})")
