@@ -39,8 +39,8 @@ foreach(x RANGE 0 ${len})
     #file(COPY ${pycomps_TESTSDIR}/comps/${val} DESTINATION ./libcomps/comps/)
 endforeach()
 add_custom_command(TARGET ${pycopy} POST_BUILD COMMAND ${CMAKE_COMMAND} -E
-        copy ${pycomps_SRCDIR}/__init__.py ${pycomps_LIBPATH}/libcomps/
-                        COMMENT "copy ${pycomps_SRCDIR}/__init__.py to ${pycomps_LIBPATH}/libcomps/")
+        copy ${pycomps_SRCDIR}/libcomps/__init__.py ${pycomps_LIBPATH}/libcomps/
+                        COMMENT "copy ${pycomps_SRCDIR}/libcomps/__init__.py to ${pycomps_LIBPATH}/libcomps/")
 
 configure_file(${pycomps_TESTSDIR}run_tests.sh.in ${pycomps_LIBPATH}/libcomps/run_tests.sh)
 #endif (NOT TARGET ${pycopy})
