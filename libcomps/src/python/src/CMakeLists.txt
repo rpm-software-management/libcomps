@@ -42,27 +42,23 @@ foreach(i RANGE 0 ${pycomps_SRCLEN})
     LIST_REPLACE(pycomps_HEADERS ${i} "${CMAKE_CURRENT_SOURCE_DIR}/${val}")
 endforeach(i)
 
-if (${pversion} EQUAL 2)
-    find_package (PythonLibs 2.6)
-    find_package (PythonInterp 2.6 REQUIRED)
-else ()
-    find_package (PythonLibs 3.0)
-    find_package (PythonInterp 3.0)
-    #add_custom_target(py3-copy)
-endif ()
-
-EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "
-from sys import stdout
-from distutils import sysconfig
-path=sysconfig.get_python_lib(True, prefix='${CMAKE_INSTALL_PREFIX}')
-stdout.write(path)"
-OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
+if (NOT SKBUILD)
+    if (${pversion} EQUAL 2)
+        find_package (PythonLibs 2.6)
+        find_package (PythonInterp 2.6 REQUIRED)
+    else ()
+        find_package (PythonLibs 3.0)
+        find_package (PythonInterp 3.0)
+        #add_custom_target(py3-copy)
+    endif ()
+endif(NOT SKBUILD)
 
 include_directories(${PYTHON_INCLUDE_PATH})
 include_directories(${LIBCOMPS_INCLUDE_PATH})
 
-configure_file(${pycomps_TESTSDIR}/run_tests.sh.in
-               ./libcomps/run_tests.sh)
+if (ENABLE_TESTS)
+    configure_file(${pycomps_TESTSDIR}/run_tests.sh.in ./libcomps/run_tests.sh)
+endif ()
 
 if (${pversion} EQUAL 2)
     add_library(pycomps SHARED ${pycomps_SRC})
@@ -88,38 +84,53 @@ target_link_libraries(pycomps ${EXPAT_LIBRARIES})
 target_link_libraries(pycomps ${LIBXML2_LIBRARIES})
 target_link_libraries(pycomps ${PYTHON_LIBRARIES})
 
-if (${pversion} EQUAL 2)
+if ((${pversion} EQUAL 2) AND ENABLE_TESTS)
     set(pycopy pytest_run)
 
     add_custom_target(pytest_run)
     add_dependencies(pytest_run pycomps)
 
-    include(../../pycopy.cmake)
+    include(../pycopy.cmake)
 
     add_custom_command(TARGET pytest_run COMMAND ./run_tests.sh
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
                     COMMENT "Running python binding tests")
 endif ()
 
-add_custom_target(pytest_run COMMAND ./run_tests.sh
-                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
-                COMMENT "Running python binding tests")
+if (ENABLE_TESTS)
+    add_custom_target(pytest_run COMMAND ./run_tests.sh
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
+                    COMMENT "Running python binding tests")
+endif ()
 
 if (${pversion} EQUAL 2)
-    add_dependencies(pytest pytest_run)
+    if (ENABLE_TESTS)
+        add_dependencies(pytest pytest_run)
+    endif ()
 else ()
     add_dependencies(pycomps pycomps py3-copy)
 endif ()
 
-INSTALL(FILES ${pycomps_SRCDIR}/__init__.py DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
-#INSTALL(FILES ${pycomps_SRCDIR}/tests/__test.py DESTINATION
-#              ${PYTHON_INSTALL_DIR}/libcomps/)
-#INSTALL(FILES ${pycomps_SRCDIR}/tests/fedora_comps.xml DESTINATION
-#              ${PYTHON_INSTALL_DIR}/libcomps/)
-#INSTALL(FILES ${pycomps_SRCDIR}/tests/sample_comps.xml DESTINATION
-#              ${PYTHON_INSTALL_DIR}/libcomps/)
-#INSTALL(FILES ${pycomps_SRCDIR}/tests/main_comps.xml DESTINATION
-#              ${PYTHON_INSTALL_DIR}/libcomps/)
-#INSTALL(FILES ${pycomps_SRCDIR}/tests/main_comps2.xml DESTINATION
-#              ${PYTHON_INSTALL_DIR}/libcomps/)
-INSTALL (TARGETS pycomps LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
+IF (SKBUILD)
+    find_package(PythonExtensions REQUIRED)
+    python_extension_module(pycomps)
+    INSTALL(FILES libcomps/__init__.py DESTINATION libcomps/src/python/src/libcomps)
+    INSTALL(TARGETS pycomps LIBRARY DESTINATION libcomps/src/python/src/libcomps)
+ELSE ()
+    EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from distutils import sysconfig; stdout.write(sysconfig.get_python_lib(True))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
+
+    INSTALL(FILES ${pycomps_SRCDIR}/libcomps/__init__.py DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
+    #INSTALL(FILES ${pycomps_SRCDIR}/tests/__test.py DESTINATION
+    #              ${PYTHON_INSTALL_DIR}/libcomps/)
+    #INSTALL(FILES ${pycomps_SRCDIR}/tests/fedora_comps.xml DESTINATION
+    #              ${PYTHON_INSTALL_DIR}/libcomps/)
+    #INSTALL(FILES ${pycomps_SRCDIR}/tests/sample_comps.xml DESTINATION
+    #              ${PYTHON_INSTALL_DIR}/libcomps/)
+    #INSTALL(FILES ${pycomps_SRCDIR}/tests/main_comps.xml DESTINATION
+    #              ${PYTHON_INSTALL_DIR}/libcomps/)
+    #INSTALL(FILES ${pycomps_SRCDIR}/tests/main_comps2.xml DESTINATION
+    #              ${PYTHON_INSTALL_DIR}/libcomps/)
+    INSTALL (TARGETS pycomps LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
+    # Version has to be passed as last argument.
+    INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/../setup_for_python_metadata.py install_egg_info --install-dir \$ENV{DESTDIR}/${PYTHON_INSTALL_DIR}/ ${VERSION})")
+ENDIF (SKBUILD)

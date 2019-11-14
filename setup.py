@@ -1,12 +1,17 @@
-from distutils.core import setup
-import sys
+import json
 
-# This is a simple and fragile way of creating python metadata for non
-# setuptools-guided installs (RPM builds). It's duplicate because of the
-# scikit-build dependency in normal setup.py.
-#
-# This script has to have the version always specified as last argument.
-version = sys.argv.pop()
+from skbuild import setup
+
+
+with open('version.json', 'r+') as version_file:
+    version_dict = json.loads(version_file.read())
+    # build version string
+    version = '{major}.{minor}.{patch}-{release}'.format(
+        major=version_dict['libcomps_VERSION_MAJOR'],
+        minor=version_dict['libcomps_VERSION_MINOR'],
+        patch=version_dict['libcomps_VERSION_PATCH'],
+        release=version_dict['libcomps_RELEASE']
+    )
 
 setup(
     name='libcomps',
@@ -31,4 +36,17 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
+    packages=['libcomps'],
+    package_dir={
+        'libcomps': 'libcomps/src/python/src/libcomps/'
+    },
+    cmake_args=[
+        '-DBIN_INSTALL_DIR:PATH=libcomps/src/python/src/libcomps/data/bin',
+        '-DBUILD_LIBCOMPS_SHARED:BOOL=OFF',
+        '-DENABLE_DEVELOPMENT:BOOL=OFF',
+        '-DENABLE_DOCS:BOOL=OFF',
+        '-DENABLE_TESTS:BOOL=OFF'
+    ],
+    cmake_languages=['C'],
+    cmake_source_dir="libcomps",
 )

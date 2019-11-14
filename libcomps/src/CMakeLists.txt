@@ -25,7 +25,6 @@ add_custom_target(src-copy)
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-
 configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/libcomps_config.h.in"
                 "${PROJECT_SOURCE_DIR}/src/libcomps/libcomps_config.h")
 
@@ -40,7 +39,12 @@ foreach(file ${files})
 endforeach()
 
 
-add_library(libcomps SHARED ${libcomps_SOURCES})
+if (BUILD_LIBCOMPS_SHARED)
+  set (libcomps_library_type SHARED)
+else ()
+  set (libcomps_library_type STATIC)
+endif ()
+add_library(libcomps ${libcomps_library_type} ${libcomps_SOURCES})
 target_link_libraries(libcomps ${EXPAT_LIBRARY})
 target_link_libraries(libcomps ${LIBXML2_LIBRARIES})
 target_link_libraries(libcomps ${ZLIB_LIBRARIES})
@@ -50,18 +54,23 @@ set_target_properties(libcomps PROPERTIES SOVERSION ${VERSION})
 
 add_dependencies(libcomps src-copy)
 
-IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
-    SET (LIB_SUFFIX "64")
-ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
-set (LIB_INST_DIR ${CMAKE_INSTALL_LIBDIR})
-
+if (ENABLE_DEVELOPMENT OR "${libcomps_library_type}" STREQUAL "SHARED")
+    install (
+        TARGETS libcomps
+        RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT RuntimeLibraries
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT RuntimeLibraries
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
+    )
+endif ()
 
 configure_file("${PROJECT_SOURCE_DIR}/../libcomps.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/libcomps.pc" @ONLY)
 
-install (FILES ${libcomps_HEADERS} DESTINATION include/libcomps)
-install (TARGETS libcomps LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install (FILES "${CMAKE_CURRENT_BINARY_DIR}/libcomps.pc"
-         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
+if (ENABLE_DEVELOPMENT)
+  install (FILES ${libcomps_HEADERS} DESTINATION include/libcomps)
+  install (TARGETS libcomps LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  install (FILES "${CMAKE_CURRENT_BINARY_DIR}/libcomps.pc"
+          DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
+endif ()
 
 add_subdirectory(python)
 

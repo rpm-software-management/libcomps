@@ -20,7 +20,7 @@ import sys, os
 import ctypes
 clibcomps = ctypes.cdll.LoadLibrary("@LIBCOMPS_OUT@/libcomps.so.@VERSION@")
 os.environ['LD_LIBRARY_PATH'] = "%s" % "@LIBCOMPS_OUT@"
-print os.environ['LD_LIBRARY_PATH'] 
+print os.environ['LD_LIBRARY_PATH']
 
 sys.path.insert(0, os.path.abspath("@PYCOMPS_LIB_PATH@"))
 import libcomps
