@@ -42,4 +42,84 @@ foreach(i RANGE 0 ${pycomps_SRCLEN})
     LIST_REPLACE(pycomps_HEADERS ${i} "${CMAKE_CURRENT_SOURCE_DIR}/${val}")
 endforeach(i)
 
-add_subdirectory(python${pversion})
+if (${pversion} EQUAL 2)
+    find_package (PythonLibs 2.6)
+    find_package (PythonInterp 2.6 REQUIRED)
+else ()
+    find_package (PythonLibs 3.0)
+    find_package (PythonInterp 3.0)
+    #add_custom_target(py3-copy)
+endif ()
+
+EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "
+from sys import stdout
+from distutils import sysconfig
+path=sysconfig.get_python_lib(True, prefix='${CMAKE_INSTALL_PREFIX}')
+stdout.write(path)"
+OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
+
+include_directories(${PYTHON_INCLUDE_PATH})
+include_directories(${LIBCOMPS_INCLUDE_PATH})
+
+configure_file(${pycomps_TESTSDIR}/run_tests.sh.in
+               ./libcomps/run_tests.sh)
+
+if (${pversion} EQUAL 2)
+    add_library(pycomps SHARED ${pycomps_SRC})
+    set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
+    set_target_properties(pycomps PROPERTIES PREFIX "_lib")
+    #set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_NAME "_libpycomps")
+    #add_dependencies(pycomps src-copy)
+    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+    SET(CMAKE_SKIP_BUILD_RPATH  TRUE)
+    SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+else ()
+    include(../pycopy.cmake)
+
+    add_library(pycomps SHARED ${pycomps_SRC})
+    set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
+    set_target_properties(pycomps PROPERTIES PREFIX "")
+    set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_NAME "_libpycomps")
+    add_dependencies(pycomps src-copy)
+endif ()
+
+target_link_libraries(pycomps libcomps)
+target_link_libraries(pycomps ${EXPAT_LIBRARIES})
+target_link_libraries(pycomps ${LIBXML2_LIBRARIES})
+target_link_libraries(pycomps ${PYTHON_LIBRARIES})
+
+if (${pversion} EQUAL 2)
+    set(pycopy pytest_run)
+
+    add_custom_target(pytest_run)
+    add_dependencies(pytest_run pycomps)
+
+    include(../../pycopy.cmake)
+
+    add_custom_command(TARGET pytest_run COMMAND ./run_tests.sh
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
+                    COMMENT "Running python binding tests")
+endif ()
+
+add_custom_target(pytest_run COMMAND ./run_tests.sh
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
+                COMMENT "Running python binding tests")
+
+if (${pversion} EQUAL 2)
+    add_dependencies(pytest pytest_run)
+else ()
+    add_dependencies(pycomps pycomps py3-copy)
+endif ()
+
+INSTALL(FILES ${pycomps_SRCDIR}/__init__.py DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
+#INSTALL(FILES ${pycomps_SRCDIR}/tests/__test.py DESTINATION
+#              ${PYTHON_INSTALL_DIR}/libcomps/)
+#INSTALL(FILES ${pycomps_SRCDIR}/tests/fedora_comps.xml DESTINATION
+#              ${PYTHON_INSTALL_DIR}/libcomps/)
+#INSTALL(FILES ${pycomps_SRCDIR}/tests/sample_comps.xml DESTINATION
+#              ${PYTHON_INSTALL_DIR}/libcomps/)
+#INSTALL(FILES ${pycomps_SRCDIR}/tests/main_comps.xml DESTINATION
+#              ${PYTHON_INSTALL_DIR}/libcomps/)
+#INSTALL(FILES ${pycomps_SRCDIR}/tests/main_comps2.xml DESTINATION
+#              ${PYTHON_INSTALL_DIR}/libcomps/)
+INSTALL (TARGETS pycomps LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
