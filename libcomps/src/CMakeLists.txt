@@ -1,4 +1,3 @@
-include(GNUInstallDirs)
 set (libcomps_SOURCES comps_doc.c comps_docgroup.c comps_doccategory.c
                       comps_docenv.c comps_docpackage.c comps_docgroupid.c
      comps_obj.c comps_mm.c
@@ -60,9 +59,9 @@ set (LIB_INST_DIR ${CMAKE_INSTALL_LIBDIR})
 configure_file("${PROJECT_SOURCE_DIR}/../libcomps.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/libcomps.pc" @ONLY)
 
 install (FILES ${libcomps_HEADERS} DESTINATION include/libcomps)
-install (TARGETS libcomps LIBRARY DESTINATION ${LIB_INST_DIR})
+install (TARGETS libcomps LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install (FILES "${CMAKE_CURRENT_BINARY_DIR}/libcomps.pc"
-         DESTINATION "${LIB_INST_DIR}/pkgconfig/")
+         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
 
 add_subdirectory(python)
 
