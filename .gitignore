@@ -18,6 +18,14 @@ develop-eggs
 lib
 lib64
 
+# Compilation artifacts
+_skbuild/
+
+# Python distribution stuff
+dist/
+MANIFEST
+*.egg-info/
+
 # Installer logs
 pip-log.txt
 
