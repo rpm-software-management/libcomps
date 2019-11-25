@@ -13,7 +13,7 @@
 %endif
 
 Name:           libcomps
-Version:        0.1.11
+Version:        0.1.12
 Release:        1%{?dist}
 Summary:        Comps XML file manipulation library
 
