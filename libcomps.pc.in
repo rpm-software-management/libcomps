@@ -5,6 +5,6 @@ libdir=@CMAKE_INSTALL_FULL_LIBDIR@
 Name: libcomps
 Description: alternative for yum.libcomps written in C
 Version: @VERSION@
-Requires: -L${libdir} -lcomps
-Reuires.private: -lxml2 -lexpat
+Libs: -L${libdir} -lcomps
+Libs.private: -lxml2 -lexpat
 CFlags: -I${includedir}
