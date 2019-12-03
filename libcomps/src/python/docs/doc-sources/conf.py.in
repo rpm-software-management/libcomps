@@ -18,7 +18,7 @@ import sys, os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 import ctypes
-clibcomps = ctypes.cdll.LoadLibrary("@LIBCOMPS_OUT@/libcomps.so.@VERSION@")
+clibcomps = ctypes.cdll.LoadLibrary("@LIBCOMPS_OUT@/libcomps.so.@libcomps_VERSION_MAJOR@")
 os.environ['LD_LIBRARY_PATH'] = "%s" % "@LIBCOMPS_OUT@"
 print os.environ['LD_LIBRARY_PATH']
 
