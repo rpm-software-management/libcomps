@@ -50,7 +50,7 @@ target_link_libraries(libcomps ${LIBXML2_LIBRARIES})
 target_link_libraries(libcomps ${ZLIB_LIBRARIES})
 target_link_libraries(libcomps m)
 set_target_properties(libcomps PROPERTIES OUTPUT_NAME "comps")
-set_target_properties(libcomps PROPERTIES SOVERSION ${VERSION})
+set_target_properties(libcomps PROPERTIES SOVERSION ${libcomps_VERSION_MAJOR})
 
 add_dependencies(libcomps src-copy)
 
