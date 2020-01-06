@@ -620,6 +620,14 @@ class PackageTest(unittest.TestCase):
         self.assertTrue(hash(pkg2) != hash(pkg3))
         self.assertTrue(len(set([pkg1,pkg2,pkg3])) == 2)
 
+    def test_mandatory_in_xml_out(self):
+        self.comps = libcomps.Comps()
+        self.comps.groups.append(libcomps.Group("g1", "group1", "group desc", 0, 0, 0, "en"))
+        self.comps.groups[0].packages.append(libcomps.Package("kernel", libcomps.PACKAGE_TYPE_MANDATORY))
+
+        out = self.comps.xml_str()
+        self.assertTrue("<packagereq type=\"mandatory\" requires=\"\">kernel</packagereq>" in out)
+
 #@unittest.skip("skip")
 class DictTest(unittest.TestCase):
     def test_dict(self):
@@ -998,7 +1006,7 @@ class COMPSTest(unittest.TestCase):
         self.assertEqual(len(comps2.groups), 0)
         self.assertEqual(len(comps2.categories), 0)
         self.assertEqual(len(comps2.environments), 0)
-        
+
         s = comps.toxml_str(xml_options={"empty_groups": True,
                                      "empty_categories": True,
                                      "empty_environments": True})
