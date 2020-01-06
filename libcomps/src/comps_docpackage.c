@@ -164,8 +164,9 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
         str = "conditional";
     else
         str = "default";
-    if (pkg->type != COMPS_PACKAGE_MANDATORY)
-        ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "type", BAD_CAST str);
+
+    ret = xmlTextWriterWriteAttribute(writer, BAD_CAST "type", BAD_CAST str);
+
     if (pkg->requires) {
         str = comps_object_tostr((COMPS_Object*)pkg->requires);
         ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "requires",
