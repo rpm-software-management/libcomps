@@ -605,7 +605,7 @@ inline void comps_objmrtree_pair_destroy_v(void * pair) {
     free(pair);
 }
 
-inline COMPS_HSList* __comps_objmrtree_all(COMPS_ObjMRTree * rt, char keyvalpair) {
+static inline COMPS_HSList* __comps_objmrtree_all(COMPS_ObjMRTree * rt, char keyvalpair) {
     COMPS_HSList *to_process, *ret;
     COMPS_HSListItem *hsit, *oldit;
     size_t x;
