@@ -34,7 +34,7 @@ typedef struct COMPS_ObjListIt COMPS_ObjListIt;
 struct COMPS_ObjListIt {
     COMPS_Object *comps_obj;
     COMPS_ObjListIt *next;
-} UnfoObjListIt;
+};
 
 
 /** COMPS_Object derivate representing category element in comps.xml structure*/
