@@ -1,3 +1,5 @@
+%define __cmake_in_source_build 1
+
 # Do not build python3 bindings for RHEL <= 7
 %if 0%{?rhel} && 0%{?rhel} <= 7
 %bcond_with python3
