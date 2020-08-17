@@ -29,7 +29,7 @@ Py_ssize_t PyCOMPSSeq_len(PyObject *self) {
     return ((PyCOMPS_Sequence*)self)->list->len;
 }
 
-inline PyObject* list_getitem(PyObject *self, Py_ssize_t index) {
+static inline PyObject* list_getitem(PyObject *self, Py_ssize_t index) {
     COMPS_Object *obj;
     PyObject *ret;
     int i;
@@ -47,7 +47,7 @@ inline PyObject* list_getitem(PyObject *self, Py_ssize_t index) {
     return ret;
 }
 
-inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
+static inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
     #define _seq_ ((PyCOMPS_Sequence*)self)
     char *strid=NULL;
     COMPS_ObjListIt *it;
@@ -90,7 +90,7 @@ inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
     #undef _seq_
 }
 
-inline COMPS_Object *list_setitem_convert(PyObject *self, PyObject *item) {
+static inline COMPS_Object *list_setitem_convert(PyObject *self, PyObject *item) {
     #define _seq_ ((PyCOMPS_Sequence*)self)
     COMPS_Object *ret = NULL;
     if (!item)
@@ -107,7 +107,7 @@ inline COMPS_Object *list_setitem_convert(PyObject *self, PyObject *item) {
     #undef _seq_
 }
 
-inline int list_setitem(PyObject *self, Py_ssize_t index, PyObject *item) {
+static inline int list_setitem(PyObject *self, Py_ssize_t index, PyObject *item) {
     #define _seq_ ((PyCOMPS_Sequence*)self)
     COMPS_Object *converted_item = list_setitem_convert(self, item);
     if (!converted_item && item) {
@@ -161,7 +161,7 @@ int list_unique_id_check(PyObject *self, COMPS_Object *converted) {
     return 0;
 }
 
-inline int list_setitem_id_unique(PyObject *self,
+static inline int list_setitem_id_unique(PyObject *self,
                                   Py_ssize_t index,
                                   PyObject *item) {
     #define _seq_ ((PyCOMPS_Sequence*)self)
