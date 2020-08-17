@@ -52,25 +52,25 @@ inline void expand0(char *str, const char *fmt, char **args, char out) {
     (void)args;
     __expand(str, fmt, out);
 }
-inline void expand1(char *str, const char *fmt, char **args, char out) {
+static inline void expand1(char *str, const char *fmt, char **args, char out) {
     __expand(str, fmt, out, args[0]);
 }
-inline void expand2(char *str, const char *fmt, char **args, char out) {
+static inline void expand2(char *str, const char *fmt, char **args, char out) {
     __expand(str, fmt, out, args[0],
                           args[1]);
 }
-inline void expand3(char *str, const char *fmt, char **args, char out) {
+static inline void expand3(char *str, const char *fmt, char **args, char out) {
     __expand(str, fmt, out, args[0],
                            args[1],
                            args[2]);
 }
-inline void expand4(char *str, const char *fmt, char **args, char out) {
+static inline void expand4(char *str, const char *fmt, char **args, char out) {
     __expand(str, fmt, out, args[0],
                            args[1],
                            args[2],
                            args[3]);
 }
-inline void expand5(char *str, const char *fmt, char **args, char out) {
+static inline void expand5(char *str, const char *fmt, char **args, char out) {
     __expand(str, fmt, out, args[0],
                            args[1],
                            args[2],
@@ -80,10 +80,10 @@ inline void expand5(char *str, const char *fmt, char **args, char out) {
 
 void expand(char *str, const char *fmt, char **args, int len, int out);
 
-inline void expand_out(const char *fmt, char **args, int len) {
+static inline void expand_out(const char *fmt, char **args, int len) {
     expand(NULL, fmt, args, len, 1);
 }
-inline void expand_s(char *str, const char *fmt, char **args, int len) {
+static inline void expand_s(char *str, const char *fmt, char **args, int len) {
     expand(str, fmt, args, len, 0);
 }
 
