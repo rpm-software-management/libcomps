@@ -986,6 +986,16 @@ class COMPSTest(unittest.TestCase):
 
         _f([x.name for x in env.option_ids], option_ids)
 
+    #@unittest.skip("")
+    def test_clear_for_COMPS_ObjRTree_such_as_group_or_category_namy_by_lang(self):
+        comps = libcomps.Comps()
+        ret = comps.fromxml_f("comps/f21-rawhide-comps.xml")
+
+        env = comps.categories[0].name_by_lang.clear()
+        env = comps.groups[0].name_by_lang.clear()
+
+        self.assertEqual(str(comps.categories[0].name_by_lang), u'{}')
+        self.assertEqual(str(comps.groups[0].name_by_lang), u'{}')
 
     #@unittest.skip("")
     def test_xml_options(self):
