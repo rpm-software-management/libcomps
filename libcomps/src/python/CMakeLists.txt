@@ -3,8 +3,7 @@ if (ENABLE_TESTS)
 endif ()
 
 #include(pycopy.cmake)
-include(pversion.cmake)
-set(pycopy "py${pversion}-copy")
+set(pycopy "py3-copy")
 
 set (pycomps_TESTSDIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
 

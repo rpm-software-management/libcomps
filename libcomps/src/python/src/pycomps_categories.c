@@ -314,7 +314,7 @@ PyNumberMethods PyCOMPSCat_Nums = {
 };
 
 PyTypeObject PyCOMPS_CatType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.Category",   /*tp_name*/
     sizeof(PyCOMPS_Category), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
@@ -452,7 +452,7 @@ PyNumberMethods PyCOMPSCats_Nums = {
 };
 
 PyTypeObject PyCOMPS_CatsType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.CategoryList",   /*tp_name*/
     sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     sizeof(PyCOMPS_Category),   /*tp_itemsize*/

@@ -60,7 +60,7 @@ PyMethodDef PyCOMPSIDs_methods[] = {
 };
 
 PyTypeObject PyCOMPS_IDsType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.IdList",   /*tp_name*/
     sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     sizeof(PyObject),         /*tp_itemsize*/

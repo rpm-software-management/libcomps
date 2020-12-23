@@ -20,7 +20,7 @@
 #ifndef PYCOMPS_GIDS_H
 #define PYCOMPS_GIDS_H
 
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 
 #include "libcomps/comps_doc.h"
 //#include "libcomps/comps_list.h"
@@ -28,7 +28,7 @@
 
 #include "pycomps_types.h"
 #include "pycomps_utils.h"
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 #include "pycomps_sequence.h"
 
 typedef struct {

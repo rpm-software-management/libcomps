@@ -20,7 +20,7 @@
 #ifndef PYCOMPS_HASH_H
 #define PYCOMPS_HASH_H
 
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 
 #include "crc32.h"
 #include "pycomps_utils.h"

@@ -20,7 +20,7 @@
 #ifndef PYCOMPS_ENVS_H
 #define PYCOMPS_ENVS_H
 
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 
 #include "libcomps/comps_doc.h"
 //#include "libcomps/comps_list.h"
@@ -28,7 +28,7 @@
 #include "pycomps_sequence.h"
 #include "pycomps_gids.h"
 #include "pycomps_utils.h"
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 #include "pycomps_dict.h"
 #include "pycomps_sequence.h"
 

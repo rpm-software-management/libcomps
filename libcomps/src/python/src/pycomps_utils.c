@@ -176,21 +176,8 @@ PyObject* __pycomps_lang_decode(char * lang) {
     const char *errors = NULL;
     PyObject *tmp;
     PyObject *ret = NULL;
-    #if PY_MAJOR_VERSION >= 3
-        tmp = PyUnicode_Decode(lang, strlen(lang), "UTF-8", errors);
-        ret = PyUnicode_FromObject(tmp);
-    #else
-        tmp = PyUnicode_Decode(lang, strlen(lang), "UTF-8", errors);
-        if (!tmp) {
-            //PyErr_SetString(PyExc_TypeError, "PyUnicode_Decode error");
-            return NULL;
-        }
-        ret = PyUnicode_FromObject(tmp);
-        if (!ret) {
-            return NULL;
-        }
-        Py_XDECREF(tmp);
-    #endif
+    tmp = PyUnicode_Decode(lang, strlen(lang), "UTF-8", errors);
+    ret = PyUnicode_FromObject(tmp);
     return ret;
 }
 
@@ -343,11 +330,11 @@ int __PyCOMPS_set_numattr(PyObject *self, PyObject *val, void *closure) {
     if (val == Py_None) {
         _closure_->set_f(obj, 1, true);
         return 0;
-    } else if (!PyINT_CHECK(val)) {
+    } else if (!PyLong_Check(val)) {
         PyErr_SetString(PyExc_TypeError, "Not int object");
         return -1;
     }
-    tmp = PyINT_ASLONG(val);
+    tmp = PyLong_AsLong(val);
     _closure_->set_f(obj, tmp, false);
     #undef _closure_
     return 0;
@@ -361,7 +348,7 @@ PyObject* __PyCOMPS_get_numattr(PyObject *self, void *closure) {
     obj = ((PyCompsObject*)self)->c_obj;
     tmp_prop = _closure_->get_f(obj);
     if (tmp_prop) {
-        ret = PyINT_FROM_LONG(((COMPS_Num*)tmp_prop)->val);
+        ret = PyLong_FromLong(((COMPS_Num*)tmp_prop)->val);
         COMPS_OBJECT_DESTROY(tmp_prop);
         return ret;
     } else

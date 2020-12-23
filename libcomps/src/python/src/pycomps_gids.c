@@ -215,7 +215,7 @@ PyMethodDef PyCOMPSGID_methods[] = {
 };
 
 PyTypeObject PyCOMPS_GIDType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.GroupId",   /*tp_name*/
     sizeof(PyCOMPS_GID), /*tp_basicsize*/
     0,                        /*tp_itemsize*/
@@ -273,22 +273,12 @@ PyObject* comps_gids_out(COMPS_Object *cobj) {
 }
 
 PyCOMPS_ItemInfo PyCOMPS_GIDsInfo = {
-#if PY_MAJOR_VERSION >= 3
     .itemtypes = (PyTypeObject*[]){&PyCOMPS_GIDType,
                                    &PyUnicode_Type},
     .in_convert_funcs = (PyCOMPS_in_itemconvert[])
                         {&comps_gids_in,
                          &comps_gids_str_in},
     .item_types_len = 2,
-#else
-    .itemtypes = (PyTypeObject*[]){&PyCOMPS_GIDType, &PyString_Type,
-                                   &PyUnicode_Type},
-    .in_convert_funcs = (PyCOMPS_in_itemconvert[])
-                        {&comps_gids_in,
-                         &comps_gids_str_in,
-                         &comps_gids_str_in},
-    .item_types_len = 3,
-#endif
     .out_convert_func = &comps_gids_out,
     .pre_checker = &pycomps_gid_validate
 };
@@ -311,7 +301,7 @@ PyMethodDef PyCOMPSGIDs_methods[] = {
 PyNumberMethods PyCOMPSGIDs_Nums = {0};
 
 PyTypeObject PyCOMPS_GIDsType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.IdList",   /*tp_name*/
     sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     sizeof(PyCOMPS_GID),   /*tp_itemsize*/

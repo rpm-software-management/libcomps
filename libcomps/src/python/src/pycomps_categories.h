@@ -20,7 +20,7 @@
 #ifndef PYCOMPS_CATEGORIES_H
 #define PYCOMPS_CATEGORIES_H
 
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 
 #include "libcomps/comps_doc.h"
 //#include "libcomps/comps_list.h"

@@ -11,7 +11,7 @@ set (pycomps_SRC pycomps.c pycomps_sequence.c
      pycomps_gids.c pycomps_utils.c pycomps_dict.c pycomps_mdict.c
      pycomps_hash.c pycomps_exc.c pycomps_lbw.c)
 
-set (pycomps_HEADERS pycomps_23macros.h pycomps_sequence.h
+set (pycomps_HEADERS pycomps_macros.h pycomps_sequence.h
      pycomps_envs.h pycomps_categories.h pycomps_groups.h
      pycomps_gids.h pycomps_utils.h pycomps_dict.h pycomps_mdict.h
      pycomps_hash.h pycomps_exc.h pycomps_lbw.h
@@ -43,12 +43,8 @@ foreach(i RANGE 0 ${pycomps_SRCLEN})
 endforeach(i)
 
 if (NOT SKBUILD)
-    if (${pversion} EQUAL 2)
-        find_package (PythonInterp 2 EXACT REQUIRED)
-    else ()
-        find_package (PythonInterp 3 EXACT REQUIRED)
-    endif ()
-    find_package (PythonLibs)
+    find_package (PythonLibs 3 EXACT)
+    find_package (PythonInterp 3 EXACT REQUIRED)
 endif(NOT SKBUILD)
 
 include_directories(${PYTHON_INCLUDE_PATH})
@@ -58,55 +54,26 @@ if (ENABLE_TESTS)
     configure_file(${pycomps_TESTSDIR}/run_tests.sh.in ./libcomps/run_tests.sh)
 endif ()
 
-if (${pversion} EQUAL 2)
-    add_library(pycomps SHARED ${pycomps_SRC})
-    set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
-    set_target_properties(pycomps PROPERTIES PREFIX "_lib")
-    #set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_NAME "_libpycomps")
-    #add_dependencies(pycomps src-copy)
-    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-    SET(CMAKE_SKIP_BUILD_RPATH  TRUE)
-    SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-else ()
-    include(../pycopy.cmake)
+include(../pycopy.cmake)
 
-    add_library(pycomps SHARED ${pycomps_SRC})
-    set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
-    set_target_properties(pycomps PROPERTIES PREFIX "")
-    set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_NAME "_libpycomps")
-    add_dependencies(pycomps src-copy)
-endif ()
+add_library(pycomps SHARED ${pycomps_SRC})
+set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
+set_target_properties(pycomps PROPERTIES PREFIX "")
+set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_NAME "_libpycomps")
+add_dependencies(pycomps src-copy)
 
 target_link_libraries(pycomps libcomps)
 target_link_libraries(pycomps ${EXPAT_LIBRARIES})
 target_link_libraries(pycomps ${LIBXML2_LIBRARIES})
 target_link_libraries(pycomps ${PYTHON_LIBRARIES})
 
-if ((${pversion} EQUAL 2) AND ENABLE_TESTS)
+if (ENABLE_TESTS)
     set(pycopy pytest_run)
 
-    add_custom_target(pytest_run)
-    add_dependencies(pytest_run pycomps)
-
-    include(../pycopy.cmake)
-
-    add_custom_command(TARGET pytest_run COMMAND ./run_tests.sh
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
-                    COMMENT "Running python binding tests")
-endif ()
-
-if (ENABLE_TESTS)
     add_custom_target(pytest_run COMMAND ./run_tests.sh
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
-                    COMMENT "Running python binding tests")
-endif ()
-
-if (${pversion} EQUAL 2)
-    if (ENABLE_TESTS)
-        add_dependencies(pytest pytest_run)
-    endif ()
-else ()
-    add_dependencies(pycomps pycomps py3-copy)
+                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
+                      COMMENT "Running python binding tests")
+    add_dependencies(pytest_run pycomps py3-copy)
 endif ()
 
 IF (SKBUILD)

@@ -20,7 +20,7 @@
 #ifndef PYCOMPS_EXC_H
 #define PYCOMPS_EXC_H
 
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 
 extern PyObject * PyCOMPSExc_ParserError;
 extern PyObject * PyCOMPSExc_XMLGenError;

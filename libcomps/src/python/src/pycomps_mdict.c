@@ -118,7 +118,7 @@ PyObject* PyCOMPSMDict_str(PyObject *self) {
     Py_XDECREF(tmp2);
     Py_XDECREF(tmpkey);
     Py_XDECREF(tmpval);
-    
+
     tmp = ret;
     tmp2 = PyUnicode_FromString("}");
     ret = PyUnicode_Concat(ret, tmp2);
@@ -433,24 +433,12 @@ PyMethodDef PyCOMPSMDict_methods[] = {
      {"get", (PyCFunction)PyCOMPSMDict_get, METH_O, PyCOMPSMDict_get__doc__},
      {"has_key", (PyCFunction)PyCOMPSMDict_has_key, METH_O,
      PyCOMPSMDict_has_key__doc__},
-     {PYCOMPS_DICT_ITERITEMS, (PyCFunction)PyCOMPSMDict_getiteritems, METH_NOARGS,
+     {"items", (PyCFunction)PyCOMPSMDict_getiteritems, METH_NOARGS,
      "return iterator returning (key, value) tuple"},
-     {PYCOMPS_DICT_ITERVALUES, (PyCFunction)PyCOMPSMDict_getitervalues, METH_NOARGS,
+     {"values", (PyCFunction)PyCOMPSMDict_getitervalues, METH_NOARGS,
      "return iterator returning item's value"},
-     {PYCOMPS_DICT_ITERKEYS, (PyCFunction)PyCOMPSMDict_getiter, METH_NOARGS,
+     {"keys", (PyCFunction)PyCOMPSMDict_getiter, METH_NOARGS,
      "return iterator returning item's key"},
-
-#if PY_MAJOR_VERSION == 2
-
-     {"keys", (PyCFunction)PyCOMPSMDict_keys, METH_NOARGS,
-     "return list of keys"},
-     {"values", (PyCFunction)PyCOMPSMDict_values, METH_NOARGS,
-     "return list of values"},
-     {"items", (PyCFunction)PyCOMPSMDict_items, METH_NOARGS,
-     "return list of (key, val) tuples"},
-
-#endif
-
      {"clear", (PyCFunction)PyCOMPSMDict_clear, METH_NOARGS,
      "clear the dict"},
      {"copy", (PyCFunction)PyCOMPSMDict_copy, METH_NOARGS,
@@ -505,7 +493,7 @@ int PyCOMPSMDict_init(PyCOMPS_MDict *self, PyObject *args, PyObject *kwds)
 }
 
 PyTypeObject PyCOMPS_MDictType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.MDict",            /*tp_name*/
     sizeof(PyCOMPS_MDict),       /*tp_basicsize*/
     0,                          /*tp_itemsize*/
@@ -595,7 +583,7 @@ int PyCOMPSMDictIter_init(PyCOMPS_MDictIter *self, PyObject *args, PyObject *kwd
 }
 
 PyTypeObject PyCOMPS_MDictIterType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.DictIter",   /*tp_name*/
     sizeof(PyCOMPS_MDictIter), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
@@ -635,17 +623,10 @@ PyTypeObject PyCOMPS_MDictIterType = {
     PyCOMPSMDictIter_new,             /* tp_new */};
 
 PyCOMPS_ItemInfo PyCOMPS_StrSeqInfo = {
-#if PY_MAJOR_VERSION >= 3
     .itemtypes = (PyTypeObject*[]){&PyUnicode_Type, &PyBytes_Type},
     .in_convert_funcs = (PyCOMPS_in_itemconvert[])
                         {&__pycomps_unicode_in, &__pycomps_bytes_in},
     .item_types_len = 2,
-#else
-    .itemtypes = (PyTypeObject*[]){&PyUnicode_Type, &PyString_Type},
-    .in_convert_funcs = (PyCOMPS_in_itemconvert[])
-                        {&__pycomps_unicode_in, &__pycomps_bytes_in},
-    .item_types_len = 2,
-#endif
     .out_convert_func = &__pycomps_str_out
 };
 
@@ -657,7 +638,7 @@ int PyCOMPSStrSeq_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds) {
 }
 
 PyTypeObject PyCOMPS_StrSeqType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.StrSeq",   /*tp_name*/
     sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     0,   /*tp_itemsize*/

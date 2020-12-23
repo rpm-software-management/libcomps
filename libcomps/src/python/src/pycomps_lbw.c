@@ -19,7 +19,7 @@
 #include "pycomps_lbw.h"
 
 PyTypeObject PyCOMPS_LangPacksType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.Langpacks",            /*tp_name*/
     sizeof(PyCOMPS_Dict),       /*tp_basicsize*/
     0,                          /*tp_itemsize*/
@@ -59,7 +59,7 @@ PyTypeObject PyCOMPS_LangPacksType = {
     0,                          /* tp_new */};
 
 PyTypeObject PyCOMPS_BlacklistType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.Blacklist",            /*tp_name*/
     sizeof(PyCOMPS_MDict),       /*tp_basicsize*/
     0,                          /*tp_itemsize*/
@@ -99,7 +99,7 @@ PyTypeObject PyCOMPS_BlacklistType = {
     0,                          /* tp_new */};
 
 PyTypeObject PyCOMPS_WhiteoutType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.Whiteout",            /*tp_name*/
     sizeof(PyCOMPS_MDict),       /*tp_basicsize*/
     0,                          /*tp_itemsize*/
