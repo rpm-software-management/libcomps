@@ -1,6 +1,5 @@
 
 include(${PROJECT_SOURCE_DIR}/src/python/tests/tests.cmake)
-include(${PROJECT_SOURCE_DIR}/src/python/pversion.cmake)
 
 list(LENGTH TESTS_FILES len)
 math (EXPR len "${len} - 1")

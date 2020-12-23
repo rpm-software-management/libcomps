@@ -25,19 +25,9 @@
 
 #include <stdbool.h>
 
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 #include "pycomps.h"
 #include "pycomps_exc.h"
-
-#if PY_MAJOR_VERSION >= 3
-    #define MODINIT_RET_NONE return NULL
-    #define PY_OBJ_HEAD_INIT PyVarObject_HEAD_INIT(NULL, 0)
-    #define IS_PY3K
-#else
-    #define MODINIT_RET_NONE return
-    #define PY_OBJ_HEAD_INIT PyObject_HEAD_INIT(NULL)\
-                             0,
-#endif
 
 char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
     PyObject *val;
@@ -281,7 +271,7 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *args, PyObject* kwds) {
         PyErr_SetString(PyCOMPSExc_ParserError, "Fatal parser error");
         return NULL;
     }
-    return PyINT_FROM_LONG((long)parsed_ret);
+    return PyLong_FromLong((long)parsed_ret);
 }
 
 PyObject* PyCOMPS_get_last_errors(PyObject *self, void *closure)
@@ -370,7 +360,7 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *args, PyObject *kwds) {
         return NULL;
     }
 
-    return PyINT_FROM_LONG((long)parsed_ret);
+    return PyLong_FromLong((long)parsed_ret);
 }
 
 PyObject* PyCOMPS_get_(PyCOMPS *self, void *closure) {
@@ -881,7 +871,7 @@ PyNumberMethods PyCOMPS_Nums = {
  *     */
 
 PyTypeObject PyCOMPS_Type = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "_libpycomps.Comps",             /*tp_name*/
     sizeof(PyCOMPS), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
@@ -971,95 +961,90 @@ static PyMethodDef LibcompsMethods[] = {
      "Return xml output default options"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
-#if PY_MAJOR_VERSION >= 3
-    static struct PyModuleDef moduledef = {
-            PyModuleDef_HEAD_INIT,
-            "_libpycomps",
-            "libcomps module",
-            -1,
-            LibcompsMethods, //myextension_methods,
-            NULL,
-            NULL, //myextension_traverse,
-            NULL, //myextension_clear,
-            NULL
-    };
-#endif
+
+static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "_libpycomps",
+        "libcomps module",
+        -1,
+        LibcompsMethods, //myextension_methods,
+        NULL,
+        NULL, //myextension_traverse,
+        NULL, //myextension_clear,
+        NULL
+};
 
 #ifndef PyMODINIT_FUNC  /* declarations for DLL import/export */
 #define PyMODINIT_FUNC void
 #endif
 
-
 PyMODINIT_FUNC
-PYINIT_FUNC(void) {
+PyInit__libpycomps(void)
+{
     PyObject *m;
     PyCOMPS_GroupType.tp_new = PyCOMPSGroup_new;
     PyCOMPS_Type.tp_new = PyCOMPS_new;
-    if (PyType_Ready(&PyCOMPS_Type) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_Type) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_CatType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_CatType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_CatsType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_CatsType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_GIDType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_GIDType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_GIDsType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_GIDsType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_EnvsType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_EnvsType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_EnvType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_EnvType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_GroupType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_GroupType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_GroupsType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_GroupsType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_PacksType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_PacksType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_PackType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_PackType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_StrDictType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_StrDictType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_SeqIterType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_SeqIterType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_DictIterType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_DictIterType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_MDictType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_MDictType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_MDictIterType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_MDictIterType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_LangPacksType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_LangPacksType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_BlacklistType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_BlacklistType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_WhiteoutType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_WhiteoutType) < 0) {
+        return NULL;
     }
-    if (PyType_Ready(&PyCOMPS_StrSeqType) < 0 ) {
-        MODINIT_RET_NONE;
+    if (PyType_Ready(&PyCOMPS_StrSeqType) < 0) {
+        return NULL;
     }
-    #if PY_MAJOR_VERSION >= 3
-        m = PyModule_Create(&moduledef);
-    #else
-        m = Py_InitModule("_libpycomps", LibcompsMethods);
-    #endif
+    m = PyModule_Create(&moduledef);
     Py_INCREF(&PyCOMPS_Type);
     PyModule_AddObject(m, "Comps", (PyObject*) &PyCOMPS_Type);
     Py_INCREF(&PyCOMPS_CatsType);
@@ -1110,7 +1095,5 @@ PYINIT_FUNC(void) {
     PyModule_AddObject(m, "XMLGenError", PyCOMPSExc_XMLGenError);
 
     //Py_AtExit(&pycomps_exit)
-    #if PY_MAJOR_VERSION >= 3
-        return m;
-    #endif
+    return m;
 }

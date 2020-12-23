@@ -20,7 +20,7 @@
 #ifndef PYCOMPS_SEQ_H
 #define PYCOMPS_SEQ_H
 
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 
 #include "pycomps_hash.h"
 #include "pycomps_types.h"

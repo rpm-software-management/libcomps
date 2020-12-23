@@ -24,7 +24,7 @@
 #include "structmember.h"
 
 #include "pycomps_types.h"
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 #include "pycomps_dict.h"
 
 #include "libcomps/comps_objdict.h"

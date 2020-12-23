@@ -17,7 +17,7 @@
  * USA
  */
 
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 #include "pycomps_envs.h"
 #include "libcomps/comps_set.h"
 
@@ -348,7 +348,7 @@ PyNumberMethods PyCOMPSEnv_Nums = {
 };
 
 PyTypeObject PyCOMPS_EnvType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.Environment",   /*tp_name*/
     sizeof(PyCOMPS_Env), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
@@ -470,7 +470,7 @@ PyObject* PyCOMPSEnvs_union(PyObject *self, PyObject *other) {
                                 ((PyCOMPS_Sequence*)other)->list);
     COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)res)->list);
     res->list = res_list;
-    
+
     return (PyObject*)res;
 }
 
@@ -490,7 +490,7 @@ PyNumberMethods PyCOMPSEnvs_Nums = {
 
 
 PyTypeObject PyCOMPS_EnvsType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.EnvList",   /*tp_name*/
     sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     sizeof(PyCOMPS_Env),   /*tp_itemsize*/

@@ -18,7 +18,7 @@
  */
 #include "libcomps/comps_objlist.h"
 #include "pycomps_sequence.h"
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 //#include "pycomps_utils.h"
 
 #include <Python.h>
@@ -248,7 +248,7 @@ PyObject* list_get_slice(PyObject *self, PyObject *key) {
                                                       Py_TYPE(self),
                                                       NULL, NULL);
     self->ob_type->tp_init((PyObject*)result, NULL, NULL);
-    uret = PySlice_GetIndicesEx((SLICE_CAST)key, n,
+    uret = PySlice_GetIndicesEx((PyObject*)key, n,
                                &istart, &istop, &istep, &ilen);
 
     if (uret) {
@@ -275,8 +275,8 @@ PyObject* list_get_slice(PyObject *self, PyObject *key) {
 PyObject* PyCOMPSSeq_get(PyObject *self, PyObject *key) {
     if (PySlice_Check(key)) {
         return list_get_slice(self, key);
-    } else if (PyINT_CHECK(key)) {
-        return list_getitem(self, PyINT_ASLONG(key));
+    } else if (PyLong_Check(key)) {
+        return list_getitem(self, PyLong_AsLong(key));
     } else {
         PyErr_SetString(PyExc_TypeError, "Key must be index interger or slice");
         return NULL;
@@ -286,8 +286,8 @@ PyObject* PyCOMPSSeq_get(PyObject *self, PyObject *key) {
 PyObject* PyCOMPSSeq_id_get(PyObject *self, PyObject *key) {
     if (PySlice_Check(key)) {
         return list_get_slice(self, key);
-    } else if (PyINT_CHECK(key)) {
-        return list_getitem(self, PyINT_ASLONG(key));
+    } else if (PyLong_Check(key)) {
+        return list_getitem(self, PyLong_AsLong(key));
     } else if (PyUnicode_Check(key) || PyBytes_Check(key)){
         return list_getitem_byid(self, key);
     } else {
@@ -305,10 +305,10 @@ int list_set_slice(PyObject *self, PyObject *key, PyObject *val) {
     Py_ssize_t istart, istop, istep, ilen, i, c, clen;
     if (PySlice_Check(key)) {
         n = _seq_->list->len;
-        uret = PySlice_GetIndicesEx((SLICE_CAST)key, n,
+        uret = PySlice_GetIndicesEx((PyObject*)key, n,
                                    &istart, &istop, &istep, &ilen);
         if (ilen == 0) {
-            uret = PySlice_GetIndicesEx((SLICE_CAST)key, n+istart,
+            uret = PySlice_GetIndicesEx((PyObject*)key, n+istart,
                                        &istart, &istop, &istep, &ilen);
         }
         if (uret) return -1;
@@ -405,8 +405,8 @@ int __PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val,
                      int (*setter)(PyObject*, Py_ssize_t, PyObject*)) {
     if (PySlice_Check(key)) {
         return list_set_slice(self, key, val);
-    } else if (PyINT_CHECK(key)) {
-        return setter(self, PyINT_ASLONG(key), val);
+    } else if (PyLong_Check(key)) {
+        return setter(self, PyLong_AsLong(key), val);
     } else {
         PyErr_SetString(PyExc_TypeError, "Key must be index interger or slice");
         return -1;
@@ -485,7 +485,7 @@ PyObject* PyCOMPSSeq_append_unique(PyObject * self, PyObject *item) {
         COMPS_OBJECT_DESTROY(converted_item);
         return NULL;
     }
-    if (_seq_->it_info->pre_checker && 
+    if (_seq_->it_info->pre_checker &&
         _seq_->it_info->pre_checker(converted_item)) {
         COMPS_OBJECT_DESTROY(converted_item);
         return NULL;
@@ -650,7 +650,7 @@ PyMethodDef PyCOMPSSeq_methods[] = {
 
 
 PyTypeObject PyCOMPS_SeqType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.Sequence",   /*tp_name*/
     sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
@@ -690,7 +690,7 @@ PyTypeObject PyCOMPS_SeqType = {
     PyCOMPSSeq_new,                 /* tp_new */};
 
 PyTypeObject PyCOMPS_SeqItemType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     };
 
 PyMemberDef PyCOMPSSeqIter_members[] = {
@@ -728,7 +728,7 @@ void PyCOMPSSeqIter_dealloc(PyObject *self)
 }
 
 PyTypeObject PyCOMPS_SeqIterType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.SeqIter",   /*tp_name*/
     sizeof(PyCOMPS_SeqIter), /*tp_basicsize*/
     0,                         /*tp_itemsize*/

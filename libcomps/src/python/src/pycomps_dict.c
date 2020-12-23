@@ -99,7 +99,7 @@ PyObject* PyCOMPSDict_str(PyObject *self) {
         Py_XDECREF(tmpkey);
         Py_XDECREF(tmpval);
     }
-    
+
     tmp = ret;
     tmp2 = PyUnicode_FromString("}");
     ret = PyUnicode_Concat(ret, tmp2);
@@ -410,23 +410,12 @@ PyMethodDef PyCOMPSDict_methods[] = {
      {"get", (PyCFunction)PyCOMPSDict_get_, METH_O, PyCOMPSDict_get__doc__},
      {"has_key", (PyCFunction)PyCOMPSDict_has_key, METH_O,
        PyCOMPSDict_has_key__doc__},
-     {PYCOMPS_DICT_ITERITEMS, (PyCFunction)PyCOMPSDict_getiteritems, METH_NOARGS,
+     {"items", (PyCFunction)PyCOMPSDict_getiteritems, METH_NOARGS,
      "return iterator returning (key, value) tuple"},
-     {PYCOMPS_DICT_ITERVALUES, (PyCFunction)PyCOMPSDict_getitervalues, METH_NOARGS,
+     {"values", (PyCFunction)PyCOMPSDict_getitervalues, METH_NOARGS,
      "return iterator returning item's value"},
-     {PYCOMPS_DICT_ITERKEYS, (PyCFunction)PyCOMPSDict_getiter, METH_NOARGS,
+     {"keys", (PyCFunction)PyCOMPSDict_getiter, METH_NOARGS,
      "return iterator returning item's key"},
-#if PY_MAJOR_VERSION == 2
-
-     {"keys", (PyCFunction)PyCOMPSDict_keys, METH_NOARGS,
-     "return list of keys"},
-     {"values", (PyCFunction)PyCOMPSDict_values, METH_NOARGS,
-     "return list of values"},
-     {"items", (PyCFunction)PyCOMPSDict_items, METH_NOARGS,
-     "return list of (key, val) tuples"},
-
-#endif
-
      {"clear", (PyCFunction)PyCOMPSDict_clear, METH_NOARGS,
      "clear the dict"},
      {"copy", (PyCFunction)PyCOMPSDict_copy, METH_NOARGS,
@@ -437,7 +426,7 @@ PyMethodDef PyCOMPSDict_methods[] = {
 };
 
 PyTypeObject PyCOMPS_DictType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.Dict",            /*tp_name*/
     sizeof(PyCOMPS_Dict),       /*tp_basicsize*/
     0,                          /*tp_itemsize*/
@@ -527,7 +516,7 @@ int PyCOMPSDictIter_init(PyCOMPS_DictIter *self, PyObject *args, PyObject *kwds)
 }
 
 PyTypeObject PyCOMPS_DictIterType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.DictIter",   /*tp_name*/
     sizeof(PyCOMPS_DictIter), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
@@ -591,7 +580,7 @@ int PyCOMPSStrDict_init(PyCOMPS_Dict *self, PyObject *args, PyObject *kwds)
 }
 
 PyTypeObject PyCOMPS_StrDictType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.StrDict",            /*tp_name*/
     sizeof(PyCOMPS_Dict),       /*tp_basicsize*/
     0,                          /*tp_itemsize*/

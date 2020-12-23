@@ -28,7 +28,7 @@
 #include "libcomps/comps_dict.h"
 #include "libcomps/comps_log.h"
 
-#include "pycomps_23macros.h"
+#include "pycomps_macros.h"
 
 #include "pycomps_categories.h"
 #include "pycomps_groups.h"

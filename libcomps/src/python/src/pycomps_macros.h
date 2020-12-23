@@ -17,47 +17,12 @@
  * USA
  */
 
-#ifndef PYCOMPS_23MACROS_H
-#define PYCOMPS_23MACROS_H
+#ifndef PYCOMPS_MACROS_H
+#define PYCOMPS_MACROS_H
 #include <sys/types.h>
 
-#include "pyport.h"
 #include <Python.h>
 #include "structmember.h"
-
-
-#if PY_MAJOR_VERSION >= 3
-    #define PYINIT_FUNC PyInit__libpycomps
-#else
-    #define PYINIT_FUNC init_libpycomps
-#endif
-
-#if PY_MAJOR_VERSION >= 3
-    #define MODINIT_RET_NONE return NULL
-    #define PY_OBJ_HEAD_INIT PyVarObject_HEAD_INIT(NULL, 0)
-    #define IS_PY3K
-    #define PyINT_CHECK(OB) PyLong_Check(OB)
-    #define PyINT_ASLONG(OB) PyLong_AsLong(OB)
-    #define PyINT_FROM_LONG(OB) PyLong_FromLong(OB)
-    #define SLICE_CAST PyObject*
-    #define PYCOMPS_DICT_ITERITEMS "items"
-    #define PYCOMPS_DICT_ITERVALUES "values"
-    #define PYCOMPS_DICT_ITERKEYS "keys"
-#else
-    #define MODINIT_RET_NONE return
-    #define PY_OBJ_HEAD_INIT PyObject_HEAD_INIT(NULL)\
-                             0,
-    #define PyINT_CHECK(OB) PyInt_Check(OB)
-    #define PyINT_ASLONG(OB) PyInt_AsLong(OB)
-    #define PyINT_FROM_LONG(OB) PyInt_FromLong(OB)
-
-    #define SLICE_CAST PySliceObject*
-    #define PYCOMPS_DICT_ITERITEMS "iteritems"
-    #define PYCOMPS_DICT_ITERVALUES "itervalues"
-    #define PYCOMPS_DICT_ITERKEYS "iterkeys"
-#endif
-
-
 
 
 #define CMP_OP_EQ_NE_CHECK(OP)                                  \
@@ -75,9 +40,7 @@
         return ((OP) == Py_EQ)?(Py_INCREF(Py_False),Py_False):  \
                              (Py_INCREF(Py_True),Py_True);      \
 
-#define PYUNICODE_ASSTRING(U) PyBytes_AsString(PyUnicode_AsUTF8String(U))
-
 #define SET_TO(STRUCT, OFFSET, P) *((size_t*)(((char*)STRUCT)+OFFSET)) = (size_t)P;
 #define GET_FROM(STRUCT, OFFSET) *((char**)(((char*)STRUCT)+OFFSET))
 
-#endif /*PYCOMPS_23MACROS_H*/
+#endif /*PYCOMPS_MACROS_H*/

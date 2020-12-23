@@ -407,7 +407,7 @@ PyNumberMethods PyCOMPSGroup_Nums = {
 
 
 PyTypeObject PyCOMPS_GroupType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.Group",   /*tp_name*/
     sizeof(PyCOMPS_Group), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
@@ -514,11 +514,11 @@ COMPS_ObjList* comps_groups_union(COMPS_ObjList *groups1,
 }
 char __pycomps_pkg_type_check(PyObject* pobj, void *cobj) {
     long cint;
-    if (!PyINT_CHECK(pobj)) {
+    if (!PyLong_Check(pobj)) {
         cobj = NULL;
         return 0;
     }
-    cint = PyINT_ASLONG(pobj);
+    cint = PyLong_AsLong(pobj);
     switch(cint) {
         case COMPS_PACKAGE_DEFAULT:
         case COMPS_PACKAGE_OPTIONAL:
@@ -579,8 +579,8 @@ PyObject* PyCOMPSGroups_union(PyObject *self, PyObject *other) {
 PyObject* PyCOMPSGroups_get(PyObject *self, PyObject *key) {
     if (PySlice_Check(key)) {
         return list_get_slice(self, key);
-    } else if (PyINT_CHECK(key)) {
-        return list_getitem(self, PyINT_ASLONG(key));
+    } else if (PyLong_Check(key)) {
+        return list_getitem(self, PyLong_AsLong(key));
     } else if (PyUnicode_Check(key) || PyBytes_Check(key)){
         return list_getitem_byid(self, key);
     } else {
@@ -604,7 +604,7 @@ PyNumberMethods PyCOMPSGroups_Nums = {
 };
 
 PyTypeObject PyCOMPS_GroupsType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.GroupList",   /*tp_name*/
     sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     sizeof(PyCOMPS_Group),   /*tp_itemsize*/
@@ -750,7 +750,7 @@ PyNumberMethods PyCOMPSPacks_Nums = {
 };
 
 PyTypeObject PyCOMPS_PacksType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.PackageList",   /*tp_name*/
     sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     0,                        /*tp_itemsize*/
@@ -971,7 +971,7 @@ PyMethodDef PyCOMPSPack_methods[] = {
 };
 
 PyTypeObject PyCOMPS_PackType = {
-    PY_OBJ_HEAD_INIT
+    PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.Package",   /*tp_name*/
     sizeof(PyCOMPS_Package), /*tp_basicsize*/
     0,                        /*tp_itemsize*/
