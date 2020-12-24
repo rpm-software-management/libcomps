@@ -51,7 +51,6 @@ int PyCOMPSSeq_init(PyCOMPS_Sequence *self, PyObject *args, PyObject *kwds);
 PyObject* PyCOMPSSeq_append(PyObject * self, PyObject *item);
 PyObject* PyCOMPSSeq_append_unique(PyObject * self, PyObject *item);
 PyObject* PyCOMPSSeq_str(PyObject *self);
-int PyCOMPSSeq_print(PyObject *self, FILE *f, int flags);
 PyObject* PyCOMPSSeq_cmp(PyObject *self, PyObject *other, int op);
 
 void py_xdecref(void* obj);

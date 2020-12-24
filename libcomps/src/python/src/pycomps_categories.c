@@ -116,85 +116,6 @@ PyObject* PyCOMPSCat_repr(PyObject *self) {
     return ret;
 }
 
-int PyCOMPSCat_print(PyObject *self, FILE *f, int flags) {
-    #define _cat_ ((PyCOMPS_Category*)self)
-    COMPS_ObjListIt *it;
-    COMPS_HSList *pairlist;
-    COMPS_HSListItem *hsit;
-    char *id, *name, *desc, *disp_ord;
-    COMPS_Object *tmp_prop;
-
-    (void)flags;
-
-    tmp_prop = comps_doccategory_get_id(_cat_->c_obj);
-    id = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-    tmp_prop = comps_doccategory_get_name(_cat_->c_obj);
-    name = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-    tmp_prop = comps_doccategory_get_desc(_cat_->c_obj);
-    desc = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-    tmp_prop = comps_doccategory_get_display_order(_cat_->c_obj);
-    disp_ord = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-
-    fprintf(f, "<COMPS_Category: id='%s', name='%s', description='%s', "
-            " display_order=%s, ", id, name, desc, disp_ord);
-    fprintf(f, "name_by_lang={");
-    free(id);
-    free(name);
-    free(desc);
-    free(disp_ord);
-    pairlist = comps_objrtree_pairs(_cat_->c_obj->name_by_lang);
-    for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
-        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
-        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
-        free(name);
-    }
-    if (hsit) {
-        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
-        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
-        free(name);
-    } else
-        printf("}");
-    comps_hslist_destroy(&pairlist);
-
-    fprintf(f, ", desc_by_lang={");
-    pairlist = comps_objrtree_pairs(_cat_->c_obj->desc_by_lang);
-    for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
-        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
-        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
-        free(name);
-    }
-    if (hsit) {
-        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
-        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
-        free(name);
-    } else {
-        printf("}");
-    }
-    comps_hslist_destroy(&pairlist);
-
-    fprintf(f, ", group_ids=[");
-    if (_cat_->c_obj->group_ids) {
-        for (it = _cat_->c_obj->group_ids->first; it != NULL &&
-             it != _cat_->c_obj->group_ids->last; it = it->next){
-            name = comps_object_tostr(it->comps_obj);
-            fprintf(f, "'%s', ", name);
-            free(name);
-        }
-        if (it) {
-            name = comps_object_tostr(it->comps_obj);
-            fprintf(f, "'%s'", name);
-            free(name);
-        }
-    }
-    fprintf(f, "]>");
-    return 0;
-    #undef _cat_
-}
-
 PyObject* PyCOMPSCat_cmp(PyObject *self, PyObject *other, int op) {
     char ret;
 
@@ -319,7 +240,7 @@ PyTypeObject PyCOMPS_CatType = {
     sizeof(PyCOMPS_Category), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     (destructor)PyCOMPSCat_dealloc, /*tp_dealloc*/
-    PyCOMPSCat_print,          /*tp_print*/
+    0,                          /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,//PyCOMPSCat_cmp,            /*tp_compare*/

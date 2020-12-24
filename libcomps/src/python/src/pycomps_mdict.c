@@ -138,34 +138,6 @@ PyObject* PyCOMPSMDict_str(PyObject *self) {
 
 }
 
-int PyCOMPSMDict_print(PyObject *self, FILE *f, int flags) {
-    COMPS_HSList *pairlist;
-    COMPS_HSListItem *it;
-    char *tmpstr;
-
-    (void)flags;
-    fprintf(f, "{");
-
-
-    pairlist = comps_objmdict_pairs(((PyCOMPS_MDict*)self)->dict);
-    for (it = pairlist->first; it != pairlist->last; it = it->next) {
-        //printf("x\n");
-        tmpstr = comps_object_tostr((COMPS_Object*)
-                                    ((COMPS_ObjMRTreePair*)it->data)->data);
-        fprintf(f, "%s = '%s', ", ((COMPS_RTreePair*)it->data)->key, tmpstr);
-        free(tmpstr);
-    }
-    if (it) {
-        tmpstr = comps_object_tostr((COMPS_Object*)
-                                    ((COMPS_ObjMRTreePair*)it->data)->data);
-        fprintf(f, "%s = '%s'", ((COMPS_ObjMRTreePair*)it->data)->key, tmpstr);
-        free(tmpstr);
-    }
-    fprintf(f, "}");
-    comps_hslist_destroy(&pairlist);
-    return 0;
-}
-
 PyObject* PyCOMPSMDict_cmp(PyObject *self, PyObject *other, int op) {
     char ret;
     if (other == NULL) {
@@ -498,7 +470,7 @@ PyTypeObject PyCOMPS_MDictType = {
     sizeof(PyCOMPS_MDict),       /*tp_basicsize*/
     0,                          /*tp_itemsize*/
     (destructor)PyCOMPSMDict_dealloc, /*tp_dealloc*/
-    &PyCOMPSMDict_print,         /*tp_print*/
+    0,                          /*tp_print*/
     0,                          /*tp_getattr*/
     0,                          /*tp_setattr*/
     0,                          /*tp_compare*/
