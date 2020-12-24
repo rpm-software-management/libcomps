@@ -123,105 +123,6 @@ PyObject* PyCOMPSGroup_repr(PyObject *self) {
     return ret;
 }
 
-int PyCOMPSGroup_print(PyObject *self, FILE *f, int flags) {
-    #define _group_ ((PyCOMPS_Group*)self)
-    COMPS_ObjListIt *it;
-    COMPS_HSList *pairlist;
-    COMPS_HSListItem *hsit;
-    char *id, *name, *desc, *lang, *def, *uservis, *disp_ord, *biarch;
-    COMPS_Object* tmp_prop;
-
-    (void)flags;
-
-    tmp_prop = comps_docgroup_get_id(_group_->c_obj);
-    id = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-    tmp_prop = comps_docgroup_get_name(_group_->c_obj);
-    name = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-    tmp_prop = comps_docgroup_get_desc(_group_->c_obj);
-    desc = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-    tmp_prop = comps_docgroup_get_display_order(_group_->c_obj);
-    disp_ord = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-    tmp_prop = comps_docgroup_get_langonly(_group_->c_obj);
-    lang = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-    tmp_prop = comps_docgroup_get_def(_group_->c_obj);
-    def = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-    tmp_prop = comps_docgroup_get_uservisible(_group_->c_obj);
-    uservis = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-    tmp_prop = comps_docgroup_get_biarchonly(_group_->c_obj);
-    biarch = (tmp_prop)?comps_object_tostr(tmp_prop):NULL;
-    COMPS_OBJECT_DESTROY(tmp_prop);
-
-    fprintf(f, "<COMPS_Group: id='%s', name='%s', description='%s',  "
-            "default='%s', uservisible='%s', biarchonly='%s', lang_only='%s', "
-            "display_order=%s ",
-            id, name, desc, def, uservis, biarch, lang, disp_ord);
-    free(id);
-    free(name);
-    free(desc);
-    free(lang);
-    free(def);
-    free(uservis);
-    free(biarch);
-    free(disp_ord);
-
-    fprintf(f, "name_by_lang={");
-    pairlist = comps_objrtree_pairs(_group_->c_obj->name_by_lang);
-    for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
-        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
-        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
-        free(name);
-    }
-    if (hsit) {
-        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
-        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
-        free(name);
-    } else {
-        printf("}");
-    }
-    comps_hslist_destroy(&pairlist);
-
-    fprintf(f, ", desc_by_lang={");
-    pairlist = comps_objrtree_pairs(_group_->c_obj->desc_by_lang);
-    for (hsit = pairlist->first; hsit != pairlist->last; hsit = hsit->next) {
-        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
-        printf("'%s': '%s', ", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
-        free(name);
-    }
-    if (hsit) {
-        name = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
-        printf("'%s': '%s'}", ((COMPS_ObjRTreePair*)hsit->data)->key, name);
-        free(name);
-    } else {
-        printf("}");
-    }
-    comps_hslist_destroy(&pairlist);
-
-    fprintf(f, ", packages=[");
-    if (_group_->c_obj->packages) {
-        for (it = _group_->c_obj->packages->first;
-             it != _group_->c_obj->packages->last; it = it->next){
-            id = comps_object_tostr(it->comps_obj);
-            fprintf(f,"%s, ", id);
-            free(id);
-        }
-        if (it) {
-            id = comps_object_tostr(it->comps_obj);
-            fprintf(f,"%s", id);
-            free(id);
-        }
-    }
-    fprintf(f, "]>");
-    return 0;
-    #undef _group_
-}
-
 PyObject* PyCOMPSGroup_cmp(PyObject *self, PyObject *other, int op) {
     char ret;
 
@@ -412,7 +313,7 @@ PyTypeObject PyCOMPS_GroupType = {
     sizeof(PyCOMPS_Group), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     (destructor)PyCOMPSGroup_dealloc, /*tp_dealloc*/
-    PyCOMPSGroup_print,        /*tp_print*/
+    0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,//PyCOMPSGroup_cmp,            /*tp_compare*/
@@ -910,30 +811,6 @@ PyObject* PyCOMPSPack_repr(PyObject *self) {
     return ret;
 }
 
-int PyCOMPSPack_print(PyObject *self, FILE *f, int flags) {
-    #define _package_ ((PyCOMPS_Package*)self)->c_obj
-    (void) flags;
-    char *str;
-    const char *type;
-    type = comps_docpackage_type_str(_package_->type);
-    str = comps_object_tostr((COMPS_Object*)_package_->name);
-    fprintf(f, "<COPMS_Package name='%s' type='%s' ", str, type);
-    free(str);
-    if (_package_->requires) {
-        str = comps_object_tostr((COMPS_Object*)_package_->requires);
-        fprintf(f, "requires='%s' ", str);
-        free(str);
-    }
-    if (_package_->basearchonly && _package_->basearchonly->val) {
-        str = comps_object_tostr((COMPS_Object*)_package_->basearchonly);
-        fprintf(f, "basearchonly='%s' ", str);
-        free(str);
-    }
-    fprintf(f, ">");
-    return 0;
-    #undef _package_
-}
-
 PyObject* PyCOMPSPack_cmp(PyObject *self, PyObject *other, int op) {
     char ret;
     CMP_OP_EQ_NE_CHECK(op)
@@ -976,7 +853,7 @@ PyTypeObject PyCOMPS_PackType = {
     sizeof(PyCOMPS_Package), /*tp_basicsize*/
     0,                        /*tp_itemsize*/
     (destructor)PyCOMPSPack_dealloc, /*tp_dealloc*/
-    PyCOMPSPack_print,         /*tp_print*/
+    0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,//PyCOMPSPack_cmp,           /*tp_compare*/

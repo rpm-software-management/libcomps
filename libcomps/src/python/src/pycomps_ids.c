@@ -65,7 +65,7 @@ PyTypeObject PyCOMPS_IDsType = {
     sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     sizeof(PyObject),         /*tp_itemsize*/
     (destructor)PyCOMPSSeq_dealloc, /*tp_dealloc*/
-    PyCOMPSSeq_print,          /*tp_print*/
+    0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/

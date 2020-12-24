@@ -550,16 +550,6 @@ PyObject* PyCOMPSSeq_str(PyObject *self) {
     return PyUnicode_FromString(comps_object_tostr(
                             (COMPS_Object*)((PyCOMPS_Sequence*)self)->list));
 }
-int PyCOMPSSeq_print(PyObject *self, FILE *f, int flags) {
-    COMPS_ObjList *_list;
-    (void) flags;
-    char *tmpstr;
-    _list = ((PyCOMPS_Sequence*)self)->list;
-    tmpstr = comps_object_tostr((COMPS_Object*)_list);
-    fprintf(f, "%s", tmpstr);
-    free(tmpstr);
-    return 0;
-}
 
 PyObject* PyCOMPSSeq_cmp(PyObject *self, PyObject *other, int op) {
     char res;
@@ -648,14 +638,13 @@ PyMethodDef PyCOMPSSeq_methods[] = {
     {NULL}  /* Sentinel */
 };
 
-
 PyTypeObject PyCOMPS_SeqType = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "libcomps.Sequence",   /*tp_name*/
     sizeof(PyCOMPS_Sequence), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     (destructor)PyCOMPSSeq_dealloc, /*tp_dealloc*/
-    PyCOMPSSeq_print,          /*tp_print*/
+    0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/

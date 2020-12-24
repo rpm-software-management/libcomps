@@ -132,18 +132,6 @@ PyObject* PyCOMPSGID_str(PyObject *self) {
     return ret;
 }
 
-int PyCOMPSGID_print(PyObject *self, FILE *f, int flags) {
-    const char *def;
-    char *name;
-
-    (void) flags;
-    def = (((PyCOMPS_GID*)self)->c_obj->def)?"true":"false";
-    name = comps_object_tostr((COMPS_Object*)((PyCOMPS_GID*)self)->c_obj->name);
-    fprintf(f, "<COPMS_GroupId name='%s' default='%s'>", name, def);
-    free(name);
-    return 0;
-}
-
 COMPS_DocGroupId* comps_gid_from_str(PyObject *other) {
     COMPS_DocGroupId *gid;
     char *name;
@@ -220,7 +208,7 @@ PyTypeObject PyCOMPS_GIDType = {
     sizeof(PyCOMPS_GID), /*tp_basicsize*/
     0,                        /*tp_itemsize*/
     (destructor)PyCOMPSGID_dealloc, /*tp_dealloc*/
-    PyCOMPSGID_print,         /*tp_print*/
+    0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,//PyCOMPSPack_cmp,           /*tp_compare*/
