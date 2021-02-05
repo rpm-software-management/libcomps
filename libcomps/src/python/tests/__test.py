@@ -662,7 +662,7 @@ class DictTest(unittest.TestCase):
 
 #@unittest.skip("skip")
 class MDictTest(unittest.TestCase):
-    def test_blacklist(self):
+    def test_blocklist(self):
         bl1 = libcomps.Blacklist()
         bl2 = libcomps.Blacklist()
         self._test(bl1, bl2)

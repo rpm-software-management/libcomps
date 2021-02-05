@@ -35,7 +35,7 @@ char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
     int x;
     const char *keys[] = {"empty_groups", "empty_categories",
                           "empty_environments", "empty_langpacks",
-                          "empty_blacklist", "empty_whiteout",
+                          "empty_blocklist", "empty_whiteout",
                           "empty_packages", "empty_grouplist",
                           "empty_optionlist", "uservisible_explicit",
                           "biarchonly_explicit", "default_explicit",
@@ -46,7 +46,7 @@ char __pycomps_dict_to_xml_opts(PyObject* pobj, void *cobj) {
                       &(*options)->empty_categories,
                       &(*options)->empty_environments,
                       &(*options)->empty_langpacks,
-                      &(*options)->empty_blacklist,
+                      &(*options)->empty_blocklist,
                       &(*options)->empty_whiteout,
                       &(*options)->empty_packages,
                       &(*options)->empty_grouplist,
@@ -246,7 +246,7 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *args, PyObject* kwds) {
     Py_CLEAR(self_comps->p_categories);
     Py_CLEAR(self_comps->p_environments);
     Py_CLEAR(self_comps->p_langpacks);
-    Py_CLEAR(self_comps->p_blacklist);
+    Py_CLEAR(self_comps->p_blocklist);
     Py_CLEAR(self_comps->p_whiteout);
 
 
@@ -351,7 +351,7 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *args, PyObject *kwds) {
     Py_CLEAR(self_comps->p_categories);
     Py_CLEAR(self_comps->p_environments);
     Py_CLEAR(self_comps->p_langpacks);
-    Py_CLEAR(self_comps->p_blacklist);
+    Py_CLEAR(self_comps->p_blocklist);
     Py_CLEAR(self_comps->p_whiteout);
     COMPS_OBJECT_DESTROY(self_comps->comps_doc);
 
@@ -653,10 +653,10 @@ PyCOMPS_DGetSetClosure langpacks_closure = {&PyCOMPS_StrDictType,
                                       offsetof(PyCOMPS, p_langpacks),
                                       &comps_doc_langpacks,
                                       &comps_doc_set_langpacks};
-PyCOMPS_MDGetSetClosure blacklist_closure = {&PyCOMPS_MDictType,
-                                      offsetof(PyCOMPS, p_blacklist),
-                                      &comps_doc_blacklist,
-                                      &comps_doc_set_blacklist};
+PyCOMPS_MDGetSetClosure blocklist_closure = {&PyCOMPS_MDictType,
+                                      offsetof(PyCOMPS, p_blocklist),
+                                      &comps_doc_blocklist,
+                                      &comps_doc_set_blocklist};
 PyCOMPS_MDGetSetClosure whiteout_closure = {&PyCOMPS_MDictType,
                                       offsetof(PyCOMPS, p_whiteout),
                                       &comps_doc_whiteout,
@@ -675,9 +675,9 @@ PyGetSetDef PyCOMPS_getset[] = {
     {"langpacks",
      (getter)PyCOMPS_get_, (setter)PyCOMPS_set_,
      ":py:class:`libcomps.StrDict` of langpacks", &langpacks_closure},
-    {"blacklist",
+    {"blocklist",
      (getter)PyCOMPS_get_, (setter)PyCOMPS_set_,
-     ":py:class:`libcomps.MDict` of blacklist", &blacklist_closure},
+     ":py:class:`libcomps.MDict` of blocklist", &blocklist_closure},
     {"whiteout",
      (getter)PyCOMPS_get_, (setter)PyCOMPS_set_,
      ":py:class:`libcomps.MDict` of whiteout", &whiteout_closure},
@@ -919,7 +919,7 @@ PyTypeObject PyCOMPS_Type = {
 PyObject* Libcomps_xml_default(PyObject *self) {
     const char *keys[] = {"empty_groups", "empty_categories",
                           "empty_environments", "empty_langpacks",
-                          "empty_blacklist", "empty_whiteout",
+                          "empty_blocklist", "empty_whiteout",
                           "empty_packages", "empty_grouplist",
                           "empty_optionlist", "uservisible_explicit",
                           "biarchonly_explicit",
@@ -930,7 +930,7 @@ PyObject* Libcomps_xml_default(PyObject *self) {
                       &COMPS_XMLDefaultOptions.empty_categories,
                       &COMPS_XMLDefaultOptions.empty_environments,
                       &COMPS_XMLDefaultOptions.empty_langpacks,
-                      &COMPS_XMLDefaultOptions.empty_blacklist,
+                      &COMPS_XMLDefaultOptions.empty_blocklist,
                       &COMPS_XMLDefaultOptions.empty_whiteout,
                       &COMPS_XMLDefaultOptions.empty_packages,
                       &COMPS_XMLDefaultOptions.empty_grouplist,

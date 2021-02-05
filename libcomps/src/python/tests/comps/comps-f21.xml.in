@@ -6694,7 +6694,7 @@
     <match install="tesseract-langpack-%s" name="tesseract"/>
     <match install="tkgate-%s" name="tkgate"/>
   </langpacks>
-  <blacklist>
+  <blocklist>
     <package name="dev"/>
     <package name="system-config-mouse"/>
     <package arch="i386" name="NetworkManager"/>
@@ -6742,7 +6742,7 @@
     <package arch="ppc64" name="kmymoney"/>
     <package arch="ppc64" name="mysql"/>
     <package arch="ppc64" name="nas"/>
-  </blacklist>
+  </blocklist>
   <whiteout>
     <ignoredep package="XFree86" requires="Mesa"/>
     <ignoredep package="XFree86-libs" requires="XFree86-Mesa-libGL"/>

@@ -123,13 +123,13 @@ signed char comps_doc_cmp_u(COMPS_Object *obj1, COMPS_Object *obj2) {
         return ret;
     }
 
-    tmp1 = (COMPS_Object*) comps_doc_blacklist(_doc1_);
-    tmp2 = (COMPS_Object*) comps_doc_blacklist(_doc2_);
+    tmp1 = (COMPS_Object*) comps_doc_blocklist(_doc1_);
+    tmp2 = (COMPS_Object*) comps_doc_blocklist(_doc2_);
     ret = comps_object_cmp(tmp1, tmp2);
     COMPS_OBJECT_DESTROY(tmp1);
     COMPS_OBJECT_DESTROY(tmp2);
     if (!ret) {
-        //printf("blacklist cmp fail\n");
+        //printf("blocklist cmp fail\n");
         return ret;
     }
 
@@ -163,9 +163,9 @@ COMPS_DOC_ADDOBJLIST(environments, environment, COMPS_DocEnv) /*comps_doc.h macr
 COMPS_DOC_GETOBJDICT(langpacks)     /*comps_doc.h macro*/
 COMPS_DOC_SETOBJDICT(langpacks) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJDICT(langpacks, langpack) /*comps_doc.h macro*/
-COMPS_DOC_GETOBJMDICT(blacklist)     /*comps_doc.h macro*/
-COMPS_DOC_SETOBJMDICT(blacklist) /*comps_doc.h macro*/
-COMPS_DOC_ADDOBJMDICT(blacklist,  blacklist) /*comps_doc.h macro*/
+COMPS_DOC_GETOBJMDICT(blocklist)     /*comps_doc.h macro*/
+COMPS_DOC_SETOBJMDICT(blocklist) /*comps_doc.h macro*/
+COMPS_DOC_ADDOBJMDICT(blocklist,  blocklist) /*comps_doc.h macro*/
 COMPS_DOC_GETOBJMDICT(whiteout)      /*comps_doc.h macro*/
 COMPS_DOC_SETOBJMDICT(whiteout) /*comps_doc.h macro*/
 COMPS_DOC_ADDOBJMDICT(whiteout,  whiteout) /*comps_doc.h macro*/
@@ -730,9 +730,9 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
     }
     COMPS_OBJECT_DESTROY(dict);
 
-    mdict = comps_doc_blacklist(doc);
+    mdict = comps_doc_blocklist(doc);
     if (mdict && mdict->len) {
-        retc = xmlTextWriterStartElement(writer, BAD_CAST "blacklist");
+        retc = xmlTextWriterStartElement(writer, BAD_CAST "blocklist");
         if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
             return -1;
         }

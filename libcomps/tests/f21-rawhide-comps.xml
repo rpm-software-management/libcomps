@@ -20104,7 +20104,7 @@
     <match name="tesseract" install="tesseract-langpack-%s"/>
     <match name="tkgate" install="tkgate-%s"/>
   </langpacks>
-  <blacklist>
+  <blocklist>
     <package name="dev"/>
     <package name="system-config-mouse"/>
     <package name="NetworkManager" arch="i386"/>
@@ -20152,7 +20152,7 @@
     <package name="kmymoney" arch="ppc64"/>
     <package name="mysql" arch="ppc64"/>
     <package name="nas" arch="ppc64"/>
-  </blacklist>
+  </blocklist>
   <whiteout>
     <ignoredep requires="Mesa" package="XFree86"/>
     <ignoredep requires="XFree86-Mesa-libGL" package="XFree86-libs"/>

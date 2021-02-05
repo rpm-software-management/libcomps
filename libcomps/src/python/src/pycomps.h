@@ -69,7 +69,7 @@ typedef struct {
     PyObject *p_categories;
     PyObject *p_environments;
     PyObject *p_langpacks;
-    PyObject *p_blacklist;
+    PyObject *p_blocklist;
     PyObject *p_whiteout;
 } PyCOMPS;
 
