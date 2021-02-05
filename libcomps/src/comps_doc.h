@@ -288,10 +288,10 @@ HEAD_COMPS_DOC_GETOBJLIST(environments) /*comps_doc.h macro*/
  * @return COMPS_ObjDict object of COMPS_Str*/
 HEAD_COMPS_DOC_GETOBJDICT(langpacks) /*comps_doc.h macro*/
 
-/** comps blacklist dictionary getter
+/** comps blocklist dictionary getter
  * @param doc COMPS_Doc instance
  * @return COMPS_ObjMDict object of COMPS_Str*/
-HEAD_COMPS_DOC_GETOBJMDICT(blacklist) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_GETOBJMDICT(blocklist) /*comps_doc.h macro*/
 
 /** comps whiteout dictionary getter
  * @param doc COMPS_Doc instance
@@ -336,13 +336,13 @@ HEAD_COMPS_DOC_SETOBJLIST(environments) /*comps_doc.h macro*/
  */
 HEAD_COMPS_DOC_SETOBJDICT(langpacks) /*comps_doc.h macro*/
 
-/** comps blacklist multi-dict setter
+/** comps blocklist multi-dict setter
  * @param doc COMPS_Doc instance
  * @param dict COMPS_ObjMDict of COMPS_Str items
  * \warning make sure of correct items type. Setter doesn't provide any
  * additional control routines
  */
-HEAD_COMPS_DOC_SETOBJMDICT(blacklist) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_SETOBJMDICT(blocklist) /*comps_doc.h macro*/
 
 /** comps whiteout multi-dict setter
  * @param doc COMPS_Doc instance
@@ -392,21 +392,21 @@ HEAD_COMPS_DOC_ADDOBJLIST(environment, COMPS_DocEnv) /*comps_doc.h macro*/
  */
 HEAD_COMPS_DOC_ADDOBJDICT(langpack) /*comps_doc.h macro*/
 
-/** Blacklist adder to blacklist multi-dict in COMPS_Doc
+/** Blocklist adder to blocklist multi-dict in COMPS_Doc
  * @param doc COMPS_Doc instance
- * @param key COMPS_Str dictionary key of blacklist
- * @param obj COMPS_Str blacklist item
- * append blacklist item object to blacklist in COMPS_Doc structure. Items 
+ * @param key COMPS_Str dictionary key of blocklist
+ * @param obj COMPS_Str blocklist item
+ * append blocklist item object to blocklist in COMPS_Doc structure. Items
  * with same key are grouped in COMPS_ObjList object.
  * \warning function doesn't increment obj param reference count.
  */
-HEAD_COMPS_DOC_ADDOBJMDICT(blacklist) /*comps_doc.h macro*/
+HEAD_COMPS_DOC_ADDOBJMDICT(blocklist) /*comps_doc.h macro*/
 
 /** whiteout adder to whitetout multi-dict in COMPS_Doc
  * @param doc COMPS_Doc instance
  * @param key COMPS_Str dictionary key of whiteout
  * @param obj COMPS_Str whiteout item
- * append whiteout item object to blacklist in COMPS_Doc structure. Items 
+ * append whiteout item object to blocklist in COMPS_Doc structure. Items
  * with same key are grouped in COMPS_ObjList object.
  * \warning function doesn't increment obj param reference count.
  */

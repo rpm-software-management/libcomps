@@ -198,12 +198,12 @@ const COMPS_ElemInfo COMPS_MATCH_ElemInfo = {
     .postproc = NULL//&comps_elem_match_postproc
 };
 const COMPS_ElemInfo COMPS_BLACKLIST_ElemInfo = {
-    .name = "blacklist",
+    .name = "blocklist",
     .ancestors = (const COMPS_ElemType[]){COMPS_ELEM_DOC,
                                           COMPS_ELEM_SENTINEL},
     .attributes = (const COMPS_ElemAttrInfo*[]){NULL},
-    .preproc = NULL,//&comps_elem_blacklist_preproc,
-    .postproc = NULL//&comps_elem_blacklist_postproc
+    .preproc = NULL,//&comps_elem_blocklist_preproc,
+    .postproc = NULL//&comps_elem_blocklist_postproc
 };
 const COMPS_ElemInfo COMPS_PACKAGE_ElemInfo = {
     .name = "package",
@@ -357,7 +357,7 @@ char * comps_elem_get_name(COMPS_ElemType type) {
             return "whiteout";
         break;
         case COMPS_ELEM_BLACKLIST:
-            return "blacklist";
+            return "blocklist";
         break;
         case COMPS_ELEM_PACKAGE:
             return "package";
@@ -394,7 +394,7 @@ COMPS_ElemType comps_elem_get_type(const char * name) {
     else if (strcmp(name, "optionlist") == 0) type = COMPS_ELEM_OPTLIST;
     else if (strcmp(name, "langpacks") == 0) type = COMPS_ELEM_LANGPACKS;
     else if (strcmp(name, "match") == 0) type = COMPS_ELEM_MATCH;
-    else if (strcmp(name, "blacklist") == 0) type = COMPS_ELEM_BLACKLIST;
+    else if (strcmp(name, "blocklist") == 0) type = COMPS_ELEM_BLACKLIST;
     else if (strcmp(name, "package") == 0) type = COMPS_ELEM_PACKAGE;
     else if (strcmp(name, "whiteout") == 0) type = COMPS_ELEM_WHITEOUT;
     else if (strcmp(name, "ignoredep") == 0) type = COMPS_ELEM_IGNOREDEP;
@@ -699,7 +699,7 @@ void comps_elem_match_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
                            comps_str(comps_dict_get(elem->attrs, "install")));
 }
 void comps_elem_package_preproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
-    comps_doc_add_blacklist(parsed->comps_doc,
+    comps_doc_add_blocklist(parsed->comps_doc,
                             comps_dict_get(elem->attrs, "name"),
                             comps_str((comps_dict_get(elem->attrs, "arch"))));
 }
