@@ -1,0 +1,27 @@
+---
+name: Python CI
+on: pull_request
+
+jobs:
+  python-build:
+    name: Python Build
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo dnf -y install dnf-plugins-core
+          sudo dnf -y builddep libcomps.spec
+          pip install --upgrade pip
+          pip install pytest
+
+      - name: Compile and Install
+        run: pip install --user .
+
+      - name: Test
+        run: |
+          pushd libcomps/src/python/tests/
+          pytest --verbose --color=yes ./
+          popd
