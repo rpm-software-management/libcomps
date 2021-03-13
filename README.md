@@ -2,7 +2,7 @@ libcomps
 ========
 
 Libcomps is alternative for yum.comps library. It's written in pure C as library
-and there's bindings for python2 and python3.
+with Python bindings.
 
 Building
 --------
@@ -40,13 +40,12 @@ for rpm building:
 
 ### Building
 1. clone this repository
-        git clone https://github.com/midnightercz/libcomps.git
+        git clone https://github.com/rpm-software-management/libcomps.git
 2. from the checkout dir:
 
         mkdir build
         cd build/
-        cmake ../libcomps -DPYTHON_DESIRED=3
-        (alternatively cmake ../libcomps -DPYTHON_DESIRED=3 for python2 bindings)
+        cmake ../libcomps
         make
 3. building the documentation:
 
@@ -109,7 +108,7 @@ Here's the most direct way to get your work merged into the project.
 1. Clone down your fork
 1. Implement your feature or bug fix and commit changes
 1. If the change fixes a bug at [Red Hat bugzilla](https://bugzilla.redhat.com/), or if it is important to the end user, add the following block to the commit message:
-    
+
        = changelog =
        msg:           message to be included in the changelog
        type:          one of: bugfix/enhancement/security (this field is required when message is present)
