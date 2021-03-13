@@ -1,0 +1,7 @@
+graft libcomps*
+include version.cmake
+include version.json
+include pyproject.toml
+include setup.py
+include COPYING
+include README.md

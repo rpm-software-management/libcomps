@@ -1,0 +1,53 @@
+---
+name: Python Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  release:
+    name: PyPI Release
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo dnf -y install dnf-plugins-core
+        sudo dnf -y builddep libcomps.spec
+        pip install --upgrade pip
+        pip install pytest twine scikit-build
+
+    - name: Build Python sdist
+      run: python3 setup.py sdist
+
+    - name: Build manylinux Python wheels
+      uses: RalfG/python-wheels-manylinux-build@v0.3.3-manylinux2014_x86_64
+      with:
+        python-versions: 'cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39'
+        build-requirements: 'scikit-build'
+        system-packages: 'make cmake bzip2-devel expat-devel libxml2-devel xz-devel'
+
+    - name: Install and Test Python source package
+      run: |
+        pip install --user dist/*.tar.gz
+        pushd libcomps/src/python/tests/
+        pytest --verbose --color=yes ./
+        popd
+
+    - name: Install and Test Python universal binary wheel package
+      run: |
+        pip install --user dist/libcomps-*-cp39-cp39-manylinux2014_x86_64.whl
+        pushd libcomps/src/python/tests/
+        pytest --verbose --color=yes ./
+        popd
+
+    - name: Publish packages to PyPI
+      env:
+        TWINE_USERNAME: __TOKEN__
+        TWINE_PASSWORD: ${{secrets.PYPI_API_TOKEN}}
+      run: |
+        twine upload dist/*.tar.gz
+        twine upload wheelhouse/*-manylinux*.whl
