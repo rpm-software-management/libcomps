@@ -63,9 +63,9 @@ if (ENABLE_DEVELOPMENT OR "${libcomps_library_type}" STREQUAL "SHARED")
     )
 endif ()
 
-configure_file("${PROJECT_SOURCE_DIR}/../libcomps.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/libcomps.pc" @ONLY)
-
 if (ENABLE_DEVELOPMENT)
+  configure_file("${PROJECT_SOURCE_DIR}/../libcomps.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/libcomps.pc" @ONLY)
+
   install (FILES ${libcomps_HEADERS} DESTINATION include/libcomps)
   install (TARGETS libcomps LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
   install (FILES "${CMAKE_CURRENT_BINARY_DIR}/libcomps.pc"

@@ -43,11 +43,11 @@ foreach(i RANGE 0 ${pycomps_SRCLEN})
 endforeach(i)
 
 if (NOT SKBUILD)
-    find_package (PythonLibs 3 EXACT)
     find_package (PythonInterp 3 EXACT REQUIRED)
+    find_package (PythonLibs 3 EXACT)
 endif(NOT SKBUILD)
 
-include_directories(${PYTHON_INCLUDE_PATH})
+include_directories(${PYTHON_INCLUDE_DIR})
 include_directories(${LIBCOMPS_INCLUDE_PATH})
 
 if (ENABLE_TESTS)
@@ -65,7 +65,12 @@ add_dependencies(pycomps src-copy)
 target_link_libraries(pycomps libcomps)
 target_link_libraries(pycomps ${EXPAT_LIBRARIES})
 target_link_libraries(pycomps ${LIBXML2_LIBRARIES})
-target_link_libraries(pycomps ${PYTHON_LIBRARIES})
+
+if (NOT SKBUILD)
+    # manylinux links statically, no libpythonX.so available
+    # https://github.com/pypa/manylinux/issues/255#issuecomment-450761634
+    target_link_libraries(pycomps ${PYTHON_LIBRARIES})
+endif (NOT SKBUILD)
 
 if (ENABLE_TESTS)
     set(pycopy pytest_run)
@@ -77,8 +82,6 @@ if (ENABLE_TESTS)
 endif ()
 
 IF (SKBUILD)
-    find_package(PythonExtensions REQUIRED)
-    python_extension_module(pycomps)
     INSTALL(FILES libcomps/__init__.py DESTINATION libcomps/src/python/src/libcomps)
     INSTALL(TARGETS pycomps LIBRARY DESTINATION libcomps/src/python/src/libcomps)
 ELSE ()
