@@ -228,7 +228,10 @@ PyObject* PyCOMPS_fromxml_f(PyObject *self, PyObject *args, PyObject* kwds) {
     }
 
     parsed = comps_parse_parsed_create();
-    comps_parse_parsed_init(parsed, "UTF-8", 0);
+    if (!comps_parse_parsed_init(parsed, "UTF-8", 0)) {
+        PyErr_SetString(PyCOMPSExc_ParserError, "Fatal error in comps_parse_parsed_init()");
+        return NULL;
+    }
     f =  fopen(fname, "r");
     if (!f) {
         PyErr_Format(PyExc_IOError, "Cannot open %s for reading", fname);
@@ -337,7 +340,10 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *args, PyObject *kwds) {
 
     COMPS_Parsed *parsed;
     parsed = comps_parse_parsed_create();
-    comps_parse_parsed_init(parsed, "UTF-8", 0);
+    if (!comps_parse_parsed_init(parsed, "UTF-8", 0)) {
+        PyErr_SetString(PyCOMPSExc_ParserError, "Fatal error in comps_parse_parsed_init()");
+        return NULL;
+    }
     parsed_ret = comps_parse_str(parsed, tmps, options);
     if (options)
         free(options);
