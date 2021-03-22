@@ -523,7 +523,7 @@ START_TEST(test_comps_doc_union)
     COMPS_Parsed *parsed;
     FILE *fp;
     parsed = comps_parse_parsed_create();
-    comps_parse_parsed_init(parsed, "UTF-8", 0);
+    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
     fp = fopen("sample_comps.xml", "r");
     comps_parse_file(parsed, fp, NULL);
 
@@ -595,7 +595,7 @@ START_TEST(test_doc_defaults) {
     tmp = comps2xml_str(doc, NULL, NULL);
     //printf("tmp %s\n", tmp);
     parsed = comps_parse_parsed_create();
-    comps_parse_parsed_init(parsed, "UTF-8", 1);
+    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 1) == 0);
     comps_parse_str(parsed, tmp, NULL);
     doc2 = parsed->comps_doc;
     groups = comps_doc_groups(doc2);
