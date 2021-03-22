@@ -349,11 +349,11 @@ signed char comps_docenv_xml(COMPS_DocEnv *env, xmlTextWriterPtr writer,
                 }
                 str = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
                 ret = xmlTextWriterWriteString(writer, (xmlChar*)str);
+                free(str);
                 if (__comps_check_xml_get(ret, (COMPS_Object*)log) < 0) {
                     comps_hslist_destroy(&pairlist);
                     return -1;
                 }
-                free(str);
                 ret = xmlTextWriterEndElement(writer);
                 if (__comps_check_xml_get(ret, (COMPS_Object*)log) < 0) {
                     comps_hslist_destroy(&pairlist);

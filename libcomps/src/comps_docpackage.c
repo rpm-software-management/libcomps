@@ -196,8 +196,8 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
     COMPS_XMLRET_CHECK()
     str = comps_object_tostr((COMPS_Object*)pkg->name);
     ret = xmlTextWriterWriteString(writer, (xmlChar*)str);
-    COMPS_XMLRET_CHECK()
     free(str);
+    COMPS_XMLRET_CHECK()
     ret = xmlTextWriterEndElement(writer);
     COMPS_XMLRET_CHECK()
     return 0;
