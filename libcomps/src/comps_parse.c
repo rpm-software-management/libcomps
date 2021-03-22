@@ -76,6 +76,7 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
         if (!parsed->text_buffer)
             comps_hslist_destroy(&parsed->text_buffer);
         COMPS_OBJECT_DESTROY(parsed->log);
+        XML_ParserFree(parsed->parser);
         free(parsed);
         return 0;
     }
@@ -218,6 +219,7 @@ signed char comps_parse_file(COMPS_Parsed *parsed, FILE *f,
         buff = XML_GetBuffer(parsed->parser, BUFF_SIZE);
         if (buff == NULL) {
             comps_log_error(parsed->log, COMPS_ERR_MALLOC, 0);
+            fclose(f);
             raise(SIGABRT);
             return -1;
         }
