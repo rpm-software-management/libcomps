@@ -30,7 +30,7 @@ typedef struct COMPS_XMLOptions {
     bool empty_categories;
     bool empty_environments;
     bool empty_langpacks;
-    bool empty_blocklist;
+    bool empty_blacklist;
     bool empty_whiteout;
     bool empty_packages;
     bool empty_grouplist;
