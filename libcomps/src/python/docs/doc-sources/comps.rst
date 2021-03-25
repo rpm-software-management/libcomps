@@ -13,7 +13,7 @@
 
         .. note::
 
-            :members: blocklist, langpacks, whiteout
+            :members: blacklist, langpacks, whiteout
 
             are Fedora objects only
 
