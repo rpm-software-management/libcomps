@@ -626,7 +626,7 @@ class PackageTest(unittest.TestCase):
         self.comps.groups[0].packages.append(libcomps.Package("kernel", libcomps.PACKAGE_TYPE_MANDATORY))
 
         out = self.comps.xml_str()
-        self.assertTrue("<packagereq type=\"mandatory\" requires=\"\">kernel</packagereq>" in out)
+        self.assertTrue("<packagereq type=\"mandatory\">kernel</packagereq>" in out)
 
 #@unittest.skip("skip")
 class DictTest(unittest.TestCase):
