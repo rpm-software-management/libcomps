@@ -169,8 +169,9 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
 
     if (pkg->requires) {
         str = comps_object_tostr((COMPS_Object*)pkg->requires);
-        ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "requires",
-                                            BAD_CAST str);
+        if (str && *str) {
+            ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "requires", BAD_CAST str);
+        }
         free(str);
     }
     COMPS_XMLRET_CHECK()
