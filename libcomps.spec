@@ -7,7 +7,7 @@ Summary:        Comps XML file manipulation library
 
 License:        GPLv2+
 URL:            https://github.com/rpm-software-management/libcomps
-Source0:        %{url}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
@@ -58,7 +58,7 @@ Obsoletes:      platform-python-%{name} < %{version}-%{release}
 Python3 bindings for libcomps library.
 
 %prep
-%autosetup -n %{name}-%{name}-%{version}
+%autosetup -n %{name}-%{version}
 
 mkdir build-py3
 mkdir build-doc
