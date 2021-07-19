@@ -499,7 +499,6 @@ PyObject* PyCOMPS_filter_arches(PyObject *self, PyObject *other) {
     PyCOMPS *doc;
     COMPS_Doc *comps_doc;
     PyObject *item;
-    char *str;
     char created = 0;
     if ((Py_TYPE(other) != &PyCOMPS_StrSeqType) &&
         (Py_TYPE(other) != &PyList_Type)) {
@@ -512,9 +511,9 @@ PyObject* PyCOMPS_filter_arches(PyObject *self, PyObject *other) {
         arches = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
         for (Py_ssize_t x=0; x < PyList_Size(other); x++) {
             item = PyList_GetItem(other, x);
+            char *str;
             __pycomps_arg_to_char(item, &str);
-            comps_objlist_append_x(arches, (COMPS_Object*)comps_str(str));
-            free(str);
+            comps_objlist_append_x(arches, (COMPS_Object*)comps_str_x(str));
         }
     } else {
         arches = ((PyCOMPS_Sequence*)other)->list;

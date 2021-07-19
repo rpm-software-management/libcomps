@@ -113,14 +113,16 @@ char comps_set_add(COMPS_Set * set, void *item) {
 }
 
 void* comps_set_remove(COMPS_Set *set, void *item) {
-    void * ret;
-    COMPS_HSListItem * it;
-    for (it = set->data->first; it != NULL; it = it->next) {
-        if (set->eqf(it->data, item)) {
-            comps_hslist_remove(set->data, it);
-            ret = it->data;
-            free(it);
-            return ret;
+    if (set && set->data) {
+        void * ret;
+        COMPS_HSListItem * it;
+        for (it = set->data->first; it != NULL; it = it->next) {
+            if (set->eqf(it->data, item)) {
+                comps_hslist_remove(set->data, it);
+                ret = it->data;
+                free(it);
+                return ret;
+            }
         }
     }
     return NULL;
