@@ -307,12 +307,14 @@ int list_set_slice(PyObject *self, PyObject *key, PyObject *val) {
         n = _seq_->list->len;
         uret = PySlice_GetIndicesEx((PyObject*)key, n,
                                    &istart, &istop, &istep, &ilen);
+        if (uret) return -1;
         if (ilen == 0) {
             uret = PySlice_GetIndicesEx((PyObject*)key, n+istart,
                                        &istart, &istop, &istep, &ilen);
         }
         if (uret) return -1;
         if (val) {
+            // set val for list items indexed by given slice
             if (Py_TYPE(self) != Py_TYPE(val)) {
                 PyErr_SetString(PyExc_TypeError, "different object class");
                 return -1;
@@ -340,6 +342,11 @@ int list_set_slice(PyObject *self, PyObject *key, PyObject *val) {
             for (i=0 ; i<istart && it != NULL; it=it->next, i++);
             if (istep != 1) {
                 while (clen != ilen) {
+                    if (!it) {
+                        PyErr_SetString(PyExc_ValueError,
+                                        "failed to index list using the given slice");
+                        return -1;
+                    }
                     COMPS_OBJECT_DESTROY(it->comps_obj);
                     it->comps_obj = comps_object_incref(it2->comps_obj);
                     clen += 1;
@@ -372,10 +379,16 @@ int list_set_slice(PyObject *self, PyObject *key, PyObject *val) {
             }
             return 0;
         } else {
+            // if val is NULL we want to delete list items indexed by given slice
             clen = 0;
             it = ((PyCOMPS_Sequence*)self)->list->first;
             for (i=0 ; i<istart && it != NULL; it=it->next, i++);
             while (clen != ilen) {
+                if (!it) {
+                    PyErr_SetString(PyExc_ValueError,
+                                    "failed to index list using the given slice");
+                    return -1;
+                }
                 if (it->comps_obj) {
                     COMPS_OBJECT_DESTROY(it->comps_obj);
                     it->comps_obj = NULL;
