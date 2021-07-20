@@ -399,8 +399,13 @@ char* comps_docgroup_tostr_u(COMPS_Object* group) {
     total_len += strlen(desc_by_lang_str);
     group_packages_str = comps_object_tostr((COMPS_Object*)_group_->packages);
     total_len += strlen(group_packages_str);
-    
-    ret = malloc(sizeof(char) * (total_len+2+(8*2)+strlen(head)));
+
+    if ((ret = malloc(sizeof(char) * (total_len+2+(8*2)+strlen(head)))) == NULL) {
+        free(name_by_lang_str);
+        free(desc_by_lang_str);
+        free(group_packages_str);
+        return NULL;
+    }
     ret[0] = 0;
     strcat(ret, head);
     for (int i=0; i<6; i++) {

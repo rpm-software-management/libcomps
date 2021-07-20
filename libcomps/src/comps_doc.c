@@ -644,7 +644,6 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
     COMPS_ObjMDict *mdict;
     COMPS_HSList *hslist;
     COMPS_HSListItem *hsit;
-    char *tmp;
     int retc;
     signed char ret = 0, tmpret;
 
@@ -709,7 +708,7 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
             xmlTextWriterWriteAttribute(writer, BAD_CAST "name",
                     (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
 
-            tmp = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
+            char *tmp = comps_object_tostr(((COMPS_ObjRTreePair*)hsit->data)->data);
             xmlTextWriterWriteAttribute(writer, BAD_CAST "install", BAD_CAST tmp);
             free(tmp);
 
@@ -749,7 +748,7 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                 xmlTextWriterWriteAttribute(writer, BAD_CAST "name",
                         (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
 
-                tmp = comps_object_tostr(it->comps_obj);
+                char *tmp = comps_object_tostr(it->comps_obj);
                 xmlTextWriterWriteAttribute(writer, BAD_CAST "arch", BAD_CAST tmp);
                 free(tmp);
 
@@ -789,7 +788,7 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                 xmlTextWriterWriteAttribute(writer, BAD_CAST "requires",
                         (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
 
-                tmp = comps_object_tostr(it->comps_obj);
+                char *tmp = comps_object_tostr(it->comps_obj);
                 xmlTextWriterWriteAttribute(writer, BAD_CAST "package", BAD_CAST tmp);
                 free(tmp);
 

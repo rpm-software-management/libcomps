@@ -317,8 +317,13 @@ char* comps_doccategory_tostr_u(COMPS_Object* cat) {
     total_len += strlen(desc_by_lang_str);
     group_ids_str = comps_object_tostr((COMPS_Object*)_cat_->group_ids);
     total_len += strlen(group_ids_str);
-    
-    ret = malloc(sizeof(char) * (total_len+2+(6*2)+strlen(head)));
+
+    if ((ret = malloc(sizeof(char) * (total_len+2+(6*2)+strlen(head)))) == NULL) {
+        free(name_by_lang_str);
+        free(desc_by_lang_str);
+        free(group_ids_str);
+        return NULL;
+    }
     ret[0] = 0;
     strcat(ret, head);
     for (int i=0; i<4; i++) {

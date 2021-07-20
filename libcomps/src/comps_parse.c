@@ -436,19 +436,16 @@ void comps_parse_char_data_handler(void *userData,
 }
 
 void comps_parse_check_attributes(COMPS_Parsed *parsed, COMPS_Elem* elem) {
-    #define parser_line XML_GetCurrentLineNumber(parsed->parser)
-    #define parser_col XML_GetCurrentColumnNumber(parsed->parser)
     const COMPS_ElemInfo *info;
     info = COMPS_ElemInfos[elem->type];
     int attr_count;
     COMPS_HSList *keys;
     char *val;
-    COMPS_HSListItem *it;
 
     for (attr_count = 0; info->attributes[attr_count] != NULL; attr_count++);
     keys = comps_dict_keys(elem->attrs);
     for (int x =0; x<attr_count; x++) {
-        for (it = keys->first; it != NULL; it = it->next) {
+        for (COMPS_HSListItem *it = keys->first; it != NULL; it = it->next) {
             if (strcmp((char*)it->data, info->attributes[x]->name) == 0) {
                 if (info->attributes[x]->val_check) {
                     val = comps_dict_get(elem->attrs, it->data);
@@ -464,12 +461,11 @@ void comps_parse_check_attributes(COMPS_Parsed *parsed, COMPS_Elem* elem) {
             }
         }
     }
-    for (it = keys->first; it != NULL; it = it->next) {
+    for (COMPS_HSListItem *it = keys->first; it != NULL; it = it->next) {
         comps_log_warning_x(parsed->log, COMPS_ERR_ATTR_UNKNOWN, 4,
                             comps_str(it->data), comps_str(info->name),
-                            comps_num(parser_line), comps_num(parser_col));
+                            comps_num(XML_GetCurrentLineNumber(parsed->parser)),
+                            comps_num(XML_GetCurrentColumnNumber(parsed->parser)));
     }
     comps_hslist_destroy(&keys);
-    #undef parser_line
-    #undef parser_col
 }

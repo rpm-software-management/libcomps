@@ -415,8 +415,14 @@ char* comps_docenv_tostr_u(COMPS_Object* env) {
     total_len += strlen(group_list_str);
     option_list_str = comps_object_tostr((COMPS_Object*)_env_->option_list);
     total_len += strlen(option_list_str);
-    
-    ret = malloc(sizeof(char) * (total_len+2+(8*2)+strlen(head)));
+
+    if ((ret = malloc(sizeof(char) * (total_len+2+(8*2)+strlen(head)))) == NULL) {
+        free(name_by_lang_str);
+        free(desc_by_lang_str);
+        free(group_list_str);
+        free(option_list_str);
+        return NULL;
+    }
     ret[0] = 0;
     strcat(ret, head);
     for (int i=0; i<4; i++) {
