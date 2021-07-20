@@ -352,7 +352,7 @@ int list_set_slice(PyObject *self, PyObject *key, PyObject *val) {
                     clen += 1;
                     it2 = it2->next;
                     for (i=0 ; i<istep && it != NULL; it=it->next,  i++);
-                    if (!it) it = ((PyCOMPS_Sequence*)self)->list->first;
+                    if (!it) it = _seq_->list->first;
                     for (; i<istep; it=it->next, i++);
                 }
             } else {
@@ -366,14 +366,12 @@ int list_set_slice(PyObject *self, PyObject *key, PyObject *val) {
                 }
                 if (it == NULL) {
                     for (;it2 != NULL; it2 = it2->next) {
-                        comps_objlist_append(((PyCOMPS_Sequence*)self)->list,
-                                          it2->comps_obj);
+                        comps_objlist_append(_seq_->list, it2->comps_obj);
                     }
                 }
                 if (it != NULL) {
                     for (c = i; c < istop; c++) {
-                        comps_objlist_remove_at(((PyCOMPS_Sequence*)self)->list,
-                                              i);
+                        comps_objlist_remove_at(_seq_->list, i);
                     }
                 }
             }
@@ -381,7 +379,7 @@ int list_set_slice(PyObject *self, PyObject *key, PyObject *val) {
         } else {
             // if val is NULL we want to delete list items indexed by given slice
             clen = 0;
-            it = ((PyCOMPS_Sequence*)self)->list->first;
+            it = _seq_->list->first;
             for (i=0 ; i<istart && it != NULL; it=it->next, i++);
             while (clen != ilen) {
                 if (!it) {
@@ -395,23 +393,24 @@ int list_set_slice(PyObject *self, PyObject *key, PyObject *val) {
                 }
                 clen+=1;
                 for (i=0 ; i<istep && it != NULL; it=it->next,  i++);
-                if (!it) it = ((PyCOMPS_Sequence*)self)->list->first;
+                if (!it) it = _seq_->list->first;
                 for (; i<istep; it=it->next, i++);
             }
             it2 = NULL;
-            for (i=0, it = ((PyCOMPS_Sequence*)self)->list->first;
+            for (i=0, it = _seq_->list->first;
                  it != NULL; it2 = it, it = it->next, i++) {
                 if (it2 && !it2->comps_obj) {
-                    comps_objlist_remove_at(((PyCOMPS_Sequence*)self)->list, i);
+                    comps_objlist_remove_at(_seq_->list, i);
                 }
             }
             if (it2 && !it2->comps_obj) {
-                comps_objlist_remove_at(((PyCOMPS_Sequence*)self)->list, i);
+                comps_objlist_remove_at(_seq_->list, i);
             }
             return 0;
         }
     }
     return 0;
+    #undef _seq_
 }
 
 int __PyCOMPSSeq_set(PyObject *self, PyObject *key, PyObject *val,
