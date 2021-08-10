@@ -512,7 +512,10 @@ PyObject* PyCOMPS_filter_arches(PyObject *self, PyObject *other) {
         for (Py_ssize_t x=0; x < PyList_Size(other); x++) {
             item = PyList_GetItem(other, x);
             char *str;
-            __pycomps_arg_to_char(item, &str);
+            if (__pycomps_arg_to_char(item, &str)) {
+                COMPS_OBJECT_DESTROY(arches);
+                return NULL;
+            }
             comps_objlist_append_x(arches, (COMPS_Object*)comps_str_x(str));
         }
     } else {
