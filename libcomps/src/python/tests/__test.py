@@ -1088,6 +1088,11 @@ class COMPSTest(unittest.TestCase):
         comps5.fromxml_str(s)
         self.assertTrue(comps == comps5)
 
+    def test_arches_invalid_input(self):
+        INVALID_UTF8_CHAR = '\udcfd'
+        c = libcomps.Comps()
+        self.assertRaises(TypeError, c.arch_filter, [INVALID_UTF8_CHAR])
+
     #@unittest.skip("")
     def test_validate(self):
         c = libcomps.Comps()
