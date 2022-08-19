@@ -18,6 +18,7 @@
  */
 
 #include "pycomps_groups.h"
+#include "pycomps_mdict.h"
 #include "libcomps/comps_set.h"
 
 PyObject* PyCOMPSGroup_union(PyObject *self, PyObject *other) {
@@ -693,6 +694,7 @@ PyTypeObject PyCOMPS_PacksType = {
 
 void PyCOMPSPack_dealloc(PyCOMPS_Package *self)
 {
+    Py_XDECREF(self->p_arches);
     COMPS_OBJECT_DESTROY(self->c_obj);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
@@ -707,6 +709,7 @@ PyObject* PyCOMPSPack_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     self = (PyCOMPS_Package*) type->tp_alloc(type, 0);
     if (self != NULL) {
         self->c_obj = COMPS_OBJECT_CREATE(COMPS_DocGroupPackage, NULL);
+        self->p_arches = NULL;
     }
     return (PyObject*) self;
 }
@@ -759,6 +762,13 @@ __COMPS_NUMPROP_GETSET_CLOSURE(COMPS_DocGroupPackage) DocGroupPkg_BAOClosure = {
     .set_f = &comps_docpackage_set_basearchonly,
 };
 
+__COMPS_LIST_GETSET_CLOSURE(COMPS_DocGroupPackage) DocGroupPkg_ArchesClosure = {
+    .get_f = &comps_docpackage_arches,
+    .set_f = &comps_docpackage_set_arches,
+    .p_offset = offsetof(PyCOMPS_Package, p_arches),
+    .type = &PyCOMPS_StrSeqType,
+};
+
 PyDoc_STRVAR(PyCOMPS_package_type__doc__,
              "package type which could be one of following:\n\n"
              "* :py:const:`libcomps.PACKAGE_TYPE_DEFAULT`\n"
@@ -784,6 +794,10 @@ PyGetSetDef pack_getset[] = {
      (getter)__PyCOMPS_get_boolattr, (setter)__PyCOMPS_set_boolattr,
      "Package basearchonly attribute",
      (void*)&DocGroupPkg_BAOClosure},
+    {"arches",
+     (getter)__PyCOMPS_get_ids, (setter)__PyCOMPS_set_ids,
+     ":py:class:`libcomps.StrSeq` of package architectures",
+     (void*)&DocGroupPkg_ArchesClosure},
     {NULL}  /* Sentinel */
 };
 
