@@ -439,7 +439,7 @@ char __pycomps_pkg_type_check(PyObject* pobj, void *cobj) {
 PyObject* PyCOMPSGroup_packages_match(PyObject *self, PyObject *args, PyObject *kwds) {
 
     PyObject *ret;
-    int type=-1;
+    int type=COMPS_PACKAGE_UNKNOWN;
     char *name = NULL;
     char *keywords[] = {"name", "type", NULL};
     COMPS_ObjList * list;
