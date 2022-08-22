@@ -610,6 +610,20 @@ class PackageTest(unittest.TestCase):
         self.assertEqual(pkg.name, "kernel-3.2")
         self.assertEqual(pkg.type, libcomps.PACKAGE_TYPE_MANDATORY)
 
+    def test_arch(self):
+        pkg = libcomps.Package("kernel-3.2", libcomps.PACKAGE_TYPE_MANDATORY)
+        self.assertFalse(pkg.arches)
+        arch = libcomps.StrSeq()
+        arch.append("x86_64")
+        pkg.arches = arch
+        utest.assertSequenceEqual(pkg.arches, ["x86_64"])
+
+        self.comps = libcomps.Comps()
+        self.comps.groups.append(libcomps.Group("g1", "group1", "group desc", 0, 0, 0, "en"))
+        self.comps.groups[0].packages.append(pkg)
+        out = self.comps.xml_str(xml_options={"arch_output": True})
+        self.assertIn("<packagereq arch=\"x86_64\" ", out)
+
     def test_hash(self):
         pkg1 = libcomps.Package("kernel-3.2", libcomps.PACKAGE_TYPE_MANDATORY)
         pkg2 = libcomps.Package("kernel-3.2", libcomps.PACKAGE_TYPE_MANDATORY)

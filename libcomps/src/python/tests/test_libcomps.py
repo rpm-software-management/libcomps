@@ -164,5 +164,46 @@ class TestLibcomps(unittest.TestCase):
             self.assertEqual("{}", str(category.name_by_lang))
             self.assertEqual("{}", str(category.desc_by_lang))
 
+    def test_package_arch(self):
+        self.comps = libcomps.Comps()
+        self.comps.fromxml_str("""<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE comps PUBLIC "-//Red Hat, Inc.//DTD Comps info//EN" "comps.dtd">
+<comps>
+  <group>
+    <id>core</id>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq arch="aarch64,ppc64le,x86_64">package-with-arch</packagereq>
+      <packagereq>package-without-arch</packagereq>
+    </packagelist>
+  </group>
+</comps>
+        """)
+        def find_pkg(group, pkg):
+            groups = self.comps.groups_match(id=group)
+            self.assertGreaterEqual(len(groups), 1)
+            pkgs = groups[0].packages_match(name=pkg)
+            self.assertGreaterEqual(len(pkgs), 1)
+            return pkgs[0]
+
+        package = find_pkg("core", "package-without-arch")
+        self.assertFalse(package.arches)
+
+        package = find_pkg("core", "package-with-arch")
+        utest.assertSequenceEqual(package.arches,
+                                  ["aarch64", "ppc64le", "x86_64"])
+        package.arches.clear()
+        package.arches.append("i686")
+        utest.assertSequenceEqual(package.arches, ["i686"])
+
+        options = {"arch_output": True}
+        self.comps.xml_f(self.tmp_file, xml_options=options)
+        self.comps.fromxml_str(self.comps.xml_str(xml_options=options))
+
+        package = find_pkg("core", "package-with-arch")
+        utest.assertSequenceEqual(package.arches, ["i686"])
+
+
 if __name__ == "__main__":
     unittest.main(testRunner = utest.MyRunner)
