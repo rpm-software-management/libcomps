@@ -565,6 +565,14 @@ PyObject* PyCOMPSSeq_str(PyObject *self) {
 
 PyObject* PyCOMPSSeq_cmp(PyObject *self, PyObject *other, int op) {
     char res;
+
+    if (!PyObject_IsInstance(other, (PyObject *) &PyCOMPS_SeqType)) {
+        PyErr_Format(PyExc_TypeError, "Cannot compare %s with %s",
+                      Py_TYPE(other)->tp_name,
+                      Py_TYPE(self)->tp_name);
+        return NULL;
+    }
+
     res = COMPS_OBJECT_CMP(((PyCOMPS_Sequence*)self)->list,
                            ((PyCOMPS_Sequence*)other)->list);
     if (op == Py_EQ && res) {
