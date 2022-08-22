@@ -795,7 +795,7 @@ PyGetSetDef pack_getset[] = {
      "Package basearchonly attribute",
      (void*)&DocGroupPkg_BAOClosure},
     {"arches",
-     (getter)__PyCOMPS_get_ids, (setter)__PyCOMPS_set_ids,
+     (getter)__PyCOMPS_get_arches, (setter)__PyCOMPS_set_arches,
      ":py:class:`libcomps.StrSeq` of package architectures",
      (void*)&DocGroupPkg_ArchesClosure},
     {NULL}  /* Sentinel */

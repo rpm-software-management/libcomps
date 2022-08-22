@@ -227,6 +227,59 @@ int __PyCOMPS_set_ids(PyObject *self, PyObject *value, void *closure) {
     #undef _closure_
 }
 
+PyObject* __PyCOMPS_get_arches(PyObject *self, void *closure) {
+    #define _closure_ ((__PyCOMPS_ListGetSetClosure*)closure)
+
+    PyCOMPS_Sequence *ret = (PyCOMPS_Sequence*)GET_FROM(self, _closure_->p_offset);
+    COMPS_Object * c_obj;
+    COMPS_ObjList * list;
+
+    if (!ret) {
+        c_obj = ((PyCompsObject*)self)->c_obj;
+        list = (COMPS_ObjList*)
+               comps_object_incref((COMPS_Object*)_closure_->get_f(c_obj));
+        if (list == NULL) {
+            Py_RETURN_NONE;
+        }
+
+        ret = (PyCOMPS_Sequence*)_closure_->type->tp_new(_closure_->type,
+                                                          NULL, NULL);
+        _closure_->type->tp_init((PyObject*)ret, NULL, NULL);
+        COMPS_OBJECT_DESTROY(ret->list);
+        ret->list = list;
+    } else {
+        Py_INCREF(ret);
+    }
+    return  (PyObject*)ret;
+    #undef _closure_
+}
+
+int __PyCOMPS_set_arches(PyObject *self, PyObject *value, void *closure) {
+    #define _closure_ ((__PyCOMPS_ListGetSetClosure*)closure)
+    PyCOMPS_Sequence *pobj;
+    COMPS_Object * c_obj;
+    (void) closure;
+    (void) self;
+
+    if (!value) {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute arches");
+        return -1;
+    }
+    if (value->ob_type != _closure_->type) {
+        PyErr_Format(PyExc_TypeError, "Not %s instance",_closure_->type->tp_name);
+        return -1;
+    }
+
+    c_obj = ((PyCompsObject*)self)->c_obj;
+    _closure_->set_f(c_obj, (COMPS_ObjList *)
+            COMPS_OBJECT_INCREF(((PyCOMPS_Sequence*)value)->list));
+    pobj = (PyCOMPS_Sequence*)GET_FROM(self, _closure_->p_offset);
+    Py_XDECREF(pobj);
+    SET_TO(self, _closure_->p_offset, pobj);
+    return 0;
+    #undef _closure_
+}
+
 PyObject* __PyCOMPS_get_dict(PyObject *self, void *closure) {
     #define _closure_ ((__PyCOMPS_DictGetSetClosure*)closure)
 

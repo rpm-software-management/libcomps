@@ -108,6 +108,9 @@ typedef struct {\
 PyObject* __PyCOMPS_get_ids(PyObject *self, void *closure);
 int __PyCOMPS_set_ids(PyObject *self, PyObject *value, void *closure);
 
+PyObject* __PyCOMPS_get_arches(PyObject *self, void *closure);
+int __PyCOMPS_set_arches(PyObject *self, PyObject *value, void *closure);
+
 PyObject* __PyCOMPS_get_dict(PyObject *self, void *closure);
 int __PyCOMPS_set_dict(PyObject *self, PyObject *value, void *closure);
 
