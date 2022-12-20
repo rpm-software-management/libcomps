@@ -13,9 +13,14 @@ with open('version.json', 'r+') as version_file:
         release=version_dict['libcomps_RELEASE']
     )
 
+with open('README.md') as readme:
+    README = readme.read()
+
 setup(
     name='libcomps',
     description='Comps XML file manipulation library',
+    long_description_content_type='text/markdown',
+    long_description=README,
     version=version,
     license='GPLv2+',
     author='RPM Software Management',
@@ -32,6 +37,9 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
     ],
     packages=['libcomps'],
     package_dir={
