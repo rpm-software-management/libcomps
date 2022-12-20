@@ -44,18 +44,20 @@ jobs:
 
     # setup Python for cibuildwheel
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: '3.x'
 
     # for other architectures, see: https://cibuildwheel.readthedocs.io/en/stable/faq/#emulation
     - name: Build wheels for CPython
-      uses: pypa/cibuildwheel@v2.1.1
+      uses: pypa/cibuildwheel@v2.11.3
       env:
         CIBW_ARCHS: auto64  # only 64-bit
         CIBW_SKIP: "pp*"  # no PyPy builds
         CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014  # centos 7
-        CIBW_BEFORE_ALL: yum install -y make cmake bzip2-devel expat-devel libxml2-devel xz-devel
+        CIBW_BEFORE_ALL: |
+           yum install -y yum-utils epel-release
+           yum-builddep libcomps.spec
         CIBW_BEFORE_BUILD: python -m pip install scikit-build
         CIBW_TEST_REQUIRES: pytest
         CIBW_TEST_COMMAND: |
@@ -79,7 +81,7 @@ jobs:
           name: artifact
           path: dist
 
-      - uses: pypa/gh-action-pypi-publish@v1.4.2
+      - uses: pypa/gh-action-pypi-publish@v1.5.0
         with:
           user: __token__
           password: ${{secrets.PYPI_API_TOKEN}}
