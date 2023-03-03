@@ -26,6 +26,6 @@
 #include "pycomps_utils.h"
 
 
-long PyCOMPS_hash(PyObject *self);
+Py_hash_t PyCOMPS_hash(PyObject *self);
 
 #endif

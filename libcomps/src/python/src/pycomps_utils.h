@@ -137,7 +137,7 @@ COMPS_Object* __pycomps_bytes_in(PyObject *pobj);
 PyObject* __pycomps_str_out(COMPS_Object *obj);
 PyObject *str_to_unicode(void* str);
 
-long PyCOMPS_hash(PyObject *self);
+Py_hash_t PyCOMPS_hash(PyObject *self);
 
 PyObject* PyCOMPSSeq_extra_get(PyObject *self, PyObject *key);
 

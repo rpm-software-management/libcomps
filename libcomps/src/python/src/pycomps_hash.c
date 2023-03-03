@@ -20,9 +20,9 @@
 #include "pycomps_hash.h"
 #include "pycomps_utils.h"
 
-long PyCOMPS_hash(PyObject *self) {
+Py_hash_t PyCOMPS_hash(PyObject *self) {
     char *cstr = NULL;
-    long crc;
+    Py_hash_t crc;
 
     cstr = comps_object_tostr(((PyCompsObject*)self)->c_obj);
     crc = crc32(0, cstr, strlen(cstr));
