@@ -718,23 +718,24 @@ class COMPSTest(unittest.TestCase):
         ret = comps2.fromxml_f(fname)
         self.assertTrue(ret == 0, comps2.get_last_errors())
 
-        compsdoc = comps2.xml_str()
-        compsdoc = compsdoc[0:-5] # make some error
         self.assertTrue(len(comps2.groups) == 3)
         self.assertTrue(len(comps2.categories) == 2)
         self.assertTrue(len(comps2.environments) == 0)
 
-        comps3 = libcomps.Comps()
-        self.assertRaises(libcomps.ParserError, comps3.fromxml_str, compsdoc)
-
-        self.assertTrue(len(comps3.groups) == 3)
-        self.assertTrue(len(comps3.categories) == 2)
-        self.assertTrue(len(comps3.environments) == 0)
         x = self.comps.xml_str(xml_options={})
         y = comps2.xml_str()
 
         self.assertTrue(x == y)
         os.remove(fname)
+
+        compsdoc = comps2.xml_str()
+        compsdoc = compsdoc[0:-5] # make some error
+        comps3 = libcomps.Comps()
+        self.assertRaises(libcomps.ParserError, comps3.fromxml_str, compsdoc)
+
+        INVALID_COMPS_XML = "invalid xml"
+        comps4 = libcomps.Comps()
+        self.assertRaises(libcomps.ParserError, comps4.fromxml_str, str(INVALID_COMPS_XML))
 
     #@unittest.skip("")
     def test_fedora(self):
