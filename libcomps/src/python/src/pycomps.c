@@ -347,6 +347,11 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *args, PyObject *kwds) {
     parsed_ret = comps_parse_str(parsed, tmps, options);
     if (options)
         free(options);
+    if (parsed_ret == -1) {
+        comps_parse_parsed_destroy(parsed);
+        PyErr_SetString(PyCOMPSExc_ParserError, "Fatal parser error");
+        return NULL;
+    }
     Py_CLEAR(self_comps->p_groups);
     Py_CLEAR(self_comps->p_categories);
     Py_CLEAR(self_comps->p_environments);
@@ -361,10 +366,6 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *args, PyObject *kwds) {
     parsed->log = NULL;
     parsed->comps_doc = NULL;
     comps_parse_parsed_destroy(parsed);
-    if (parsed_ret == -1) {
-        PyErr_SetString(PyCOMPSExc_ParserError, "Fatal parser error");
-        return NULL;
-    }
 
     return PyLong_FromLong((long)parsed_ret);
 }
