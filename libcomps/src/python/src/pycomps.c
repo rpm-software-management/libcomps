@@ -360,7 +360,16 @@ PyObject* PyCOMPS_fromxml_str(PyObject *self, PyObject *args, PyObject *kwds) {
     Py_CLEAR(self_comps->p_whiteout);
     COMPS_OBJECT_DESTROY(self_comps->comps_doc);
 
-    self_comps->comps_doc = parsed->comps_doc;
+    if (parsed->comps_doc) {
+        self_comps->comps_doc = parsed->comps_doc;
+    } else {
+        COMPS_Object *tmpstr;
+        tmpstr = (COMPS_Object*)comps_str("UTF-8");
+        self_comps->comps_doc = COMPS_OBJECT_CREATE(COMPS_Doc,
+                                                    (COMPS_Object*[]){tmpstr});
+        COMPS_OBJECT_DESTROY(tmpstr);
+    }
+
     COMPS_OBJECT_DESTROY(self_comps->comps_doc->log);
     self_comps->comps_doc->log = parsed->log;
     parsed->log = NULL;
