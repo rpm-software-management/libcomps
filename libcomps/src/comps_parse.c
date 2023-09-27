@@ -176,21 +176,21 @@ int comps_parse_validate_dtd(char *filename, char *dtd_file) {
 }
 
 void __comps_after_parse(COMPS_Parsed *parsed) {
-    if (parsed->doctype_name) {
+    if (parsed->doctype_name && parsed->comps_doc) {
         COMPS_OBJECT_DESTROY(parsed->comps_doc->doctype_name);
         parsed->comps_doc->doctype_name = (COMPS_Str*)
                                   COMPS_OBJECT_INCREF(parsed->doctype_name);
     } else {
         //parsed->comps_doc->doctype_name = comps_str(comps_default_doctype_name);
     }
-    if (parsed->doctype_sysid) {
+    if (parsed->doctype_sysid && parsed->comps_doc) {
         COMPS_OBJECT_DESTROY(parsed->comps_doc->doctype_sysid);
         parsed->comps_doc->doctype_sysid = (COMPS_Str*)
                                   COMPS_OBJECT_INCREF(parsed->doctype_sysid);
     } else {
         //parsed->comps_doc->doctype_sysid = comps_str(comps_default_doctype_sysid);
     }
-    if (parsed->doctype_pubid) {
+    if (parsed->doctype_pubid && parsed->comps_doc) {
         COMPS_OBJECT_DESTROY(parsed->comps_doc->doctype_pubid);
         parsed->comps_doc->doctype_pubid = (COMPS_Str*)
                                   COMPS_OBJECT_INCREF(parsed->doctype_pubid);
