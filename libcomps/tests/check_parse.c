@@ -72,7 +72,7 @@ START_TEST(test_comps_parse1)
     fprintf(stderr, "## Running test_parse1\n\n");
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 1) == 0);
+    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
 
 
     fp = fopen("sample-comps.xml", "r");
@@ -171,7 +171,7 @@ START_TEST(test_comps_parse1)
     comps_parse_parsed_destroy(parsed);
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 1) == 0);
+    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
     comps_parse_file(parsed, fp, NULL);
     ret = comps_parse_validate_dtd("sample-bad-elem.xml", "comps.dtd");
     fail_if(ret >0, "XML shouldn't be valid. Validation returned: %d", ret);
@@ -280,7 +280,7 @@ START_TEST(test_comps_parse2)
     //                                         COMPS_ERR_ELEM_REQUIRED, 1201, 2, 0);
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 1) == 0);
+    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
     fp = fopen("sample_comps.xml", "r");
     comps_parse_file(parsed, fp, NULL);
 
@@ -320,7 +320,7 @@ START_TEST(test_comps_parse3)
                                              comps_num(188), comps_num(2));
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 1) == 0);
+    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
     fp = fopen("sample_comps_bad1.xml", "r");
     comps_parse_file(parsed, fp, NULL);
 
@@ -413,7 +413,7 @@ START_TEST(test_comps_parse4)
                                      comps_num(1244), comps_num(4));
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 1) == 0);
+    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
     fp = fopen("sample_comps_bad2.xml", "r");
     comps_parse_file(parsed, fp, NULL);
 
@@ -446,7 +446,7 @@ START_TEST(test_comps_parse5)
                                     comps_num(2));
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 1) == 0);
+    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
     fp = fopen("sample_comps_bad3.xml", "r");
     comps_parse_file(parsed, fp, NULL);
     //comps_log_print(parsed->log);
