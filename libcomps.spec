@@ -1,7 +1,7 @@
 %define __cmake_in_source_build 1
 
 Name:           libcomps
-Version:        0.1.19
+Version:        0.1.20
 Release:        1%{?dist}
 Summary:        Comps XML file manipulation library
 
