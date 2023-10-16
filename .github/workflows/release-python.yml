@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     container: fedora:latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Install / upgrade dependencies
       run: |
@@ -31,7 +31,7 @@ jobs:
         pytest --verbose --color=yes ./
         popd
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         path: dist/*.tar.gz
 
@@ -40,17 +40,17 @@ jobs:
     name: Build binary wheels
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     # setup Python for cibuildwheel
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: '3.x'
 
     # for other architectures, see: https://cibuildwheel.readthedocs.io/en/stable/faq/#emulation
     - name: Build wheels for CPython
-      uses: pypa/cibuildwheel@v2.11.3
+      uses: pypa/cibuildwheel@v2.16.2
       env:
         CIBW_ARCHS: auto64  # only 64-bit
         CIBW_SKIP: "pp* *-musllinux_*"  # no PyPy builds
@@ -65,7 +65,7 @@ jobs:
           pytest --verbose --color=yes ./
           popd
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         path: ./wheelhouse/*.whl
 
@@ -76,12 +76,12 @@ jobs:
     needs: [build_bdist, build_sdist]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: artifact
           path: dist
 
-      - uses: pypa/gh-action-pypi-publish@v1.5.0
+      - uses: pypa/gh-action-pypi-publish@v1.8.10
         with:
           user: __token__
           password: ${{secrets.PYPI_API_TOKEN}}
