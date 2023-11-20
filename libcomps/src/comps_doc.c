@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <libxml/parser.h>
 static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                                  COMPS_XMLOptions *xml_options,
                                  COMPS_DefaultsOptions *def_options);
