@@ -585,8 +585,8 @@ START_TEST(test_arch)
     list = comps_doc_categories(doc2);
     ck_assert(list->len == 2);
     for (it = list->first, x=0; it != NULL; it = it->next, x++) {
-        g = (COMPS_DocCategory*)it->comps_obj;
-        str = (COMPS_Str*)comps_doccategory_get_id(g);
+        c = (COMPS_DocCategory*)it->comps_obj;
+        str = (COMPS_Str*)comps_doccategory_get_id(c);
         ck_assert_msg(strcmp(str->val, cats[0][x]) == 0, "%s != %s",
                       str->val, cats[0][x]);
         COMPS_OBJECT_DESTROY(str);
@@ -605,8 +605,8 @@ START_TEST(test_arch)
     list = comps_doc_environments(doc2);
     ck_assert(list->len == 2);
     for (it = list->first, x=0; it != NULL; it = it->next, x++) {
-        g = (COMPS_DocEnv*)it->comps_obj;
-        str = (COMPS_Str*)comps_docenv_get_id(g);
+        e = (COMPS_DocEnv*)it->comps_obj;
+        str = (COMPS_Str*)comps_docenv_get_id(e);
         ck_assert_msg(strcmp(str->val, envs[0][x]) == 0, "%s != %s",
                       str->val, envs[0][x]);
         COMPS_OBJECT_DESTROY(str);
