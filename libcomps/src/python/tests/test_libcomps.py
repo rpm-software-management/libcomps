@@ -139,6 +139,28 @@ class TestLibcomps(unittest.TestCase):
         self.comps.xml_str()
         self.comps.xml_f(self.tmp_file)
 
+    def test_iter_iter_environments(self):
+        it1 = iter(self.comps.environments)
+        it2 = iter(it1)
+        it3 = iter(it1)
+        it4 = iter(it2)
+        self.assertIs(it1, it2)
+        self.assertIs(it1, it3)
+        self.assertIs(it1, it4)
+        del it1
+        next(it2)
+
+    def test_iter_iter_langpacks(self):
+        it1 = iter(self.comps.langpacks)
+        it2 = iter(it1)
+        it3 = iter(it1)
+        it4 = iter(it2)
+        self.assertIs(it1, it2)
+        self.assertIs(it1, it3)
+        self.assertIs(it1, it4)
+        del it1
+        next(it2)
+
     def test_duplicate_groups(self):
         self.comps = libcomps.Comps()
 
