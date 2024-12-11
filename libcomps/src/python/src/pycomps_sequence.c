@@ -754,7 +754,7 @@ PyTypeObject PyCOMPS_SeqIterType = {
     0,                          /* tp_clear */
     0,                          /* tp_richcompare */
     0,                          /* tp_weaklistoffset */
-    PyCOMPSSeq_getiter,         /* tp_iter */
+    PyObject_SelfIter,          /* tp_iter */
     PyCOMPSSeq_iternext,         /* tp_iternext */
     PyCOMPSSeqIter_methods,         /* tp_methods */
     PyCOMPSSeqIter_members,         /* tp_members */
