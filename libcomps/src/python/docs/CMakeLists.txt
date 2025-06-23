@@ -26,7 +26,8 @@ add_dependencies(pydocs pycomps)
 include(../pycopy.cmake)
 add_custom_command(TARGET pydocs PRE_BUILD COMMAND set -E $ENV{LD_LIBRARY_PATH} "${LIBCOMPS_OUT}:$ENV{LD_LIBRARY_PATH}")
 
-add_custom_command(TARGET pydocs COMMAND ${PYTHON_EXECUTABLE} ${SPHINX_EXECUTABLE} -E -b html
+add_custom_command(TARGET pydocs POST_BUILD
+                                 COMMAND ${PYTHON_EXECUTABLE} ${SPHINX_EXECUTABLE} -E -b html
                                   "${CMAKE_CURRENT_SOURCE_DIR}/doc-sources/"
                                   "${CMAKE_CURRENT_BINARY_DIR}/html/"
                                  COMMENT "LDLP $ENV{LD_LIBRARY_PATH}")

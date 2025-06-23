@@ -27,7 +27,7 @@ for python bindings:
 
 for C library tests:
 
-*   check http://check.sourceforge.net/
+*   check https://github.com/libcheck/check
 
 for documentation build:
 
@@ -128,4 +128,3 @@ Here's the most direct way to get your work merged into the project.
 
 1. Push the branch to your fork
 1. Send a pull request for your branch
-

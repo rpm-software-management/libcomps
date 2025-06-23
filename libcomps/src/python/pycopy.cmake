@@ -6,9 +6,10 @@ math (EXPR len "${len} - 1")
 
 #set(pycopy "py${pversion}-copy")
 
-#if (NOT TARGET ${pycopy})
+if (NOT TARGET ${pycopy})
+    add_custom_target(${pycopy} DEPENDS pycomps)
+endif()
 
-#add_custom_target(${pycopy} DEPENDS pycomps)
 set (pycomps_SRCDIR "${PROJECT_SOURCE_DIR}/src/python/src/")
 set (pycomps_TESTDIR "${PROJECT_SOURCE_DIR}/src/python/tests/")
 set (pycomps_LIBPATH ${PYCOMPS_LIB_PATH})#"${PROJECT_BINARY_DIR}/src/python/src/python${pversion}")
@@ -16,7 +17,7 @@ set (pycomps_LIBPATH ${PYCOMPS_LIB_PATH})#"${PROJECT_BINARY_DIR}/src/python/src/
 #add_custom_command(TARGET pycopy PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
 #                    make_directory "${CP_DST}")
 
-add_custom_command(TARGET ${pycopy} COMMAND ${CMAKE_COMMAND} -E
+add_custom_command(TARGET ${pycopy} POST_BUILD COMMAND ${CMAKE_COMMAND} -E
                     make_directory ${pycomps_LIBPATH}/libcomps/comps/)
 
 foreach(x RANGE 0 ${len})
