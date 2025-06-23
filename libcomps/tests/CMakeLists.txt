@@ -87,7 +87,5 @@ add_custom_target(test_parse_run
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS test_parse
                    COMMENT "Running comps_parse test")
-target_link_libraries(test_parse_run libcomps)
-target_link_libraries(test_comps_run libcomps)
 
 add_dependencies(ctest test_comps_run test_parse_run)
