@@ -68,24 +68,24 @@ mkdir build-doc
 %build
 pushd build-py3
   %cmake ../libcomps/
-  %make_build
+  %cmake_build
 popd
 
 pushd build-doc
   %cmake ../libcomps/
-  make %{?_smp_mflags} docs
-  make %{?_smp_mflags} pydocs
+  %cmake_build -t docs
+  %cmake_build -t pydocs
 popd
 
 %install
 pushd build-py3
-  %make_install
+  %cmake_install
 popd
 
 %check
 pushd build-py3
-  make test
-  make pytest
+  %cmake_build -t test
+  %cmake_build -t pytest
 popd
 
 %if %{undefined ldconfig_scriptlets}
