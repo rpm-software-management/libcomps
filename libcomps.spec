@@ -10,7 +10,7 @@ URL:            https://github.com/rpm-software-management/libcomps
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc-c++
-BuildRequires:  cmake
+BuildRequires:  cmake >= 3.10
 BuildRequires:  gcc
 BuildRequires:  libxml2-devel
 BuildRequires:  check-devel
@@ -60,7 +60,7 @@ Obsoletes:      platform-python-%{name} < %{version}-%{release}
 Python3 bindings for libcomps library.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 mkdir build-py3
 mkdir build-doc
