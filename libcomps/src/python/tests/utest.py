@@ -22,11 +22,11 @@ import unittest
 import traceback
 def assertSequenceEqual(seq1, seq2):
     if len(seq1) != len(seq2):
-        raise (AssertionError, "%s != %s" % (seq1, seq2))
+        raise AssertionError(f"{seq1} != {seq2}")
     for x,y in zip(seq1,seq2):
         if x != y:
-            raise (AssertionError, "%s != %s" % (seq1, seq2))
-        
+            raise AssertionError(f"{seq1} != {seq2}")
+
 
 class MyResult(unittest.TestResult):
     WHITEBOLD = {"1":(1,),  "2":(0,)}
@@ -44,9 +44,9 @@ class MyResult(unittest.TestResult):
     def __init__(self, stream, descriptions, verbosity):
         self.stream = stream
         try:
-        	super(MyResult, self).__init__(stream, descriptions, verbosity)
+            super().__init__(stream, descriptions, verbosity)
         except TypeError:
-        	super(MyResult, self).__init__()
+            super().__init__()
         self.last_cls = None
         self.fail = False
 
@@ -111,7 +111,7 @@ class MyResult(unittest.TestResult):
         self.stream.write(self.colored(self.YELLOW,"[SKIPED]\n"))
         self.stream.write(self.colored(self.YELLOW,"reason: %s\n"%reason))
         self.errors += [(test, reason)]
-    
+
     def wasSuccessful(self):
         return not self.fail
     def printErrors(self):
