@@ -1,24 +1,18 @@
 #!/bin/env python3
 import json
-import sys
 import string
 
 if __name__ == "__main__":
-    f = open("version.json", "r")
-    version = json.load(f)
-    f.close()
+    with open("version.json", "r", encoding="utf-8") as f:
+        version = json.load(f)
     version["libcomps_RELEASE"] += 1
 
-    f = open("version.json", "w")
-    json.dump(version, f, indent=4)
-    f.close()
+    with open("version.json", "w", encoding="utf-8") as f:
+        json.dump(version, f, indent=4)
 
-    f = open("libcomps/version.cmake.in", "r")
-    version_in = f.read()
-    f.close()
+    with open("libcomps/version.cmake.in", "r", encoding="utf-8") as f:
+        version_in = f.read()
 
     version_out = string.Template(version_in).substitute(version)
-    f = open("libcomps/version.cmake", "w")
-    f.write(version_out)
-    f.close()
-
+    with open("libcomps/version.cmake", "w", encoding="utf-8") as f:
+        f.write(version_out)
