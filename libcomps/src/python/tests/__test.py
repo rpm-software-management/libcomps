@@ -978,9 +978,9 @@ class COMPSTest(unittest.TestCase):
         comps = libcomps.Comps()
         ret = comps.fromxml_f("comps/f21-rawhide-comps.xml")
         env = comps.environments[0]
-        self.assertEqual(env.name_by_lang['cs'], u'Pracovní prostředí GNOME')
+        self.assertEqual(env.name_by_lang['cs'], 'Pracovní prostředí GNOME')
         self.assertEqual(env.desc_by_lang['de'],
-                         u'GNOME ist eine hoch-intuitive und benutzerfreundliche Benutzeroberfläche')
+                         'GNOME ist eine hoch-intuitive und benutzerfreundliche Benutzeroberfläche')
         group_ids = ("base-x", "standard", "core", "dial-up",
                      "fonts", "input-methods", "multimedia",
                      "hardware-support", "printing", "firefox",
@@ -1011,8 +1011,8 @@ class COMPSTest(unittest.TestCase):
         env = comps.categories[0].name_by_lang.clear()
         env = comps.groups[0].name_by_lang.clear()
 
-        self.assertEqual(str(comps.categories[0].name_by_lang), u'{}')
-        self.assertEqual(str(comps.groups[0].name_by_lang), u'{}')
+        self.assertEqual(str(comps.categories[0].name_by_lang), '{}')
+        self.assertEqual(str(comps.groups[0].name_by_lang), '{}')
 
     #@unittest.skip("")
     def test_xml_options(self):
