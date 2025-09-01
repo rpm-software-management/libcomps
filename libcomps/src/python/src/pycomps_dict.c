@@ -241,7 +241,7 @@ int PyCOMPSDict_set(PyObject *self, PyObject *key, PyObject *val) {
         return -1;
     } else if (val)
         comps_objdict_set_x(_DICT_->dict, ckey, ret);
-    else if (!val)
+    else
         comps_objdict_unset(_DICT_->dict, ckey);
 
     free(ckey);
