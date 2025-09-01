@@ -259,7 +259,7 @@ int PyCOMPSMDict_set(PyObject *self, PyObject *key, PyObject *val) {
         } else {
             COMPS_OBJECT_DESTROY(ret);
         }
-    } else if (!val){
+    } else {
         comps_objmdict_unset(((PyCOMPS_MDict*)self)->dict, ckey);
     }
     free(ckey);
