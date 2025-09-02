@@ -650,7 +650,7 @@ class DictTest(unittest.TestCase):
         self.assertTrue(_dict == _dict2)
 
         _values =  []
-        _values2 = ["Ahoj svete", "Hello world"] 
+        _values2 = ["Ahoj svete", "Hello world"]
         for v in _itervalues(_dict):
             _values.append(v)
         self.assertTrue(set(_values) == set(_values2))
@@ -671,7 +671,7 @@ class MDictTest(unittest.TestCase):
         wo1 = libcomps.Whiteout()
         wo2 = libcomps.Whiteout()
         self._test(wo1, wo2)
-    
+
     def _test(self, obj1, obj2):
         obj1["key"] = []
         self.assertTrue(obj1["key"] == libcomps.StrSeq())
@@ -991,7 +991,7 @@ class COMPSTest(unittest.TestCase):
         elif hasattr(self, "assertItemsEqual"):
             _f = self.assertSequenceEqual
         else:
-           _f = utest.assertSequenceEqual
+            _f = utest.assertSequenceEqual
 
         _f([id_.name for id_ in env.group_ids],
                               group_ids)
@@ -1271,7 +1271,7 @@ if __name__ == "__main__":
     #unittest.main()
     #suite = unittest.TestLoader().loadTestsFromTestCase(Category_Test)
     #ret = MyRunner(verbosity=2).run(suite)
-    
+
     #unittest.TextTestRunner(verbosity=2).run(suite)
     #suite = unittest.TestLoader().loadTestsFromTestCase(GroupTest)
     #ret = MyRunner(verbosity=2).run(suite)
@@ -1285,6 +1285,3 @@ if __name__ == "__main__":
     #MyRunner(verbosity=2).run(suite)
     #suite = unittest.TestLoader().loadTestsFromTestCase(EnvListTest)
     #MyRunner(verbosity=2).run(suite)
-
-
-
