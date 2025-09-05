@@ -185,13 +185,8 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
         }
     } else {
         if (pkg->basearchonly && pkg->basearchonly->val != bao_def) {
-            if (pkg->basearchonly) {
-                ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
-                                                    BAD_CAST "true");
-            } else {
-                ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
-                                                    BAD_CAST "false");
-            }
+            ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
+                                                BAD_CAST "true");
         }
     }
     COMPS_XMLRET_CHECK()
