@@ -322,6 +322,8 @@ PyObject* PyCOMPSDict_getiter(PyObject *self) {
     ((PyCOMPS_DictIter*)res)->hslist = comps_objdict_keys(((PyCOMPS_Dict*)self)->dict);
     ((PyCOMPS_DictIter*)res)->hsit = ((PyCOMPS_DictIter*)res)->hslist->first;
     ((PyCOMPS_DictIter*)res)->out_func = &__pycomps_dict_key_out;
+    Py_INCREF(self);  /* Hold reference to source dictionary */
+    ((PyCOMPS_DictIter*)res)->source_dict = self;
     return res;
 }
 
@@ -332,6 +334,8 @@ PyObject* PyCOMPSDict_getiteritems(PyObject *self) {
     ((PyCOMPS_DictIter*)res)->hslist = comps_objdict_pairs(((PyCOMPS_Dict*)self)->dict);
     ((PyCOMPS_DictIter*)res)->hsit = ((PyCOMPS_DictIter*)res)->hslist->first;
     ((PyCOMPS_DictIter*)res)->out_func = &__pycomps_dict_pair_out;
+    Py_INCREF(self);  /* Hold reference to source dictionary */
+    ((PyCOMPS_DictIter*)res)->source_dict = self;
     return res;
 }
 
@@ -342,6 +346,8 @@ PyObject* PyCOMPSDict_getitervalues(PyObject *self) {
     ((PyCOMPS_DictIter*)res)->hslist = comps_objdict_values(((PyCOMPS_Dict*)self)->dict);
     ((PyCOMPS_DictIter*)res)->hsit = ((PyCOMPS_DictIter*)res)->hslist->first;
     ((PyCOMPS_DictIter*)res)->out_func = &__pycomps_dict_val_out;
+    Py_INCREF(self);  /* Hold reference to source dictionary */
+    ((PyCOMPS_DictIter*)res)->source_dict = self;
     return res;
 }
 
@@ -456,6 +462,7 @@ PyObject* PyCOMPSDictIter_new(PyTypeObject *type, PyObject *args, PyObject *kwds
     self = (PyCOMPS_DictIter*)type->tp_alloc(type, 0);
     self->hslist = NULL;
     self->hsit = NULL;
+    self->source_dict = NULL;
     return (PyObject*) self;
 }
 
@@ -463,6 +470,7 @@ void PyCOMPSDictIter_dealloc(PyCOMPS_DictIter *self)
 {
     comps_hslist_destroy(&self->hslist);
     COMPS_OBJECT_DESTROY(self->objlist);
+    Py_XDECREF(self->source_dict);  /* Release reference to source dictionary */
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -487,6 +495,7 @@ int PyCOMPSDictIter_init(PyCOMPS_DictIter *self, PyObject *args, PyObject *kwds)
     self->hslist = NULL;
     self->objlist = NULL;
     self->it = NULL;
+    self->source_dict = NULL;
     return 0;
 }
 
@@ -516,12 +525,12 @@ PyTypeObject PyCOMPS_DictIterType = {
     0,                          /* tp_clear */
     0,                          /* tp_richcompare */
     0,                          /* tp_weaklistoffset */
-    0,         /* tp_iter */
+    PyObject_SelfIter,         /* tp_iter */
     PyCOMPSDict_iternext,         /* tp_iternext */
     PyCOMPSDictIter_methods,         /* tp_methods */
     PyCOMPSDictIter_members,         /* tp_members */
     0,                          /* tp_getset */
-    &PySeqIter_Type,                          /* tp_base */
+    0,                          /* tp_base */
     0,                          /* tp_dict */
     0,                          /* tp_descr_get */
     0,                          /* tp_descr_set */

@@ -66,6 +66,7 @@ typedef struct PyCOMPS_DictIter{
     COMPS_ObjList *objlist;
     COMPS_HSList *hslist;
     PyObject* (*out_func)(COMPS_HSListItem *hsit);
+    PyObject* source_dict;
 } PyCOMPS_DictIter;
 
 typedef struct PyCOMPS_MDictIter{
@@ -75,6 +76,7 @@ typedef struct PyCOMPS_MDictIter{
     COMPS_ObjList *objlist;
     COMPS_HSList *hslist;
     PyObject* (*out_func)(COMPS_HSListItem *hsit);
+    PyObject* source_dict;
 } PyCOMPS_MDictIter;
 
 extern PyTypeObject PyCOMPS_GIDsType;
