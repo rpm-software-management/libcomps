@@ -341,6 +341,8 @@ PyObject* PyCOMPSMDict_getiter(PyObject *self) {
     ((PyCOMPS_MDictIter*)res)->hslist = comps_objmdict_keys(((PyCOMPS_MDict*)self)->dict);
     ((PyCOMPS_MDictIter*)res)->hsit = ((PyCOMPS_MDictIter*)res)->hslist->first;
     ((PyCOMPS_MDictIter*)res)->out_func = &__pycomps_dict_key_out;
+    Py_INCREF(self);  /* Hold reference to source dictionary */
+    ((PyCOMPS_MDictIter*)res)->source_dict = self;
     return res;
 }
 
@@ -351,6 +353,8 @@ PyObject* PyCOMPSMDict_getiteritems(PyObject *self) {
     ((PyCOMPS_MDictIter*)res)->hslist = comps_objmdict_pairs(((PyCOMPS_MDict*)self)->dict);
     ((PyCOMPS_MDictIter*)res)->hsit = ((PyCOMPS_MDictIter*)res)->hslist->first;
     ((PyCOMPS_MDictIter*)res)->out_func = &__pycomps_mdict_pair_out;
+    Py_INCREF(self);  /* Hold reference to source dictionary */
+    ((PyCOMPS_MDictIter*)res)->source_dict = self;
     return res;
 }
 
@@ -361,6 +365,8 @@ PyObject* PyCOMPSMDict_getitervalues(PyObject *self) {
     ((PyCOMPS_MDictIter*)res)->hslist = comps_objmdict_values(((PyCOMPS_MDict*)self)->dict);
     ((PyCOMPS_MDictIter*)res)->hsit = ((PyCOMPS_MDictIter*)res)->hslist->first;
     ((PyCOMPS_MDictIter*)res)->out_func = &__pycomps_mdict_val_out;
+    Py_INCREF(self);  /* Hold reference to source dictionary */
+    ((PyCOMPS_MDictIter*)res)->source_dict = self;
     return res;
 }
 
@@ -520,6 +526,7 @@ PyObject* PyCOMPSMDictIter_new(PyTypeObject *type, PyObject *args, PyObject *kwd
     self = (PyCOMPS_MDictIter*)type->tp_alloc(type, 0);
     self->hslist = NULL;
     self->hsit = NULL;
+    self->source_dict = NULL;
     return (PyObject*) self;
 }
 
@@ -527,6 +534,7 @@ void PyCOMPSMDictIter_dealloc(PyCOMPS_MDictIter *self)
 {
     comps_hslist_destroy(&self->hslist);
     COMPS_OBJECT_DESTROY(self->objlist);
+    Py_XDECREF(self->source_dict);  /* Release reference to source dictionary */
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -551,6 +559,7 @@ int PyCOMPSMDictIter_init(PyCOMPS_MDictIter *self, PyObject *args, PyObject *kwd
     self->hslist = NULL;
     self->objlist = NULL;
     self->it = NULL;
+    self->source_dict = NULL;
     return 0;
 }
 
