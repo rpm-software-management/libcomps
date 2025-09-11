@@ -57,7 +57,8 @@ const COMPS_ElemInfo COMPS_NAME_ElemInfo = {
                                           COMPS_ELEM_CATEGORY,
                                           COMPS_ELEM_ENV,
                                           COMPS_ELEM_SENTINEL},
-    .attributes = (const COMPS_ElemAttrInfo*[]){&COMPS_XMLLANG_ElemAttrInfo},
+    .attributes = (const COMPS_ElemAttrInfo*[]){&COMPS_XMLLANG_ElemAttrInfo,
+                                                NULL},
     .preproc = NULL,//&comps_elem_name_preproc,
     .postproc = &comps_elem_idnamedesc_postproc
 };
@@ -67,7 +68,8 @@ const COMPS_ElemInfo COMPS_DESC_ElemInfo = {
                                           COMPS_ELEM_CATEGORY,
                                           COMPS_ELEM_ENV,
                                           COMPS_ELEM_SENTINEL},
-    .attributes = (const COMPS_ElemAttrInfo*[]){&COMPS_XMLLANG_ElemAttrInfo},
+    .attributes = (const COMPS_ElemAttrInfo*[]){&COMPS_XMLLANG_ElemAttrInfo,
+                                                NULL},
     .preproc = NULL,//&comps_elem_desc_preproc,
     .postproc = &comps_elem_idnamedesc_postproc
 };
