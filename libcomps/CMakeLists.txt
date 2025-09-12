@@ -1,9 +1,11 @@
 cmake_minimum_required (VERSION 3.10)
 project(libcomps C)
 
-cmake_policy(SET CMP0148 OLD)
+if("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.27")
+  cmake_policy(SET CMP0148 OLD)
+endif()
 if ("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.31")
-cmake_policy(SET CMP0175 NEW)
+  cmake_policy(SET CMP0175 NEW)
 endif()
 
 include (GNUInstallDirs)
