@@ -3,7 +3,7 @@ name: Python CI
 on: pull_request
 
 jobs:
-  python-build:
+  python-build-fedora:
     name: Python Build
     runs-on: ubuntu-latest
     container: fedora:latest
@@ -14,6 +14,33 @@ jobs:
         run: |
           sudo dnf -y install dnf-plugins-core python3-pip
           sudo dnf -y builddep libcomps.spec
+          pip install --upgrade pip
+          pip install pytest
+
+      - name: Compile and Install
+        run: pip install --user .
+
+      - name: Test
+        run: |
+          pushd libcomps/src/python/tests/
+          pytest --verbose --color=yes ./
+          popd
+
+  python-build-centos:
+    name: Python Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        container: ["quay.io/centos/centos:stream9","quay.io/centos/centos:stream10"]
+    container:
+      image: ${{ matrix.container }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          dnf -y install dnf-plugins-core python3-pip && dnf config-manager --set-enabled crb
+          dnf -y builddep libcomps.spec
           pip install --upgrade pip
           pip install pytest
 
