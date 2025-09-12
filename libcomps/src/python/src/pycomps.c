@@ -642,8 +642,8 @@ PyObject* PyCOMPS_validate_nf(PyCOMPS *comps) {
             PyList_Append(list, PyUnicode_FromString(
                                     ((COMPS_ValErr*)it->comps_obj)->err_msg));
         }
-        return list;
         COMPS_OBJECT_DESTROY(result);
+        return list;
     }
     #undef _result_
 }
