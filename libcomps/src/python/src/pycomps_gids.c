@@ -89,8 +89,7 @@ int PyCOMPSGID_init(PyCOMPS_GID *self, PyObject *args, PyObject *kwds)
 PyObject* PyCOMPSGID_get_default(PyCOMPS_GID *self, void *closure) {
     (void) closure;
     char def = self->c_obj->def;
-        return Py_BuildValue("O&", &pycomps_c2p_bool_convert, &def);
-    Py_RETURN_NONE;
+    return Py_BuildValue("O&", &pycomps_c2p_bool_convert, &def);
 }
 
 int PyCOMPSGID_set_default(PyCOMPS_GID *self, PyObject *value, void *closure){
