@@ -90,7 +90,7 @@ inline PyObject* list_getitem_byid(PyObject *self, PyObject *id) {
     #undef _seq_
 }
 
-inline COMPS_Object *list_setitem_convert(PyObject *self, PyObject *item) {
+static inline COMPS_Object *list_setitem_convert(PyObject *self, PyObject *item) {
     #define _seq_ ((PyCOMPS_Sequence*)self)
     COMPS_Object *ret = NULL;
     if (!item)
@@ -643,7 +643,7 @@ PyMethodDef PyCOMPSSeq_methods[] = {
      "Append item to new of the list"},
      {"remove", (PyCFunction)PyCOMPSSeq_remove, METH_O,
      PyCOMPSSeq_remove__doc__},
-     {"clear", (PyCFunction)PyCOMPSSeq_clear, METH_NOARGS,
+     {"clear", _PyCFunction_CAST(PyCOMPSSeq_clear), METH_NOARGS,
      "Clear the list"},
      {"insert", (PyCFunction)PyCOMPSSeq_insert, METH_VARARGS,
      PyCOMPSSeq_insert__doc__},

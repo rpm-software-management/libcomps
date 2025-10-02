@@ -210,9 +210,9 @@ PyDoc_STRVAR(PyCOMPS_group_packages_match__doc__,
              ":return: List of packages\n\n");
 
 PyMethodDef PyCOMPSGroup_methods[] = {
-    {"validate", (PyCFunction)PyCOMPSGroup_validate, METH_NOARGS,
+    {"validate", _PyCFunction_CAST(PyCOMPSGroup_validate), METH_NOARGS,
      PyCOMPS_group_validate__doc__},
-    {"packages_match", (PyCFunction)PyCOMPSGroup_packages_match,
+    {"packages_match", _PyCFunction_CAST(PyCOMPSGroup_packages_match),
      METH_VARARGS | METH_KEYWORDS,
      PyCOMPS_group_packages_match__doc__},
     {NULL}  /* Sentinel */
@@ -842,7 +842,7 @@ PyDoc_STRVAR(PyCOMPS_package_validate__doc__,
              ":raises ValueError: on first occured error");
 
 PyMethodDef PyCOMPSPack_methods[] = {
-    {"validate", (PyCFunction)PyCOMPSPackage_validate, METH_NOARGS,
+    {"validate", _PyCFunction_CAST(PyCOMPSPackage_validate), METH_NOARGS,
     PyCOMPS_package_validate__doc__},
     {NULL}  /* Sentinel */
 };

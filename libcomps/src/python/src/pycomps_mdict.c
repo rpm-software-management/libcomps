@@ -166,11 +166,11 @@ PyObject* PyCOMPSMDict_cmp(PyObject *self, PyObject *other, int op) {
 Py_ssize_t PyCOMPSMDict_len(PyObject *self) {
     return ((PyCOMPS_MDict*)self)->dict->len;
 }
-PyObject* PyCOMPSMDict_clear(PyObject *self) {
+PyObject* PyCOMPSMDict_clear(PyObject *self, PyObject *args __attribute__((unused))) {
     comps_objmrtree_clear(((PyCOMPS_MDict*)self)->dict);
     Py_RETURN_NONE;
 }
-PyObject* PyCOMPSMDict_copy(PyObject *self) {
+PyObject* PyCOMPSMDict_copy(PyObject *self, PyObject *args __attribute__((unused))) {
     PyObject *ret;
     ret = PyCOMPSDict_new(Py_TYPE(self), NULL, NULL);
     Py_TYPE(self)->tp_init(ret, NULL, NULL);
@@ -411,15 +411,15 @@ PyMethodDef PyCOMPSMDict_methods[] = {
      {"get", (PyCFunction)PyCOMPSMDict_get, METH_O, PyCOMPSMDict_get__doc__},
      {"has_key", (PyCFunction)PyCOMPSMDict_has_key, METH_O,
      PyCOMPSMDict_has_key__doc__},
-     {"items", (PyCFunction)PyCOMPSMDict_getiteritems, METH_NOARGS,
+     {"items", _PyCFunction_CAST(PyCOMPSMDict_getiteritems), METH_NOARGS,
      "return iterator returning (key, value) tuple"},
-     {"values", (PyCFunction)PyCOMPSMDict_getitervalues, METH_NOARGS,
+     {"values", _PyCFunction_CAST(PyCOMPSMDict_getitervalues), METH_NOARGS,
      "return iterator returning item's value"},
-     {"keys", (PyCFunction)PyCOMPSMDict_getiter, METH_NOARGS,
+     {"keys", _PyCFunction_CAST(PyCOMPSMDict_getiter), METH_NOARGS,
      "return iterator returning item's key"},
-     {"clear", (PyCFunction)PyCOMPSMDict_clear, METH_NOARGS,
+     {"clear", _PyCFunction_CAST(PyCOMPSMDict_clear), METH_NOARGS,
      "clear the dict"},
-     {"copy", (PyCFunction)PyCOMPSMDict_copy, METH_NOARGS,
+     {"copy", _PyCFunction_CAST(PyCOMPSMDict_copy), METH_NOARGS,
      "return shallow copy of dict"},
      {"update", (PyCFunction)PyCOMPSMDict_update, METH_O,
       PyCOMPSMDict_update__doc__},

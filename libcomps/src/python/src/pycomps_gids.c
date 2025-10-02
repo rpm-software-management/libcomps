@@ -196,7 +196,7 @@ PyMemberDef PyCOMPSGID_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSGID_methods[] = {
-    {"validate", (PyCFunction)PyCOMPSGID_validate, METH_NOARGS,
+    {"validate", _PyCFunction_CAST(PyCOMPSGID_validate), METH_NOARGS,
     "validate inner Group ID structure"},
     {NULL}  /* Sentinel */
 };

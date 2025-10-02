@@ -199,7 +199,7 @@ PyMemberDef PyCOMPSCat_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSCat_methods[] = {
-    {"validate", (PyCFunction)PyCOMPSCat_validate, METH_NOARGS,
+    {"validate", _PyCFunction_CAST(PyCOMPSCat_validate), METH_NOARGS,
     "validate inner category structure"},
     {NULL}  /* Sentinel */
 };
