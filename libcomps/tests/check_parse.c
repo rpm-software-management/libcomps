@@ -72,7 +72,7 @@ START_TEST(test_comps_parse1)
     fprintf(stderr, "## Running test_parse1\n");
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
+    ck_assert(comps_parse_parsed_init(parsed, "UTF-8", 0) != 0);
 
 
     fp = fopen("sample-comps.xml", "r");
@@ -81,64 +81,50 @@ START_TEST(test_comps_parse1)
 
     if (parsed->log->entries->first != NULL) {
         //err_log = comps_log_str(parsed->log);
-        ck_assert_msg(parsed->log->entries->first != NULL,
-                "Some errors have been found (and shouldn't have) during parsing");
+        ck_assert_msg(parsed->log->entries->first != NULL, "Some errors have been found (and shouldn't have) during parsing");
         //free(err_log);
     }
     tmplist = comps_doc_groups(parsed->comps_doc);
-    ck_assert_msg(tmplist->len == 3, "Should have 3 groups parsed."
-            "Have %d", tmplist->len);
+    ck_assert_msg(tmplist->len == 3, "Should have 3 groups parsed. Have %lu", tmplist->len);
     COMPS_OBJECT_DESTROY(tmplist);
     tmplist = comps_doc_categories(parsed->comps_doc);
-    ck_assert_msg(tmplist->len == 2, "Should have 2 categories"
-            "parsed. Have %d", tmplist->len);
+    ck_assert_msg(tmplist->len == 2, "Should have 2 categories parsed. Have %lu", tmplist->len);
     COMPS_OBJECT_DESTROY(tmplist);
     tmplist = comps_doc_environments(parsed->comps_doc);
-    fail_if(tmplist->len != 1,
-            "Should have 1 environment parsed. Have %d", tmplist->len);
+    ck_assert_msg(tmplist->len == 1, "Should have 1 environment parsed. Have %lu", tmplist->len);
     COMPS_OBJECT_DESTROY(tmplist);
 
 
     for (int i=0; i<3; i++) {
         tmplist = comps_doc_groups(parsed->comps_doc);
         tmpobj2 = comps_objlist_get_x(tmplist, i);
-        fail_if(tmpobj2 == NULL, "Group not found");
+        ck_assert_msg(tmpobj2 != NULL, "Group not found");
         tmpobj = comps_docgroup_get_id((COMPS_DocGroup*)tmpobj2);
         tmpstr = comps_object_tostr(tmpobj);
-        fail_if(strcmp(tmpstr, groups_ids[i]) != 0,
-                       "%d.group should have id:%s not %s",
-                        i, groups_ids[i], tmpstr);
+        ck_assert_msg(strcmp(tmpstr, groups_ids[i]) == 0, "%d.group should have id:%s not %s", i, groups_ids[i], tmpstr);
         free(tmpstr);
         COMPS_OBJECT_DESTROY(tmpobj);
 
         tmpobj = comps_docgroup_get_name((COMPS_DocGroup*)tmpobj2);
         tmpstr = comps_object_tostr(tmpobj);
-        fail_if(strcmp(tmpstr, groups_names[i]) != 0,
-                       "%d.group should have name:%s not %s",
-                        i, groups_names[i], tmpstr);
+        ck_assert_msg(strcmp(tmpstr, groups_names[i]) == 0, "%d.group should have name:%s not %s", i, groups_names[i], tmpstr);
         free(tmpstr);
         COMPS_OBJECT_DESTROY(tmpobj);
 
         tmpobj = comps_docgroup_get_desc((COMPS_DocGroup*)tmpobj2);
         tmpstr = comps_object_tostr(tmpobj);
-        fail_if(strcmp(tmpstr, groups_descs[i]) != 0,
-                       "%d.group should have desc:%s not %s",
-                        i, groups_descs[i], tmpstr);
+        ck_assert_msg(strcmp(tmpstr, groups_descs[i]) == 0, "%d.group should have desc:%s not %s", i, groups_descs[i], tmpstr);
         free(tmpstr);
         COMPS_OBJECT_DESTROY(tmpobj);
         COMPS_OBJECT_DESTROY(tmplist);
 
         tmplist = comps_docgroup_get_packages((COMPS_DocGroup*)tmpobj2, NULL,
                                              COMPS_PACKAGE_DEFAULT);
-        fail_if(group_packages[i][0] != tmplist->len, "Group #%d should have"
-                " %d default packages, Have %d", i, group_packages[i][0],
-                tmplist->len);
+        ck_assert_msg((size_t) group_packages[i][0] == tmplist->len, "Group #%d should have %d default packages, Have %lu", i, group_packages[i][0], tmplist->len);
         COMPS_OBJECT_DESTROY(tmplist);
         tmplist = comps_docgroup_get_packages((COMPS_DocGroup*)tmpobj2, NULL,
                                              COMPS_PACKAGE_OPTIONAL);
-        fail_if(group_packages[i][1] != tmplist->len, "Group #%d should have"
-                " %d optional packages, Have %d", i, group_packages[i][1],
-                tmplist->len);
+        ck_assert_msg((size_t) group_packages[i][1] == tmplist->len, "Group #%d should have %d optional packages, Have %lu", i, group_packages[i][1], tmplist->len);
         COMPS_OBJECT_DESTROY(tmplist);
     }
     for (int i=0; i<2; i++) {
@@ -146,23 +132,18 @@ START_TEST(test_comps_parse1)
         tmpobj2 = comps_objlist_get(tmplist, i);
         tmpobj = comps_doccategory_get_id((COMPS_DocCategory*)tmpobj2);
         tmpstr = comps_object_tostr(tmpobj);
-        fail_if(strcmp(tmpstr, cats_ids[i]) != 0,
-                       "%s. category should have id:%s not %s",
-                        i, cats_ids[i], tmpstr);
+        ck_assert_msg(strcmp(tmpstr, cats_ids[i]) == 0, "%d. category should have id:%s not %s", i, cats_ids[i], tmpstr);
         free(tmpstr);
         COMPS_OBJECT_DESTROY(tmpobj);
 
         tmpobj = comps_doccategory_get_name((COMPS_DocCategory*)tmpobj2);
         tmpstr = comps_object_tostr(tmpobj);
-        fail_if(strcmp(tmpstr, cats_names[i]) != 0,
-                       "%s. category should have name:%s not %s",
-                        i, cats_names[i], tmpstr);
+        ck_assert_msg(strcmp(tmpstr, cats_names[i]) == 0, "%d. category should have name:%s not %s", i, cats_names[i], tmpstr);
         free(tmpstr);
         COMPS_OBJECT_DESTROY(tmpobj);
 
-        fail_if(((COMPS_DocCategory*)tmpobj2)->group_ids->len != cats_gids[i],
-                "Category #%d should have %d groupids, have %d", i,
-                cats_gids[i], ((COMPS_DocCategory*)tmpobj2)->group_ids->len);
+        ck_assert_msg(((COMPS_DocCategory*)tmpobj2)->group_ids->len == (size_t)cats_gids[i],
+                      "Category #%d should have %d groupids, have %lu", i, cats_gids[i], ((COMPS_DocCategory*)tmpobj2)->group_ids->len);
         COMPS_OBJECT_DESTROY(tmpobj2);
         COMPS_OBJECT_DESTROY(tmplist);
     }
@@ -171,15 +152,14 @@ START_TEST(test_comps_parse1)
     comps_parse_parsed_destroy(parsed);
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
+    ck_assert(comps_parse_parsed_init(parsed, "UTF-8", 0) != 0);
     comps_parse_file(parsed, fp, NULL);
     ret = comps_parse_validate_dtd("sample-bad-elem.xml", "comps.dtd");
-    fail_if(ret >0, "XML shouldn't be valid. Validation returned: %d", ret);
+    ck_assert_msg(ret <= 0, "XML shouldn't be valid. Validation returned: %d", ret);
 
     if (parsed->log->entries->first != NULL) {
         //err_log = comps_log_str(parsed->log);
-        ck_assert_msg(parsed->log->entries->first != NULL,
-                      "No errors have found during parsing (and should have)");
+        ck_assert_msg(parsed->log->entries->first != NULL, "No errors have found during parsing (and should have)");
         //free(err_log);
     }
     comps_parse_parsed_destroy(parsed);
@@ -193,22 +173,15 @@ int check_errors(COMPS_Log *log, COMPS_LogEntry ** known_errors,
 
     it = log->entries->first;
     for (i = 0; it != NULL && i != known_len; it = it->next, i++) {
-        fail_if(((COMPS_LogEntry*)it->data)->arg_count !=
-                known_errors[i]->arg_count,
-                "%d err opt_message doesn't match (%d != %d)", i,
-                ((COMPS_LogEntry*)it->data)->arg_count,
-                known_errors[i]->arg_count);
-        fail_if(((COMPS_LogEntry*)it->data)->code !=
-                    known_errors[i]->code, "%d. err code different\n (%d != %d)",
-                    i, ((COMPS_LogEntry*)it->data)->code,
-                    known_errors[i]->code);
+        ck_assert_msg(((COMPS_LogEntry*)it->data)->arg_count == known_errors[i]->arg_count,
+                      "%d err opt_message doesn't match (%d != %d)", i, ((COMPS_LogEntry*)it->data)->arg_count, known_errors[i]->arg_count);
+        ck_assert_msg(((COMPS_LogEntry*)it->data)->code == known_errors[i]->code,
+                      "%d. err code different\n (%d != %d)", i, ((COMPS_LogEntry*)it->data)->code, known_errors[i]->code);
         for (int x = 0; x < known_errors[i]->arg_count; x++) {
             char *_x, *_y;
             _x = comps_object_tostr(((COMPS_LogEntry*)it->data)->args[x]);
             _y = comps_object_tostr(known_errors[i]->args[x]);
-            fail_if(comps_object_cmp(((COMPS_LogEntry*)it->data)->args[x],
-                                     known_errors[i]->args[x]) == 0, "%d. %s != %s",
-                                     x, _x, _y);
+            ck_assert_msg(comps_object_cmp(((COMPS_LogEntry*)it->data)->args[x], known_errors[i]->args[x]) != 0, "%d. %s != %s", x, _x, _y);
             free(_x);
             free(_y);
         }
@@ -280,14 +253,14 @@ START_TEST(test_comps_parse2)
     //                                         COMPS_ERR_ELEM_REQUIRED, 1201, 2, 0);
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
+    ck_assert(comps_parse_parsed_init(parsed, "UTF-8", 0) != 0);
     fp = fopen("sample_comps.xml", "r");
     comps_parse_file(parsed, fp, NULL);
 
-    fail_if(parsed->log->entries->first == NULL);
+    ck_assert(parsed->log->entries->first != NULL);
     i = check_errors(parsed->log, known_errors, 10);
 
-    fail_if(i != 10);
+    ck_assert(i == 10);
 
     comps_parse_parsed_destroy(parsed);
     for (i = 0; i < 10; i++) {
@@ -320,11 +293,11 @@ START_TEST(test_comps_parse3)
                                              comps_num(188), comps_num(2));
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
+    ck_assert(comps_parse_parsed_init(parsed, "UTF-8", 0) != 0);
     fp = fopen("sample_comps_bad1.xml", "r");
     comps_parse_file(parsed, fp, NULL);
 
-    fail_if(parsed->log->entries->first == NULL);
+    ck_assert(parsed->log->entries->first != NULL);
     check_errors(parsed->log, known_errors, 3);
 
     for (i = 0; i < 3; i++) {
@@ -341,13 +314,13 @@ START_TEST(test_comps_parse3)
     COMPS_OBJECT_DESTROY(tmplist);
 
     tmpobj = comps_docgroup_get_id((COMPS_DocGroup*)it->comps_obj);
-    fail_if(tmpobj, "%d. category should have NULL id\n");
-    COMPS_OBJECT_DESTROY(tmpobj);
+    ck_assert_msg(tmpobj == NULL, "group should have NULL id\n");
+    if (tmpobj) COMPS_OBJECT_DESTROY(tmpobj);
     tmpobj = comps_docgroup_get_name((COMPS_DocGroup*)it->comps_obj);
-    fail_if(tmpobj, "%d. category should have NULL name\n");
-    COMPS_OBJECT_DESTROY(tmpobj);
+    ck_assert_msg(tmpobj == NULL, "group should have NULL name\n");
+    if (tmpobj) COMPS_OBJECT_DESTROY(tmpobj);
     tmpobj = comps_docgroup_get_desc((COMPS_DocGroup*)it->comps_obj);
-    fail_if(tmpobj, "%d. category should have NULL description\n");
+    ck_assert_msg(tmpobj == NULL, "group should have NULL description\n");
     COMPS_OBJECT_DESTROY(tmpobj);
     comps_parse_parsed_destroy(parsed);
 }
@@ -413,11 +386,11 @@ START_TEST(test_comps_parse4)
                                      comps_num(1244), comps_num(4));
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
+    ck_assert(comps_parse_parsed_init(parsed, "UTF-8", 0) != 0);
     fp = fopen("sample_comps_bad2.xml", "r");
     comps_parse_file(parsed, fp, NULL);
 
-    fail_if(parsed->log->entries->first == NULL);
+    ck_assert(parsed->log->entries->first != NULL);
     check_errors(parsed->log, known_errors, 15);
 
     for (i = 0; i < 15; i++) {
@@ -446,12 +419,12 @@ START_TEST(test_comps_parse5)
                                     comps_num(2));
 
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
+    ck_assert(comps_parse_parsed_init(parsed, "UTF-8", 0) != 0);
     fp = fopen("sample_comps_bad3.xml", "r");
     comps_parse_file(parsed, fp, NULL);
     //comps_log_print(parsed->log);
 
-    fail_if(parsed->log->entries->first == NULL);
+    ck_assert(parsed->log->entries->first != NULL);
     check_errors(parsed->log, known_errors, 2);
     //comps2xml_f(parsed->comps_doc, "fed2.xml", 0);
 
@@ -472,11 +445,11 @@ START_TEST(test_comps_fedora_parse)
     //char *tmp;
     fprintf(stderr, "## Running test_parse fedora\n");
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
+    ck_assert(comps_parse_parsed_init(parsed, "UTF-8", 0) != 0);
     fp = fopen("fedora_comps.xml", "r");
     comps_parse_file(parsed, fp, NULL);
     //printf("log len:%d\n", parsed->log->logger_data->len);
-    fail_if(parsed->fatal_error != 0, "Some fatal errors found after parsing");
+    ck_assert_msg(parsed->fatal_error == 0, "Some fatal errors found after parsing");
     //printf("log len:%d\n", parsed->log->logger_data->len);
     //err_str = comps_log_str(parsed->log);
     //printf("parsed err log: %s", err_str);
@@ -501,10 +474,10 @@ START_TEST(test_main2)
     //char *tmp;
     fprintf(stderr, "## Running test_parse main2\n");
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
+    ck_assert(comps_parse_parsed_init(parsed, "UTF-8", 0) != 0);
     fp = fopen("main_comps2.xml", "r");
     comps_parse_file(parsed, fp, NULL);
-    fail_if(parsed->fatal_error != 0, "Some fatal errors found after parsing");
+    ck_assert_msg(parsed->fatal_error == 0, "Some fatal errors found after parsing");
     //comps2xml_f(parsed->comps_doc, "fed2.xml", 0);
     comps_parse_parsed_destroy(parsed);
 }
@@ -550,11 +523,11 @@ START_TEST(test_arch)
     //char *tmp;
     fprintf(stderr, "## Running test_parse arch\n");
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) == 0);
+    ck_assert(comps_parse_parsed_init(parsed, "UTF-8", 0) != 0);
     fp = fopen("main_arches.xml", "r");
     comps_parse_file(parsed, fp, NULL);
     //comps_log_print(parsed->log);
-    fail_if(parsed->fatal_error != 0, "Some fatal errors found after parsing");
+    ck_assert_msg(parsed->fatal_error == 0, "Some fatal errors found after parsing");
     //comps2xml_f(parsed->comps_doc, "fed2.xml", 0);
     arches = (COMPS_ObjList*)comps_object_create(&COMPS_ObjList_ObjInfo, NULL);
     comps_objlist_append_x(arches, (COMPS_Object*)comps_str("x86"));
@@ -567,8 +540,7 @@ START_TEST(test_arch)
     for (it = list->first, x=0; it != NULL; it = it->next, x++) {
         g = (COMPS_DocGroup*)it->comps_obj;
         str = (COMPS_Str*)comps_docgroup_get_id(g);
-        ck_assert_msg(strcmp(str->val, grps[0][x]) == 0, "%s != %s",
-                      str->val, grps[0][x]);
+        ck_assert_msg(strcmp(str->val, grps[0][x]) == 0, "%s != %s", str->val, grps[0][x]);
         COMPS_OBJECT_DESTROY(str);
     }
     g = (COMPS_DocGroup*)list->first->comps_obj;
@@ -577,8 +549,7 @@ START_TEST(test_arch)
         //printf("%s\n", ((COMPS_DocGroupPackage*)it->comps_obj)->name->val);
         if (g1_pkgs[0][x] == NULL)
             break;
-        ck_assert(strcmp(((COMPS_DocGroupPackage*)it->comps_obj)->name->val,
-                         g1_pkgs[0][x]) == 0);
+        ck_assert(strcmp(((COMPS_DocGroupPackage*)it->comps_obj)->name->val, g1_pkgs[0][x]) == 0);
     }
     COMPS_OBJECT_DESTROY(list);
 
@@ -587,8 +558,7 @@ START_TEST(test_arch)
     for (it = list->first, x=0; it != NULL; it = it->next, x++) {
         c = (COMPS_DocCategory*)it->comps_obj;
         str = (COMPS_Str*)comps_doccategory_get_id(c);
-        ck_assert_msg(strcmp(str->val, cats[0][x]) == 0, "%s != %s",
-                      str->val, cats[0][x]);
+        ck_assert_msg(strcmp(str->val, cats[0][x]) == 0, "%s != %s", str->val, cats[0][x]);
         COMPS_OBJECT_DESTROY(str);
     }
     c = (COMPS_DocCategory*)list->first->comps_obj;
@@ -597,8 +567,7 @@ START_TEST(test_arch)
         //printf("%s\n", ((COMPS_DocGroupId*)it->comps_obj)->name->val);
         if (c1_gids[0][x] == NULL)
             break;
-        ck_assert(strcmp(((COMPS_DocGroupId*)it->comps_obj)->name->val,
-                         c1_gids[0][x]) == 0);
+        ck_assert(strcmp(((COMPS_DocGroupId*)it->comps_obj)->name->val, c1_gids[0][x]) == 0);
     }
     COMPS_OBJECT_DESTROY(list);
 
@@ -607,8 +576,7 @@ START_TEST(test_arch)
     for (it = list->first, x=0; it != NULL; it = it->next, x++) {
         e = (COMPS_DocEnv*)it->comps_obj;
         str = (COMPS_Str*)comps_docenv_get_id(e);
-        ck_assert_msg(strcmp(str->val, envs[0][x]) == 0, "%s != %s",
-                      str->val, envs[0][x]);
+        ck_assert_msg(strcmp(str->val, envs[0][x]) == 0, "%s != %s", str->val, envs[0][x]);
         COMPS_OBJECT_DESTROY(str);
     }
     e = (COMPS_DocEnv*)list->first->comps_obj;
@@ -617,17 +585,14 @@ START_TEST(test_arch)
         //printf("%s\n", ((COMPS_DocGroupId*)it->comps_obj)->name->val);
         if (e1_gids[0][x] == NULL)
             break;
-        ck_assert_msg(strcmp(((COMPS_DocGroupId*)it->comps_obj)->name->val,
-                         e1_gids[0][x]) == 0, "%s != %s",
-                         ((COMPS_DocGroupId*)it->comps_obj)->name->val,
-                         e1_gids[0][x]);
+        ck_assert_msg(strcmp(((COMPS_DocGroupId*)it->comps_obj)->name->val, e1_gids[0][x]) == 0,
+                      "%s != %s", ((COMPS_DocGroupId*)it->comps_obj)->name->val, e1_gids[0][x]);
     }
     list2 = e->option_list;
     for (x=0, it = list2->first; it != NULL; it = it->next, x++) {
         if (e1_oids[0][x] == NULL)
             break;
-        ck_assert(strcmp(((COMPS_DocGroupId*)it->comps_obj)->name->val,
-                         e1_oids[0][x]) == 0);
+        ck_assert(strcmp(((COMPS_DocGroupId*)it->comps_obj)->name->val, e1_oids[0][x]) == 0);
     }
     COMPS_OBJECT_DESTROY(list);
 

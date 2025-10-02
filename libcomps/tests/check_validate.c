@@ -132,7 +132,7 @@ START_TEST(test_doc_validate) {
 
     fp = fopen("f21-rawhide-comps.xml", "r");
     parsed = comps_parse_parsed_create();
-    fail_if(comps_parse_parsed_init(parsed, "UTF-8", 0) != 1);
+    ck_assert(comps_parse_parsed_init(parsed, "UTF-8", 0) != 1);
     comps_parse_file(parsed, fp, NULL);
     doc = parsed->comps_doc;
     result = comps_validate_execute((COMPS_Object*)doc, COMPS_Doc_ValidateRules);
