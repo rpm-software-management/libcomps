@@ -165,7 +165,7 @@ PyMemberDef PyCOMPSEnv_members[] = {
     {NULL}};
 
 PyMethodDef PyCOMPSEnv_methods[] = {
-    {"validate", (PyCFunction)PyCOMPSEnv_validate, METH_NOARGS,
+    {"validate", _PyCFunction_CAST(PyCOMPSEnv_validate), METH_NOARGS,
     PyCOMPS_env_validate__doc__},
     {NULL}  /* Sentinel */
 };
