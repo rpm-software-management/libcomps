@@ -87,23 +87,20 @@ START_TEST(test_comps_doc_basic)
         comps_doc_add_category(doc, c);
     }
     tmplist = comps_doc_groups(doc);
-    fail_if(tmplist->len == 0, "No groups found");
+    ck_assert_msg(tmplist->len != 0, "No groups found");
     g = (COMPS_DocGroup*)tmplist->first->comps_obj;
     COMPS_OBJECT_DESTROY(tmplist);
 
     tmplist = comps_doc_get_groups(doc, "g1", NULL, NULL, NULL, 0);
-    fail_if(tmplist->len == 0, "Group with id 'g1' should be in groups, but"
-                               "cant get it");
+    ck_assert_msg(tmplist->len != 0, "Group with id 'g1' should be in groups, but cant get it");
     g = (COMPS_DocGroup*)tmplist->first->comps_obj;
     COMPS_OBJECT_DESTROY(tmplist);
 
     tmplist = comps_docgroup_get_packages(g, NULL, COMPS_PACKAGE_OPTIONAL);
-    fail_if(tmplist->len != 4, "Group with id 'g1' should have 4 optional "
-                               "packages. But have %d.", tmplist->len);
+    ck_assert_msg(tmplist->len == 4, "Group with id 'g1' should have 4 optional packages. But have %lu.", tmplist->len);
     COMPS_OBJECT_DESTROY(tmplist);
     tmplist = comps_docgroup_get_packages(g, NULL, COMPS_PACKAGE_MANDATORY);
-    fail_if(tmplist->len != 4, "Group with id 'g1' should have 4 optional "
-                               "packages. But have %d.", tmplist->len);
+    ck_assert_msg(tmplist->len == 4, "Group with id 'g1' should have 4 optional packages. But have %lu.", tmplist->len);
     COMPS_OBJECT_DESTROY(tmplist);
     COMPS_OBJECT_DESTROY(doc);
 }END_TEST
@@ -276,22 +273,18 @@ START_TEST(test_comps_doc_setfeats)
     g1 = (COMPS_DocGroup*)list->first->comps_obj;
     g2 = (COMPS_DocGroup*)list->first->next->comps_obj;
     g = comps_docgroup_union(g1, g2);
-    fail_if(g->packages->len != 14, "Union of (g1 v g2) should have 14 packages"
-            " have %d", g->packages->len);
+    ck_assert_msg(g->packages->len == 14, "Union of (g1 v g2) should have 14 packages have %lu", g->packages->len);
     COMPS_OBJECT_DESTROY(g);
     g = comps_docgroup_intersect(g1, g2);
-    fail_if(g->packages->len != 2, "Intersect of (g1 ^ g2) should have 2"
-            "packages, have %d", g->packages->len);
+    ck_assert_msg(g->packages->len == 2, "Intersect of (g1 ^ g2) should have 2 packages, have %lu", g->packages->len);
     COMPS_OBJECT_DESTROY(g);
     g1 = (COMPS_DocGroup*)list->first->next->comps_obj;
     g2 = (COMPS_DocGroup*)list->first->next->next->comps_obj;
     g = comps_docgroup_union(g1, g2);
-    fail_if(g->packages->len != 16, "Union of (g2 v g3) should have 16 packages"
-            " have %d", g->packages->len);
+    ck_assert_msg(g->packages->len == 16, "Union of (g2 v g3) should have 16 packages have %lu", g->packages->len);
     COMPS_OBJECT_DESTROY(g);
     g = comps_docgroup_intersect(g1, g2);
-    fail_if(g->packages->len != 0, "Intersect of (g2 ^ g3) should have 0"
-            "packages, have %d", g->packages->len);
+    ck_assert_msg(g->packages->len == 0, "Intersect of (g2 ^ g3) should have 0 packages, have %lu", g->packages->len);
     COMPS_OBJECT_DESTROY(g);
     COMPS_OBJECT_DESTROY(list);
     list = comps_doc_categories(doc);
@@ -300,24 +293,20 @@ START_TEST(test_comps_doc_setfeats)
 
     c = comps_doccategory_union(c1, c2);
     //print_category(c);
-    fail_if(c->group_ids->len != 4, "Union of (c1 v c2) should have 4 "
-            "group ids, have %d", c->group_ids->len);
+    ck_assert_msg(c->group_ids->len == 4, "Union of (c1 v c2) should have 4 group ids, have %lu", c->group_ids->len);
     COMPS_OBJECT_DESTROY(c);
 
     c = comps_doccategory_intersect(c1, c2);
-    fail_if(c->group_ids->len != 2, "Intersect of (c1 ^ c2) should have 2"
-            "group ids, have %d", c->group_ids->len);
+    ck_assert_msg(c->group_ids->len == 2, "Intersect of (c1 ^ c2) should have 2 group ids, have %lu", c->group_ids->len);
     COMPS_OBJECT_DESTROY(c);
 
     c1 = (COMPS_DocCategory*)list->first->next->comps_obj;
     c2 = (COMPS_DocCategory*)list->first->next->next->comps_obj;
     c = comps_doccategory_union(c1, c2);
-    fail_if(c->group_ids->len != 4, "Union of (c2 v c3) should have 4 "
-            "group ids, have %d", c->group_ids->len);
+    ck_assert_msg(c->group_ids->len == 4, "Union of (c2 v c3) should have 4 group ids, have %lu", c->group_ids->len);
     COMPS_OBJECT_DESTROY(c);
     c = comps_doccategory_intersect(c1, c2);
-    fail_if(c->group_ids->len != 2, "Intersect of (c2 ^ c3) should have 2"
-            "group ids, have %d", c->group_ids->len);
+    ck_assert_msg(c->group_ids->len == 2, "Intersect of (c2 ^ c3) should have 2 group ids, have %lu", c->group_ids->len);
     COMPS_OBJECT_DESTROY(c);
     COMPS_OBJECT_DESTROY(list);
 
@@ -325,60 +314,46 @@ START_TEST(test_comps_doc_setfeats)
     e1 = (COMPS_DocEnv*)list->first->comps_obj;
     e2 = (COMPS_DocEnv*)list->first->next->comps_obj;
     e = comps_docenv_union(e1, e2);
-    fail_if(e->group_list->len != 4, "Union of (e1 v e2) should have 4 "
-            "groud ids have %d", e->group_list->len);
-    fail_if(e->option_list->len != 7, "Union of (e1 v e2) should have 7 "
-            "option ids have %d", e->option_list->len);
+    ck_assert_msg(e->group_list->len == 4, "Union of (e1 v e2) should have 4 groud ids have %lu", e->group_list->len);
+    ck_assert_msg(e->option_list->len == 7, "Union of (e1 v e2) should have 7 option ids have %lu", e->option_list->len);
     COMPS_OBJECT_DESTROY(e);
     e = comps_docenv_intersect(e1, e2);
-    fail_if(e->group_list->len != 2, "Intersect of (e1 ^ e2) should have 2"
-            "group ids have %d", e->group_list->len);
-    fail_if(e->option_list->len != 1, "Union of (e1 v e2) should have 1 "
-            "option ids have %d", e->option_list->len);
+    ck_assert_msg(e->group_list->len == 2, "Intersect of (e1 ^ e2) should have 2 group ids have %lu", e->group_list->len);
+    ck_assert_msg(e->option_list->len == 1, "Union of (e1 v e2) should have 1 option ids have %lu", e->option_list->len);
     COMPS_OBJECT_DESTROY(e);
 
     e1 = (COMPS_DocEnv*)list->first->next->comps_obj;
     e2 = (COMPS_DocEnv*)list->first->next->next->comps_obj;
     e = comps_docenv_union(e1, e2);
-    fail_if(e->group_list->len != 4, "Union of (e2 v e3) should have 4 "
-            "groud ids have %d", e->group_list->len);
-    fail_if(e->option_list->len != 6, "Union of (e2 v e3) should have 7 "
-            "option ids have %d", e->option_list->len);
+    ck_assert_msg(e->group_list->len == 4, "Union of (e2 v e3) should have 4 groud ids have %lu", e->group_list->len);
+    ck_assert_msg(e->option_list->len == 6, "Union of (e2 v e3) should have 7 option ids have %lu", e->option_list->len);
     COMPS_OBJECT_DESTROY(e);
     e = comps_docenv_intersect(e1, e2);
-    fail_if(e->group_list->len != 2, "Intersect of (e2 ^ e3) should have 2 "
-            "groupids  have %d", e->group_list->len);
-    fail_if(e->option_list->len != 2, "Intersect of (e2 v e3) should have 2 "
-            "option ids have %d", e->option_list->len);
+    ck_assert_msg(e->group_list->len == 2, "Intersect of (e2 ^ e3) should have 2 groupids have %lu", e->group_list->len);
+    ck_assert_msg(e->option_list->len == 2, "Intersect of (e2 v e3) should have 2 option ids have %lu", e->option_list->len);
     COMPS_OBJECT_DESTROY(e);
     COMPS_OBJECT_DESTROY(list);
 
     tmpdoc = comps_doc_union(doc, doc2);
     list = comps_doc_groups(tmpdoc);
-    fail_if(list->len != 6, "Union of (doc ^ doc2) should have 6 "
-            "groups  have %d", list->len);
+    ck_assert_msg(list->len == 6, "Union of (doc ^ doc2) should have 6 groups have %lu", list->len);
     COMPS_OBJECT_DESTROY(list);
     list = comps_doc_categories(tmpdoc);
-    fail_if(list->len != 4, "Union of (doc ^ doc2) "
-            "should have 4 categories  have %d", list->len);
+    ck_assert_msg(list->len == 4, "Union of (doc ^ doc2) should have 4 categories have %lu", list->len);
     COMPS_OBJECT_DESTROY(list);
     list = comps_doc_environments(tmpdoc);
-    fail_if(list->len != 4, "Union of (doc ^ doc2) "
-            "should have 4 environments  have %d", list->len);
+    ck_assert_msg(list->len == 4, "Union of (doc ^ doc2) should have 4 environments have %lu", list->len);
     COMPS_OBJECT_DESTROY(list);
     COMPS_OBJECT_DESTROY(tmpdoc);
     tmpdoc = comps_doc_intersect(doc, doc2);
     list = comps_doc_groups(tmpdoc);
-    fail_if(list->len != 2, "Intersect of (doc ^ doc2) "
-            "should have 2 groups  have %d", list->len);
+    ck_assert_msg(list->len == 2, "Intersect of (doc ^ doc2) should have 2 groups have %lu", list->len);
     COMPS_OBJECT_DESTROY(list);
     list = comps_doc_categories(tmpdoc);
-    fail_if(list->len != 2, "Intersect of (doc ^ doc2)"
-            " should have 2 categories  have %d", list->len);
+    ck_assert_msg(list->len == 2, "Intersect of (doc ^ doc2) should have 2 categories have %lu", list->len);
     COMPS_OBJECT_DESTROY(list);
     list = comps_doc_environments(tmpdoc);
-    fail_if(list->len != 2, "Intersect of "
-            "(doc ^ doc2) should have 2 environments  have %d", list->len);
+    ck_assert_msg(list->len == 2, "Intersect of (doc ^ doc2) should have 2 environments have %lu", list->len);
     COMPS_OBJECT_DESTROY(list);
     COMPS_OBJECT_DESTROY(tmpdoc);
     COMPS_OBJECT_DESTROY(doc2);
