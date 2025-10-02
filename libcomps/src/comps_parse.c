@@ -130,7 +130,7 @@ void comps_parse_start_doctype(void *userData,
                                const XML_Char *doctypeName,
                                const XML_Char *sysid,
                                const XML_Char *pubid,
-                               int standalone) {
+                               int standalone __attribute__((unused))) {
     #define parsed ((COMPS_Parsed*)userData)
     parsed->doctype_name = comps_str(doctypeName);
     parsed->doctype_sysid = comps_str(sysid);
@@ -143,7 +143,7 @@ int comps_parse_validate_dtd(char *filename, char *dtd_file) {
     xmlDtdPtr dtd_ptr;
     xmlValidCtxtPtr vctxt;
     int ret;
-    xmlErrorPtr err;
+    const xmlError *err;
 
     fptr = xmlReadFile(filename, NULL, 0);
     if (fptr == NULL) {
