@@ -198,7 +198,7 @@ void pycomps_clear(PyObject *self) {
     COMPS_OBJECT_DESTROY(((PyCOMPS*)self)->comps_doc);
 }
 
-PyObject* PyCOMPS_clear(PyObject *self) {
+PyObject* PyCOMPS_clear(PyObject *self, PyObject *args __attribute__((unused))) {
 
     COMPS_Str *enc;
     enc = (COMPS_Str*)
@@ -772,27 +772,27 @@ PyDoc_STRVAR(PyCOMPS_arch_filter__doc__,
              ":return: new :py:class:`libcomps.Comps` instace");
 
 static PyMethodDef PyCOMPS_methods[] = {
-    {"groups_match", (PyCFunction)PyCOMPS_groups_match, METH_VARARGS | METH_KEYWORDS,
+    {"groups_match", _PyCFunction_CAST(PyCOMPS_groups_match), METH_VARARGS | METH_KEYWORDS,
     PyCOMPS_validate__doc__},
-    {"categories_match", (PyCFunction)PyCOMPS_categories_match, METH_VARARGS | METH_KEYWORDS,
+    {"categories_match", _PyCFunction_CAST(PyCOMPS_categories_match), METH_VARARGS | METH_KEYWORDS,
     PyCOMPS_validate__doc__},
-    {"environments_match", (PyCFunction)PyCOMPS_envs_match, METH_VARARGS | METH_KEYWORDS,
+    {"environments_match", _PyCFunction_CAST(PyCOMPS_envs_match), METH_VARARGS | METH_KEYWORDS,
     PyCOMPS_validate__doc__},
-    {"validate", (PyCFunction)PyCOMPS_validate, METH_NOARGS,
+    {"validate", _PyCFunction_CAST(PyCOMPS_validate), METH_NOARGS,
     PyCOMPS_validate__doc__},
-    {"validate_nf", (PyCFunction)PyCOMPS_validate_nf, METH_NOARGS,
+    {"validate_nf", _PyCFunction_CAST(PyCOMPS_validate_nf), METH_NOARGS,
     PyCOMPS_validate_nf__doc__},
-    {"xml_f", (PyCFunction)PyCOMPS_toxml_f, METH_VARARGS | METH_KEYWORDS,
+    {"xml_f", _PyCFunction_CAST(PyCOMPS_toxml_f), METH_VARARGS | METH_KEYWORDS,
     PyCOMPS_xml_f__doc__},
-    {"xml_str", (PyCFunction)PyCOMPS_toxml_str, METH_VARARGS | METH_KEYWORDS,
+    {"xml_str", _PyCFunction_CAST(PyCOMPS_toxml_str), METH_VARARGS | METH_KEYWORDS,
     PyCOMPS_xml_str__doc__},
-    {"toxml_f", (PyCFunction)PyCOMPS_toxml_f, METH_VARARGS | METH_KEYWORDS,
+    {"toxml_f", _PyCFunction_CAST(PyCOMPS_toxml_f), METH_VARARGS | METH_KEYWORDS,
     PyCOMPS_toxml_f__doc__},
-    {"toxml_str", (PyCFunction)PyCOMPS_toxml_str, METH_VARARGS | METH_KEYWORDS,
+    {"toxml_str", _PyCFunction_CAST(PyCOMPS_toxml_str), METH_VARARGS | METH_KEYWORDS,
     PyCOMPS_toxml_str__doc__},
-    {"fromxml_f", (PyCFunction)PyCOMPS_fromxml_f, METH_VARARGS | METH_KEYWORDS,
+    {"fromxml_f", _PyCFunction_CAST(PyCOMPS_fromxml_f), METH_VARARGS | METH_KEYWORDS,
     PyCOMPS_fromxml_f__doc__},
-    {"fromxml_str", (PyCFunction)PyCOMPS_fromxml_str, METH_VARARGS | METH_KEYWORDS,
+    {"fromxml_str", _PyCFunction_CAST(PyCOMPS_fromxml_str), METH_VARARGS | METH_KEYWORDS,
     PyCOMPS_fromxml_str__doc__},
     {"clear", (PyCFunction)PyCOMPS_clear, METH_NOARGS,
     "Clear Comps"},
@@ -928,7 +928,7 @@ PyTypeObject PyCOMPS_Type = {
     0,                         /* tp_alloc */
     PyCOMPS_new,                /* tp_new */};
 
-PyObject* Libcomps_xml_default(PyObject *self) {
+PyObject* Libcomps_xml_default(PyObject *self, PyObject *args __attribute__((unused))) {
     const char *keys[] = {"empty_groups", "empty_categories",
                           "empty_environments", "empty_langpacks",
                           "empty_blacklist", "empty_whiteout",
