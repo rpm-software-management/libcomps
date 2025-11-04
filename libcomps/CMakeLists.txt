@@ -18,7 +18,7 @@ OPTION (ENABLE_DOCS "Build docs?" ON)
 
 set(LIBCOMPS_OUT "${CMAKE_CURRENT_BINARY_DIR}/src")
 
-set (CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} --pedantic -std=c99 -Wall -Wextra -g -Wno-missing-field-initializers -O2 -fno-strict-aliasing -g")
+set (CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} --pedantic -std=c99 -Wall -Wextra -Wno-missing-field-initializers -O2 -fno-strict-aliasing")
 set (CMAKE_C_FLAGS_DEBUG    "${CMAKE_C_FLAGS} -ggdb -O0 -Wall -Wextra")
 
 set (VERSION "${libcomps_VERSION_MAJOR}.${libcomps_VERSION_MINOR}.${libcomps_VERSION_PATCH}")
