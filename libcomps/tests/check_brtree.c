@@ -48,19 +48,19 @@ void destroy_test_struct(void *ts) {
 void print_key(struct _key *key){
     unsigned char x;
     for (x = 0; x<key->keylen-1; x++) {
-        printf("%hhu|",key->key[x]);
+        printf("%hhu|", (unsigned char)key->key[x]);
         if (x>10) break;
     }
-    printf("%hhu\n",key->key[x]);
+    printf("%hhu\n", (unsigned char)key->key[x]);
 }
 
 void print_key_(struct _key *key){
     unsigned char x;
     for (x = 0; x<key->keylen-1; x++) {
-        printf("%hhu|",key->key[x]);
+        printf("%hhu|", (unsigned char)key->key[x]);
         if (x>10) break;
     }
-    printf("%hhu ",key->key[x]);
+    printf("%hhu ", (unsigned char)key->key[x]);
 }
 
 void key_destroy(void *key) {
