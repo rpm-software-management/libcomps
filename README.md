@@ -95,7 +95,7 @@ bindings documentation
 
 ### Documentation
 After build, documentation is in __docs directory__. Documentation is built
-in html xml and latex format. Only uncomplete documentation for C library
+in html xml and latex format. Only incomplete documentation for C library
 is available at the moment. Look at bindings unittest `__test.py__` for python
 bindings usage.
 

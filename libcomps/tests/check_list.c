@@ -114,7 +114,7 @@ START_TEST(test_remove)
     fail_unless(*(int*)it->data == 77,
                 "Item data after remove should be 77 not %d",
                 *(int*)it->data);
-    fail_unless(list->len == 8, "List lenght should be 8");
+    fail_unless(list->len == 8, "List length should be 8");
     tmp = list->len;
 
     for (i=0; i < tmp; i++) {
@@ -164,9 +164,9 @@ START_TEST(test_insert)
     }
     for (i=0; i<test_data_len; i++) {
         item = comps_list_at(list, test_data_len-i-1);
-        fail_unless(*((int*)item->data) == test_data[i], "Item data doens't match");
+        fail_unless(*((int*)item->data) == test_data[i], "Item data does not match");
     }
-    fail_unless(list->len == 10, "List lenght should be 10");
+    fail_unless(list->len == 10, "List length should be 10");
 
     data = 14;
     item = comps_list_item_create((void*)&data,
