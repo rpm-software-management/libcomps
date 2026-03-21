@@ -63,7 +63,12 @@ MACRO(MAKE_LOGENTRY log_entry commit)
     set(log_entry "${FMT_FINAL}")
 ENDMACRO(MAKE_LOGENTRY)
 
-include (${CMAKE_SOURCE_DIR}/libcomps/version.cmake)
+file(READ "${CMAKE_SOURCE_DIR}/VERSION" VERSION)
+string(STRIP "${VERSION}" VERSION)
+string(REPLACE "." ";" VERSION_LIST ${VERSION})
+list(GET VERSION_LIST 0 libcomps_VERSION_MAJOR)
+list(GET VERSION_LIST 1 libcomps_VERSION_MINOR)
+list(GET VERSION_LIST 2 libcomps_VERSION_PATCH)
 
 SET(changelog_commits 946584c5a01d83bf9ec4c26d3f9d73e37bfb5456;
                       76764059f1085abbd0eeaeab64f45ec48a58ba4d;

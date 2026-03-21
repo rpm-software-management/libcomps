@@ -50,7 +50,6 @@ Documentation files for python bindings libcomps library.
 %package -n python3-%{name}
 Summary:        Python 3 bindings for libcomps library
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
 BuildRequires:  make
 %{?python_provide:%python_provide python3-%{name}}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -113,6 +112,6 @@ popd
 
 %files -n python3-%{name}
 %{python3_sitearch}/%{name}/
-%{python3_sitearch}/%{name}-*-py%{python3_version}.egg-info
+%{python3_sitearch}/%{name}-*.dist-info
 
 %changelog
