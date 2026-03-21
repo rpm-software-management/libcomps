@@ -10,7 +10,13 @@ endif()
 
 include (GNUInstallDirs)
 include (${CMAKE_ROOT}/Modules/CheckFunctionExists.cmake)
-include (${CMAKE_SOURCE_DIR}/version.cmake)
+file(READ "${CMAKE_SOURCE_DIR}/../VERSION" VERSION)
+string(STRIP "${VERSION}" VERSION)
+string(REPLACE "." ";" VERSION_LIST ${VERSION})
+list(GET VERSION_LIST 0 libcomps_VERSION_MAJOR)
+list(GET VERSION_LIST 1 libcomps_VERSION_MINOR)
+list(GET VERSION_LIST 2 libcomps_VERSION_PATCH)
+set (libcomps_RELEASE 1)
 #set (CMAKE_CXX_COMPILER g++)
 
 OPTION (ENABLE_TESTS "Build test?" ON)
@@ -20,8 +26,6 @@ set(LIBCOMPS_OUT "${CMAKE_CURRENT_BINARY_DIR}/src")
 
 set (CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} --pedantic -std=c99 -Wall -Wextra -Wno-missing-field-initializers -O2 -fno-strict-aliasing")
 set (CMAKE_C_FLAGS_DEBUG    "${CMAKE_C_FLAGS} -ggdb -O0 -Wall -Wextra")
-
-set (VERSION "${libcomps_VERSION_MAJOR}.${libcomps_VERSION_MINOR}.${libcomps_VERSION_PATCH}")
 #set (libcomps_SOURCE comps_list.c)
 #set (libcomps_HEADERS comps_list.h)
 

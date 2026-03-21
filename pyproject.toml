@@ -1,3 +1,41 @@
 [build-system]
-requires = ["setuptools", "wheel", "scikit-build"]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "libcomps"
+description = "Comps XML file manipulation library"
+readme = "README.md"
+license = "GPL-2.0-or-later"
+dynamic = ["version"]
+authors = [
+    {name = "RPM Software Management", email = "rpm-ecosystem@lists.rpm.org"},
+]
+classifiers = [
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: C",
+    "Topic :: System :: Software Distribution",
+    "Topic :: System :: Systems Administration",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+Homepage = "https://github.com/rpm-software-management/libcomps"
+
+[tool.scikit-build]
+cmake.source-dir = "libcomps"
+cmake.args = [
+    "-DBUILD_LIBCOMPS_SHARED:BOOL=OFF",
+    "-DENABLE_DEVELOPMENT:BOOL=OFF",
+    "-DENABLE_DOCS:BOOL=OFF",
+    "-DENABLE_TESTS:BOOL=OFF",
+]
+metadata.version.provider = "scikit_build_core.metadata.regex"
+metadata.version.input = "VERSION"
+metadata.version.regex = "(?P<value>.+)"
