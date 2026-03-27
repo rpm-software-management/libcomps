@@ -113,6 +113,6 @@ popd
 
 %files -n python3-%{name}
 %{python3_sitearch}/%{name}/
-%{python3_sitearch}/%{name}-%{version}-py%{python3_version}.egg-info
+%{python3_sitearch}/%{name}-*-py%{python3_version}.egg-info
 
 %changelog
