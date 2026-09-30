@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE comps PUBLIC "-//CentOS//DTD Comps info//EN" "comps.dtd">
+<comps>
+  <group>
+    <id>empty-fields-group</id>
+    <name>Empty Fields Group</name>
+    <description>Group with empty numeric/bool elements</description>
+    <default></default>
+    <uservisible></uservisible>
+    <biarchonly></biarchonly>
+    <display_order></display_order>
+    <packagelist>
+      <packagereq type='mandatory'>bash</packagereq>
+    </packagelist>
+  </group>
+  <category>
+    <id>empty-fields-category</id>
+    <name>Empty Fields Category</name>
+    <description>Category with empty display_order</description>
+    <display_order></display_order>
+    <grouplist>
+      <groupid>empty-fields-group</groupid>
+    </grouplist>
+  </category>
+  <environment>
+    <id>empty-fields-environment</id>
+    <name>Empty Fields Environment</name>
+    <description>Environment with empty display_order</description>
+    <display_order></display_order>
+    <grouplist>
+      <groupid>empty-fields-group</groupid>
+    </grouplist>
+    <optionlist>
+    </optionlist>
+  </environment>
+</comps>

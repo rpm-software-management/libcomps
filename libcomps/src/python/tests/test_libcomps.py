@@ -186,5 +186,24 @@ class TestLibcomps(unittest.TestCase):
             self.assertEqual("{}", str(category.name_by_lang))
             self.assertEqual("{}", str(category.desc_by_lang))
 
+    def test_empty_numeric_tags(self):
+        self.comps = libcomps.Comps()
+        self.comps.fromxml_f("comps/empty_numeric_tags.xml")
+
+        group = self.comps.groups[0]
+        self.assertEqual("empty-fields-group", group.id)
+        # empty <display_order> defaults to 0
+        self.assertEqual(0, group.display_order)
+
+        category = self.comps.categories[0]
+        self.assertEqual("empty-fields-category", category.id)
+        self.assertEqual(0, category.display_order)
+
+        environment = self.comps.environments[0]
+        self.assertEqual("empty-fields-environment", environment.id)
+        self.assertEqual(0, environment.display_order)
+        self.assertEqual(["empty-fields-group"],
+                         [gid.name for gid in environment.group_ids])
+
 if __name__ == "__main__":
     unittest.main(testRunner = utest.MyRunner)
