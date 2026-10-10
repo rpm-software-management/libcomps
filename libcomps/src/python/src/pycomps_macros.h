@@ -24,6 +24,10 @@
 #include <Python.h>
 #include "structmember.h"
 
+/* _PyCFunction_CAST() was introduced in Python 3.11 */
+#ifndef _PyCFunction_CAST
+#define _PyCFunction_CAST(func) ((PyCFunction)(void(*)(void))(func))
+#endif
 
 #define CMP_OP_EQ_NE_CHECK(OP)                                  \
     if ((OP) != Py_EQ && (OP) != Py_NE) {                       \
