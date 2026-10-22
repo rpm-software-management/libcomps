@@ -122,6 +122,9 @@ void comps_objmrtree_copy(COMPS_ObjMRTree *ret, COMPS_ObjMRTree *rt){
     COMPS_ObjMRTreeData *rtdata;
     COMPS_ObjList *new_data_list;
 
+    ret->subnodes = comps_hslist_create();
+    comps_hslist_init(ret->subnodes, NULL, NULL, &comps_objmrtree_data_destroy_v);
+
     to_clone = comps_hslist_create();
     comps_hslist_init(to_clone, NULL, NULL, NULL);
 
