@@ -366,7 +366,8 @@ void comps_parse_start_elem_handler(void *userData,
                 }
             }
         }
-    } else if (elem->type != COMPS_ELEM_UNKNOWN){
+    } else if (elem->type != COMPS_ELEM_UNKNOWN && !LAST) {
+        /* <comps> is valid only as the document root element */
         elem->valid = 1;
     }
     if (!elem->valid) {
