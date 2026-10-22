@@ -393,7 +393,9 @@ void __comps_mrtree_set(COMPS_MRTree * rt, char * key, size_t len, void * data)
                                   &comps_mrtree_data_destroy_v);
                 rtdata->data = NULL;
                 if (cmpret > 0) {
-                    rtd = comps_mrtree_data_create(rt, rtdata->key+x, tmpdata);
+                    rtd = comps_mrtree_data_create(rt, rtdata->key+x, NULL);
+                    comps_hslist_destroy(&rtd->data);
+                    rtd->data = tmpdata;
                     comps_hslist_destroy(&rtd->subnodes);
                     rtd->subnodes = tmpnodes;
                     comps_hslist_append(rtdata->subnodes, rtd, 0);
@@ -402,7 +404,9 @@ void __comps_mrtree_set(COMPS_MRTree * rt, char * key, size_t len, void * data)
                 } else {
                     rtd = comps_mrtree_data_create(rt, key+offset+x, ndata);
                     comps_hslist_append(rtdata->subnodes, rtd, 0);
-                    rtd = comps_mrtree_data_create(rt, rtdata->key+x, tmpdata);
+                    rtd = comps_mrtree_data_create(rt, rtdata->key+x, NULL);
+                    comps_hslist_destroy(&rtd->data);
+                    rtd->data = tmpdata;
                     comps_hslist_destroy(&rtd->subnodes);
                     rtd->subnodes = tmpnodes;
                     comps_hslist_append(rtdata->subnodes, rtd, 0);
