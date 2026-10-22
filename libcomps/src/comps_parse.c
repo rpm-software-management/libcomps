@@ -34,7 +34,7 @@ inline unsigned __comps_is_whitespace_only(const char * s, int len)
 {
     int i;
     for (i = 0; i<len; i++) {
-        if (!isspace(s[i])) return 0;
+        if (!isspace((unsigned char)s[i])) return 0;
     }
     return 1;
 }
