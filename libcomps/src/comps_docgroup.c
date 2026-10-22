@@ -351,8 +351,8 @@ signed char comps_docgroup_xml(COMPS_DocGroup *group, xmlTextWriterPtr writer,
                 COMPS_XMLRET_CHECK(comps_hslist_destroy(&pairlist))
                 str = tostrf[i](((COMPS_ObjRTreePair*)hsit->data)->data);
                 ret = xmlTextWriterWriteString(writer, (xmlChar*)str);
-                COMPS_XMLRET_CHECK(comps_hslist_destroy(&pairlist))
                 free(str);
+                COMPS_XMLRET_CHECK(comps_hslist_destroy(&pairlist))
                 ret = xmlTextWriterEndElement(writer);
                 COMPS_XMLRET_CHECK(comps_hslist_destroy(&pairlist))
             }
