@@ -50,6 +50,10 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
     if (parsed == NULL)
         return 0;
     parsed->parser = XML_ParserCreate((const XML_Char*)encoding);
+    if (parsed->parser == NULL) {
+        free(parsed);
+        return 0;
+    }
 
     XML_SetDefaultHandler(parsed->parser, &comps_parse_def_handler);
     XML_SetElementHandler(parsed->parser, &comps_parse_start_elem_handler,
