@@ -546,13 +546,11 @@ void comps_mrtree_unset(COMPS_MRTree * rt, const char * key) {
         if (ended == 3) {
             /* remove node from tree only if there's no descendant*/
             if (rtdata->subnodes->last == NULL) {
-                printf("removing all\n");
                 comps_hslist_remove(subnodes, it);
                 comps_mrtree_data_destroy(rtdata);
                 free(it);
             }
             else {
-                printf("removing data only\n");
                 comps_hslist_clear(rtdata->data);
                 rtdata->is_leaf = 0;
             }
