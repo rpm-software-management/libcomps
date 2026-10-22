@@ -364,10 +364,10 @@ void comps_objmrtree_set(COMPS_ObjMRTree *rt, char *key, COMPS_Object *data) {
 
 void __comps_objmrtree_set(COMPS_ObjMRTree *rt, char *key,
                            size_t len, COMPS_Object *ndata) {
-    static COMPS_HSListItem *it;
+    COMPS_HSListItem *it;
     COMPS_HSList *subnodes;
     COMPS_ObjMRTreeData *rtd;
-    static COMPS_ObjMRTreeData *rtdata;
+    COMPS_ObjMRTreeData *rtdata;
 
     size_t _len, offset=0;
     unsigned x, found = 0;

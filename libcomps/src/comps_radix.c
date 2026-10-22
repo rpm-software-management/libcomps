@@ -191,7 +191,7 @@ void __comps_rtree_set(COMPS_RTree * rt, char * key, size_t len, void * data)
     COMPS_HSListItem *it, *lesser;
     COMPS_HSList *subnodes;
     COMPS_RTreeData *rtd;
-    static COMPS_RTreeData *rtdata;
+    COMPS_RTreeData *rtdata;
 
     size_t offset=0, _len;
     unsigned x, found = 0;
