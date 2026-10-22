@@ -801,9 +801,9 @@ void comps_elem_langonly_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
 void comps_elem_uservisible_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     (void)elem;
     COMPS_ObjList *list = comps_doc_groups(parsed->comps_doc);
-    if (strcmp(parsed->tmp_buffer, "false") == 0)
+    if (__comps_strcmp(parsed->tmp_buffer, "false"))
         comps_docgroup_set_uservisible(last_group, 0, false);
-    else if (strcmp(parsed->tmp_buffer, "true") == 0)
+    else if (__comps_strcmp(parsed->tmp_buffer, "true"))
         comps_docgroup_set_uservisible(last_group, 1, false);
     else {
         comps_log_warning_x(parsed->log, COMPS_ERR_DEFAULT_PARAM, 3,
@@ -817,9 +817,9 @@ void comps_elem_uservisible_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
 void comps_elem_biarchonly_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
     (void)elem;
     COMPS_ObjList *list = comps_doc_groups(parsed->comps_doc);
-    if (strcmp(parsed->tmp_buffer, "false") == 0)
+    if (__comps_strcmp(parsed->tmp_buffer, "false"))
         comps_docgroup_set_biarchonly(last_group, 0, false);
-    else if (strcmp(parsed->tmp_buffer, "true") == 0)
+    else if (__comps_strcmp(parsed->tmp_buffer, "true"))
         comps_docgroup_set_biarchonly(last_group, 1, false);
     else {
         comps_log_warning_x(parsed->log, COMPS_ERR_DEFAULT_PARAM, 3,
@@ -853,6 +853,13 @@ void comps_elem_display_order_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
         prop = comps_docgroup_get_display_order(group);
     }
     COMPS_OBJECT_DESTROY(list);
+    if (!parsed->tmp_buffer) {
+        comps_log_error_x(parsed->log, COMPS_ERR_NOCONTENT, 3,
+                          comps_str(COMPS_ElemInfos[elem->type]->name),
+                          comps_num(parser_line), comps_num(parser_col));
+        COMPS_OBJECT_DESTROY(prop);
+        return;
+    }
     if (prop) {
         comps_log_warning_x(parsed->log, COMPS_ERR_ELEM_ALREADYSET, 3,
                             comps_str(elem->name), comps_num(parser_line),
