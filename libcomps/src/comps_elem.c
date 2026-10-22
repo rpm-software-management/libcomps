@@ -859,10 +859,11 @@ void comps_elem_display_order_postproc(COMPS_Parsed *parsed, COMPS_Elem *elem) {
                             comps_num(parser_col));
     } else if (dict) {
         prop = (COMPS_Object*)comps_num(0);
-        comps_objdict_set_x(dict, "display_order", prop);
+        comps_objdict_set(dict, "display_order", prop);
     }
     if (prop)
         sscanf(parsed->tmp_buffer, "%d", &((COMPS_Num*)prop)->val);
+    COMPS_OBJECT_DESTROY(prop);
     parsed->tmp_buffer = NULL;
 }
     #undef parser_line
