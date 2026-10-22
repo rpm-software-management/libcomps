@@ -208,7 +208,8 @@ void comps_objmrtree_copy_shallow(COMPS_ObjMRTree *ret, COMPS_ObjMRTree *rt){
             rtdata = comps_objmrtree_data_create(
                                           ((COMPS_ObjMRTreeData*)it->data)->key,
                                           NULL);
-            new_data_list = ((COMPS_ObjMRTreeData*)it->data)->data;
+            new_data_list = (COMPS_ObjList*)
+                            COMPS_OBJECT_INCREF(((COMPS_ObjMRTreeData*)it->data)->data);
 
             comps_hslist_destroy(&rtdata->subnodes);
             COMPS_OBJECT_DESTROY(rtdata->data);
