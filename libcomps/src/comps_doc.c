@@ -749,9 +749,13 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                 xmlTextWriterWriteAttribute(writer, BAD_CAST "name",
                         (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
 
-                char *tmp = comps_object_tostr(it->comps_obj);
-                xmlTextWriterWriteAttribute(writer, BAD_CAST "arch", BAD_CAST tmp);
-                free(tmp);
+                /* <package name="foo"/> without arch is parsed as NULL */
+                if (((COMPS_Str*)it->comps_obj)->val) {
+                    char *tmp = comps_object_tostr(it->comps_obj);
+                    xmlTextWriterWriteAttribute(writer, BAD_CAST "arch",
+                                                BAD_CAST tmp);
+                    free(tmp);
+                }
 
                 retc = xmlTextWriterEndElement(writer);
                 if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
@@ -789,9 +793,12 @@ static signed char comps_doc_xml(COMPS_Doc *doc, xmlTextWriterPtr writer,
                 xmlTextWriterWriteAttribute(writer, BAD_CAST "requires",
                         (xmlChar*) ((COMPS_ObjRTreePair*)hsit->data)->key);
 
-                char *tmp = comps_object_tostr(it->comps_obj);
-                xmlTextWriterWriteAttribute(writer, BAD_CAST "package", BAD_CAST tmp);
-                free(tmp);
+                if (((COMPS_Str*)it->comps_obj)->val) {
+                    char *tmp = comps_object_tostr(it->comps_obj);
+                    xmlTextWriterWriteAttribute(writer, BAD_CAST "package",
+                                                BAD_CAST tmp);
+                    free(tmp);
+                }
 
                 retc = xmlTextWriterEndElement(writer);
                 if (__comps_check_xml_get(retc, (COMPS_Object*)doc->log) < 0) {
