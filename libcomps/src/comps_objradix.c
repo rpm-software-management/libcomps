@@ -197,6 +197,7 @@ void comps_objrtree_copy(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2){
         ((COMPS_ObjRTreeData*)it2->data)->subnodes = new_subnodes;
         free(it2);
     }
+    rt1->len = rt2->len;
     comps_hslist_destroy(&to_clone);
 
 }
@@ -256,6 +257,7 @@ void comps_objrtree_copy_shallow(COMPS_ObjRTree *rt1, COMPS_ObjRTree *rt2){
         ((COMPS_ObjRTreeData*)it2->data)->subnodes = new_subnodes;
         free(it2);
     }
+    rt1->len = rt2->len;
     comps_hslist_destroy(&to_clone);
 }
 
