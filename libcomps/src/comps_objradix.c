@@ -388,6 +388,10 @@ void __comps_objrtree_set(COMPS_ObjRTree *rt, char *key, size_t len,
                 if (key[offset+x] != rtdata->key[x]) break;
             }
             if (ended == 3) { //keys equals; data replacement
+                if (rtdata->data == NULL && ndata != NULL)
+                    rt->len++;
+                else if (rtdata->data != NULL && ndata == NULL)
+                    rt->len--;
                 comps_object_destroy(rtdata->data);
                 rtdata->data = ndata;
                 return;
