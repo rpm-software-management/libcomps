@@ -430,8 +430,9 @@ void __comps_objmrtree_set(COMPS_ObjMRTree *rt, char *key,
                 rtdata->data = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 
                 if (cmpret > 0) {
-                    rtd = comps_objmrtree_data_create(rtdata->key+x,
-                                                      (COMPS_Object*)tmpdata);
+                    rtd = comps_objmrtree_data_create(rtdata->key+x, NULL);
+                    COMPS_OBJECT_DESTROY(rtd->data);
+                    rtd->data = tmpdata;
                     comps_hslist_destroy(&rtd->subnodes);
                     rtd->subnodes = tmphslist;
 
@@ -444,8 +445,9 @@ void __comps_objmrtree_set(COMPS_ObjMRTree *rt, char *key,
                     rtd = comps_objmrtree_data_create(key+offset+x,
                                                      (COMPS_Object*)ndata);
                     comps_hslist_append(rtdata->subnodes, rtd, 0);
-                    rtd = comps_objmrtree_data_create(rtdata->key+x,
-                                                     (COMPS_Object*)tmpdata);
+                    rtd = comps_objmrtree_data_create(rtdata->key+x, NULL);
+                    COMPS_OBJECT_DESTROY(rtd->data);
+                    rtd->data = tmpdata;
                     comps_hslist_destroy(&rtd->subnodes);
                     rtd->subnodes = tmphslist;
                     comps_hslist_append(rtdata->subnodes, rtd, 0);
