@@ -173,6 +173,7 @@ void comps_rtree_values_walk(COMPS_RTree * rt, void* udata,
         it = tmplist->first;
         comps_hslist_remove(tmplist, tmplist->first);
         tmp_subnodes = (COMPS_HSList*)it->data;
+        free(it);
         for (it = tmp_subnodes->first; it != NULL; it=it->next) {
             if (((COMPS_RTreeData*)it->data)->subnodes->first) {
                 comps_hslist_append(tmplist,

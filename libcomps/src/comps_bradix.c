@@ -216,6 +216,7 @@ void comps_brtree_values_walk(COMPS_BRTree * brt, void* udata,
         it = tmplist->first;
         comps_hslist_remove(tmplist, tmplist->first);
         tmp_subnodes = (COMPS_HSList*)it->data;
+        free(it);
         for (it = tmp_subnodes->first; it != NULL; it=it->next) {
             if (((COMPS_BRTreeData*)it->data)->subnodes->first) {
                 comps_hslist_append(tmplist,
