@@ -396,6 +396,10 @@ void comps_rtree_unset(COMPS_RTree * rt, const char * key) {
                 (*rtdata->data_destructor)(rtdata->data);
                 rtdata->is_leaf = 0;
                 rtdata->data = NULL;
+            } else {
+                /* no destructor, just forget the data */
+                rtdata->is_leaf = 0;
+                rtdata->data = NULL;
             }
 
             if (path->last == NULL) {
