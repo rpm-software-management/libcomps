@@ -75,10 +75,9 @@ unsigned comps_parse_parsed_init(COMPS_Parsed * parsed, const char * encoding,
     parsed->doctype_pubid = NULL;
     parsed->fatal_error = 0;
     if (parsed->elem_stack == NULL || parsed->text_buffer == NULL) {
-        if (!parsed->elem_stack)
-            comps_hslist_destroy(&parsed->elem_stack);
-        if (!parsed->text_buffer)
-            comps_hslist_destroy(&parsed->text_buffer);
+        /* lists are not initialized yet, just free them */
+        free(parsed->elem_stack);
+        free(parsed->text_buffer);
         COMPS_OBJECT_DESTROY(parsed->log);
         XML_ParserFree(parsed->parser);
         free(parsed);
