@@ -426,13 +426,11 @@ void comps_brtree_unset(COMPS_BRTree * brt, void * key) {
         if (ended == 3) {
             /* remove node from tree only if there's no descendant*/
             if (brtdata->subnodes->last == NULL) {
-                printf("removing all\n");
                 comps_hslist_remove(subnodes, it);
                 comps_brtree_data_destroy(brtdata);
                 free(it);
             }
             else if (brtdata->data_destructor != NULL) {
-                printf("removing data only\n");
                 brtdata->data_destructor(brtdata->data);
                 brtdata->is_leaf = 0;
                 brtdata->data = NULL;
