@@ -131,7 +131,7 @@ void comps_objmrtree_copy(COMPS_ObjMRTree *ret, COMPS_ObjMRTree *rt){
                                        NULL);
         new_data_list = (COMPS_ObjList*)
                         COMPS_OBJECT_COPY(((COMPS_ObjMRTreeData*)it->data)->data);
-        COMPS_OBJECT_DESTROY(&rtdata->data);
+        COMPS_OBJECT_DESTROY(rtdata->data);
         comps_hslist_destroy(&rtdata->subnodes);
         rtdata->subnodes = ((COMPS_ObjMRTreeData*)it->data)->subnodes;
         rtdata->data = new_data_list;
@@ -185,7 +185,7 @@ void comps_objmrtree_copy_shallow(COMPS_ObjMRTree *ret, COMPS_ObjMRTree *rt){
                                        NULL);
         new_data_list = (COMPS_ObjList*)
                         COMPS_OBJECT_COPY(((COMPS_ObjMRTreeData*)it->data)->data);
-        COMPS_OBJECT_DESTROY(&rtdata->data);
+        COMPS_OBJECT_DESTROY(rtdata->data);
         comps_hslist_destroy(&rtdata->subnodes);
         rtdata->subnodes = ((COMPS_ObjMRTreeData*)it->data)->subnodes;
         rtdata->data = new_data_list;
@@ -239,7 +239,7 @@ COMPS_ObjMRTree * comps_objmrtree_clone(COMPS_ObjMRTree * rt) {
                                        NULL);
         new_data_list = (COMPS_ObjList*)
                         COMPS_OBJECT_COPY(((COMPS_ObjMRTreeData*)it->data)->data);
-        COMPS_OBJECT_DESTROY(&rtdata->data);
+        COMPS_OBJECT_DESTROY(rtdata->data);
         comps_hslist_destroy(&rtdata->subnodes);
         rtdata->subnodes = ((COMPS_ObjMRTreeData*)it->data)->subnodes;
         rtdata->data = new_data_list;
