@@ -127,7 +127,7 @@ signed char comps_docgroup_cmp_u(COMPS_Object *group1, COMPS_Object *group2) {
 
     if (!comps_object_cmp((COMPS_Object*)_group1->properties,
                           (COMPS_Object*)_group2->properties)) {
-        printf("Group properties cmp fail\n");
+        //printf("Group properties cmp fail\n");
         return 0;
     }
     //printf("group cmp properties pass\n");
