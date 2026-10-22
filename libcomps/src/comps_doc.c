@@ -826,10 +826,10 @@ void comps_doc_doctype_name_set(COMPS_Doc* doc, COMPS_Str *val) {
     COMPS_OBJECT_REPLACE(doc->doctype_name, COMPS_Str, val);
 }
 void comps_doc_doctype_sysid_set(COMPS_Doc* doc, COMPS_Str *val) {
-    COMPS_OBJECT_REPLACE(doc->doctype_name, COMPS_Str, val);
+    COMPS_OBJECT_REPLACE(doc->doctype_sysid, COMPS_Str, val);
 }
 void comps_doc_doctype_pubid_set(COMPS_Doc* doc, COMPS_Str *val) {
-    COMPS_OBJECT_REPLACE(doc->doctype_name, COMPS_Str, val);
+    COMPS_OBJECT_REPLACE(doc->doctype_pubid, COMPS_Str, val);
 }
 
 
