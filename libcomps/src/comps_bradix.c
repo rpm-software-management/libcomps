@@ -436,6 +436,10 @@ void comps_brtree_unset(COMPS_BRTree * brt, void * key) {
                 brtdata->data_destructor(brtdata->data);
                 brtdata->is_leaf = 0;
                 brtdata->data = NULL;
+            } else {
+                /* no destructor, just forget the data */
+                brtdata->is_leaf = 0;
+                brtdata->data = NULL;
             }
 
             if (path->last == NULL) {
