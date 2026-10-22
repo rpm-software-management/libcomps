@@ -138,6 +138,8 @@ void comps_hslist_prepend(COMPS_HSList * hslist, void *data, unsigned construct)
     it->data = ndata;
     it->next = hslist->first;
     hslist->first = it;
+    if (hslist->last == NULL)
+        hslist->last = it;
 }
 
 void* comps_hslist_shift(COMPS_HSList * hslist) {
