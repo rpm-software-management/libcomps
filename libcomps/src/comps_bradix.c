@@ -231,10 +231,10 @@ void comps_brtree_values_walk(COMPS_BRTree * brt, void* udata,
 
 void comps_brtree_set(COMPS_BRTree * brt, void * key, void * data)
 {
-    static COMPS_HSListItem *it;
+    COMPS_HSListItem *it;
     COMPS_HSList *subnodes;
     COMPS_BRTreeData *brtd;
-    static COMPS_BRTreeData *brtdata;
+    COMPS_BRTreeData *brtdata;
 
     unsigned int len, offset=0;
     unsigned x, found = 0;

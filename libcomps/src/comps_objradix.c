@@ -342,7 +342,7 @@ void __comps_objrtree_set(COMPS_ObjRTree *rt, char *key, size_t len,
     COMPS_HSListItem *it, *lesser;
     COMPS_HSList *subnodes;
     COMPS_ObjRTreeData *rtd;
-    static COMPS_ObjRTreeData *rtdata;
+    COMPS_ObjRTreeData *rtdata;
 
     size_t _len, offset=0;
     unsigned x, found = 0;

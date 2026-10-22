@@ -324,10 +324,10 @@ COMPS_HSList* comps_mrtree_keys(COMPS_MRTree * rt) {
 
 void __comps_mrtree_set(COMPS_MRTree * rt, char * key, size_t len, void * data)
 {
-    static COMPS_HSListItem *it;
+    COMPS_HSListItem *it;
     COMPS_HSList *subnodes;
     COMPS_MRTreeData *rtd;
-    static COMPS_MRTreeData *rtdata;
+    COMPS_MRTreeData *rtdata;
 
     size_t _len, offset=0;
     unsigned x, found = 0;
