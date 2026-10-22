@@ -555,6 +555,8 @@ void comps_objrtree_unset(COMPS_ObjRTree * rt, const char * key) {
             if (key[offset+x] != rtdata->key[x]) break;
         }
         if (ended == 3) {
+            if (rtdata->data != NULL)
+                rt->len--;
             /* remove node from tree only if there's no descendant*/
             if (rtdata->subnodes->last == NULL) {
                 //printf("removing all\n");
