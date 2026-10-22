@@ -902,6 +902,7 @@ COMPS_Elem* comps_elem_create(const char * s, const char ** attrs,
         return NULL;
 
     elem->type = type;
+    elem->ancestor = NULL;
     if (type == COMPS_ELEM_UNKNOWN) {
         if ((elem->name = malloc(sizeof(char) * (strlen(s)+1))) == NULL) {
             free(elem);
