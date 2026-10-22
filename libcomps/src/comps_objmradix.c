@@ -711,7 +711,7 @@ char comps_objmrtree_paircmp(void *obj1, void *obj2) {
                ((COMPS_ObjMRTreePair*)obj2)->key) != 0)
         return 0;
     return comps_object_cmp((COMPS_Object*)((COMPS_ObjMRTreePair*)obj1)->data,
-                            (COMPS_Object*)((COMPS_ObjMRTreePair*)obj1)->data);
+                            (COMPS_Object*)((COMPS_ObjMRTreePair*)obj2)->data);
 }
 
 signed char comps_objmrtree_cmp(COMPS_ObjMRTree *ort1, COMPS_ObjMRTree *ort2) {
