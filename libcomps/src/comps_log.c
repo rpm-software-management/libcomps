@@ -2,7 +2,7 @@
 
 const char* COMPS_LogCodeFormat[] = {
       [COMPS_ERR_NO_ERR] = "",
-      [COMPS_ERR_ELEM_UNKNOWN] = "WARNING: Unknown elemenet '%s' at line:%s\n",
+      [COMPS_ERR_ELEM_UNKNOWN] = "WARNING: Unknown element '%s' at line:%s\n",
       [COMPS_ERR_ATTR_UNKNOWN] = "WARNING: Unknown attribute '%s' in element "
                                  "'%s' at line:%s col: %s\n",
       [COMPS_ERR_ELEM_ALREADYSET] = "WARNING: Element <%s> at line:%s "
@@ -11,13 +11,13 @@ const char* COMPS_LogCodeFormat[] = {
       [COMPS_ERR_DEFAULT_PARAM] = "WARNING: Wrong default param value '%s' "
                                    "at line:%s col:%s\n",
       [COMPS_ERR_USERVISIBLE_PARAM] = "WARNING: Wrong uservisible param value"
-                                        "'%s' at line:%s col:%s\n",
-      [COMPS_ERR_PACKAGE_UNKNOWN] = "WARNING: Unkonwn package type '%s' "
+                                        " '%s' at line:%s col:%s\n",
+      [COMPS_ERR_PACKAGE_UNKNOWN] = "WARNING: Unknown package type '%s' "
                                      "at line:%s col:%s\n",
       [COMPS_ERR_DEFAULT_MISSING] = "WARNING: <default> subelement required"
                                      " at line:%s col:%s\n",
       [COMPS_ERR_USERVISIBLE_MISSING] = "WARNING: <uservisible> subelement"
-                                         "required at line:%s col%s\n",
+                                         " required at line:%s col:%s\n",
       [COMPS_ERR_NAME_MISSING] = "ERROR: '<name>' subelement required at "
                                   "line:%s col:%s\n",
       [COMPS_ERR_ID_MISSING] = "WARNING: '<id>' subelement required at "
@@ -42,11 +42,11 @@ const char* COMPS_LogCodeFormat[] = {
       [COMPS_ERR_NOCONTENT] = "<%s> content missing at line:%s "
                                "column:%s\n",
       [COMPS_ERR_PKGLIST_EMPTY] = "Group with id %s has no packages."
-                                  "skipping xml output\n",
+                                  " Skipping xml output\n",
       [COMPS_ERR_GROUPIDS_EMPTY] = "Category with id %s has no group ids."
-                                  "skipping xml output\n",
-      [COMPS_ERR_IDS_EMPTY] = "Environment with id %s has no group ids and no ."
-                                  "option ids. Skipping xml output\n"
+                                  " Skipping xml output\n",
+      [COMPS_ERR_IDS_EMPTY] = "Environment with id %s has no group ids and no"
+                                  " option ids. Skipping xml output\n"
 };
 
 void comps_log_create(COMPS_Log *log, COMPS_Object **args){
