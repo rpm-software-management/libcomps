@@ -37,8 +37,6 @@ if (ENABLE_TESTS)
     configure_file(${pycomps_TESTSDIR}/run_tests.sh.in ./libcomps/run_tests.sh)
 endif ()
 
-include(../pycopy.cmake)
-
 IF (SKBUILD)
     find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
     Python_add_library(pycomps MODULE ${pycomps_SRC})
@@ -56,6 +54,9 @@ ELSE ()
     target_link_libraries(pycomps PRIVATE ${PYTHON_LIBRARIES})
 ENDIF ()
 
+# after find_package(), run_tests.sh needs PYTHON_EXECUTABLE
+include(../pycopy.cmake)
+
 set_target_properties(pycomps PROPERTIES LIBRARY_OUTPUT_DIRECTORY "./libcomps")
 add_dependencies(pycomps src-copy)
 
@@ -70,6 +71,7 @@ if (ENABLE_TESTS)
                       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libcomps/
                       COMMENT "Running python binding tests")
     add_dependencies(pytest_run pycomps py3-copy)
+    add_dependencies(pytest pytest_run)
 endif ()
 
 IF (SKBUILD)
