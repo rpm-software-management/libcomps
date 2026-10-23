@@ -174,7 +174,7 @@ const COMPS_ElemInfo COMPS_ENV_ElemInfo = {
     .postproc = &comps_elem_env_postproc
 };
 const COMPS_ElemInfo COMPS_OPTLIST_ElemInfo = {
-    .name = "option_list",
+    .name = "optionlist",
     .ancestors = (const COMPS_ElemType[]){COMPS_ELEM_ENV,
                                           COMPS_ELEM_SENTINEL},
     .attributes = (const COMPS_ElemAttrInfo*[]){NULL},
