@@ -1,6 +1,5 @@
 #!/bin/sh
 export LD_LIBRARY_PATH="@LIBCOMPS_OUT@/:$LD_LIBRARY_PATH"
-@PYTHON_EXECUTABLE@ __test.py
-@PYTHON_EXECUTABLE@ test_libcomps.py
-@PYTHON_EXECUTABLE@ test_merge_comps.py
-@PYTHON_EXECUTABLE@ test_empty_bool_display_order_crash.py
+for test in __test.py test_*.py; do
+    @PYTHON_EXECUTABLE@ "$test" || exit 1
+done
