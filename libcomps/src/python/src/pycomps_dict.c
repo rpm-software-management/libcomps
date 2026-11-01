@@ -230,8 +230,10 @@ int PyCOMPSDict_set(PyObject *self, PyObject *key, PyObject *val) {
             break;
         }
     }
-    if (__pycomps_stringable_to_char(key, &ckey))
+    if (__pycomps_stringable_to_char(key, &ckey)) {
+        COMPS_OBJECT_DESTROY(ret);
         return -1;
+    }
 
     if (!ret && val) {
         PyErr_Format(PyExc_TypeError, "Cannot set %s to %s",
