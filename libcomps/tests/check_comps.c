@@ -586,6 +586,33 @@ START_TEST(test_doc_defaults) {
 
 }END_TEST
 
+START_TEST(test_doc_doctype) {
+    COMPS_Doc *doc;
+    COMPS_Str *name, *sysid, *pubid, *tmp;
+
+    doc = COMPS_OBJECT_CREATE(COMPS_Doc, NULL);
+    name = comps_str("my-name");
+    sysid = comps_str("my-sysid");
+    pubid = comps_str("my-pubid");
+    comps_doc_doctype_name_set(doc, name);
+    comps_doc_doctype_sysid_set(doc, sysid);
+    comps_doc_doctype_pubid_set(doc, pubid);
+    COMPS_OBJECT_DESTROY(name);
+    COMPS_OBJECT_DESTROY(sysid);
+    COMPS_OBJECT_DESTROY(pubid);
+
+    tmp = comps_doc_doctype_name_get(doc);
+    ck_assert_str_eq(tmp->val, "my-name");
+    COMPS_OBJECT_DESTROY(tmp);
+    tmp = comps_doc_doctype_sysid_get(doc);
+    ck_assert_str_eq(tmp->val, "my-sysid");
+    COMPS_OBJECT_DESTROY(tmp);
+    tmp = comps_doc_doctype_pubid_get(doc);
+    ck_assert_str_eq(tmp->val, "my-pubid");
+    COMPS_OBJECT_DESTROY(tmp);
+    COMPS_OBJECT_DESTROY(doc);
+}END_TEST
+
 Suite* basic_suite (void)
 {
     Suite *s = suite_create ("Basic Tests");
@@ -596,6 +623,7 @@ Suite* basic_suite (void)
     tcase_add_test (tc_core, test_comps_doc_setfeats);
     tcase_add_test (tc_core, test_comps_doc_union);
     tcase_add_test (tc_core, test_doc_defaults);
+    tcase_add_test (tc_core, test_doc_doctype);
     suite_add_tcase (s, tc_core);
     return s;
 }
