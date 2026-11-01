@@ -97,8 +97,9 @@ COMPS_ObjList* comps_docgroup_get_packages(COMPS_DocGroup *group, char *name,
     unsigned int matched, matched_max;
     matched_max = 0;
     #define package ((COMPS_DocGroupPackage*)it->comps_obj)
-    COMPS_Str *objname = comps_str(name);
+    COMPS_Str *objname;
     if (!group) return NULL;
+    objname = comps_str(name);
 
     ret = COMPS_OBJECT_CREATE(COMPS_ObjList, NULL);
 
