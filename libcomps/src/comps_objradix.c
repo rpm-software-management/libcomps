@@ -595,6 +595,8 @@ void comps_objrtree_unset(COMPS_ObjRTree * rt, const char * key) {
                 it = path->last;
                 comps_hslist_remove(path, path->last);
                 free(it);
+                if (path->last == NULL)
+                    break;
                 rtdata = (COMPS_ObjRTreeData*)
                          ((struct Relation*)path->last->data)->child_it->data;
             }
@@ -610,9 +612,9 @@ void comps_objrtree_unset(COMPS_ObjRTree * rt, const char * key) {
             comps_hslist_destroy(&path);
             return;
         }
-        subnodes = ((COMPS_ObjRTreeData*)it->data)->subnodes;
         relation->parent_nodes = subnodes;
         relation->child_it = it;
+        subnodes = ((COMPS_ObjRTreeData*)it->data)->subnodes;
         comps_hslist_append(path, (void*)relation, 0);
     }
     comps_hslist_destroy(&path);
