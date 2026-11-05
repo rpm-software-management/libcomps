@@ -660,6 +660,32 @@ class DictTest(unittest.TestCase):
         self.assertTrue(_dict.get("notindict") == None)
         self.assertRaises(KeyError, _dict.__getitem__, "notindict")
 
+    def test_delete_single_key(self):
+        _dict = libcomps.StrDict()
+        _dict["x"] = "1"
+        del _dict["x"]
+        self.assertTrue("x" not in _dict)
+        self.assertEqual(len(_dict), 0)
+
+    def test_delete_shared_prefix(self):
+        _dict = libcomps.StrDict()
+        _dict["pt"] = "PT"
+        _dict["pt_BR"] = "BR"
+        del _dict["pt_BR"]
+        self.assertTrue("pt_BR" not in _dict)
+        self.assertTrue("pt" in _dict)
+        self.assertEqual(_dict["pt"], "PT")
+        self.assertEqual(len(_dict), 1)
+
+    def test_delete_childless_ancestor(self):
+        _dict = libcomps.StrDict()
+        _dict["ab"] = "AB"
+        _dict["abc"] = "ABC"
+        del _dict["abc"]
+        self.assertTrue("abc" not in _dict)
+        self.assertEqual(_dict["ab"], "AB")
+        self.assertEqual(len(_dict), 1)
+
 #@unittest.skip("skip")
 class MDictTest(unittest.TestCase):
     def test_blacklist(self):
