@@ -168,12 +168,58 @@ START_TEST(test_objrtree) {
     COMPS_OBJECT_DESTROY(tree);
 } END_TEST
 
+START_TEST(test_objrtree_unset_issue180) {
+    COMPS_ObjRTree *tree;
+    COMPS_Object *val;
+
+    tree = (COMPS_ObjRTree*)comps_object_create(&COMPS_ObjRTree_ObjInfo, NULL);
+    comps_objrtree_set_x(tree, "pt", (COMPS_Object*)comps_num(1));
+    comps_objrtree_set_x(tree, "pt_BR", (COMPS_Object*)comps_num(2));
+    ck_assert_uint_eq(tree->len, 2);
+
+    comps_objrtree_unset(tree, "pt_BR");
+
+    val = comps_objrtree_get(tree, "pt_BR");
+    ck_assert_msg(val == NULL, "pt_BR was not removed");
+    COMPS_OBJECT_DESTROY(val);
+
+    val = comps_objrtree_get(tree, "pt");
+    ck_assert_msg(val != NULL, "pt was pruned when deleting pt_BR");
+    ck_assert(((COMPS_Num*)val)->val == 1);
+    COMPS_OBJECT_DESTROY(val);
+    ck_assert_uint_eq(tree->len, 1);
+    COMPS_OBJECT_DESTROY(tree);
+
+    tree = (COMPS_ObjRTree*)comps_object_create(&COMPS_ObjRTree_ObjInfo, NULL);
+    comps_objrtree_set_x(tree, "ab", (COMPS_Object*)comps_num(1));
+    comps_objrtree_set_x(tree, "abc", (COMPS_Object*)comps_num(2));
+
+    comps_objrtree_unset(tree, "abc");
+
+    val = comps_objrtree_get(tree, "ab");
+    ck_assert_msg(val != NULL, "ab was pruned when deleting abc");
+    ck_assert(((COMPS_Num*)val)->val == 1);
+    COMPS_OBJECT_DESTROY(val);
+    ck_assert_uint_eq(tree->len, 1);
+    COMPS_OBJECT_DESTROY(tree);
+
+    tree = (COMPS_ObjRTree*)comps_object_create(&COMPS_ObjRTree_ObjInfo, NULL);
+    comps_objrtree_set_x(tree, "x", (COMPS_Object*)comps_num(1));
+    comps_objrtree_unset(tree, "x");
+    val = comps_objrtree_get(tree, "x");
+    ck_assert(val == NULL);
+    COMPS_OBJECT_DESTROY(val);
+    ck_assert_uint_eq(tree->len, 0);
+    COMPS_OBJECT_DESTROY(tree);
+} END_TEST
+
 Suite* basic_suite (void)
 {
     Suite *s = suite_create ("Basic Tests");
     /* Core test case */
     TCase *tc_core = tcase_create ("Core");
     tcase_add_test (tc_core, test_objrtree);
+    tcase_add_test (tc_core, test_objrtree_unset_issue180);
     suite_add_tcase (s, tc_core);
     return s;
 }

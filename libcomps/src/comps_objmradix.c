@@ -572,7 +572,7 @@ void comps_objmrtree_unset(COMPS_ObjMRTree * rt, const char * key) {
                      ((struct Relation*)path->last->data)->child_it->data;
 
             /*remove all predecessor of deleted node (recursive) with no childs*/
-            while (rtdata->subnodes->last == NULL) {
+            while (rtdata->subnodes->last == NULL && rtdata->data->len == 0) {
                 //printf("removing '%s'\n", rtdata->key);
                 comps_objmrtree_data_destroy(rtdata);
                 comps_hslist_remove(
