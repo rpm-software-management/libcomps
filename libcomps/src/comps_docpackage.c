@@ -176,7 +176,7 @@ signed char comps_docpackage_xml(COMPS_DocGroupPackage *pkg,
     }
     COMPS_XMLRET_CHECK()
     if (xml_options->bao_explicit) {
-        if (pkg->basearchonly) {
+        if (pkg->basearchonly && pkg->basearchonly->val) {
             ret = xmlTextWriterWriteAttribute(writer, (xmlChar*) "basearchonly",
                                                 BAD_CAST "true");
         } else {
