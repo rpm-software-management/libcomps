@@ -710,6 +710,26 @@ class MDictTest(unittest.TestCase):
         self.assertRaises(KeyError, obj1.__getitem__, "key")
         self.assertFalse(obj1 == obj2)
 
+    def test_delete_shared_prefix(self):
+        bl = libcomps.Blacklist()
+        bl["pt"] = ["PT"]
+        bl["pt_BR"] = ["BR"]
+        del bl["pt_BR"]
+        self.assertTrue("pt_BR" not in bl)
+        self.assertTrue("pt" in bl)
+        self.assertTrue(list(bl["pt"]) == ["PT"])
+
+    def test_iteration(self):
+        bl = libcomps.Blacklist()
+        bl["pt"] = ["PT"]
+        bl["pt_BR"] = ["BR"]
+        self.assertEqual(list(iter(bl)), ["pt", "pt_BR"])
+        self.assertEqual(list(bl), ["pt", "pt_BR"])
+        self.assertEqual(list(bl.keys()), ["pt", "pt_BR"])
+        self.assertEqual([(k, list(v)) for k, v in bl.items()],
+                         [("pt", ["PT"]), ("pt_BR", ["BR"])])
+        self.assertEqual([list(v) for v in bl.values()], [["PT"], ["BR"]])
+
 #@unittest.skip("skip")
 class COMPSTest(unittest.TestCase):
     def setUp(self):

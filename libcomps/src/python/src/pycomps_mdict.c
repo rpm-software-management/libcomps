@@ -27,7 +27,7 @@ PyObject* __pycomps_mdict_val_out(COMPS_HSListItem *hsit) {
     PyCOMPSStrSeq_init((PyCOMPS_Sequence*)ret, NULL, NULL);
     COMPS_OBJECT_DESTROY(((PyCOMPS_Sequence*)ret)->list);
     ((PyCOMPS_Sequence*)ret)->list = (COMPS_ObjList*)comps_object_incref(
-                       (COMPS_Object*)((COMPS_ObjMRTreePair*)hsit->data)->data);
+                       (COMPS_Object*)hsit->data);
     return ret;
 }
 
@@ -589,12 +589,12 @@ PyTypeObject PyCOMPS_MDictIterType = {
     0,                          /* tp_clear */
     0,                          /* tp_richcompare */
     0,                          /* tp_weaklistoffset */
-    0,         /* tp_iter */
+    PyObject_SelfIter,         /* tp_iter */
     PyCOMPSMDict_iternext,         /* tp_iternext */
     PyCOMPSMDictIter_methods,         /* tp_methods */
     PyCOMPSMDictIter_members,         /* tp_members */
     0,                          /* tp_getset */
-    &PySeqIter_Type,                          /* tp_base */
+    0,                          /* tp_base */
     0,                          /* tp_dict */
     0,                          /* tp_descr_get */
     0,                          /* tp_descr_set */
