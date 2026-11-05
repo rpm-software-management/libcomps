@@ -660,6 +660,32 @@ class DictTest(unittest.TestCase):
         self.assertTrue(_dict.get("notindict") == None)
         self.assertRaises(KeyError, _dict.__getitem__, "notindict")
 
+    def test_delete_single_key(self):
+        _dict = libcomps.StrDict()
+        _dict["x"] = "1"
+        del _dict["x"]
+        self.assertTrue("x" not in _dict)
+        self.assertEqual(len(_dict), 0)
+
+    def test_delete_shared_prefix(self):
+        _dict = libcomps.StrDict()
+        _dict["pt"] = "PT"
+        _dict["pt_BR"] = "BR"
+        del _dict["pt_BR"]
+        self.assertTrue("pt_BR" not in _dict)
+        self.assertTrue("pt" in _dict)
+        self.assertEqual(_dict["pt"], "PT")
+        self.assertEqual(len(_dict), 1)
+
+    def test_delete_childless_ancestor(self):
+        _dict = libcomps.StrDict()
+        _dict["ab"] = "AB"
+        _dict["abc"] = "ABC"
+        del _dict["abc"]
+        self.assertTrue("abc" not in _dict)
+        self.assertEqual(_dict["ab"], "AB")
+        self.assertEqual(len(_dict), 1)
+
 #@unittest.skip("skip")
 class MDictTest(unittest.TestCase):
     def test_blacklist(self):
@@ -683,6 +709,26 @@ class MDictTest(unittest.TestCase):
         self.assertTrue("key" not in obj1)
         self.assertRaises(KeyError, obj1.__getitem__, "key")
         self.assertFalse(obj1 == obj2)
+
+    def test_delete_shared_prefix(self):
+        bl = libcomps.Blacklist()
+        bl["pt"] = ["PT"]
+        bl["pt_BR"] = ["BR"]
+        del bl["pt_BR"]
+        self.assertTrue("pt_BR" not in bl)
+        self.assertTrue("pt" in bl)
+        self.assertTrue(list(bl["pt"]) == ["PT"])
+
+    def test_iteration(self):
+        bl = libcomps.Blacklist()
+        bl["pt"] = ["PT"]
+        bl["pt_BR"] = ["BR"]
+        self.assertEqual(list(iter(bl)), ["pt", "pt_BR"])
+        self.assertEqual(list(bl), ["pt", "pt_BR"])
+        self.assertEqual(list(bl.keys()), ["pt", "pt_BR"])
+        self.assertEqual([(k, list(v)) for k, v in bl.items()],
+                         [("pt", ["PT"]), ("pt_BR", ["BR"])])
+        self.assertEqual([list(v) for v in bl.values()], [["PT"], ["BR"]])
 
 #@unittest.skip("skip")
 class COMPSTest(unittest.TestCase):

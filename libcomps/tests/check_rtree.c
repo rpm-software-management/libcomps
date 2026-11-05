@@ -19,6 +19,7 @@
 
 #include "../src/comps_radix.h"
 #include <stdio.h>
+#include <assert.h>
 
 void print_intp_data(void * data, const char * key) {
     if (data == NULL) printf("data for '%s': NULL\n", key);
@@ -132,6 +133,29 @@ int main(int argc, char * argv[]) {
 
     (void)argc;
     (void)argv;
+
+    {
+        int v1 = 1, v2 = 2, *got;
+        COMPS_RTree *rt;
+
+        rt = comps_rtree_create(NULL, &int_cloner, &free);
+        comps_rtree_set(rt, "pt", int_cloner((void*)&v1));
+        comps_rtree_set(rt, "pt_BR", int_cloner((void*)&v2));
+        comps_rtree_unset(rt, "pt_BR");
+        assert(comps_rtree_get(rt, "pt_BR") == NULL);
+        got = comps_rtree_get(rt, "pt");
+        assert(got != NULL && *got == 1);
+        comps_rtree_destroy(rt);
+
+        rt = comps_rtree_create(NULL, &int_cloner, &free);
+        comps_rtree_set(rt, "ab", int_cloner((void*)&v1));
+        comps_rtree_set(rt, "abc", int_cloner((void*)&v2));
+        comps_rtree_unset(rt, "abc");
+        got = comps_rtree_get(rt, "ab");
+        assert(got != NULL && *got == 1);
+        comps_rtree_destroy(rt);
+        printf("issue #180 regression (comps_rtree_unset): OK\n");
+    }
 
     tree = comps_rtree_create( NULL, &int_cloner, &free);
     //comps_rtree_init(tree);

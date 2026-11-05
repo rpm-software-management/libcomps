@@ -222,12 +222,14 @@ PyObject* PyCOMPSDict_get_(PyObject *self, PyObject *key) {
 int PyCOMPSDict_set(PyObject *self, PyObject *key, PyObject *val) {
     char *ckey;
     COMPS_Object *ret = NULL;
-    for (unsigned i = 0; i < _INFO_->item_types_len; i++) {
-        if (Py_TYPE(val) != _INFO_->itemtypes[i])
-            continue;
-        if (_INFO_->in_convert_funcs[i]) {
-            ret = _INFO_->in_convert_funcs[i](val);
-            break;
+    if (val) {
+        for (unsigned i = 0; i < _INFO_->item_types_len; i++) {
+            if (Py_TYPE(val) != _INFO_->itemtypes[i])
+                continue;
+            if (_INFO_->in_convert_funcs[i]) {
+                ret = _INFO_->in_convert_funcs[i](val);
+                break;
+            }
         }
     }
     if (__pycomps_stringable_to_char(key, &ckey))

@@ -449,8 +449,7 @@ void comps_brtree_unset(COMPS_BRTree * brt, void * key) {
                      ((struct Relation*)path->last->data)->child_it->data;
 
             /*remove all predecessor of deleted node (recursive) with no childs*/
-            while (brtdata->subnodes->last == NULL) {
-                //printf("removing '%s'\n", brtdata->key);
+            while (brtdata->subnodes->last == NULL && !brtdata->is_leaf) {
                 comps_brtree_data_destroy(brtdata);
                 comps_hslist_remove(
                             ((struct Relation*)path->last->data)->parent_nodes,
@@ -459,6 +458,8 @@ void comps_brtree_unset(COMPS_BRTree * brt, void * key) {
                 it = path->last;
                 comps_hslist_remove(path, path->last);
                 free(it);
+                if (path->last == NULL)
+                    break;
                 brtdata = (COMPS_BRTreeData*)
                          ((struct Relation*)path->last->data)->child_it->data;
             }
@@ -474,9 +475,9 @@ void comps_brtree_unset(COMPS_BRTree * brt, void * key) {
             comps_hslist_destroy(&path);
             return;
         }
-        subnodes = ((COMPS_BRTreeData*)it->data)->subnodes;
         relation->parent_nodes = subnodes;
         relation->child_it = it;
+        subnodes = ((COMPS_BRTreeData*)it->data)->subnodes;
         comps_hslist_append(path, (void*)relation, 0);
     }
     comps_hslist_destroy(&path);
